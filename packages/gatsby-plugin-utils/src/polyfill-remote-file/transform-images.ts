@@ -103,7 +103,7 @@ async function resizeImageWithSharp(
   pipeline: Pipeline | Buffer,
   { width, height, format, outputPath, quality }: IResizeArgs
 ): Promise<Buffer | void> {
-  if (pipeline instanceof Buffer) {
+  if (Buffer.isBuffer(pipeline)) {
     if (!outputPath) {
       return pipeline
     }
