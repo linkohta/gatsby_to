@@ -1,4 +1,4 @@
-// Move this to gatsby-core-utils?
+// gatsby-core-utils へ移すべきか？
 import { Actions, CreatePagesArgs } from "gatsby"
 import { Reporter } from "gatsby/reporter"
 import { Options as ISlugifyOptions } from "@sindresorhus/slugify"
@@ -34,10 +34,10 @@ export async function createPagesFromCollectionBuilder(
     return
   }
 
-  // 1. Query for the data for the collection to generate pages
+  // 1. ページを生成するために、コレクションのデータをクエリする
   const queryString = collectionExtractQueryString(absolutePath, reporter)
 
-  // 1.a  If the query string is not findable, we can't move on. So we stop and watch
+  // 1.a  クエリ文字列が見つからない場合は先へ進めない。処理を止めて監視する
   if (queryString === null) {
     watchCollectionBuilder(absolutePath, ``, [], actions, reporter, () =>
       createPagesFromCollectionBuilder(args)
@@ -49,7 +49,7 @@ export async function createPagesFromCollectionBuilder(
     queryString
   )
 
-  // 1.a If it fails, we need to inform the user and exit early
+  // 1.a 失敗した場合は、ユーザーに知らせて早期に終了する必要がある
   if (!data || errors) {
     reporter.error({
       id: prefixId(CODES.CollectionBuilder),
@@ -74,7 +74,7 @@ ${errors.map(error => error.message).join(`\n`)}`.trim(),
     return
   }
 
-  // 2. Get the nodes out of the data. We very much expect data to come back in a known shape:
+  // 2. データからノードを取り出す。データは決まった形で返ってくることを強く前提にしている:
   //    data = { [key: string]: { nodes: Array<ACTUAL_DATA> } }
   const nodes = Object.values(Object.values(data)[0])[0] as any as Array<
     Record<string, Record<string, unknown>>
@@ -90,7 +90,7 @@ ${errors.map(error => error.message).join(`\n`)}`.trim(),
 
   let derivePathErrors = 0
 
-  // Start listening for changes to this type
+  // この型の変更のリッスンを開始する
   const pluginInstance = getPluginInstance({ path: pagesPath })
   if (!pluginInstance.createAPageFromNode) {
     throw new Error(`Expected pluginInstance.createAPageFromNode to be defined`)
@@ -104,8 +104,8 @@ ${errors.map(error => error.message).join(`\n`)}`.trim(),
   }
   listOfTemplateFilePaths.add(absolutePath)
 
-  // 3. Loop through each node and create the page, also save the path it creates to pass to the watcher
-  //    the watcher will use this data to delete the pages if the query changes significantly.
+  // 3. 各ノードをループしてページを作成し、作成したパスを watcher に渡すために保存する
+  //    クエリが大きく変わった場合、watcher はこのデータを使ってページを削除する。
   const paths: Array<string> = []
   for (const node of nodes) {
     const createPageResult = await pluginInstance.createAPageFromNode({

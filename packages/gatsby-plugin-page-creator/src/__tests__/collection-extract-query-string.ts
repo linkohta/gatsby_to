@@ -9,7 +9,7 @@ jest.mock(`gatsby/reporter`, () => {
   }
 })
 
-// This makes the tests work on windows properly
+// windows でテストが正しく動作するようにする
 const createPath = (path: string): string => path.replace(/\//g, sysPath.sep)
 
 const originalReadFileSync = fs.readFileSync

@@ -2,11 +2,11 @@ import sysPath from "path"
 import { Reporter } from "gatsby/reporter"
 import { CODES, prefixId } from "./error-utils"
 
-// This file is a helper for consumers. It's going to log an error to them if they
-// in any way have an incorrect filepath setup for us to predictably use collection
-// querying.
+// このファイルは利用者向けのヘルパーである。コレクションのクエリを確実に行うための
+// ファイルパスの構成に何らかの誤りがあると、利用者に向けてエラーをログに
+// 出す。
 //
-// Without this, users will can get mystic errors.
+// これがないと、利用者は不可解なエラーに遭遇することになる。
 export function isValidCollectionPathImplementation(
   filePath: string,
   reporter: Reporter
@@ -18,8 +18,8 @@ export function isValidCollectionPathImplementation(
   parts.forEach(part => {
     if (!part.includes(`{`) && !part.includes(`}`)) return
 
-    const model = Array.from(part.matchAll(/\{([a-zA-Z_]\w*)./g)) // Search for word before first dot, e.g. Model
-    const field = Array.from(part.matchAll(/.*?((?<=\w\.)[^}]*)}/g)) // Search for everything after the first dot, e.g. foo__bar (or in invalid case: foo.bar)
+    const model = Array.from(part.matchAll(/\{([a-zA-Z_]\w*)./g)) // 最初のドットより前の語を探す。例: Model
+    const field = Array.from(part.matchAll(/.*?((?<=\w\.)[^}]*)}/g)) // 最初のドットより後のすべてを探す。例: foo__bar（不正な場合は foo.bar）
     try {
       if (
         model.length === 0 ||
@@ -33,10 +33,10 @@ export function isValidCollectionPathImplementation(
       const fields = Array.from(field, f => f[1])
 
       for (const m of models) {
-        assert(m, /^[a-zA-Z_]\w*$/, errorMessage(part)) // Check that Model is https://spec.graphql.org/draft/#sec-Names
+        assert(m, /^[a-zA-Z_]\w*$/, errorMessage(part)) // Model が https://spec.graphql.org/draft/#sec-Names に従っていることを確認する
       }
       for (const f of fields) {
-        assert(f, /^[a-zA-Z_][\w_()]*$/, errorMessage(part)) // Check that field is foo__bar__baz (and not foo.bar.baz) + https://spec.graphql.org/draft/#sec-Names
+        assert(f, /^[a-zA-Z_][\w_()]*$/, errorMessage(part)) // field が foo__bar__baz の形（foo.bar.baz ではない）であり、https://spec.graphql.org/draft/#sec-Names に従っていることを確認する
       }
     } catch (e) {
       reporter.panicOnBuild({

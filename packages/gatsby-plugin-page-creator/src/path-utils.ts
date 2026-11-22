@@ -1,16 +1,16 @@
 import glob from "globby"
 
-// Regex created with: https://spec.graphql.org/draft/#sec-Names
-// First char only letter, underscore; rest letter, underscore, digit
+// 正規表現は https://spec.graphql.org/draft/#sec-Names をもとに作成した
+// 先頭の文字は英字かアンダースコアのみ、残りは英字、アンダースコア、数字
 const extractModelRegex = /\{([a-zA-Z_][\w]*)\./
 
-// Given a absolutePath that has a collection marker it will extract the Model.
+// コレクションのマーカーを含む absolutePath から Model を取り出す。
 // /foo/bar/{Model.bar} => Model
 export function extractModel(absolutePath: string): string {
   const model = extractModelRegex.exec(absolutePath)
 
-  // This shouldn't happen - but TS requires us to validate
-  // Don't throw an error here as otherwise it would be captured in the onPreInit hook and not by isValidCollectionPathImplementation()
+  // ここには到達しないはずだが、TS の都合で検証が必要である
+  // ここでエラーを throw してはいけない。throw すると、isValidCollectionPathImplementation() ではなく onPreInit フックで捕捉されてしまう
   if (!model) {
     return ``
   }
@@ -18,26 +18,26 @@ export function extractModel(absolutePath: string): string {
   return model[1]
 }
 
-// Remove the file extension from the end of a path
+// パスの末尾からファイルの拡張子を取り除く
 export function removeFileExtension(absolutePath: string): string {
   return absolutePath.replace(/\.[a-z]+$/, ``)
 }
 
-// Remove trailing slash
+// 末尾のスラッシュを取り除く
 export function stripTrailingSlash(str: string): string {
   return str.endsWith(`/`) ? str.slice(0, -1) : str
 }
 
 const curlyBracesContentsRegex = /\{.*?\}/g
 
-// This extracts all information in an absolute path to an array of each collection part
+// 絶対パスに含まれるすべての情報を、コレクションの各部分の配列として取り出す
 // /foo/{Model.bar}/{Model.baz} => ['Model.bar', 'Model.baz']
 export function extractAllCollectionSegments(
   absolutePath: string
 ): Array<string> {
   const slugParts = absolutePath.match(curlyBracesContentsRegex)
 
-  // This shouldn't happen - but TS requires us to validate
+  // ここには到達しないはずだが、TS の都合で検証が必要である
   if (!slugParts) {
     throw new Error(
       `An error occurred building the slug parts. This is likely a bug within Gatsby and not your code. Please report it to us if you run into this.`
@@ -50,9 +50,9 @@ export function extractAllCollectionSegments(
 const extractFieldWithoutUnionRegex = /\(.*\)__/g
 
 /**
- * Given a filePath part that is a collection marker it do this transformation:
- * @param {string} filePart - The individual part of the URL
- * @returns {Array<string>} - Returns an array of extracted fields (with converted "Unions")
+ * コレクションのマーカーである filePath の一部を受け取り、次のように変換する:
+ * @param {string} filePart - URL の個々の部分
+ * @returns {Array<string>} - 取り出したフィールドの配列を返す（"Unions" は変換済み）
  * @example
  * {Model.bar} => bar
  * {Model.field__bar} => field__bar
@@ -65,14 +65,14 @@ export function extractFieldWithoutUnion(filePart: string): Array<string> {
 }
 
 const extractFieldRegexCurlyBraces = /[{}]/g
-// Regex created with: https://spec.graphql.org/draft/#sec-Names
-// First char only letter, underscore; rest letter, underscore, digit
+// 正規表現は https://spec.graphql.org/draft/#sec-Names をもとに作成した
+// 先頭の文字は英字かアンダースコアのみ、残りは英字、アンダースコア、数字
 const extractFieldGraphQLModel = /[a-zA-Z_][\w]*\./
 
 /**
- * Given a filePath part that is a collection marker it do this transformation:
- * @param {string} filePart - The individual part of the URL
- * @returns {Array<string>} - Returns an array of extracted fields
+ * コレクションのマーカーである filePath の一部を受け取り、次のように変換する:
+ * @param {string} filePart - URL の個々の部分
+ * @returns {Array<string>} - 取り出したフィールドの配列を返す
  * @example
  * {Model.field__(Union)__bar} => field__(Union)__bar
  * Also works with lowercased model
@@ -96,26 +96,26 @@ export function extractField(filePart: string): Array<string> {
 
 const switchToPeriodDelimitersRegex = /__/g
 
-// Used to convert filePath field accessors to js syntax accessors.
-// e.g.
+// filePath のフィールドアクセサーを js の構文のアクセサーに変換するために使う。
+// 例:
 //   foo__bar => foo.bar
-// This can then be used with _.get
+// 変換後は _.get で使える
 export function switchToPeriodDelimiters(filePart: string): string {
-  // replace access by periods
+  // アクセスをピリオドに置き換える
   return filePart.replace(switchToPeriodDelimitersRegex, `.`)
 }
 
 const convertUnionSyntaxToGraphqlRegex = /\(/g
 
-// Converts the part of the file from something like `(Union)` to `... on Union`
+// ファイルの一部を、`(Union)` のような形から `... on Union` に変換する
 export function convertUnionSyntaxToGraphql(filePart: string): string {
   return filePart
     .replace(convertUnionSyntaxToGraphqlRegex, `... on `)
     .replace(/\)/g, ``)
 }
 
-// Compose function to chain multiple methods from this file together
-// e.g.
+// このファイルの複数のメソッドをつなげるための compose 関数
+// 例:
 // compose(extractFieldWithoutUnion, switchToPeriodDelimters)(`{Model.foo__bar}`)
 export function compose(
   ...functions: Array<(filePart: string) => string>
@@ -124,9 +124,9 @@ export function compose(
     functions.reduce((value, fn) => fn(value), filePart)
 }
 
-// Use globby to find all page files with collection routes
-// We want to find all files in a given path where any segment includes text wrapped in curly braces
-// e.g. "{Collection.field}.tsx" and "{Collection.field}/nestedpage.tsx"
+// globby を使って、コレクションルートを持つすべてのページファイルを見つける
+// 指定されたパスの中で、いずれかのセグメントに波括弧で囲まれたテキストを含むファイルをすべて探したい
+// 例: "{Collection.field}.tsx" や "{Collection.field}/nestedpage.tsx"
 export const pagesGlob = `**/**\\{*\\}**(/**)`
 export const findCollectionPageFiles = (
   pagesPath: string

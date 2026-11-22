@@ -5,25 +5,25 @@ export function validatePathQuery(
   filePath: string,
   extensions: Array<string>
 ): void {
-  // Paths must start with /
+  // パスは / で始まらなければならない
   if (filePath.startsWith(`/`) !== true) {
     throw new Error(`PageCreator: To query node "gatsbyPath" the "filePath" argument must be an absolute path, starting with a /
 Please change this to: "/${filePath}"`)
   }
 
-  // Paths must not include file extension
+  // パスにファイルの拡張子を含めてはならない
   if (/\.[a-z]+$/i.test(filePath)) {
     throw new Error(`PageCreator: To query node "gatsbyPath" the "filePath" argument must omit the file extension
 Please change ${filePath} to "${filePath.replace(/\.[a-z]+$/i, ``)}"`)
   }
 
-  // Paths must not utilize src/pages
+  // パスに src/pages を使ってはならない
   if (filePath.includes(`src/pages`)) {
     throw new Error(`PageCreator: To query node "gatsbyPath" the "filePath" argument must omit the src/pages prefix.
 Please change this to: "${filePath.replace(/\/?src\/pages\//, ``)}"`)
   }
 
-  // Paths must not include index
+  // パスに index を含めてはならない
   if (/index$/.test(filePath)) {
     throw new Error(
       `PageCreator: To query node "gatsbyPath" the "filePath" argument must omit index.

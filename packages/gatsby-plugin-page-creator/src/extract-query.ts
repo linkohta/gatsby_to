@@ -8,17 +8,17 @@ import {
   switchToPeriodDelimiters,
 } from "./path-utils"
 
-// Input queryStringParent could be a Model or a full graphql query
-// End result should be something like { allProducts { nodes { id }}}
+// 入力の queryStringParent は、Model のことも完全な graphql クエリのこともある
+// 最終的な結果は { allProducts { nodes { id }}} のような形になる
 export function generateQueryFromString(
   queryOrModel: string,
   fileAbsolutePath: string,
   nodeIds?: Array<string>
 ): string {
-  // TODO: 'fields' possibly contains duplicate fields, e.g. field{name},field{description} that should be merged to field{name,description}
+  // TODO: 'fields' には重複したフィールドが含まれることがある。たとえば field{name},field{description} は field{name,description} にマージすべきである
   const fields = extractUrlParamsForQuery(fileAbsolutePath)
 
-  // In case queryOrModel is not capitalized
+  // queryOrModel の先頭が大文字でない場合に備える
   const connectionQuery = _.camelCase(`all ${queryOrModel}`)
 
   const connectionArgs = nodeIds
@@ -28,15 +28,15 @@ export function generateQueryFromString(
   return `{${connectionQuery}${connectionArgs}{nodes{${fields}}}}`
 }
 
-// Takes a query result of something like `{ fields: { value: 'foo' }}` with a filepath of `/fields__value` and
-// translates the object into `{ fields__value: 'foo' }`. This is necassary to pass the value
-// into a query function for each individual page.
+// ファイルパスが `/fields__value` のとき、`{ fields: { value: 'foo' }}` のようなクエリ結果を受け取り、
+// そのオブジェクトを `{ fields__value: 'foo' }` に変換する。個々のページのクエリ関数へ
+// 値を渡すために必要である。
 export function reverseLookupParams(
   queryResults: Record<string, Record<string, unknown> | string>,
   absolutePath: string
 ): Record<string, string> {
   const reversedParams = {
-    // We always include id
+    // id は常に含める
     id: (queryResults.nodes ? queryResults.nodes[0] : queryResults).id,
   }
 
@@ -48,7 +48,7 @@ export function reverseLookupParams(
 
       const results = _.get(
         queryResults.nodes ? queryResults.nodes[0] : queryResults,
-        // replace __ with accessors '.'
+        // __ をアクセサーの '.' に置き換える
         switchToPeriodDelimiters(extract)
       )
       reversedParams[extract] = results
@@ -58,17 +58,17 @@ export function reverseLookupParams(
   return reversedParams
 }
 
-// Changes something like `/Users/site/src/pages/foo/{Model.id}/{Model.baz}` to `id,baz,internal{contentFilePath}`.
-// Also supports prefixes/postfixes, e.g. `/foo/prefix-{Model.id}` to `id`
+// `/Users/site/src/pages/foo/{Model.id}/{Model.baz}` のようなものを `id,baz,internal{contentFilePath}` に変換する。
+// プレフィックスやポストフィックスにも対応している。たとえば `/foo/prefix-{Model.id}` は `id` になる
 function extractUrlParamsForQuery(createdPath: string): string {
   const parts = createdPath.split(path.sep)
 
-  // always add `id` to queries
+  // クエリには必ず `id` を追加する
   if (parts.some(s => s.includes(`.id}`)) === false) {
     parts.push(`{Model.id}`)
   }
 
-  // Always add internal { contentFilePath } if feature is available
+  // 機能が利用できる場合は、必ず internal { contentFilePath } を追加する
   if (hasFeature(`content-file-path`)) {
     parts.push(`{Model.internal__contentFilePath}`)
   }
@@ -90,7 +90,7 @@ function extractUrlParamsForQuery(createdPath: string): string {
     .join(`,`)
 }
 
-// pulls out nesting from file names with the special __ syntax
+// 特殊な __ の構文を使ったファイル名から、入れ子を取り出す
 // src/pages/{Model.fields__baz}.js => `fields{baz}`
 // src/pages/{Model.fields__(File)__baz}.js => `fields{... on File {baz}}`
 function deriveNesting(part: string): string {
@@ -99,7 +99,7 @@ function deriveNesting(part: string): string {
       .split(`__`)
       .reverse()
       .reduce((path: string, part: string): string => {
-        // This adds support for Unions
+        // ユニオンへの対応を追加する
         path = convertUnionSyntaxToGraphql(path)
 
         if (path) {

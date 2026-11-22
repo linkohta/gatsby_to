@@ -3,12 +3,12 @@ import chokidar from "chokidar"
 import { collectionExtractQueryString } from "./collection-extract-query-string"
 
 /*
- * When a user is developing, they may want to mess around with the collectionQuery or renaming
- * the file, this function watches the file and if the query strings change, we delete the old
- * pages and then re-run the collection builder.
+ * 開発中のユーザーは、collectionQuery を試行錯誤したり、ファイルの名前を
+ * 変えたりすることがある。この関数はファイルを監視し、クエリ文字列が変わったら古い
+ * ページを削除して、コレクションビルダーを再実行する。
  *
- * TODO: Can we reuse the watcher from gatsby-node to avoid creating new watchers? or use a different
- *       library that is _better_ at watching files with a single global internal watcher, like watchpack.
+ * TODO: 新しい watcher を作らずに、gatsby-node の watcher を再利用できないか？ または、watchpack のように、
+ *       単一のグローバルな内部 watcher でファイルを監視するのが「得意な」別のライブラリを使えないか。
  */
 export function watchCollectionBuilder(
   absolutePath: string,
@@ -21,19 +21,19 @@ export function watchCollectionBuilder(
   const watcher = chokidar.watch(absolutePath).on(`change`, () => {
     const queryString = collectionExtractQueryString(absolutePath, reporter)
 
-    // if the users is changing the query to generate the pages, we need to delete the old pages
-    // and re-run the builder.
+    // ユーザーがページを生成するクエリを変更している場合は、古いページを削除して
+    // ビルダーを再実行する必要がある。
     if (queryString !== previousQueryString) {
-      // 1.  close the old watcher, because when we rerun the collection builder
-      //     it'll create a new watcher. Just easier to code that way.
+      // 1.  古い watcher を閉じる。コレクションビルダーを再実行すると、
+      //     新しい watcher が作成されるからである。そのほうが実装が簡単である。
       watcher.close()
 
-      // 2.  Make sure to delete all the old pages
+      // 2.  古いページを確実にすべて削除する
       paths.forEach(path =>
         actions.deletePage({ path, component: absolutePath })
       )
 
-      // 3.  Then run it again!
+      // 3.  そして、もう一度実行する！
       rerunCollectionBuilder()
     }
   })

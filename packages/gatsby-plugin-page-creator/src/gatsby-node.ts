@@ -41,11 +41,11 @@ export function createPages(_: CreatePagesArgs, pluginOptions: IOptions): void {
   }
 }
 
-// Path creator.
-// Auto-create pages.
-// algorithm is glob /pages directory for js/jsx/cjsx files *not*
-// underscored. Then create url w/ our path algorithm *unless* user
-// takes control of that page component in gatsby-node.
+// パスの作成。
+// ページを自動で作成する。
+// アルゴリズムは、/pages ディレクトリから、名前がアンダースコアで
+// 始まらない js/jsx/cjsx ファイルを glob で集め、独自のパスのアルゴリズムで URL を作成する。
+// ただし、ユーザーが gatsby-node でそのページコンポーネントを自分で扱う場合は除く。
 export async function createPagesStatefully(
   {
     store,
@@ -83,7 +83,7 @@ See docs here - https://www.gatsbyjs.com/plugins/gatsby-plugin-page-creator/`,
       })
     }
 
-    // Validate that the path exists.
+    // パスが存在することを検証する。
     if (pathCheck && !existsSync(pagesPath)) {
       reporter.panic({
         id: prefixId(CODES.NonExistingPath),
@@ -100,7 +100,7 @@ Please pick a path to an existing directory.`,
     const pagesDirectory = systemPath.resolve(process.cwd(), pagesPath)
     const pagesGlob = `**/*.{${exts}}`
 
-    // Get initial list of files.
+    // 最初のファイル一覧を取得する。
     const files = await glob(pagesGlob, { cwd: pagesPath })
     files.forEach(file => {
       createPage(
@@ -157,7 +157,7 @@ Please pick a path to an existing directory.`,
       }: ICreateAPageFromNodeArgs): Promise<string> {
         const filePath = systemPath.relative(pluginOptions.path, absolutePath)
 
-        // URL path for the component and node
+        // コンポーネントとノードの URL パス
         const { derivedPath } = await derivePath(
           filePath,
           node,
@@ -180,7 +180,7 @@ Please pick a path to an existing directory.`,
       const filePath = systemPath.relative(pluginOptions.path, absolutePath)
 
       const contentFilePath = node.internal?.contentFilePath
-      // URL path for the component and node
+      // コンポーネントとノードの URL パス
       const { derivedPath, errors } = await derivePath(
         filePath,
         node,
@@ -192,16 +192,16 @@ Please pick a path to an existing directory.`,
       const path = createPath(derivedPath, hasTrailingSlash, true)
       const modifiedPath = applyTrailingSlashOption(path, trailingSlash)
 
-      // We've already created a page with this path
+      // このパスのページはすでに作成済みである
       if (this.knownPagePaths.has(modifiedPath)) {
         return undefined
       }
       this.knownPagePaths.add(modifiedPath)
-      // Params is supplied to the FE component on props.params
+      // params は、フロントエンドのコンポーネントに props.params として渡される
       const params = getCollectionRouteParams(createPath(filePath), path)
-      // nodeParams is fed to the graphql query for the component
+      // nodeParams は、コンポーネントの graphql クエリに渡される
       const nodeParams = reverseLookupParams(node, absolutePath)
-      // matchPath is an optional value. It's used if someone does a path like `{foo}/[bar].js`
+      // matchPath は省略可能な値である。`{foo}/[bar].js` のようなパスが使われた場合に使う
       const matchPath = getMatchPath(path)
 
       const componentPath = contentFilePath
@@ -279,7 +279,7 @@ Please pick a path to an existing directory.`,
         }
       },
       removedPath => {
-        // Delete the page for the now deleted component.
+        // 削除されたコンポーネントのページを削除する。
         try {
           const componentPath = systemPath.join(pagesDirectory, removedPath)
           store.getState().pages.forEach(page => {
@@ -320,7 +320,7 @@ Please pick a path to an existing directory.`,
 
     emitter.on(`CREATE_NODE`, action => {
       if (pluginInstance.trackedTypes.has(action.payload?.internal?.type)) {
-        // If this node was deleted before being recreated, remove it from the deleted node list
+        // このノードが削除された後に再作成された場合は、削除済みノードの一覧から取り除く
         pluginInstance.changedNodesSinceLastPageCreation.deleted.delete(
           action.payload.id
         )
@@ -367,11 +367,11 @@ export function setFieldsOnGraphQLNodeType(
             { filePath }: { filePath: string },
             context
           ): Promise<string> => {
-            // This is a quick hack for attaching parents to the node.
-            // This may be an incomprehensive fixed for the general use case
-            // of connecting nodes together. However, I don't quite know how to
-            // fully understand the use-cases. So this is a simple fix for this
-            // one common-use, and we'll iterate as we understand.
+            // ノードに親を関連付けるための簡易的なハックである。
+            // ノード同士を接続するという一般的な用途に対しては、
+            // 不完全な修正かもしれない。ただ、ユースケースの全体像をまだ
+            // 把握しきれていない。そのため、このよくある用途 1 つに対する単純な修正に
+            // とどめ、理解が進むのに合わせて改善していく。
             const sourceCopy = { ...source }
             // @ts-ignore
             if (typeof source.parent === `string`) {

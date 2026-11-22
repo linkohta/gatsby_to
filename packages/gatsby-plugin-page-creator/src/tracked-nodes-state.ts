@@ -11,42 +11,42 @@ export interface IStatePerInstance {
     created: Map<string, { id: string; contentDigest: string; type: string }>
   }
   /**
-   * nodeType to list of absolute file paths using that node type
+   * nodeType から、そのノードタイプを使っている絶対ファイルパスの一覧への対応
    */
   trackedTypes: Map<string, Set<string>>
   /**
-   * applies changes to pages (creates, updates, deletes) based
-   * on node changes
+   * ノードの変更をもとに、ページへ変更（作成、更新、削除）を
+   * 適用する
    */
   syncPages?: () => void
   /**
-   * Cleanup tracked state after removal of template file
+   * テンプレートファイルが削除された後、追跡中の状態を片付ける
    */
   templateFileRemoved: (absolutePath: string) => void
   /**
-   * keep track of pages created by node id and template file path
+   * 作成したページを、ノード id とテンプレートファイルのパスごとに記録する
    */
   nodeIdToPagePath: Map<string, Map<string, string>>
   /**
-   * list of known page paths to avoid trying to creating pages that already exist
+   * 既知のページパスの一覧。すでに存在するページを作成しようとするのを避けるためである
    */
   knownPagePaths: Set<string>
   /**
-   * construct a page path from template absolute path and resolved node fields
+   * テンプレートの絶対パスと、解決済みのノードのフィールドから、ページのパスを組み立てる
    */
   getPathFromAResolvedNode?: (arg: ICreateAPageFromNodeArgs) => Promise<string>
   /**
-   * create a page from a node and template absolute path
+   * ノードとテンプレートの絶対パスからページを作成する
    */
   createAPageFromNode?: (
     arg: ICreateAPageFromNodeArgs
   ) => Promise<{ errors: number; path: string } | undefined>
   /**
-   * delete all pages created from a node id
+   * あるノード id から作成されたページをすべて削除する
    */
   deletePagesCreateFromNode?: (id: string) => void
   /**
-   * run graphql query to resolve fields for given node ids
+   * graphql クエリを実行して、指定されたノード id のフィールドを解決する
    */
   resolveFields?: (
     nodeIds: Array<string>,

@@ -190,9 +190,9 @@ describe(`derive-path`, () => {
   })
 
   it(`keeps existing slashes around and handles possible double forward slashes`, async () => {
-    // This tests two things
-    // 1) There shouldn't be a double forward slash in the final URL => blog//fire-and-powder/
-    // 2) If the slug is supposed to be a URL (e.g. foo/bar) it should keep that
+    // ここでは 2 つのことをテストする
+    // 1) 最終的な URL でスラッシュが二重にならないこと => blog//fire-and-powder/
+    // 2) slug が URL（例: foo/bar）として指定されている場合は、それを保つこと
     const { derivedPath: one } = await derivePath(
       `blog/{MarkdownRemark.fields__slug}`,
       {

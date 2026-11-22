@@ -4,7 +4,7 @@ import { Reporter } from "gatsby/reporter"
 import { extractModel } from "./path-utils"
 import { CODES, prefixId } from "./error-utils"
 
-// This Function opens up the actual collection file and extracts the queryString used in the
+// この関数は、実際のコレクションファイルを開き、そこで使われている queryString を取り出す
 export function collectionExtractQueryString(
   absolutePath: string,
   reporter: Reporter,
@@ -14,16 +14,16 @@ export function collectionExtractQueryString(
 
   const modelType = extractModel(absolutePath)
 
-  // This can happen if you have an invalid path and you are trying to query for that path
-  // our path graphql resolution logic does not validate the path before calling this
-  // so it can hit this case.
+  // 不正なパスに対してクエリを実行しようとすると、こうなることがある
+  // パスの graphql の解決ロジックは、これを呼び出す前にパスを検証しないので、
+  // このケースに到達しうる。
   if (!modelType) return null
 
-  // 1.  Read the file and scan for a use of collectionGraphql
+  // 1.  ファイルを読み込み、collectionGraphql が使われているかを調べる
   const fileContents = fs.readFileSync(absolutePath).toString()
 
-  // 2.  If the user is using the collectionGraphql function, we have to
-  //     warn that this functionality was removed
+  // 2.  ユーザーが collectionGraphql 関数を使っている場合は、
+  //     この機能が削除されたことを警告する必要がある
   if (
     fileContents.includes(`collectionGraphql`) ||
     fileContents.includes(`unstable_collectionGraphql`)
@@ -37,8 +37,8 @@ export function collectionExtractQueryString(
     })
   }
 
-  // 3  This is important, we get the model or query, but we have to create a real graphql
-  //    query from it. This generateQueryFromString call does all of that magic
+  // 3  ここが重要である。model またはクエリが得られるが、そこから実際の graphql の
+  //    クエリを作成する必要がある。この generateQueryFromString の呼び出しがそれをすべて行う
   queryString = generateQueryFromString(modelType, absolutePath, nodeIds)
 
   return queryString

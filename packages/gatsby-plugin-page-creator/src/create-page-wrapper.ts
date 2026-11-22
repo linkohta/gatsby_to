@@ -32,20 +32,20 @@ export function createPage(
   ignore?: IPathIgnoreOptions | string | Array<string> | null,
   slugifyOptions?: ISlugifyOptions
 ): void {
-  // Filter out special components that shouldn't be made into
-  // pages.
+  // ページにしてはいけない特殊なコンポーネントを
+  // 取り除く。
   if (!validatePath(filePath)) {
     return
   }
 
-  // Filter out anything matching the given ignore patterns and options
+  // 指定された ignore のパターンとオプションに一致するものを取り除く
   if (ignorePath(filePath, ignore)) {
     return
   }
 
   const absolutePath = systemPath.join(pagesDirectory, filePath)
 
-  // If the page includes a `{}` in it, then we create it as a collection builder
+  // ページに `{}` が含まれる場合は、コレクションビルダーとして作成する
   if (pathIsCollectionBuilder(absolutePath)) {
     createPagesFromCollectionBuilder({
       filePath,
@@ -60,13 +60,13 @@ export function createPage(
     return
   }
 
-  // If the path includes a `[]` in it, then we create it as a client only route
+  // パスに `[]` が含まれる場合は、クライアント専用のルートとして作成する
   if (pathIsClientOnlyRoute(absolutePath)) {
     createClientOnlyPage(filePath, absolutePath, actions, trailingSlash)
     return
   }
 
-  // Create page object
+  // ページオブジェクトを作成する
   const createdPath = createPath(filePath)
   const modifiedPath = applyTrailingSlashOption(createdPath, trailingSlash)
   const page = {
@@ -75,6 +75,6 @@ export function createPage(
     context: {},
   }
 
-  // Add page
+  // ページを追加する
   actions.createPage(page)
 }

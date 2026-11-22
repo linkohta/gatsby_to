@@ -19,8 +19,8 @@ export function prefixId(id: string): string {
   return `${pluginPrefix}_${id}`
 }
 
-// TODO: Refactor to use contextual data instead of only context.sourceMessage
-// once reporter.setErrorMap is guaranteed to be available
+// TODO: reporter.setErrorMap が確実に使えるようになったら、
+// context.sourceMessage だけでなくコンテキストのデータを使うようリファクタリングする
 export const ERROR_MAP = {
   [CODES.Generic]: {
     text: (context): string => `PageCreator: ${context.sourceMessage}`,
