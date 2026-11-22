@@ -20,7 +20,8 @@
 | `e2e-tests/` `integration-tests/`     | E2E テストと統合テスト。こちらも独立した `package.json` を持つ              |
 | `deprecated-packages/`                | 廃止済みパッケージ。変更しない                                              |
 | `scripts/`                            | ビルド、リリース、依存更新などの補助スクリプト                              |
-| `peril/` `.circleci/` `.github/`      | 自動化と CI の設定                                                          |
+| `.github/`                            | CI（GitHub Actions）と Issue、PR のテンプレート                             |
+| `peril/`                              | 本家の自動化（Danger）の設定。このリポジトリでは動いていない                |
 
 ## セットアップとよく使うコマンド
 
@@ -119,6 +120,16 @@ TypeScript では次のルールも適用されます。
 - テストを通すためにテストをスキップ、削除、無効化しません。
 - 失敗したテストを直すときは、失敗したテストだけを再実行します。
 - PR を出す前に、変更したパッケージについて `yarn lint:code`、型チェック、`yarn jest <package-name>` を実行し、結果を PR の説明に書きます。
+
+### CI
+
+PR と `master` への push では、GitHub Actions（`.github/workflows/ci.yml`）が次のジョブを実行します。
+
+- Lint: `yarn lint:code` と `yarn lint:other`
+- Typecheck: `yarn bootstrap` の後に `yarn typecheck`
+- Unit tests: `yarn jest` を 4 分割して実行
+
+CI が失敗している PR はマージしません。失敗の原因を調べて直し、テストのスキップや再実行の繰り返しで通そうとしません。統合テスト（`integration-tests/`）と E2E テスト（`e2e-tests/`）は CI では実行していないため、必要な場合は手元で実行します。
 
 ## 依存パッケージのバージョンアップ方針
 

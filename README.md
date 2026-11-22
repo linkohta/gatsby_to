@@ -19,6 +19,9 @@
   <a href="https://github.com/linkohta/gatsby_to/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Gatsby は MIT ライセンスで公開されています。" />
   </a>
+  <a href="https://github.com/linkohta/gatsby_to/actions/workflows/ci.yml">
+    <img src="https://github.com/linkohta/gatsby_to/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI の現在の状態。" />
+  </a>
 </p>
 
 <h2 align="center">
