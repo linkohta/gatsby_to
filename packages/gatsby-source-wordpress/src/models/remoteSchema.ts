@@ -23,7 +23,7 @@ const remoteSchema = createModel<IRootModel>()({
     fieldBlacklist: [
       `isWpGatsby`,
       `edges`,
-      // these aren't useful without authentication
+      // これらは認証がないと役に立たない
       `revisions`,
       `isJwtAuthSecretRevoked`,
       `isRestricted`,
@@ -40,7 +40,7 @@ const remoteSchema = createModel<IRootModel>()({
       `editingLockedBy`,
       `cursor`,
     ],
-    // @todo make this a plugin option
+    // @todo これをプラグインオプションにする
     fieldAliases: {
       parent: `wpParent`,
       children: `wpChildren`,
@@ -87,8 +87,8 @@ const remoteSchema = createModel<IRootModel>()({
 
       type = state.typeMap.get(key)
 
-      // union types with no member types will cause schema customization errors
-      // @todo move this to a better place. This should be excluded before it gets to this point.
+      // メンバー型のないユニオン型は、スキーマのカスタマイズでエラーの原因になる
+      // @todo これをもっと適切な場所へ移す。ここに到達する前に除外されているべきである。
       if (type && type.kind === `UNION` && type.possibleTypes.length === 0) {
         return state
       }

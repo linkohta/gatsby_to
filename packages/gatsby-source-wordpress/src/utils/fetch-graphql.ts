@@ -19,7 +19,7 @@ import { CODES } from "./report"
 
 let http = null
 
-// this is an object so that we can override getHttp in our tests
+// テストで getHttp を上書きできるよう、オブジェクトにしている
 export const moduleHelpers = {
   getHttp: (limit = 50): RateLimitedAxiosInstance => {
     if (!http) {
@@ -64,7 +64,7 @@ const handleErrorOptions = async ({
   try {
     query = prettier.format(query, { parser: `graphql` })
   } catch (e) {
-    // do nothing
+    // 何もしない
   }
 
   if (pluginOptions.debug.graphql.showQueryOnError) {
@@ -73,11 +73,11 @@ const handleErrorOptions = async ({
 
   if (pluginOptions.debug.graphql.copyQueryOnError) {
     try {
-      // clipboardy is ESM-only package
+      // clipboardy は ESM のみのパッケージである
       const { default: clipboardy } = await import(`clipboardy`)
       await clipboardy.write(query)
     } catch (e) {
-      // do nothing
+      // 何もしない
     }
   }
 }
@@ -158,14 +158,14 @@ const handleGraphQLErrors = async ({
     return
   }
 
-  // if we have json data, the error wasn't critical.
+  // json のデータがあれば、エラーは致命的ではなかったということである。
   if (
     json &&
     json.data &&
     pluginOptions.debug.graphql.onlyReportCriticalErrors &&
-    // only return if we're not force disabling this.
-    // this is used when we make GraphQL requests intentionally rather than programmatically
-    // for ex during the Preview process
+    // 強制的に無効化していない場合にだけ return する。
+    // プログラムからではなく意図的に GraphQL リクエストを送る場合に使う
+    // たとえばプレビューの処理中など
     !forceReportCriticalErrors
   ) {
     return
@@ -194,27 +194,27 @@ const handleGraphQLErrors = async ({
       })
     }
 
-    // convert the error path array into a string like "mediaItems.nodes[55].mediaDetails.meta.focalLength"
+    // エラーのパスの配列を "mediaItems.nodes[55].mediaDetails.meta.focalLength" のような文字列に変換する
     let errorPath = error?.path
       ?.map((field, index) => {
-        // if this is a number it's the index of a node
+        // 数値であれば、ノードのインデックスである
         if (typeof field === `number`) {
           return `[${field}].`
         } else if (
-          // otherwise if the next field isn't a number
+          // そうではなく、次のフィールドが数値でない場合は
           typeof error.path[index + 1] !== `number`
         ) {
-          // add dot notation
+          // ドット記法を付ける
           return `${field}.`
         }
 
-        // or just return the field
+        // それ以外はフィールドをそのまま返す
         return field
       })
       ?.join(``)
 
     if (errorPath?.endsWith(`.`)) {
-      // trim "." off the end of the errorPath
+      // errorPath の末尾の "." を取り除く
       errorPath = errorPath.slice(0, -1)
     }
 
@@ -267,7 +267,7 @@ const ensureStatementsAreTrue = `${bold(
   `Please ensure the following statements are true`
 )} \n  - your WordPress URL is correct in gatsby-config.js\n  - your server is responding to requests \n  - WPGraphQL and WPGatsby are installed and active in your WordPress backend\n  - Your WordPress debug.log does not contain critical errors`
 
-// @todo add a link to docs page for debugging
+// @todo デバッグ用のドキュメントページへのリンクを追加する
 const genericError = ({ url }: { url: string }): string =>
   `GraphQL request to ${bold(url)} failed.\n\n${ensureStatementsAreTrue}`
 
@@ -511,7 +511,7 @@ ${slackChannelSupportMessage}`
       if (contentType?.includes(`application/json;`)) {
         const docsLink = `https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-source-wordpress/docs/plugin-options.md#url-string`
 
-        // if adding `/graphql` works, panic with a useful message
+        // `/graphql` を付ければ動作する場合は、役に立つメッセージを出して panic する
         reporter.panic({
           id: CODES.MissingAppendedPath,
           context: {
@@ -532,7 +532,7 @@ ${slackChannelSupportMessage}`
         return
       }
     } catch (err) {
-      // elsewise, continue to handle HTML response as normal
+      // そうでなければ、通常どおり HTML レスポンスの処理を続ける
     }
 
     const copyHtmlResponseOnError =
@@ -540,7 +540,7 @@ ${slackChannelSupportMessage}`
 
     if (copyHtmlResponseOnError) {
       try {
-        // clipboardy is ESM-only package
+        // clipboardy は ESM のみのパッケージである
         const { default: clipboardy } = await import(`clipboardy`)
         if (`writeSync` in clipboardy) {
           clipboardy.writeSync(response.data)
@@ -639,7 +639,7 @@ if ( defined( 'GRAPHQL_REQUEST' ) && true === GRAPHQL_REQUEST ) {
     return
   }
 
-  // generic error if none of the above exit the process
+  // 上のどれでもプロセスが終了しなかった場合の汎用エラー
   reporter.panic({
     id: CODES.BadResponse,
     context: {
@@ -658,9 +658,9 @@ if ( defined( 'GRAPHQL_REQUEST' ) && true === GRAPHQL_REQUEST ) {
 }
 
 export interface IJSON {
-  // these will always be different depending on where this is used
-  // we need this for GraphQL results and the node filter api
-  // which can be used in any way by users
+  // 使われる場所によって必ず異なる
+  // GraphQL の結果と、ユーザーがどのようにでも使える
+  // ノードフィルター API のために必要である
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
@@ -752,12 +752,12 @@ const fetchGraphql = async ({
           .post(url, { query, variables }, requestOptions)
           .catch(e => {
             if (!errorIs500ish(e)) {
-              // for any error that is not a 50x error, we bail, meaning we stop retrying. error will be thrown one level higher
+              // 50x 以外のエラーでは bail する。つまり再試行をやめる。エラーは 1 つ上の階層で throw される
               bail(e)
 
               return null
             } else {
-              // otherwise throwing the error will cause the retry to happen again
+              // それ以外では、エラーを throw すると再試行が行われる
               throw e
             }
           }),

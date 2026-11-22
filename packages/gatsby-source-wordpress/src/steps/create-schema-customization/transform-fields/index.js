@@ -21,8 +21,8 @@ const handleCustomScalars = field => {
     field.type.kind === `SCALAR` && !typeIsASupportedScalar(field.type)
 
   if (fieldTypeIsACustomScalar) {
-    // if this field is an unsupported custom scalar,
-    // type it as JSON
+    // このフィールドが未対応のカスタムスカラーであれば、
+    // JSON として型付けする
     return {
       ...field,
       type: {
@@ -36,8 +36,8 @@ const handleCustomScalars = field => {
     field.type.ofType?.kind === `SCALAR` && !typeIsASupportedScalar(field.type)
 
   if (fieldTypeOfTypeIsACustomScalar) {
-    // if this field is an unsupported custom scalar,
-    // type it as JSON
+    // このフィールドが未対応のカスタムスカラーであれば、
+    // JSON として型付けする
     return {
       ...field,
       type: {
@@ -53,8 +53,8 @@ const handleCustomScalars = field => {
   return field
 }
 
-// this is used to alias fields that conflict with Gatsby node fields
-// for ex Gatsby and WPGQL both have a `parent` field
+// これは、Gatsby のノードフィールドと衝突するフィールドにエイリアスを付けるために使う
+// たとえば、Gatsby と WPGQL はどちらも `parent` フィールドを持つ
 export const getAliasedFieldName = ({ fieldAliases, field }) =>
   fieldAliases && fieldAliases[field.name]
     ? fieldAliases[field.name]
@@ -73,13 +73,13 @@ const fieldIsExcluded = ({
   parentTypeSettings,
   parentInterfacesImplementingTypeSettings,
 }) =>
-  // this field wasn't previously fetched, so we shouldn't
-  // add it to our schema
+  // このフィールドは以前に取得されていないので、
+  // スキーマに追加すべきではない
   (!fieldOfTypeWasFetched(field.type) && fieldName !== `id`) ||
-  // this field was excluded on its parent fields Type
+  // このフィールドは、親フィールドの型で除外されている
   (parentTypeSettings.excludeFieldNames &&
     parentTypeSettings.excludeFieldNames.includes(fieldName)) ||
-  // this field is on an interface type and one of the implementing types has this field excluded on it.
+  // このフィールドはインターフェース型にあり、それを実装する型のいずれかでこのフィールドが除外されている。
   (parentInterfacesImplementingTypeSettings &&
     parentInterfacesImplementingTypeSettings.find(
       typeSetting =>
@@ -88,19 +88,19 @@ const fieldIsExcluded = ({
           excludedFieldName => fieldName === excludedFieldName
         )
     )) ||
-  // the type of this field was excluded via plugin options
+  // このフィールドの型は、プラグインオプションで除外されている
   thisTypeSettings.exclude ||
-  // field is blacklisted
+  // フィールドがブラックリストに入っている
   fieldBlacklist.includes(fieldName) ||
-  // this field has required input args
+  // このフィールドには必須の入力引数がある
   (field.args && field.args.find(arg => arg.type.kind === `NON_NULL`)) ||
-  // this field has no typeName
+  // このフィールドには typeName がない
   !findNamedTypeName(field.type)
 
 /**
- * Transforms fields from the WPGQL schema to work in the Gatsby schema
- * with proper node linking and type namespacing
- * also filters out unusable fields and types
+ * WPGQL スキーマのフィールドを、ノードのリンクと型の名前空間を正しく保ったまま
+ * Gatsby のスキーマで動くように変換する
+ * 使えないフィールドと型の除外も行う
  */
 export const transformFields = ({
   fields,
@@ -126,7 +126,7 @@ export const transformFields = ({
       : null
 
   const transformedFields = fields.reduce((fieldsObject, field) => {
-    // if there's no field name this field is unusable
+    // フィールド名がなければ、このフィールドは使えない
     if (field.name === ``) {
       return fieldsObject
     }
@@ -165,11 +165,11 @@ export const transformFields = ({
       })
     })
 
-    // if the child fields of this field are all excluded,
-    // we shouldn't add this field
-    // @todo move this to a central location.
-    // if a type is missing all it's child fields due to exclusion
-    // it should be globally excluded automatically.
+    // このフィールドの子フィールドがすべて除外されている場合、
+    // このフィールドは追加すべきではない
+    // @todo これを 1 か所にまとめる。
+    // 除外によって子フィールドをすべて失った型は、
+    // 自動的にグローバルで除外されるべきである。
     if (Array.isArray(includedChildFields) && !includedChildFields.length) {
       return fieldsObject
     }
@@ -193,13 +193,13 @@ export const transformFields = ({
 
       let transformedField = transform(transformerApi)
 
-      // add default resolver
+      // デフォルトのリゾルバーを追加する
       if (typeof transformedField === `string`) {
-        // we need to add a custom resolver to override the default resolver
-        // and check for aliased fields
-        // fields are aliased automatically if they have conflicting types
-        // with other fields of the same name when placed in side-by-side
-        // inlineFragments on the same union or interface type.
+        // デフォルトのリゾルバーを上書きし、エイリアス付きのフィールドを確認するために、
+        // カスタムリゾルバーを追加する必要がある
+        // 同じユニオン型またはインターフェース型の上で inlineFragments を
+        // 並べたときに、同じ名前のほかのフィールドと型が衝突するフィールドには、
+        // 自動的にエイリアスが付く。
         transformedField = {
           type: transformedField,
           resolve: buildDefaultResolver(transformerApi),

@@ -75,7 +75,7 @@ export const transformInlineFragments = ({
 
       possibleType.type = { ...type }
 
-      // save this type so we can use it in schema customization
+      // スキーマのカスタマイズで使えるよう、この型を保存する
       getStore().dispatch.remoteSchema.addFetchedType(type)
 
       const isAGatsbyNode = gatsbyNodesInfo.typeNames.includes(
@@ -83,7 +83,7 @@ export const transformInlineFragments = ({
       )
 
       if (isAGatsbyNode && !buildGatsbyNodeFields) {
-        // we use the id to link to the top level Gatsby node
+        // トップレベルの Gatsby ノードへのリンクには id を使う
         possibleType.fields = [`id`]
         return possibleType
       }
@@ -93,7 +93,7 @@ export const transformInlineFragments = ({
       let filteredFields = [...typeInfo.fields]
 
       if (parentType?.kind === `INTERFACE`) {
-        // remove any fields from our fragment if the parent type already has them as shared fields
+        // 親の型がすでに共通フィールドとして持っているフィールドは、フラグメントから取り除く
         filteredFields = filteredFields.filter(
           filteredField =>
             !parentType.fields.find(
@@ -130,7 +130,7 @@ export const transformInlineFragments = ({
   return possibleTypes && depth <= maxDepth ? transformedInlineFragments : null
 }
 
-// since we're counting circular types that may be on fields many levels up, incarnation felt like it works here ;) the types are born again in later generations
+// 何階層も上のフィールドにあるかもしれない循環する型を数えているので、ここでは incarnation（化身）という言葉が合うと感じた ;) 型は後の世代で生まれ変わる
 const countIncarnations = ({ typeName, ancestorTypeNames }) =>
   ancestorTypeNames.length
     ? ancestorTypeNames.filter(
@@ -154,15 +154,15 @@ export function transformField({
 } = {}) {
   const ancestorTypeNames = [...parentAncestorTypeNames]
 
-  // we're potentially infinitely recursing when fields are connected to other types that have fields that are connections to other types
-  //  so we need a maximum limit for that
+  // フィールドがほかの型につながり、その型のフィールドがさらにほかの型へのコネクションになっていると、無限に再帰する可能性がある
+  //  そのため、上限が必要である
   if (depth > maxDepth) {
     return false
   }
 
   depth++
 
-  // if the field has no type we can't use it.
+  // フィールドに型がなければ使えない。
   if (!field || !field.type) {
     return false
   }
@@ -173,8 +173,8 @@ export function transformField({
     return false
   }
 
-  // count the number of times this type has appeared as an ancestor of itself
-  // somewhere up the tree
+  // この型が、ツリーの上のどこかで自分自身の祖先として
+  // 現れた回数を数える
   const typeName = findNamedTypeName(field.type)
   const typeKind = findTypeKind(field.type)
 
@@ -184,8 +184,8 @@ export function transformField({
   })
 
   if (typeIncarnationCount > 0) {
-    // this type is nested within itself atleast once
-    // create a fragment here that can be reused
+    // この型は、少なくとも 1 回は自分自身の中にネストしている
+    // ここで再利用できるフラグメントを作成する
     createFragment({
       fields: typeMap.get(typeName).fields,
       type: field.type,
@@ -208,8 +208,8 @@ export function transformField({
     return false
   }
 
-  // this is used to alias fields that conflict with Gatsby node fields
-  // for ex Gatsby and WPGQL both have a `parent` field
+  // これは、Gatsby のノードフィールドと衝突するフィールドにエイリアスを付けるために使う
+  // たとえば、Gatsby と WPGQL はどちらも `parent` フィールドを持つ
   const fieldName = returnAliasedFieldName({ fieldAliases, field })
 
   if (
@@ -219,8 +219,8 @@ export function transformField({
     return false
   }
 
-  // remove fields that have required args. They'll cause query errors if omitted
-  //  and we can't determine how to use those args programatically.
+  // 必須の引数を持つフィールドを取り除く。引数を省略するとクエリエラーになり、
+  //  その引数の使い方をプログラムから判断することもできない。
   if (
     field.args &&
     field.args.length &&
@@ -237,9 +237,9 @@ export function transformField({
     fieldType.kind === `ENUM` ||
     (fieldType.kind === `NON_NULL` && ofType.kind === `SCALAR`) ||
     (fieldType.kind === `LIST` && fieldType.ofType.kind === `SCALAR`) ||
-    // a list of enums has no type name, so findNamedTypeName above finds the enum type
-    // instead of the field type. Need to explicitly check here
-    // instead of using helpers
+    // enum のリストには型名がないので、上の findNamedTypeName はフィールドの型ではなく
+    // enum の型を見つける。ヘルパーを使わずに、ここで明示的に
+    // 確認する必要がある
     (field.type.kind === `LIST` && field.type?.ofType?.kind === `ENUM`)
   ) {
     return {
@@ -304,7 +304,7 @@ export function transformField({
       return false
     }
 
-    // if we have either inlineFragments or fields
+    // inlineFragments か fields のどちらかがある場合
     return {
       fieldName: fieldName,
       fields: transformedFields,
@@ -314,9 +314,9 @@ export function transformField({
   }
 
   const isAGatsbyNode =
-    // if this is a gatsby node type
+    // これが gatsby のノードタイプである場合
     gatsbyNodesInfo.typeNames.includes(typeName) ||
-    // or all possible types on this type are Gatsby node types
+    // または、この型が取り得るすべての型が Gatsby のノードタイプである場合
     typeMap
       .get(typeName)
       ?.possibleTypes?.every(possibleType =>
@@ -436,7 +436,7 @@ const createFragment = ({
   const typeName = findNamedTypeName(type)
 
   if (buildingFragment) {
-    // this fragment is inside a fragment that's already being built so we should exit
+    // このフラグメントは、すでに組み立て中のフラグメントの中にあるので、抜ける
     return null
   }
 
@@ -451,8 +451,8 @@ const createFragment = ({
     const fieldType = typeMap.get(fieldTypeName)
 
     if (
-      // if this field is a different type than the fragment but has a field of the same type as the fragment,
-      // we need to skip this field in the fragment to prevent nesting this type in itself a level down
+      // このフィールドがフラグメントとは別の型で、フラグメントと同じ型のフィールドを持つ場合は、
+      // この型が 1 階層下で自分自身の中にネストしないよう、フラグメント内のこのフィールドをスキップする必要がある
       fieldType.name !== typeName &&
       fieldType?.fields?.find(
         innerFieldField => findNamedTypeName(innerFieldField.type) === typeName
@@ -565,19 +565,19 @@ const transformFields = ({
       })
 
       if (transformedField) {
-        // save this type so we know to use it in schema customization
+        // スキーマのカスタマイズで使うことが分かるよう、この型を保存する
         getStore().dispatch.remoteSchema.addFetchedType(field.type)
       }
 
       const typeName = findNamedTypeName(field.type)
       const fragment = fragments?.[typeName]
 
-      // @todo add any adjacent fields and inline fragments directly to the stored fragment object so this logic can be changed to if (fragment) useTheFragment()
-      // once that's done it can be added above and below transformField() above ☝️
-      // and potentially short circuit expensive work that will be thrown away anyway
+      // @todo 隣接するフィールドとインラインフラグメントを、保存するフラグメントのオブジェクトに直接追加し、このロジックを if (fragment) useTheFragment() に変えられるようにする
+      // それができれば、上の transformField() の前後に追加でき ☝️
+      // どのみち捨てられるコストの高い処理を省ける可能性がある
       if (fragment && transformedField && buildingFragment !== typeName) {
         // if (fragment && buildingFragment !== typeName && transformedField) {
-        // remove fields from this query that already exist in the fragment
+        // フラグメントにすでに存在するフィールドを、このクエリから取り除く
         if (transformedField?.fields?.length) {
           transformedField.fields = transformedField.fields.filter(
             field =>
@@ -587,9 +587,9 @@ const transformFields = ({
           )
         }
 
-        // if this field has no fields (because it has inline fragments only)
-        // we need to create an empty array since we treat reusable fragments as
-        // a field
+        // このフィールドにフィールドがない場合（インラインフラグメントしかないため）は、
+        // 空の配列を作る必要がある。再利用可能なフラグメントをフィールドとして
+        // 扱っているためである
         if (!transformedField.fields) {
           transformedField.fields = []
         }
@@ -603,7 +603,7 @@ const transformFields = ({
           transformedField.inlineFragments =
             transformedField.inlineFragments.filter(
               fieldInlineFragment =>
-                // yes this is a horrible use of .find(). @todo refactor this for better perf
+                // これが .find() のひどい使い方であることは承知している。@todo パフォーマンス改善のためにリファクタリングする
                 !fragment.inlineFragments.find(
                   fragmentInlineFragment =>
                     fragmentInlineFragment.name === fieldInlineFragment.name
@@ -624,16 +624,16 @@ const transformFields = ({
         typeKindsRequiringSelectionSets.includes(fieldOfTypeKind)
 
       if (
-        // if our field needs a selectionset
+        // フィールドにセレクションセットが必要で
         fieldNeedsSelectionSet &&
-        // but we have no fields
+        // かつ、フィールドがなく
         !transformedField.fields &&
-        // and no inline fragments
+        // かつ、インラインフラグメントもない場合
         !transformedField.inlineFragments
       ) {
-        // we need to discard this field to prevent GraphQL errors
-        // we're likely at the very bottom of the query depth
-        // so that this fields children were omitted
+        // GraphQL のエラーを防ぐため、このフィールドを破棄する必要がある
+        // おそらくクエリの深さの最下層にいるので、
+        // このフィールドの子が省略されている
         return null
       }
 
@@ -681,12 +681,12 @@ const recursivelyTransformFields = ({
     : null
 
   if (grandParentTypeName && typeName !== grandParentTypeName) {
-    // if a field has fields of the same type as the field above it
-    // we shouldn't fetch them. 2 types that are circular between each other
-    // are dangerous as they will generate very large queries and fetch data we don't need
-    // these types should instead be proper connections so we can identify
-    // that only an id needs to be fetched.
-    // @todo maybe move this into transformFields() instead of here
+    // フィールドが、その上のフィールドと同じ型のフィールドを持つ場合は、
+    // それらを取得すべきではない。互いに循環する 2 つの型は、
+    // 非常に大きなクエリを生成し、不要なデータを取得してしまうので危険である
+    // こうした型は本来、適切なコネクションであるべきで、そうすれば
+    // id だけを取得すればよいと判断できる。
+    // @todo これをここではなく transformFields() へ移すことを検討する
     fields = fields.filter(field => {
       const fieldTypeName = findNamedTypeName(field.type)
       return fieldTypeName !== grandParentTypeName

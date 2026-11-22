@@ -202,10 +202,10 @@ export const setHardCachedNodes = async ({
     value: allWpNodes,
   })
 
-  // if we're hard caching data,
-  // that means any inline html images paths will be baked into
-  // the processed hard cached nodes.
-  // so we need to copy the static directory
+  // データをハードキャッシュしている場合、
+  // インライン HTML の画像のパスは、処理済みでハードキャッシュされた
+  // ノードに焼き込まれている。
+  // そのため、static ディレクトリをコピーする必要がある
   await copyStaticDirectory()
 }
 
@@ -228,7 +228,7 @@ export const clearHardCachedNodes = async (): Promise<void> => {
   }
 }
 
-// persistent cache
+// 永続キャッシュ
 export const setPersistentCache = async ({
   key,
   value,
@@ -239,9 +239,9 @@ export const setPersistentCache = async ({
   const { helpers } = getGatsbyApi()
 
   await Promise.all([
-    // set Gatsby cache
+    // Gatsby のキャッシュに設定する
     helpers.cache.set(withPluginKey(key), value),
-    // and hard cache
+    // ハードキャッシュにも設定する
     setHardCachedData({ key, value }),
   ])
 }
@@ -274,7 +274,7 @@ export const restoreHardCachedNodes = async ({
   const { helpers, pluginOptions } = getGatsbyApi()
   const { reporter } = helpers
 
-  // restore nodes
+  // ノードを復元する
   await Promise.all(
     hardCachedNodes.map(async node => {
       if (!loggerTypeCounts[node.internal.type]) {
@@ -283,7 +283,7 @@ export const restoreHardCachedNodes = async ({
 
       loggerTypeCounts[node.internal.type] += 1
 
-      // media items are created in a special way
+      // メディアアイテムは特別な方法で作成される
       if (node.internal.type.endsWith(`MediaItem`)) {
         delete node.internal
 
@@ -308,7 +308,7 @@ export const restoreHardCachedNodes = async ({
       const typeSettingsCache = {}
 
       const typeSettings =
-        // TODO: extend node type for wordpress?
+        // TODO: wordpress 用にノードの型を拡張する？
         typeSettingsCache[node.type as string] ??
         getTypeSettingsByType({
           name: node.type,
@@ -342,8 +342,8 @@ export const restoreHardCachedNodes = async ({
         }
       }
 
-      // restore each node
-      // TODO: update gatsby types
+      // 各ノードを復元する
+      // TODO: gatsby の型を更新する
       await helpers.actions.createNode(remoteNode)
 
       return null
@@ -369,10 +369,10 @@ export const restoreHardCachedNodes = async ({
     })
   })
 
-  // restore static directory
+  // static ディレクトリを復元する
   await restoreStaticDirectory()
 
-  // build createdNodeIds id array to be cached 1 level above
+  // 1 つ上の階層でキャッシュする createdNodeIds の id 配列を組み立てる
   const createdNodeIds = hardCachedNodes.map(node => node.id)
 
   return createdNodeIds

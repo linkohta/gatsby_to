@@ -20,7 +20,7 @@ import { needToTouchNodes } from "../../../utils/gatsby-features"
 /**
  * fetchWPGQLContentNodes
  *
- * fetches and paginates remote nodes by post type while reporting progress
+ * 進捗を報告しながら、リモートのノードを投稿タイプごとに取得してページ送りする
  */
 export const fetchWPGQLContentNodes = async ({ queryInfo }) => {
   const { pluginOptions, helpers } = getStore().getState().gatsbyApi
@@ -42,7 +42,7 @@ export const fetchWPGQLContentNodes = async ({ queryInfo }) => {
 
   let allNodesOfContentType = []
 
-  // there's normally just one query here, but more can be added using the settings.nodeListQueries api
+  // 通常ここにあるクエリは 1 つだけだが、settings.nodeListQueries の API で追加できる
   for (const nodeListQuery of nodeListQueries) {
     const contentNodes = await paginatedWpNodeFetch({
       first: perPage,
@@ -74,10 +74,10 @@ export const fetchWPGQLContentNodes = async ({ queryInfo }) => {
 /**
  * getContentTypeQueryInfos
  *
- * returns query infos (Type info & GQL query strings) filtered to
- * remove types that are excluded in the plugin options
+ * クエリ情報（型情報と GQL のクエリ文字列）を、プラグインオプションで
+ * 除外された型を取り除いたうえで返す
  *
- * @returns {Array} Type info & GQL query strings
+ * @returns {Array} 型情報と GQL のクエリ文字列
  */
 export const getContentTypeQueryInfos = () => {
   const { nodeQueries } = getStore().getState().remoteSchema
@@ -136,7 +136,7 @@ export const getGatsbyNodeTypeNames = () => {
 /**
  * fetchWPGQLContentNodesByContentType
  *
- * fetches nodes from the remote WPGQL server and groups them by post type
+ * リモートの WPGQL サーバーからノードを取得し、投稿タイプごとにグループ化する
  *
  * @returns {Array}
  */
@@ -150,11 +150,11 @@ export const runFnForEachNodeQuery = async fn => {
     await Promise.all(
       queries.map(async queryInfo => {
         if (
-          // if the type settings call for lazyNodes, don't fetch them upfront here
+          // 型の設定で lazyNodes が指定されている場合は、ここでは先に取得しない
           (queryInfo.settings.lazyNodes &&
-            // but not in Gatsby v4+ since lazyNodes isn't supported in 4+
+            // ただし Gatsby v4 以降は別である。4 以降では lazyNodes が使えないためである
             !usingGatsbyV4OrGreater) ||
-          // for media items we only want to fetch referenced nodes so don't fetch them here.
+          // メディアアイテムは参照されているノードだけを取得したいので、ここでは取得しない。
           queryInfo.typeInfo.nodesTypeName === `MediaItem`
         ) {
           return
@@ -183,15 +183,15 @@ export const fetchWPGQLContentNodesByContentType = async () => {
 /**
  * fetchAndCreateAllNodes
  *
- * uses query info (generated from introspection in onPreBootstrap) to
- * fetch and create Gatsby nodes from any lists of nodes in the remote schema
+ * （onPreBootstrap でイントロスペクションから生成した）クエリ情報を使い、
+ * リモートスキーマにあるノードのリストを取得して Gatsby のノードを作成する
  */
 export const fetchAndCreateAllNodes = async () => {
   const { helpers } = getGatsbyApi()
   const { reporter } = helpers
 
   //
-  // fetch nodes from WPGQL
+  // WPGQL からノードを取得する
   const activity = reporter.activityTimer(formatLogMessage(`fetching nodes`))
   activity.start()
 
@@ -212,7 +212,7 @@ export const fetchAndCreateAllNodes = async () => {
     createNodesActivity.start()
 
     //
-    // Create Gatsby nodes from WPGQL response
+    // WPGQL のレスポンスから Gatsby のノードを作成する
     createdNodeIds = await createGatsbyNodesFromWPGQLContentNodes({
       wpgqlNodesByContentType,
       createNodesActivity,
@@ -229,8 +229,8 @@ export const fetchAndCreateAllNodes = async () => {
   }
 
   if (needToTouchNodes) {
-    // save the node id's so we can touch them on the next build
-    // so that we don't have to refetch all nodes
+    // 次回のビルドで touch できるよう、ノードの id を保存する
+    // こうすれば、すべてのノードを取得し直さずに済む
     await setPersistentCache({ key: CREATED_NODE_IDS, value: createdNodeIds })
   }
 }

@@ -10,8 +10,8 @@ export const writeQueriesToDisk = async ({ reporter }, pluginOptions) => {
 
   const { remoteSchema } = getStore().getState()
 
-  // the queries only change when the remote schema changes
-  // no need to write them to disk in that case
+  // クエリが変わるのは、リモートスキーマが変わったときだけである
+  // 変わっていなければ、ディスクに書き出す必要はない
   if (!remoteSchema.schemaWasChanged) {
     return
   }
@@ -23,7 +23,7 @@ export const writeQueriesToDisk = async ({ reporter }, pluginOptions) => {
   activity.start()
   const wordPressGraphQLDirectory = `${process.cwd()}/WordPress/GraphQL`
 
-  // remove before writing in case there are old types
+  // 古い型が残っている場合に備え、書き出す前に削除する
   fs.rmSync(wordPressGraphQLDirectory, {
     recursive: true,
     force: true,

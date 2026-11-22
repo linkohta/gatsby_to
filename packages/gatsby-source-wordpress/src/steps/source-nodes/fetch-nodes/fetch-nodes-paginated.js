@@ -4,25 +4,25 @@ import { formatLogMessage } from "../../../utils/format-log-message"
 
 export const normalizeNode = ({ node, nodeTypeName }) => {
   const normalizedNodeTypeName = node.__typename || nodeTypeName
-  // @todo is node.type used anywhere??
+  // @todo node.type はどこかで使われているか
   node.type = normalizedNodeTypeName
-  // this is used to filter node interfaces by content types
+  // これは、ノードのインターフェースをコンテンツタイプで絞り込むために使う
   node.nodeType = normalizedNodeTypeName
 
   return node
 }
 
-// this is used to determine wether we've already seen an id
-// for cold builds.
-// the reason we want to do this is to detect if we create 2 nodes with the same id
-// if we do there will be less nodes in Gatsby than in WP and users will be confused.
+// これは、コールドビルドで id をすでに見たかどうかを
+// 判定するために使う。
+// こうしているのは、同じ id のノードを 2 つ作成していないかを検出するためである
+// そうなると、Gatsby のノードが WP より少なくなり、ユーザーが混乱する。
 const idSet = new Set()
 let hasLoggedDuplicateMessage = false
 
 /**
  * paginatedWpNodeFetch
  *
- * recursively fetches/paginates remote nodes
+ * リモートのノードを再帰的に取得し、ページ送りする
  */
 const paginatedWpNodeFetch = async ({
   contentTypePlural,
@@ -42,24 +42,24 @@ const paginatedWpNodeFetch = async ({
     typeof settings.limit === `number` &&
     settings.limit === 0
   ) {
-    // if the Type.limit plugin option is set to the number 0,
-    // we shouldn't fetch anything
+    // プラグインオプションの Type.limit が数値の 0 に設定されている場合は、
+    // 何も取得すべきではない
     return []
   }
 
   if (
     settings.limit &&
-    // if we're about to fetch more than our limit
+    // 上限を超えて取得しようとしている場合
     allContentNodes.length + variables.first > settings.limit
   ) {
-    // just fetch whatever number is remaining
+    // 残りの数だけ取得する
     variables.first = settings.limit - allContentNodes.length
   }
 
-  // if the GQL var "first" is greater than our Type.limit plugin option,
-  // that's no good
+  // GQL の変数 "first" がプラグインオプションの Type.limit より大きいのは
+  // 望ましくない
   if (settings.limit && settings.limit < variables.first) {
-    // so just fetch our limit
+    // そのため、上限の数だけ取得する
     variables.first = settings.limit
   }
 
@@ -89,8 +89,8 @@ const paginatedWpNodeFetch = async ({
 
   const { hasNextPage, endCursor } = pageInfo || {}
 
-  // Sometimes private posts return as null.
-  // That causes problems for us so let's strip them out
+  // 非公開の投稿が null で返ってくることがある。
+  // それは問題になるので、取り除く
   nodes = nodes.filter(Boolean)
 
   if (nodes && nodes.length) {
@@ -99,9 +99,9 @@ const paginatedWpNodeFetch = async ({
 
       if (
         existingId &&
-        // when the since variable is present
-        // we're fetching lists of node updates from WPGQL
-        // in that case we don't need to worry about logging duplicates
+        // since 変数がある場合は、
+        // WPGQL からノードの更新の一覧を取得している
+        // その場合は、重複のログ出力を気にする必要はない
         !(`since` in variables)
       ) {
         const existingNode = allContentNodes.find(
@@ -134,7 +134,7 @@ const paginatedWpNodeFetch = async ({
       allContentNodes.push(node)
     })
 
-    // MediaItem type is incremented in createMediaItemNode
+    // MediaItem 型は createMediaItemNode で加算される
     if (nodeTypeName !== `MediaItem`) {
       getStore().dispatch.logger.incrementActivityTimer({
         typeName: nodeTypeName,

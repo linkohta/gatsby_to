@@ -4,19 +4,19 @@ import { GatsbyNodeApiHelpers } from "~/utils/gatsby-types"
 import { inPreviewMode } from "."
 
 /**
- * during onCreatePage we want to figure out which node the page is dependant on
-and then store that page in state so we can return info about the page to WordPress
-when the page is updated during Previews.
-We do that by finding the node id on pageContext.id
-Ideally we could detect this without the need for pageContext.id.
-There was an attempt to use store.componentDataDependencies but my implementation
-was buggy and unreliable. @todo it's worth trying to remove the need for
-pageContext.id again in the future.
+ * onCreatePage では、ページがどのノードに依存しているかを突き止め、
+そのページを state に保存する。プレビュー中にページが更新されたとき、
+ページの情報を WordPress へ返せるようにするためである。
+そのために、pageContext.id からノード id を見つけている
+理想的には、pageContext.id に頼らずに検出できるとよい。
+store.componentDataDependencies を使う方法も試したが、実装に不具合があり
+信頼できなかった。@todo 将来、pageContext.id を不要にすることを
+もう一度試す価値がある。
  */
 export const onCreatepageSavePreviewNodeIdToPageDependency = (
   helpers: GatsbyNodeApiHelpers
 ): void => {
-  // if we're not in preview mode we don't want to track this
+  // プレビューモードでなければ、これを追跡する必要はない
   if (!inPreviewMode()) {
     return
   }
@@ -38,15 +38,15 @@ export const onCreatepageSavePreviewNodeIdToPageDependency = (
 }
 
 /**
- * during onCreatePage we check if the node this page was created from
- * has been updated and if it has a callback waiting for it
- * if both of those things are true we invoke the callback to
- * respond to the WP instance preview client
+ * onCreatePage では、このページの元になったノードが更新されたか、
+ * またそれを待っているコールバックがあるかを確認する
+ * 両方が当てはまる場合は、コールバックを呼び出して
+ * WP のインスタンスのプレビュークライアントへ応答する
  */
 export const onCreatePageRespondToPreviewStatusQuery = async (
   helpers: GatsbyNodeApiHelpers
 ): Promise<void> => {
-  // if we're not in preview mode we don't want to set this up
+  // プレビューモードでなければ、これを設定する必要はない
   if (!inPreviewMode()) {
     return
   }
@@ -96,8 +96,8 @@ export const onCreatePageRespondToPreviewStatusQuery = async (
     return
   }
 
-  // We need to add the modified time to pageContext so we can read it in WP
-  // This way can tell when the updated page has been deployed
+  // WP 側で読めるよう、更新時刻を pageContext に追加する必要がある
+  // これにより、更新されたページがデプロイされたことを判別できる
   if (!page.context.__wpGatsbyNodeModified) {
     const pageCopy = { ...page }
     pageCopy.context.__wpGatsbyNodeModified = nodeThatCreatedThisPage.modified

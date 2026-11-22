@@ -1,11 +1,11 @@
 import { getStore } from "~/store"
 import { setPersistentCache } from "~/utils/cache"
 
-// since we create image nodes in resolvers
-// we cache our image node id's on post build for production
-// and on create dev server for development
-// so we can touch our image nodes in both develop and build
-// so they don't get garbage collected by Gatsby
+// 画像ノードはリゾルバーで作成するので、
+// 本番ではビルド後に、開発時は開発サーバーの作成時に、
+// 画像ノードの id をキャッシュする
+// こうすることで develop と build の両方で画像ノードを touch でき、
+// Gatsby にガベージコレクションされない
 const setImageNodeIdCache = async (): Promise<void> => {
   const state = getStore().getState()
   const { imageNodes } = state

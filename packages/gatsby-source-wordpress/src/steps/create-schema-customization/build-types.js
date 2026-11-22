@@ -40,7 +40,7 @@ const unionType = typeBuilderApi => {
     },
   }
 
-  // @todo add this as a plugin option
+  // @todo これをプラグインオプションとして追加する
   unionType = filterTypeDefinition(unionType, typeBuilderApi, `UNION`)
 
   return schema.buildUnionType(unionType)
@@ -72,7 +72,7 @@ const interfaceType = typeBuilderApi => {
     extensions: { infer: false },
   }
 
-  // this is a regular interface type, not a node interface type so we need to resolve the type name
+  // これはノードのインターフェース型ではなく通常のインターフェース型なので、型名を解決する必要がある
   if (!nodeInterfaceTypes.includes(type.name)) {
     typeDef.resolveType = node =>
       node?.__typename ? buildTypeName(node.__typename, prefix) : null
@@ -103,10 +103,10 @@ const objectType = typeBuilderApi => {
     fieldBlacklist,
   })
 
-  // if all child fields are excluded, this type shouldn't exist.
-  // check null first, otherwise cause:
+  // 子フィールドがすべて除外されている場合、この型は存在すべきではない。
+  // 先に null を確認する。そうしないと次のエラーになる:
   // TypeError: Cannot convert undefined or null to object at Function.keys (<anonymous>)
-  // Also cause wordpress blog site build failure in createSchemaCustomization step
+  // また、createSchemaCustomization のステップで wordpress のブログサイトのビルドが失敗する原因にもなる
   if (!transformedFields || !Object.keys(transformedFields).length) {
     return false
   }
@@ -124,7 +124,7 @@ const objectType = typeBuilderApi => {
     objectType.interfaces = [`Node`]
   }
 
-  // @todo add this as a plugin option
+  // @todo これをプラグインオプションとして追加する
   objectType = filterTypeDefinition(objectType, typeBuilderApi, `OBJECT`)
 
   return schema.buildObjectType(objectType)

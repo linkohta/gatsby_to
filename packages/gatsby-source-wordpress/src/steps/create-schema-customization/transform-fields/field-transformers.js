@@ -133,9 +133,9 @@ export const getFieldTransformers = () => {
         if (typeIsABuiltInScalar(field.type)) {
           return field.type.name
         } else {
-          // custom scalars are typed as JSON
-          // @todo if frequently requested,
-          // make this hookable so a plugin could register a custom scalar
+          // カスタムスカラーは JSON として型付けする
+          // @todo 要望が多ければ、
+          // プラグインがカスタムスカラーを登録できるようフック可能にする
           return `JSON`
         }
       },
@@ -149,14 +149,14 @@ export const getFieldTransformers = () => {
         const pluginOptions = getPluginOptions()
 
         const isAnInterfaceTypeOfGatsbyNodes =
-          // if this is an interface
+          // これがインターフェースである場合
           field.type.kind === `INTERFACE` &&
-          // and every possible type is a future gatsby node
+          // かつ、取り得るすべての型が将来 gatsby のノードになる場合
           getStore()
             .getState()
-            // get the full type for this interface
+            // このインターフェースの完全な型を取得する
             .remoteSchema.typeMap.get(findNamedTypeName(field.type))
-            // filter out any excluded types
+            // 除外された型を取り除く
             .possibleTypes?.filter(
               possibleType =>
                 !typeIsExcluded({
@@ -164,8 +164,8 @@ export const getFieldTransformers = () => {
                   typeName: possibleType.name,
                 })
             )
-            // if every remaining type is a Gatsby node type
-            // then use this field transformer
+            // 残ったすべての型が Gatsby のノードタイプであれば、
+            // このフィールドトランスフォーマーを使う
             ?.every(possibleType => gatsbyNodeTypes.includes(possibleType.name))
 
         return (
@@ -188,11 +188,11 @@ export const getFieldTransformers = () => {
         } = getStore().getState()
 
         return (
-          // this is a list of Gatsby nodes
+          // これは Gatsby のノードのリストである
           (field.type.kind === `LIST` &&
             field.type.ofType.kind === `OBJECT` &&
             gatsbyNodeTypes.includes(field.type.ofType.name)) ||
-          // or it's a list of an interface type which Gatsby nodes implement
+          // または、Gatsby のノードが実装するインターフェース型のリストである
           (field.type.kind === `LIST` &&
             field.type.ofType.kind === `INTERFACE` &&
             typeMap
@@ -274,7 +274,7 @@ export const getFieldTransformers = () => {
         `${buildTypeName(findNamedTypeName(field.type), prefix)}!`,
     },
 
-    // for finding unhandled types
+    // 未処理の型を見つけるためのもの
     // {
     //   description: `Unhandled type`,
     //   test: () => true,

@@ -6,10 +6,10 @@ import { getPersistentCache, setPersistentCache } from "~/utils/cache"
 /**
  * buildNodeQueries
  *
- * Uses plugin options to introspect the remote GraphQL
- * source, run cache logic, and generate GQL query strings/info
+ * プラグインオプションを使ってリモートの GraphQL ソースをイントロスペクションし、
+ * キャッシュの処理を行い、GQL のクエリ文字列と情報を生成する
  *
- * @returns {Object} GraphQL query info including gql query strings
+ * @returns {Object} gql のクエリ文字列を含む GraphQL のクエリ情報
  */
 const buildNodeQueries = async () => {
   const { pluginOptions } = getGatsbyApi()
@@ -21,13 +21,13 @@ const buildNodeQueries = async () => {
   const { schemaWasChanged } = getStore().getState().remoteSchema
 
   if (schemaWasChanged || !nodeQueries) {
-    // regenerate queries from introspection
+    // イントロスペクションからクエリを再生成する
     nodeQueries = await generateNodeQueriesFromIngestibleFields()
 
-    // and cache them
+    // そしてキャッシュする
     await setPersistentCache({ key: QUERY_CACHE_KEY, value: nodeQueries })
   }
-  // set the queries in our redux store to use later
+  // 後で使えるよう、クエリを redux ストアに設定する
   getStore().dispatch.remoteSchema.setState({
     nodeQueries,
   })

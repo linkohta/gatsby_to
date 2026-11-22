@@ -1,5 +1,5 @@
 /**
- * Used to check if there have been any updates at all. A single action is enough to trigger refreshing in gatsby develop
+ * 更新が 1 つでもあったかを確認するために使う。gatsby develop では、アクションが 1 つあれば再取得が始まる
  */
 export const contentPollingQuery = /* GraphQL */ `
   query GET_SINGLE_ACTION_MONITOR_ACTION($since: Float!) {
@@ -12,8 +12,8 @@ export const contentPollingQuery = /* GraphQL */ `
 `
 
 /**
- * Used to fetch WP changes since a unix timestamp
- * so we can do incremental data fetches
+ * ある unix タイムスタンプ以降の WP の変更を取得するために使う
+ * これによりデータを差分で取得できる
  */
 export const actionMonitorQuery = /* GraphQL */ `
   query GET_ACTION_MONITOR_ACTIONS($since: Float!, $after: String) {

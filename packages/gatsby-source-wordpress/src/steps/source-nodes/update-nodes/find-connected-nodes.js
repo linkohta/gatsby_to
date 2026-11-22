@@ -1,11 +1,11 @@
 import flattenDeep from "lodash/flattenDeep"
 import { dump } from "dumper.js"
 
-// After all nodes are created while building the schema, store possible node type relationships. So for example when building the WpPost type, for every gatsby node discovered as a potential connected node type WpPost's fields, record that in redux as WpPost => [...ConnectedTypeNames].
+// スキーマの構築中にすべてのノードが作成された後で、ノードタイプ間に成り立ち得るリレーションシップを保存する。たとえば WpPost 型を構築するとき、WpPost のフィールドでつながり得るノードタイプとして見つかった gatsby のノードごとに、WpPost => [...ConnectedTypeNames] の形で redux に記録する。
 
-// when creating or updating a Page incrementally, we should find all connected node ids, check the types of each of those id's, if any connected id type has the current node type as a potential connected node type, AND this node is not a connected node of that node, we should refetch that node in case it's now a connected node.
+// Page を差分で作成または更新するときは、つながっているノードの id をすべて見つけ、それぞれの id の型を確認する。つながっている id の型のいずれかが、現在のノードタイプをつながり得るノードタイプとして持ち、かつこのノードがそのノードとつながっていない場合は、新しくつながった可能性があるので、そのノードを取得し直すべきである。
 
-// So we create a new Page, we then check the connected node id's and determine that one of them is a User type. The User type has Page as a potential connected node. So we check if this node is a connected node of that node. If it's not we can't be sure that that User node isn't missing this node as a connected node. So we refetch the connected node of our Page which is a User. Do this for all connected nodes where we can't find a relationship back.
+// たとえば新しい Page を作成し、つながっているノードの id を確認して、その 1 つが User 型だと判定したとする。User 型は、つながり得るノードとして Page を持つ。そこで、このノードがそのノードとつながっているかを確認する。つながっていなければ、その User ノードが、つながっているノードとしてこのノードを取りこぼしていないとは言い切れない。そのため、Page につながっているノードである User を取得し直す。逆方向のリレーションシップが見つからない、すべてのつながっているノードについて、これを行う。
 
 const recursivelySearchForIds = ([key, value]) => {
   if (!key || !value) {
@@ -20,8 +20,8 @@ const recursivelySearchForIds = ([key, value]) => {
 
   if (Array.isArray(value)) {
     dump(key)
-    // loop through each value of the array. If it's an object recurse on it's fields
-    // if it's anything else skip it.
+    // 配列の各値を順に処理する。オブジェクトであれば、そのフィールドを再帰的に処理する
+    // それ以外であればスキップする。
     value.map(innerValue => {
       if (innerValue === null) {
         return null

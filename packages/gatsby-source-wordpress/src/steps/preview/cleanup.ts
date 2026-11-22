@@ -4,8 +4,8 @@ import { getStore } from "~/store"
 import { NodePluginArgs } from "gatsby"
 
 /**
- * This callback is invoked to send WP the preview status. In this case the status
- * is that we couldn't find a page for the node being previewed
+ * このコールバックは、WP にプレビューの状態を送るために呼び出される。この場合の状態は、
+ * プレビュー対象のノードに対応するページが見つからなかった、というものである
  */
 const invokeLeftoverPreviewCallback =
   ({
@@ -28,8 +28,8 @@ const invokeLeftoverPreviewCallback =
     await callback({
       passedNode,
       nodeId,
-      // we pass null as the path because no page was created for this node.
-      // if it had been, this callback would've been removed earlier in the process
+      // このノードのページは作成されていないので、path として null を渡す。
+      // 作成されていれば、このコールバックは処理のもっと早い段階で取り除かれている
       pageNode: { path: null },
       status,
       context,
@@ -61,19 +61,19 @@ export const invokeAndCleanupLeftoverPreviewCallbacks = async ({
       )
     )
 
-    // after processing our callbacks, we need to remove them all so they don't get called again in the future
+    // コールバックを処理した後は、将来また呼ばれないよう、すべて取り除く必要がある
     getStore().dispatch.previewStore.clearPreviewCallbacks()
   }
 }
 
 /**
- * Preview callbacks are usually invoked during onCreatePage in Gatsby Preview
- * so that we can send back the preview status of a created page to WP
- * In the case that no page is created for the node we're previewing, we'll
- * have callbacks hanging around and WP will not know the status of the preview
- * So in onPreExtractQueries (which runs after pages are created), we check which
- * preview callbacks haven't been invoked, and invoke them with a "NO_PAGE_CREATED_FOR_PREVIEWED_NODE" status, which sends that status to WP
- * After invoking all these leftovers, we clear them out from the store so they aren't called again later.
+ * プレビューのコールバックは通常、Gatsby Preview の onCreatePage の中で呼び出され、
+ * 作成されたページのプレビューの状態を WP へ送り返す
+ * プレビュー対象のノードのページが作成されなかった場合は、コールバックが
+ * 残ったままになり、WP はプレビューの状態を知ることができない
+ * そこで、（ページの作成後に実行される）onPreExtractQueries で、まだ呼び出されていない
+ * プレビューのコールバックを調べ、"NO_PAGE_CREATED_FOR_PREVIEWED_NODE" の状態で呼び出して、その状態を WP へ送る
+ * 残っていたものをすべて呼び出した後は、後でまた呼ばれないようストアから消去する。
  */
 export const onPreExtractQueriesInvokeLeftoverPreviewCallbacks =
   async (): Promise<void> => {
@@ -84,8 +84,8 @@ export const onPreExtractQueriesInvokeLeftoverPreviewCallbacks =
       })
     }
 
-    // check for any onCreatePageCallbacks that weren't called during createPages
-    // we need to tell WP that a page wasn't created for the preview
+    // createPages の中で呼ばれなかった onCreatePageCallbacks があるかを確認する
+    // プレビュー用のページが作成されなかったことを WP に伝える必要がある
     return invokeAndCleanupLeftoverPreviewCallbacks({
       status: `NO_PAGE_CREATED_FOR_PREVIEWED_NODE`,
       context: `invokeAndCleanupLeftoverPreviewCallbacks`,

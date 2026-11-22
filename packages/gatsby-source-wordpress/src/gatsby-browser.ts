@@ -35,14 +35,14 @@ function hydrateImages(): void {
     /* webpackChunkName: "gatsby-plugin-image" */ `gatsby-plugin-image`
   ).then(mod => {
     inlineWPimages.forEach(image => {
-      // usually this is the right element to hydrate on
+      // 通常は、これがハイドレーションの対象として正しい要素である
       const grandParentIsGatsbyImage =
         // @ts-ignore-next-line classList is on HTMLElement
         image?.parentNode?.parentNode?.classList?.contains(
           `gatsby-image-wrapper`
         )
 
-      // but sometimes this is the right element
+      // ただし、こちらが正しい要素であることもある
       const parentIsGatsbyImage =
         // @ts-ignore-next-line classList is on HTMLElement
         image?.parentNode?.classList?.contains(`gatsby-image-wrapper`)

@@ -27,11 +27,11 @@ export const previewOptimizationPreset: IPluginOptionsPreset = {
     },
 
     type:
-      // in Gatsby v4+ we can't fetch nodes in resolvers.
-      // This means if we apply the following settings in v4+
-      // the site will have a lot of missing data when connection
-      // fields reference node's which werent fetched due to the limit option.
-      // so only apply the following settings before Gatsby v4
+      // Gatsby v4 以降では、リゾルバーの中でノードを取得できない。
+      // つまり、v4 以降で次の設定を適用すると、limit オプションのために
+      // 取得されなかったノードをコネクションフィールドが参照している場合に、
+      // サイトのデータが大量に欠けることになる。
+      // そのため、次の設定は Gatsby v4 より前でだけ適用する
       !usingGatsbyV4OrGreater
         ? {
             __all: {
@@ -93,7 +93,7 @@ export interface IPluginOptions {
     queryDepth: number
     circularQueryLimit: number
     typePrefix: string
-    timeout: number // 30 seconds
+    timeout: number // 30 秒
     perPage: number
     requestConcurrency?: number
     previewRequestConcurrency?: number
@@ -115,7 +115,7 @@ export interface IPluginOptions {
       excludeFieldNames?: Array<string>
 
       exclude?: boolean
-      // @todo type this
+      // @todo これに型を付ける
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       beforeChangeNode?: (any) => Promise<any>
       nodeInterface?: boolean
@@ -172,29 +172,29 @@ const defaultPluginOptions: IPluginOptions = {
     queryDepth: 15,
     circularQueryLimit: 5,
     typePrefix: `Wp`,
-    timeout: 30 * 1000, // 30 seconds
+    timeout: 30 * 1000, // 30 秒
     perPage: 100,
     requestConcurrency: 15,
     previewRequestConcurrency: 5,
   },
   excludeFieldNames: [],
   html: {
-    // this causes the source plugin to find/replace images in html
+    // これを指定すると、ソースプラグインが html 内の画像を検索して置き換える
     useGatsbyImage: true,
-    // this adds a limit to the max width an image can be
-    // if the image selected in WP is smaller, or the image is smaller than this
-    // those values will be used instead.
+    // 画像の最大幅に上限を設ける
+    // WP で選択された画像がこれより小さい場合や、画像自体がこれより小さい場合は、
+    // 代わりにそれらの値が使われる。
     imageMaxWidth: null,
-    // if a max width can't be inferred from html, this value will be passed to Sharp
-    // if the image is smaller than this, the images width will be used instead
+    // html から最大幅を推定できない場合は、この値が Sharp に渡される
+    // 画像がこれより小さい場合は、代わりに画像の幅が使われる
     fallbackImageMaxWidth: 1024,
     imageQuality: 90,
     //
-    // Transforms anchor links, video src's, and audio src's (that point to wp-content files) into local file static links
-    // Also fetches those files if they don't already exist
+    // （wp-content のファイルを指す）アンカーリンク、video の src、audio の src を、ローカルの静的ファイルへのリンクに変換する
+    // ファイルがまだ存在しなければ取得も行う
     createStaticFiles: true,
     //
-    // this adds image options to images in HTML fields when html.useGatsbyImage is also set
+    // html.useGatsbyImage も設定されている場合に、HTML フィールド内の画像に画像オプションを追加する
     gatsbyImageOptions: {},
 
     placeholderType: `blurred`,
@@ -202,16 +202,16 @@ const defaultPluginOptions: IPluginOptions = {
   presets: [previewOptimizationPreset],
   type: {
     __all: {
-      // @todo make dateFields into a plugin option?? It's not currently
-      // this may not be needed since WPGraphQL will be getting a Date type soon
+      // @todo dateFields をプラグインオプションにするか検討する。現在はなっていない
+      // WPGraphQL に近く Date 型が追加されるので、不要かもしれない
       // dateFields: [`date`],
     },
     RootQuery: {
       excludeFieldNames: [`viewer`, `node`, `schemaMd5`],
     },
     UserToMediaItemConnection: {
-      // if this type is not excluded it will potentially fetch an extra 100
-      // media items per user during node sourcing
+      // この型を除外しないと、ノードのソーシング中にユーザーごとに最大 100 件の
+      // メディアアイテムを余分に取得する可能性がある
       exclude: true,
     },
     WpContentNodeToEditLockConnectionEdge: {
@@ -246,13 +246,13 @@ const defaultPluginOptions: IPluginOptions = {
         remoteNode,
         actionType,
         typeSettings,
-        // @todo type this
+        // @todo これに型を付ける
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       }): Promise<any> => {
         if (
-          // we fetch lazy nodes files in resolvers, no need to fetch them here.
+          // 遅延ノードのファイルはリゾルバーで取得するので、ここで取得する必要はない。
           typeSettings.lazyNodes ||
-          // or if the user doesn't want us to create file nodes, don't do anything.
+          // または、ユーザーがファイルノードの作成を望んでいない場合は、何もしない。
           !typeSettings.createFileNodes
         ) {
           return {
@@ -294,18 +294,18 @@ const defaultPluginOptions: IPluginOptions = {
     },
     Menu: {
       /**
-       * This is used to fetch child menu items
-       * on Menus as it's problematic to fetch them otherwise
-       * in WPGQL currently
+       * これは、Menu の子メニュー項目を取得するために使う
+       * 現在の WPGQL では、ほかの方法で取得するのが
+       * 難しいためである
        *
-       * So after a Menu Node is fetched and processed, this function runs
-       * It loops through the child menu items, generates a query for them,
-       * fetches them, and creates nodes out of them.
+       * Menu ノードを取得して処理した後に、この関数が実行される
+       * 子メニュー項目を順に処理し、それらのクエリを生成して
+       * 取得し、ノードを作成する。
        *
-       * This runs when initially fetching all nodes, and after an incremental
-       * fetch happens
+       * これは、最初にすべてのノードを取得するときと、差分取得の後に
+       * 実行される
        *
-       * When we can get a list of all menu items regardless of location in WPGQL, this can be removed.
+       * WPGQL で、場所に関係なくすべてのメニュー項目の一覧を取得できるようになれば、これは削除できる。
        */
       beforeChangeNode: menuBeforeChangeNode,
     },
@@ -335,9 +335,9 @@ const gatsbyApi = createModel<IRootModel>()({
       const userPresets = payload.pluginOptions?.presets || []
 
       /**
-       * Presets are plugin option configurations that are conditionally
-       * applied based on a `useIf` function (which returns a boolean)
-       * If it returns true, that preset is used.
+       * プリセットは、`useIf` 関数（boolean を返す）に基づいて条件付きで
+       * 適用される、プラグインオプションの設定である
+       * この関数が true を返すと、そのプリセットが使われる。
        */
       const optionsPresets = [...defaultPresets, ...userPresets]?.filter(
         preset => preset.useIf(payload.helpers, payload.pluginOptions)
@@ -355,7 +355,7 @@ const gatsbyApi = createModel<IRootModel>()({
         state.pluginOptions = presetModifiedOptions
       }
 
-      // add the user defined plugin options last so they override any presets
+      // どのプリセットよりも優先されるよう、ユーザーが定義したプラグインオプションを最後に追加する
       state = merge(state, payload)
 
       return state

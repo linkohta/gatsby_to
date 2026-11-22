@@ -35,8 +35,8 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
 
   if (pluginOptions.type) {
     Object.entries(pluginOptions.type).forEach(([typeName, typeSettings]) => {
-      // our lazy types won't initially be fetched,
-      // so we need to mark them as fetched here
+      // 遅延型は最初は取得されないので、
+      // ここで取得済みとして印を付ける必要がある
       if (
         (typeSettings.lazyNodes || pluginOptions.type?.__all?.lazyNodes) &&
         !typeIsExcluded({ pluginOptions, typeName })
@@ -59,7 +59,7 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
     )
 
     if (fieldHasNonNullArgs) {
-      // we can't know what those args should be, so skip this field
+      // これらの引数に何を渡すべきか分からないので、このフィールドはスキップする
       continue
     }
 
@@ -110,11 +110,11 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
           }
 
           if (
-            // if we haven't marked this as a nodeInterface type then push this to root fields to fetch it
-            // nodeInterface is different than a node which is an interface type.
-            // In Gatsby nodeInterface means the node data is pulled from a different type. On the WP side we can also have nodes that are of an interface type, but we only pull them from a single root field
-            // the problem is that if we don't mark them as a node list root field
-            // we don't know to identify them later as being a node type that will have been fetched and we also wont try to fetch this type during node sourcing.
+            // これを nodeInterface 型としてマークしていなければ、取得するためにルートフィールドへ追加する
+            // nodeInterface は、インターフェース型であるノードとは別のものである。
+            // Gatsby での nodeInterface は、ノードのデータを別の型から取得することを意味する。WP 側にもインターフェース型のノードはあり得るが、それらは 1 つのルートフィールドからしか取得しない
+            // 問題は、それらをノードリストのルートフィールドとしてマークしておかないと、
+            // 後で取得済みのノードタイプとして識別できず、ノードのソーシング中にこの型を取得しようともしなくなることである。
             !pluginOptions?.type?.[findNamedTypeName(nodeListField.type)]
               ?.nodeInterface
           ) {
@@ -122,8 +122,8 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
               findNamedTypeName(nodeListField.type)
             )
 
-            // we need to mark all the possible types as being fetched
-            // and also need to record the possible type as a node type
+            // 取り得るすべての型を取得済みとしてマークし、
+            // さらにその型をノードタイプとして記録する必要がある
             for (const type of nodeInterfaceType?.possibleTypes || []) {
               if (
                 !typeIsExcluded({
@@ -165,14 +165,14 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
 
     const takesIDinput = field?.args?.find(arg => arg.type.name === `ID`)
 
-    // if a non-node root field takes an id input, we 99% likely can't use it.
-    // so don't fetch it and don't add it to the schema.
+    // ノードではないルートフィールドが id を入力に取る場合、99% の確率で使えない。
+    // そのため、取得もせず、スキーマにも追加しない。
     if (takesIDinput) {
       continue
     }
 
     if (
-      // if this type is excluded on the RootQuery, skip it
+      // この型が RootQuery で除外されていれば、スキップする
       pluginOptions.type.RootQuery?.excludeFieldNames?.find(
         excludedFieldName => excludedFieldName === field.name
       )
@@ -180,7 +180,7 @@ const identifyAndStoreIngestableFieldsAndTypes = async () => {
       continue
     }
 
-    // we don't need to mark types as fetched if they're supported SCALAR types
+    // 対応済みの SCALAR 型であれば、取得済みとしてマークする必要はない
     if (!typeIsABuiltInScalar(field.type)) {
       getStore().dispatch.remoteSchema.addFetchedType(field.type)
     }

@@ -1,7 +1,7 @@
 import { IErrorMapEntry } from "gatsby-cli/lib/structured-errors/error-map"
 
 export const CODES = {
-  /* Fetch errors */
+  /* フェッチのエラー */
   WordPressFilters: `111001`,
   BadResponse: `111002`,
   RequestDenied: `111004`,
@@ -10,7 +10,7 @@ export const CODES = {
   WordPress500ishError: `111007`,
   SelfSignedCert: `111008`,
 
-  /* GraphQL Errors */
+  /* GraphQL のエラー */
   RemoteGraphQLError: `112001`,
   MissingAppendedPath: `112002`,
   InconsistentSchemaCustomization: `112004`,

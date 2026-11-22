@@ -35,10 +35,10 @@ export const fetchAndCreateSingleNode = async ({
     const { nodeQuery, previewQuery } =
       getQueryInfoBySingleFieldName(singleName) || {}
 
-    // if this is a preview use the preview query
-    // if it's a preview but it's the initial blank node
-    // then use the regular node query as the preview query wont
-    // return anything
+    // プレビューの場合は、プレビュー用のクエリを使う
+    // プレビューであっても、最初の空のノードの場合は、
+    // 通常のノードのクエリを使う。プレビュー用のクエリは
+    // 何も返さないためである
     const query = isPreview && !isDraft ? previewQuery : nodeQuery
 
     return query
@@ -106,7 +106,7 @@ export const fetchAndCreateSingleNode = async ({
   })
 
   if (isPreview && `slug` in remoteNode && !remoteNode.slug) {
-    // sometimes preview nodes do not have a slug - but some users will use slugs to build page urls. So we should make sure we have something for the slug.
+    // プレビューのノードにはスラッグがないことがある。しかし、スラッグを使ってページの URL を組み立てるユーザーもいる。そのため、スラッグに何らかの値が入るようにすべきである。
     remoteNode.slug = id
   }
 
@@ -114,9 +114,9 @@ export const fetchAndCreateSingleNode = async ({
     const existingNode = getNode(id)
 
     /**
-     * For Preview, revisions of a node type can have data that updates unecessarily
-     * This code block fixes that. The result being that less queries
-     * are invalidated in Gatsby. For example if you have a query where you're getting the latest published post using the date field, that should be static but each preview updates the date field on the node being previewed (because the revision has a new date). So if we prevent the following fields from changing, this will be less problematic.
+     * プレビューでは、あるノードタイプのリビジョンが、不必要に更新されるデータを持つことがある
+     * このコードブロックはそれを修正する。その結果、Gatsby で無効化されるクエリが
+     * 少なくなる。たとえば、date フィールドを使って最新の公開済み投稿を取得するクエリは本来変化しないはずだが、プレビューのたびに、プレビュー対象のノードの date フィールドが更新される（リビジョンが新しい日付を持つため）。そこで、次のフィールドが変わらないようにすれば、この問題は小さくなる。
      */
     if (existingNode) {
       remoteNode = {
@@ -305,17 +305,17 @@ const wpActionUPDATE = async ({ helpers, wpAction }) => {
 
   if (wpAction.referencedNodeStatus !== `publish`) {
     if (needToTouchNodes) {
-      // if the post status isn't publish anymore, we need to remove the node
-      // by removing it from cached nodes so it's garbage collected by Gatsby
+      // 投稿のステータスが publish でなくなった場合は、ノードを削除する必要がある
+      // キャッシュしたノードから取り除けば、Gatsby がガベージコレクションする
       const validNodeIds = cachedNodeIds.filter(cachedId => cachedId !== nodeId)
 
       await setPersistentCache({ key: CREATED_NODE_IDS, value: validNodeIds })
     }
 
     if (existingNode) {
-      // calling touchNode here ensures owners is populated before we delete.
-      // In some cases calling delete node without touching the node first throws an error. this is a bug in Gatsby that has been fixed but this code remains to be backwards compatible with earlier versions that have the bug still.
-      // TODO remove in the next major version
+      // ここで touchNode を呼び出すことで、削除の前に owners が確実に設定される。
+      // 場合によっては、先にノードを touch せずに deleteNode を呼び出すとエラーになる。これは Gatsby のバグですでに修正されているが、バグが残っている以前のバージョンとの後方互換性のために、このコードを残している。
+      // TODO 次のメジャーバージョンで削除する
       await actions.touchNode(existingNode)
       await actions.deleteNode(existingNode)
       reportUpdate({ setAction: `DELETE` })
@@ -348,7 +348,7 @@ const wpActionUPDATE = async ({ helpers, wpAction }) => {
           }
 
           if (
-            // if the value of this field changed, log it
+            // このフィールドの値が変わっていれば、ログに出力する
             typeof node[key] === `string` &&
             value !== node[key]
           ) {
@@ -377,21 +377,21 @@ const wpActionUPDATE = async ({ helpers, wpAction }) => {
 const getDbIdFromRelayId = relayId => atob(relayId).split(`:`).reverse()[0]
 
 const normalizeUri = ({ uri, id, singleName }) => {
-  // remove the preview query params as they're not relevant in Gatsby
+  // プレビュー用のクエリパラメーターは Gatsby では意味がないので取り除く
   uri = uri?.replace(`preview=true`, ``)
 
-  // if removing the preview string leaves us with either of these
-  // characters at the end, trim em off!
+  // プレビューの文字列を取り除いた結果、末尾にこれらの文字の
+  // どちらかが残った場合は、切り落とす
   if (uri?.endsWith(`?`) || uri?.endsWith(`&`)) {
     uri = uri.slice(0, -1)
   }
 
-  // if this is a draft url which could look like
-  // this /?p=543534 or /?page=4324 or /?something=yep&page=543543 or /?p=4534&what=yes
-  // we will create a proper path that Gatsby can handle
+  // これが下書きの URL の場合、たとえば
+  // /?p=543534、/?page=4324、/?something=yep&page=543543、/?p=4534&what=yes のような形になる
+  // その場合は、Gatsby が扱える適切なパスを作成する
   // /post_graphql_name/post_db_id/
-  // this same logic is on the WP side in the preview template
-  // to account for this situation.
+  // この状況に対応するため、同じロジックが WP 側の
+  // プレビューテンプレートにもある。
   if (uri?.startsWith(`/?`)) {
     const dbId = getDbIdFromRelayId(id)
 

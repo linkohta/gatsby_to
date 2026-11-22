@@ -17,10 +17,10 @@ const buildReusableFragments = ({ fragments }) =>
     .join(` `)
 
 /**
- * Takes in a fragments object (built up during the buildSelectionSet function)
- * transforms that object into an actual fragment,
- * then checks for unused fragments and potential regenerates again
- * with the unused fragments removed
+ * （buildSelectionSet 関数の中で組み立てた）fragments オブジェクトを受け取り、
+ * 実際のフラグメントに変換する。
+ * その後、未使用のフラグメントを確認し、必要であれば未使用のフラグメントを
+ * 取り除いてもう一度生成する
  */
 export const generateReusableFragments = ({ fragments, selectionSet }) => {
   const fragmentsValues = Object.values(fragments)
@@ -35,10 +35,10 @@ export const generateReusableFragments = ({ fragments, selectionSet }) => {
     let regenerateFragments = false
 
     fragmentsValues.forEach(({ name, type }) => {
-      // if our query didn't use the fragment due to the query depth AND the fragment isn't used in another fragment, delete it
-      // @todo these fragments shouldn't be generated if they wont be used.
-      // if we fix this todo, we can use the buildReusableFragments function directly
-      // instead of running it twice to remove unused fragments
+      // クエリの深さのためにクエリがフラグメントを使わず、かつそのフラグメントがほかのフラグメントでも使われていなければ、削除する
+      // @todo これらのフラグメントは、使われないのであれば生成されるべきではない。
+      // この todo を直せば、未使用のフラグメントを取り除くために 2 回実行する代わりに、
+      // buildReusableFragments 関数を直接使える
       if (
         !selectionSet.includes(`...${name}`) &&
         !builtFragments.includes(`...${name}`)
@@ -136,8 +136,8 @@ export const buildSelectionSet = (
       (!variables || variables === ``) &&
       fields?.find(field => field.fieldName === `nodes`)
     ) {
-      // @todo instead of checking for a nodes field, include the field type here
-      // and check for input args instead. Maybe some kind of input args API or something would be helpful
+      // @todo nodes フィールドの有無を確認する代わりに、ここにフィールドの型を含め、
+      // 入力引数を確認する。入力引数用の API のようなものがあると役立つかもしれない
       variables = `first: 100`
     }
 
@@ -161,9 +161,9 @@ export const buildSelectionSet = (
     } else if (fieldName) {
       const fullFieldType = typeMap.get(findNamedTypeName(fieldType))
 
-      // if this field has subfields but we didn't build a selection set for it
-      // we shouldn't fetch this field. This can happen when we have self referencing types that are limited by the schema.circularQueryLimit plugin option.
-      // @todo the above should be fixed in recursively-transform-fields.js instead of here. recursion is hard :p
+      // このフィールドにサブフィールドがあるのに、セレクションセットを組み立てなかった場合は、
+      // このフィールドを取得すべきではない。自己参照する型が、プラグインオプションの schema.circularQueryLimit で制限されているときに起こり得る。
+      // @todo 上の問題は、ここではなく recursively-transform-fields.js で直すべきである。再帰は難しい :p
       if (fullFieldType.fields) {
         return null
       }

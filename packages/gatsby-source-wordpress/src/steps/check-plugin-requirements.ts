@@ -120,7 +120,7 @@ const areRemotePluginVersionsSatisfied = async ({
   const shouldDisplayBothReasons =
     shouldDisplayWPGraphQLReason && shouldDisplayWPGatsbyReason
 
-  // a message explaining why these are the minimum versions
+  // これらが最低バージョンである理由を説明するメッセージ
   const reasons = `${shouldDisplayAtleastOneReason ? `\n\nReasons:\n\n` : ``}${
     shouldDisplayWPGraphQLReason
       ? `- ${supportedWpPluginVersions.WPGraphQL.reason}`
@@ -190,10 +190,10 @@ ${reasons}`
   }
 }
 
-// This blank request is used to find debug messages
-// when a graphql request is made with no query
-// for example if 2 root fields are registered with the fieldname "products"
-// this will throw a helpful error message explaining that one should be removed
+// この空のリクエストは、クエリなしで graphql リクエストを送ったときの
+// デバッグメッセージを見つけるために使う
+// たとえば、"products" というフィールド名のルートフィールドが 2 つ登録されている場合、
+// どちらかを削除すべきだと説明する分かりやすいエラーメッセージが返る
 const blankGetRequest = async ({
   url,
   helpers,
@@ -224,8 +224,8 @@ ${firstError.debugMessage || firstError.message}
       }
     })
     .catch(() => {
-      // this is ignored because a /graphql request will always return a 200 at this point
-      // we've already checked prior to this point that /graphql is up and returns a response.
+      // この時点では /graphql へのリクエストは必ず 200 を返すので、これは無視する
+      // /graphql が稼働していてレスポンスを返すことは、ここより前で確認済みである。
     })
 
 const isWpGatsby = async (): Promise<void> => {
@@ -237,7 +237,7 @@ const isWpGatsby = async (): Promise<void> => {
     `,
     errorMap: {
       from: `Cannot query field "isWpGatsby" on type "RootQuery".`,
-      // @todo replace this link with another once we're out of alpha
+      // @todo アルファ版でなくなったら、このリンクを別のものに置き換える
       to: `WPGatsby is not active in your WordPress installation.\nTo download the latest version of WPGatsby visit https://wordpress.org/plugins/wp-gatsby/`,
     },
     panicOnError: true,
@@ -278,7 +278,7 @@ ${data.generalSettings.url}/wp-admin/options-permalink.php.
       )
     }
   } catch (e) {
-    // the WPGatsby version is too old to query for wpGatsby.arePrettyPermalinksEnabled
+    // WPGatsby のバージョンが古すぎて、wpGatsby.arePrettyPermalinksEnabled をクエリできない
   }
 }
 
@@ -287,8 +287,8 @@ const ensurePluginRequirementsAreMet = async (
 ): Promise<void> => {
   if (
     helpers.traceId === `refresh-createSchemaCustomization` ||
-    // PQR doesn't have a trace id.
-    // By the time this runs in PQR we don't need it to run again.
+    // PQR にはトレース id がない。
+    // PQR でこれが実行される時点では、もう一度実行する必要はない。
     !helpers.traceId
   ) {
     return
@@ -310,7 +310,7 @@ const ensurePluginRequirementsAreMet = async (
     remoteSchema: { schemaWasChanged },
   } = getStore().getState()
 
-  // if we don't have a cached remote schema MD5, this is a cold build
+  // キャッシュしたリモートスキーマの MD5 がなければ、これはコールドビルドである
   const isFirstBuild = !(await getPersistentCache({ key: MD5_CACHE_KEY }))
 
   if (

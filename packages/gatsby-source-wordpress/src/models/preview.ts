@@ -1,4 +1,4 @@
-// `node` here is a Gatsby node
+// ここでの `node` は Gatsby のノードである
 
 import { createModel } from "@rematch/core"
 import { IRootModel } from "."
@@ -86,9 +86,9 @@ const previewStore = createModel<IRootModel>()({
         modified: string
       }
     ) {
-      // save the callback for this nodeId
-      // when a page is created from a node that has this id,
-      // the callback will be invoked
+      // この nodeId に対するコールバックを保存する
+      // この id を持つノードからページが作成されたときに、
+      // コールバックが呼び出される
       state.nodePageCreatedCallbacks[nodeId] = sendPreviewStatus
 
       return state

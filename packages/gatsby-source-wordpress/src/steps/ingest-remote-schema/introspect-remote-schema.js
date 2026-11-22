@@ -7,7 +7,7 @@ import fetchGraphql from "~/utils/fetch-graphql"
 import { introspectionQuery } from "~/utils/graphql-queries"
 
 /**
- * Builds the cache key for retrieving cached introspection data
+ * キャッシュしたイントロスペクションデータを取得するためのキャッシュキーを組み立てる
  */
 const getCachedRemoteIntrospectionDataCacheKey = () => {
   const state = getStore().getState()
@@ -19,7 +19,7 @@ const getCachedRemoteIntrospectionDataCacheKey = () => {
 }
 
 /**
- * Returns cached introspection data for the remote WPGraphQL schema
+ * リモートの WPGraphQL スキーマについて、キャッシュしたイントロスペクションデータを返す
  */
 const getCachedRemoteIntrospectionData = async () => {
   const INTROSPECTION_CACHE_KEY = getCachedRemoteIntrospectionDataCacheKey()
@@ -31,9 +31,9 @@ const getCachedRemoteIntrospectionData = async () => {
 }
 
 /**
- * Checks if WPGraphQL is exposing a field on a type
- * for example `GatsbyPreviewData.manifestIds`
- * This allows us to make otherwise breaking changes in a backwards compatible way
+ * WPGraphQL が、ある型のフィールドを公開しているかを確認する
+ * たとえば `GatsbyPreviewData.manifestIds`
+ * これにより、本来なら破壊的になる変更を、後方互換性を保って行える
  */
 export const remoteSchemaSupportsFieldNameOnTypeName = async ({
   fieldName,
@@ -76,7 +76,7 @@ const introspectAndStoreRemoteSchema = async () => {
 
     const INTROSPECTION_CACHE_KEY = getCachedRemoteIntrospectionDataCacheKey()
 
-    // cache introspection response
+    // イントロスペクションのレスポンスをキャッシュする
     await setPersistentCache({
       key: INTROSPECTION_CACHE_KEY,
       value: introspectionData,

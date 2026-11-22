@@ -6,22 +6,22 @@ import fetchGraphql from "../../../utils/fetch-graphql"
 import { LAST_COMPLETED_SOURCE_TIME } from "../../../constants"
 
 /**
- * This function checks wether there is atleast 1 WPGatsby action ready to be processed by Gatsby
- * If there is, it calls the refresh webhook so that schema customization and source nodes run again.
+ * この関数は、Gatsby が処理できる WPGatsby のアクションが少なくとも 1 つあるかを確認する
+ * あれば refresh の webhook を呼び出し、スキーマのカスタマイズとノードのソーシングをもう一度実行させる。
  */
 const checkForNodeUpdates = async ({ cache, emitter }) => {
-  // pause polling until we know wether or not there are new actions
-  // if there aren't any we will unpause below, if there are some we will unpause
-  // at the end of sourceNodes (triggered by WEBHOOK_RECEIVED below)
+  // 新しいアクションがあるかどうかが分かるまで、ポーリングを一時停止する
+  // なければ下で再開し、あれば sourceNodes の最後
+  // （下の WEBHOOK_RECEIVED がきっかけになる）で再開する
   getStore().dispatch.develop.pauseRefreshPolling()
 
-  // get the last sourced time
+  // 最後にソーシングした時刻を取得する
   const lastCompletedSourceTime = await cache.get(
     withPluginKey(LAST_COMPLETED_SOURCE_TIME)
   )
   const since = lastCompletedSourceTime - 500
 
-  // make a graphql request for any actions that have happened since
+  // それ以降に発生したアクションを graphql でリクエストする
   const {
     data: {
       actionMonitorActions: { nodes: newActions },
@@ -31,7 +31,7 @@ const checkForNodeUpdates = async ({ cache, emitter }) => {
     variables: {
       since,
     },
-    // throw fetch errors and graphql errors so we can auto recover in refetcher()
+    // refetcher() で自動的に復旧できるよう、fetch のエラーと graphql のエラーを投げる
     throwGqlErrors: true,
     throwFetchErrors: true,
   })
@@ -45,7 +45,7 @@ const checkForNodeUpdates = async ({ cache, emitter }) => {
       pluginName: `gatsby-source-wordpress`,
     })
   } else {
-    // set new last completed source time and move on
+    // 最後にソーシングが完了した時刻を新しく設定し、先へ進む
     await cache.set(withPluginKey(LAST_COMPLETED_SOURCE_TIME), Date.now())
     getStore().dispatch.develop.resumeRefreshPolling()
   }
@@ -93,10 +93,10 @@ const refetcher = async (
       reconnectionActivity.setStatus(`retried ${retryCount} times`)
     }
 
-    // retry after retry count times 5 seconds
+    // リトライ回数 × 5 秒後にリトライする
     const retryTime = retryCount * 5000
-    // if the retry time is greater than or equal to the max (60 seconds)
-    // use the max, otherwise use the retry time
+    // リトライまでの時間が最大値（60 秒）以上であれば
+    // 最大値を使い、そうでなければリトライまでの時間を使う
     const maxWait = 60000
     const waitFor = retryTime >= maxWait ? maxWait : retryTime
 
@@ -117,8 +117,8 @@ let startedPolling = false
 let firstCompilationDone = false
 
 /**
- * Starts constantly refetching the latest WordPress changes
- * so we can update Gatsby nodes when data changes
+ * WordPress の最新の変更を取得し続ける処理を開始する
+ * データが変わったときに Gatsby のノードを更新できるようにするためである
  */
 const startPollingForContentUpdates = helpers => {
   if (
@@ -137,18 +137,18 @@ const startPollingForContentUpdates = helpers => {
 
   helpers.emitter.on(`COMPILATION_DONE`, () => {
     /**
-     * we only want to start our refetcher helper 1 time after the first COMPILATION_DONE event.
-     * This event happens when the dev server is ready. It also happens after saving a code change. We only want to run our code 1 time.
-     * onCreateDevServer (the node API we're hooking into) is called before the dev server is ready.
-     * Running our logic at that point is problematic because we could end up triggering the WEBHOOK_RECEIVED event before the dev server is ready and this can cause Gatsby to throw errors. So we're hooking into COMPILATION_DONE to avoid that problem.
+     * refetcher ヘルパーを開始するのは、最初の COMPILATION_DONE イベントの後の 1 回だけにしたい。
+     * このイベントは開発サーバーの準備ができたときに発生する。コードの変更を保存した後にも発生するが、このコードは 1 回だけ実行したい。
+     * onCreateDevServer（フックしている node API）は、開発サーバーの準備ができる前に呼ばれる。
+     * その時点でロジックを実行すると、開発サーバーの準備ができる前に WEBHOOK_RECEIVED イベントを発生させてしまい、Gatsby がエラーを投げる可能性があるので問題になる。この問題を避けるため、COMPILATION_DONE にフックしている。
      */
     if (!firstCompilationDone) {
       firstCompilationDone = true
 
-      // wait a second so that terminal output is more smooth
+      // ターミナルの出力がなめらかになるよう、1 秒待つ
       setTimeout(() => {
         if (verbose) {
-          // I'm not sure why, but we're losing the ALS context here so we need to restore it manually
+          // 理由は分からないが、ここで ALS のコンテキストが失われるので、手動で復元する必要がある
           restoreContext()
           helpers.reporter.log(``)
           helpers.reporter.info(

@@ -169,19 +169,19 @@ export const getFileNodeByMediaItemNode = async ({
   const existingNodeMeta = getFileNodeMetaBySourceUrl(fileUrl)
 
   if (
-    // if we already have this image
+    // この画像がすでにあり
     existingNodeMeta &&
     existingNodeMeta.id &&
-    // and it hasn't been modified
+    // かつ、変更されていない場合
     existingNodeMeta.modifiedGmt === modifiedGmt
   ) {
     let node = await helpers.getNode(existingNodeMeta.id)
 
-    // some of the cached node metas don't necessarily need to be a File
-    // so make sure we return a File node if what we get isn't one
+    // キャッシュしたノードのメタ情報は、必ずしも File であるとは限らない
+    // そのため、取得したものが File ノードでなければ、File ノードを返すようにする
     if (node && node.internal && node.internal.type !== `File`) {
       if (node.localFile && node.localFile.id) {
-        // look up the corresponding file node
+        // 対応するファイルノードを探す
         node = await helpers.getNode(node.localFile.id)
       } else {
         return null
@@ -236,13 +236,13 @@ export const createLocalFileNode = async ({
     // eslint-disable-next-line no-unsafe-optional-chaining
     pluginOptions.type?.MediaItem?.localFile
 
-  // if this file is larger than maxFileSizeBytes, don't fetch the remote file
+  // このファイルが maxFileSizeBytes より大きい場合は、リモートファイルを取得しない
   if (fileSize > maxFileSizeBytes) {
     getStore().dispatch.postBuildWarningCounts.incrementMaxFileSizeBytesExceeded()
     return null
   }
 
-  // if this type of file is excluded, don't fetch the remote file
+  // この種類のファイルが除外されている場合は、リモートファイルを取得しない
   if (excludeByMimeTypes.includes(mimeType)) {
     getStore().dispatch.postBuildWarningCounts.incrementMimeTypeExceeded()
     return null
@@ -275,9 +275,9 @@ export const createLocalFileNode = async ({
   let remoteFileNode
 
   if (hardCacheMediaFiles) {
-    // check for file in .wordpress-cache/wp-content
-    // if it exists, use that to create a node from instead of
-    // fetching from wp
+    // .wordpress-cache/wp-content にファイルがあるかを確認する
+    // あれば、wp から取得する代わりに、
+    // それを使ってノードを作成する
     try {
       const buffer = await fs.readFile(hardCachedFilePath)
       remoteFileNode = await createFileNodeFromBuffer({
@@ -287,12 +287,12 @@ export const createLocalFileNode = async ({
         ...createFileNodeRequirements,
       })
     } catch (e) {
-      // ignore errors, we'll download the image below if it doesn't exist
+      // エラーは無視する。画像がなければ下でダウンロードする
     }
   }
 
   if (!remoteFileNode) {
-    // Otherwise we need to download it
+    // そうでなければダウンロードする必要がある
     remoteFileNode = await retry(
       async () => {
         if (fetchState.shouldBail) {
@@ -305,8 +305,8 @@ export const createLocalFileNode = async ({
 
         const htaccessCredentials = pluginOptions.auth.htaccess
 
-        // if media items are hosted on another url like s3,
-        // using the htaccess creds will throw 400 errors
+        // メディアアイテムが s3 のような別の URL でホストされている場合、
+        // htaccess の認証情報を使うと 400 エラーになる
         const shouldUseHtaccessCredentials = wpUrlHostname === mediaItemHostname
 
         const auth =
@@ -317,7 +317,7 @@ export const createLocalFileNode = async ({
               }
             : null
 
-        // if this errors, it's caught one level above in fetch-referenced-media-items.js so it can be placed on the end of the request queue
+        // ここでエラーになった場合は、1 階層上の fetch-referenced-media-items.js で捕捉され、リクエストキューの末尾に入れ直される
         const node = await createRemoteFileNode({
           url: mediaItemUrl,
           auth,
@@ -348,9 +348,9 @@ export const createLocalFileNode = async ({
     return null
   }
 
-  // push it's id and url to our store for caching,
-  // so we can touch this node next time
-  // and so we can easily access the id by source url later
+  // キャッシュ用に、その id と URL をストアに追加する。
+  // 次回このノードを touch できるようにし、
+  // 後でソース URL から id を簡単に引けるようにするためである
   getStore().dispatch.imageNodes.pushNodeMeta({
     id: remoteFileNode.id,
     sourceUrl: mediaItemUrl,
@@ -359,15 +359,15 @@ export const createLocalFileNode = async ({
 
   if (hardCacheMediaFiles) {
     try {
-      // make sure the directory exists
+      // ディレクトリが存在するようにする
       await fs.ensureDir(path.dirname(hardCachedFilePath))
-      // copy our downloaded file to our existing directory
+      // ダウンロードしたファイルを既存のディレクトリへコピーする
       await fs.copyFile(remoteFileNode.absolutePath, hardCachedFilePath)
     } catch (e) {
       helpers.reporter.panic(e)
     }
   }
 
-  // and use it
+  // そしてそれを使う
   return remoteFileNode
 }

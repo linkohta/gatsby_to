@@ -18,11 +18,11 @@ const sourceNodes: Step = async (helpers, pluginOptions) => {
     actions.enableStatefulSourceNodes()
   }
 
-  // fetch non-node root fields such as settings.
-  // For now, we're refetching them on every build
+  // settings など、ノードではないルートフィールドを取得する。
+  // 今のところ、ビルドのたびに取得し直している
   const nonNodeRootFieldsPromise = fetchAndCreateNonNodeRootFields()
 
-  // if this is a preview we want to process it and return early
+  // プレビューの場合は、それを処理して早期に return する
   if (webhookBody.token && webhookBody.userDatabaseId) {
     await sourcePreviews(helpers)
     await nonNodeRootFieldsPromise
@@ -43,20 +43,20 @@ const sourceNodes: Step = async (helpers, pluginOptions) => {
   const fetchEverything =
     !lastCompletedSourceTime ||
     refetchAll ||
-    // don't refetch everything in development
+    // 開発時はすべてを取得し直さない
     (process.env.NODE_ENV !== `development` &&
-      // and the schema was changed
+      // かつ、スキーマが変更された場合
       schemaWasChanged)
 
-  // If this is an uncached build,
-  // or our initial build to fetch and cache everything didn't complete,
-  // pull everything from WPGQL
+  // キャッシュのないビルドの場合、
+  // または、すべてを取得してキャッシュする最初のビルドが完了しなかった場合は、
+  // WPGQL からすべてを取得する
   if (fetchEverything) {
     await fetchAndCreateAllNodes()
   }
 
-  // If we've already successfully pulled everything from WPGraphQL
-  // just pull the latest changes
+  // WPGraphQL からすでにすべてを取得できている場合は、
+  // 最新の変更だけを取得する
   else if (!fetchEverything) {
     await fetchAndApplyNodeUpdates({
       since: lastCompletedSourceTime,
