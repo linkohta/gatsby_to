@@ -1,4 +1,4 @@
-/* Code borrowed and based on
+/* 次のコードを借用し、それを元にしている
  * https://github.com/evanw/node-source-map-support/blob/master/source-map-support.js
  */
 
@@ -20,8 +20,8 @@ export class ErrorWithCodeFrame extends Error {
   constructor(error: Error) {
     super(error.message)
 
-    // We must use getOwnProperty because keys like `stack` are not enumerable,
-    // but we want to copy over the entire error
+    // `stack` のようなキーは列挙可能ではないので、getOwnProperty を使う必要がある。
+    // エラー全体をコピーしたいためである
     Object.getOwnPropertyNames(error).forEach(key => {
       this[key] = error[key]
     })
@@ -33,8 +33,8 @@ export function prepareStackTrace(
   sourceOfMainMap: string
 ): ErrorWithCodeFrame {
   const newError = new ErrorWithCodeFrame(error)
-  // source point to single map, but with code splitting for build-html we need to handle more maps
-  // we use fact that all .map files will be in same dir as main one here
+  // source は 1 つのマップを指すが、build-html ではコード分割があるので複数のマップを扱う必要がある
+  // ここでは、すべての .map ファイルがメインのものと同じディレクトリにあることを利用している
   const bundleDir = path.dirname(sourceOfMainMap)
   const bundleDirMapFiles = readdirSync(bundleDir)
     .filter(fileName => fileName.endsWith(`.js.map`))
@@ -129,7 +129,7 @@ function getPosition({
   frame: stackTrace.StackFrame
 }): OriginalMapping | InvalidOriginalMapping {
   if (frame.getFileName().includes(`webpack:`)) {
-    // if source-map-register is initiated, stack traces would already be converted
+    // source-map-register が初期化されている場合、スタックトレースはすでに変換されている
     return {
       column: frame.getColumnNumber() - 1,
       line: frame.getLineNumber(),
@@ -153,7 +153,7 @@ function getPosition({
   return { source: null, column: null, line: null, name: null }
 }
 
-// This is copied almost verbatim from the V8 source code at
+// これは、次の V8 のソースコードからほぼそのままコピーしたものである
 // https://code.google.com/p/v8/source/browse/trunk/src/messages.js.
 function CallSiteToString(): string {
   // @ts-ignore
@@ -179,9 +179,9 @@ function CallSiteToString(): string {
     if (fileName) {
       fileLocation += fileName.replace(/^webpack:\/+(lib\/)?/, ``)
     } else {
-      // Source code does not originate from a file and is not native, but we
-      // can still get the source position inside the source string, e.g. in
-      // an eval string.
+      // ソースコードがファイル由来でもネイティブでもない場合でも、
+      // ソース文字列の中での位置は取得できる。たとえば
+      // eval の文字列の中などである。
       fileLocation += `<anonymous>`
     }
     const lineNumber = `getLineNumber` in self ? self.getLineNumber() : null

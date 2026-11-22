@@ -9,8 +9,8 @@ import {
 import { sanitizeStructuredStackTrace } from "../reporter/errors"
 import { IConstructError, IStructuredError } from "./types"
 
-// Merge partial error details with information from the errorMap
-// Validate the constructed object against an error schema
+// 部分的なエラーの詳細を errorMap の情報とマージする
+// 組み立てたオブジェクトをエラーのスキーマで検証する
 const constructError = (
   { details: { id, ...otherDetails } }: IConstructError,
   suppliedErrorMap: Record<ErrorId, IErrorMapEntryPublicApi>
@@ -18,7 +18,7 @@ const constructError = (
   let errorMapEntry = defaultError
 
   if (id) {
-    // Look at original errorMap, ids cannot be overwritten
+    // 元の errorMap を確認する。ID は上書きできない
     if (errorMap[id]) {
       errorMapEntry = errorMap[id]
     } else if (suppliedErrorMap[id]) {
@@ -35,7 +35,7 @@ const constructError = (
       ? errorMapEntry.type(otherDetails.context)
       : errorMapEntry.type
 
-  // merge
+  // マージする
   const structuredError: IStructuredError = {
     context: {},
     ...otherDetails,
@@ -52,7 +52,7 @@ const constructError = (
     structuredError.code = id
   }
 
-  // validate
+  // 検証する
   const { error } = errorSchema.validate(structuredError)
   if (error) {
     console.log(`Failed to validate error`, error)

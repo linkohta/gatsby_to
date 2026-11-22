@@ -8,8 +8,8 @@ const isStringPayload = (action: ActionsUnion): action is ISetStatus =>
   typeof action.payload === `string`
 
 /**
- * Payload can either be a String or an Object
- * See more at integration-tests/structured-logging/__tests__/to-do.js
+ * payload は String か Object のどちらかである
+ * 詳しくは integration-tests/structured-logging/__tests__/to-do.js を参照
  */
 const sanitizeAction = (action: ActionsUnion): ActionsUnion => {
   const copiedAction = cloneDeep(action)
@@ -34,15 +34,15 @@ export const initializeIPCLogger = (): void => {
 
     const sanitizedAction = sanitizeAction(action)
 
-    // we mutate sanitizedAction but this is already deep copy of action so we should be good
+    // sanitizedAction を書き換えているが、これはすでに action のディープコピーなので問題ないはずである
     if (sanitizedAction.type === Actions.Log) {
-      // Don't emit Debug over IPC
+      // Debug は IPC 経由では送らない
       if (
         [LogLevels.Debug].includes(sanitizedAction.payload.level as LogLevels)
       ) {
         return
       }
-      // Override Success and Log types to Info over IPC
+      // IPC 経由では、Success と Log の種別を Info に上書きする
       if (
         [LogLevels.Success, LogLevels.Log].includes(
           sanitizedAction.payload.level as LogLevels

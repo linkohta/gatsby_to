@@ -46,11 +46,11 @@ let cancelDelayedSetStatus: (() => void) | null
 
 let pendingStatus: ActivityStatuses | "" = ``
 
-// We debounce "done" statuses because activities don't always overlap
-// and there is timing window after one activity ends and before next one starts
-// where technically we are "done" (all activities are done).
-// We don't want to emit multiple SET_STATUS events that would toggle between
-// IN_PROGRESS and SUCCESS/FAILED in short succession in those cases.
+// "done" のステータスはデバウンスしている。アクティビティは常に重なり合うわけではなく、
+// あるアクティビティが終わってから次が始まるまでのあいだに、厳密には "done"
+// （すべてのアクティビティが完了）になる時間帯があるためである。
+// そのような場合に、IN_PROGRESS と SUCCESS/FAILED を短時間で行き来する
+// SET_STATUS イベントを何度も送りたくない。
 export const setStatus =
   (status: ActivityStatuses | "", force: boolean = false) =>
   (dispatch: Dispatch<ISetStatus>): void => {
@@ -71,7 +71,7 @@ export const setStatus =
       })
       pendingStatus = ``
     } else {
-      // use pending status if truthy, fallback to current status if we don't have pending status
+      // 保留中のステータスが truthy ならそれを使い、なければ現在のステータスを使う
       const pendingOrCurrentStatus = pendingStatus || currentStatus
 
       if (status !== pendingOrCurrentStatus) {

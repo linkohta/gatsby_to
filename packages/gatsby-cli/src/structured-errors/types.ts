@@ -83,14 +83,14 @@ export enum Type {
   FUNCTIONS_EXECUTION = `FUNCTIONS.EXECUTION`,
   CLI_VALIDATION = `CLI.VALIDATION`,
   ADAPTER = `ADAPTER`,
-  // webpack errors for each stage enum: packages/gatsby/src/commands/types.ts
+  // 各ステージの enum に対応する webpack のエラー: packages/gatsby/src/commands/types.ts
   WEBPACK_DEVELOP = `WEBPACK.DEVELOP`,
   WEBPACK_DEVELOP_HTML = `WEBPACK.DEVELOP-HTML`,
   WEBPACK_BUILD_JAVASCRIPT = `WEBPACK.BUILD-JAVASCRIPT`,
   WEBPACK_BUILD_HTML = `WEBPACK.BUILD-HTML`,
   UNKNOWN = `UNKNOWN`,
-  // Backwards compatibility for plugins
-  // TODO(v6): Remove these types
+  // プラグイン向けの後方互換性
+  // TODO(v6): これらの型を削除する
   /** @deprecated */
   GRAPHQL = `GRAPHQL`,
   /** @deprecated */

@@ -242,9 +242,9 @@ export function initializeYurnalistLogger(): void {
             text: action.payload.text,
             statusText: action.payload.statusText,
             update(payload: any): void {
-              // TODO: I'm not convinced that this is ever called with a text property.
-              // From searching the codebase it appears that we do not ever assign a text
-              // property during the IUpdateActivity action.
+              // TODO: これが text プロパティ付きで呼ばれることがあるとは思えない。
+              // コードベースを検索した限りでは、IUpdateActivity アクションで text プロパティを
+              // 設定している箇所は見当たらない。
               if (payload.text) {
                 activity.text = payload.text
               }
@@ -270,18 +270,18 @@ export function initializeYurnalistLogger(): void {
           const bar = new ProgressBar(
             ` [:bar] :current/:total :elapsed s :rate /s :percent ${action.payload.text}`,
             {
-              total: Math.max(action.payload.total || 1, 1) || 1, // Not zero. Otherwise you get 0/0 errors.
+              total: Math.max(action.payload.total || 1, 1) || 1, // 0 にはしない。0 にすると 0/0 のエラーになる。
               // curr: action.payload.current, // see below
               width: 30,
               clear: true,
             }
           )
 
-          // There is a bug in the `progress` package where the timer doesn't
-          // start until the first tick and setting `curr` will cause the
-          // time/eta to remain zero: https://github.com/visionmedia/node-progress/issues/81
-          // This is a workaround although the eta will initially be wrong
-          // until it settles, if starting at non-zero.
+          // `progress` パッケージには、最初の tick までタイマーが始まらないバグがあり、
+          // `curr` を設定すると経過時間と残り時間が 0 のままになる:
+          // https://github.com/visionmedia/node-progress/issues/81
+          // これはその回避策である。ただし 0 以外から始めた場合、残り時間は
+          // 落ち着くまでのあいだ正しくない値になる。
           if (
             typeof action.payload.current === `number` &&
             action.payload.current >= 0

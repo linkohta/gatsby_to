@@ -28,7 +28,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
   const defaultPort = `8000`
   const directory = path.resolve(`.`)
 
-  // 'not dead' query not available in browserslist used in Gatsby v1
+  // Gatsby v1 で使われていた browserslist では 'not dead' クエリが使えない
   const DEFAULT_BROWSERS =
     getLocalGatsbyMajorVersion() === 1
       ? [`> 1%`, `last 2 versions`, `IE >= 9`]
@@ -73,7 +73,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
     try {
       const cmdPath =
         resolveCwd.silent(`gatsby/dist/commands/${command}`) ||
-        // Old location of commands
+        // コマンドの以前の場所
         resolveCwd.silent(`gatsby/dist/utils/${command}`)
       if (!cmdPath)
         return report.panic(
@@ -118,8 +118,8 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
       process.env.gatsby_executing_command = command
       report.verbose(`set gatsby_executing_command: "${command}"`)
 
-      // This is to make sure that the NODE_ENV is set before resolveLocalCommand is called
-      // This way, cache-lmdb uses the same DB files in main & workers
+      // resolveLocalCommand が呼ばれる前に NODE_ENV が設定されているようにするためのもの
+      // これにより、cache-lmdb はメインとワーカーで同じ DB ファイルを使う
       if (nodeEnv) {
         process.env.NODE_ENV = nodeEnv
       }
@@ -210,9 +210,9 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
           }
 
           cmd(args)
-          // Return an empty promise to prevent handlerP from exiting early.
-          // The development server shouldn't ever exit until the user directly
-          // kills it so this is fine.
+          // handlerP が早く終了しないよう、空の Promise を返す。
+          // 開発サーバーは、ユーザーが直接終了させるまで終了すべきではないので、
+          // これで問題ない。
           return new Promise(() => {})
         },
         process.env.NODE_ENV || `development`
@@ -252,10 +252,10 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
           type: `string`,
           describe: `Tracer configuration file (OpenTracing compatible). See https://gatsby.dev/tracing`,
         })
-        // log-pages and write-to-file were added specifically to experimental GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES feature
-        // in gatsby@2. They are useful, but not very applicable (specifically `--write-to-file`) as generic approach, as it only
-        // list pages without other artifacts, so it's useful in very narrow scope. Because we don't have alternative right now
-        // those toggles are kept for users that rely on them, but we won't promote them and will keep them "hidden".
+        // log-pages と write-to-file は、gatsby@2 の実験的機能 GATSBY_EXPERIMENTAL_PAGE_BUILD_ON_DATA_CHANGES のために追加された。
+        // 便利ではあるが、汎用的な方法としてはあまり使えない（特に `--write-to-file`）。ほかの成果物を含まずページを一覧にするだけなので、
+        // 役に立つ範囲がとても狭い。今は代わりの手段がないので、これらに頼っているユーザーのために残しているが、
+        // 積極的には案内せず「隠し」オプションのままにする。
         .option(`log-pages`, {
           type: `boolean`,
           default: false,
@@ -340,7 +340,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
     handler: (args: yargs.Arguments) => {
       try {
         const copyToClipboard =
-          // Clipboard is not accessible when on a linux tty
+          // Linux の tty ではクリップボードを利用できない
           process.platform === `linux` && !process.env.DISPLAY
             ? false
             : args.clipboard
@@ -358,7 +358,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
             console.log(envinfoOutput)
 
             if (copyToClipboard) {
-              // tinyclip is ESM-only package
+              // tinyclip は ESM 専用のパッケージである
               import(`tinyclip`).then(({ writeText }) => {
                 writeText(envinfoOutput)
               })
@@ -457,7 +457,7 @@ function isLocalGatsbySite(): boolean {
       (dependencies && dependencies.gatsby) ||
       (devDependencies && devDependencies.gatsby)
   } catch (err) {
-    /* ignore */
+    /* 無視する */
   }
   return !!inGatsbySite
 }
@@ -466,7 +466,7 @@ function getVersionInfo(): string {
   const { version } = require(`../package.json`)
   const isGatsbySite = isLocalGatsbySite()
   if (isGatsbySite) {
-    // we need to get the version from node_modules
+    // バージョンは node_modules から取得する必要がある
     let gatsbyVersion = getLocalGatsbyVersion()
 
     if (!gatsbyVersion) {
@@ -522,7 +522,7 @@ export const createCli = (argv: Array<string>): yargs.Arguments => {
       getVersionInfo()
     )
   } catch (e) {
-    // ignore
+    // 無視する
   }
 
   return cli
@@ -533,7 +533,7 @@ export const createCli = (argv: Array<string>): yargs.Arguments => {
         const starterStr = starter ? String(starter) : undefined
         const rootPathStr = rootPath ? String(rootPath) : undefined
 
-        // We only run the interactive CLI when there are no arguments passed in
+        // 対話式の CLI を実行するのは、引数が何も渡されなかったときだけである
         if (!starterStr && !rootPathStr) {
           await runCreateGatsby()
         } else {

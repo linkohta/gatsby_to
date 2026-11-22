@@ -87,7 +87,7 @@ const getOptionsForPlugin = (node: any): any => {
 
   let options
 
-  // When a plugin is added conditionally with && {}
+  // プラグインが && {} で条件付きで追加されている場合
   if (t.isLogicalExpression(node)) {
     // @ts-ignore - fix me
     options = node.right.properties.find(
@@ -114,7 +114,7 @@ const getKeyForPlugin = (node: any): any => {
     return key ? getValueFromNode(key.value) : null
   }
 
-  // When a plugin is added conditionally with && {}
+  // プラグインが && {} で条件付きで追加されている場合
   if (t.isLogicalExpression(node)) {
     // @ts-ignore - fix me
     const key = node.right.properties.find(p => p.key.name === `__key`)
@@ -138,7 +138,7 @@ const getNameForPlugin = (node: any): any => {
     return resolve ? getValueFromNode(resolve.value) : null
   }
 
-  // When a plugin is added conditionally with && {}
+  // プラグインが && {} で条件付きで追加されている場合
   if (t.isLogicalExpression(node)) {
     // @ts-ignore - fix me
     const resolve = node.right.properties.find(p => p.key.name === `resolve`)
@@ -280,11 +280,11 @@ function getPluginNodes(
 }
 
 /**
- * Insert plugins selected in create-gatsby questionnaire into `gatsby-config` files.
+ * create-gatsby の質問で選ばれたプラグインを `gatsby-config` ファイルに挿入する。
  *
- * Scope is limited to the `gatsby-config` files in `gatsby-starter-minimal` and
- * `gatsby-starter-minimal-ts`. Does not support general usage with other `gatsby-config` files.
- * Changes to the config object in those files may require a change to this transformer.
+ * 対象は `gatsby-starter-minimal` と `gatsby-starter-minimal-ts` の `gatsby-config` ファイルに
+ * 限られる。ほかの `gatsby-config` ファイルでの一般的な利用には対応していない。
+ * これらのファイルの設定オブジェクトを変更した場合は、このトランスフォーマーも変更が必要になることがある。
  *
  * @see {@link https://github.com/gatsbyjs/gatsby/blob/master/starters/gatsby-starter-minimal/gatsby-config.js}
  * @see {@link https://github.com/gatsbyjs/gatsby/blob/master/starters/gatsby-starter-minimal-ts/gatsby-config.ts}
@@ -303,7 +303,7 @@ export default declare(
     return {
       visitor: {
         /**
-         * Handle `module.exports = { ..., plugins: [] }` from `gatsby-config.js` in `gatsby-starter-minimal`.
+         * `gatsby-starter-minimal` の `gatsby-config.js` にある `module.exports = { ..., plugins: [] }` を処理する。
          * @see {@link https://github.com/gatsbyjs/gatsby/blob/master/starters/gatsby-starter-minimal/gatsby-config.js}
          */
         ExpressionStatement(path): void {
@@ -332,7 +332,7 @@ export default declare(
         },
 
         /**
-         * Handle `const config = { ..., plugins: [] }; export default config` in `gatsby-config.ts` in `gatsby-starter-minimal-ts`.
+         * `gatsby-starter-minimal-ts` の `gatsby-config.ts` にある `const config = { ..., plugins: [] }; export default config` を処理する。
          * @see {@link https://github.com/gatsbyjs/gatsby/blob/master/starters/gatsby-starter-minimal-ts/gatsby-config.ts}
          */
         VariableDeclaration(path): void {

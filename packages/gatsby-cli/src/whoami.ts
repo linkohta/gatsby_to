@@ -28,7 +28,7 @@ const getUsername = async (token: string): Promise<string> => {
 }
 
 /**
- * Reports the username of the logged in user if they are logged in.
+ * ユーザーがログインしている場合は、そのユーザー名を表示する。
  */
 export async function whoami(): Promise<void> {
   const tokenFromStore = await getToken()

@@ -24,13 +24,13 @@ const spawn = (
   cmd: string,
   options?: execa.Options
 ): execa.ExecaChildProcess => {
-  // Split on spaces, tabs, new lines
+  // 空白、タブ、改行で分割する
   const [file, ...args] = cmd.split(/\s+/)
   return spawnWithArgs(file, args, options)
 }
-// Checks the existence of yarn package
-// We use yarnpkg instead of yarn to avoid conflict with Hadoop yarn
-// Refer to https://github.com/yarnpkg/yarn/issues/673
+// yarn パッケージが存在するかを調べる
+// Hadoop の yarn との衝突を避けるため、yarn ではなく yarnpkg を使う
+// https://github.com/yarnpkg/yarn/issues/673 を参照
 const checkForYarn = (): boolean => {
   try {
     execSync(`yarnpkg --version`, { stdio: `ignore` })
@@ -50,7 +50,7 @@ const isAlreadyGitRepository = async (): Promise<boolean> => {
   }
 }
 
-// Initialize newly cloned directory as a git repo
+// クローンしたばかりのディレクトリを git リポジトリとして初期化する
 const gitInit = async (
   rootPath: string
 ): Promise<execa.ExecaReturnBase<string>> => {
@@ -59,7 +59,7 @@ const gitInit = async (
   return await spawn(`git init`, { cwd: rootPath })
 }
 
-// Create a .gitignore file if it is missing in the new directory
+// 新しいディレクトリに .gitignore ファイルがなければ作成する
 const maybeCreateGitIgnore = async (rootPath: string): Promise<void> => {
   if (existsSync(sysPath.join(rootPath, `.gitignore`))) {
     return
@@ -72,7 +72,7 @@ const maybeCreateGitIgnore = async (rootPath: string): Promise<void> => {
   )
 }
 
-// Create an initial git commit in the new directory
+// 新しいディレクトリで最初の git コミットを作成する
 const createInitialGitCommit = async (
   rootPath: string,
   starterUrl: string
@@ -80,20 +80,20 @@ const createInitialGitCommit = async (
   report.info(`Create initial git commit in ${rootPath}`)
 
   await spawn(`git add -A`, { cwd: rootPath })
-  // use execSync instead of spawn to handle git clients using
-  // pgp signatures (with password)
+  // （パスワード付きの）pgp 署名を使う git クライアントに対応するため、
+  // spawn ではなく execSync を使う
   try {
     execSync(`git commit -m "Initial commit from gatsby: (${starterUrl})"`, {
       cwd: rootPath,
     })
   } catch {
-    // Remove git support if initial commit fails
+    // 最初のコミットに失敗した場合は、git の設定を取り除く
     report.info(`Initial git commit failed - removing git support\n`)
     fs.removeSync(sysPath.join(rootPath, `.git`))
   }
 }
 
-// Executes `npm install` or `yarn install` in rootPath.
+// rootPath で `npm install` または `yarn install` を実行する。
 const install = async (rootPath: string): Promise<void> => {
   const prevDir = process.cwd()
 
@@ -127,12 +127,12 @@ const install = async (rootPath: string): Promise<void> => {
 const ignored = (path: string): boolean =>
   !/^\.(git|hg)$/.test(sysPath.basename(path))
 
-// Copy starter from file system.
+// ファイルシステムからスターターをコピーする。
 const copy = async (
   starterPath: string,
   rootPath: string
 ): Promise<boolean> => {
-  // Chmod with 755.
+  // 755 で chmod する。
   // 493 = parseInt('755', 8)
   await fs.ensureDir(rootPath, { mode: 493 })
 
@@ -162,16 +162,16 @@ const copy = async (
   return true
 }
 
-// Clones starter from URI.
+// URI からスターターをクローンする。
 const clone = async (
   hostInfo: hostedGitInfo,
   rootPath: string
 ): Promise<void> => {
   let url: string
-  // Let people use private repos accessed over SSH.
+  // SSH 経由でアクセスするプライベートリポジトリを使えるようにする。
   if (hostInfo.getDefaultRepresentation() === `sshurl`) {
     url = hostInfo.ssh({ noCommittish: true })
-    // Otherwise default to normal git syntax.
+    // それ以外の場合は、通常の git の書式を使う。
   } else {
     url = hostInfo.https({ noCommittish: true, noGitPlus: true })
   }
@@ -214,7 +214,7 @@ const getPaths = async (
 ): Promise<IGetPaths> => {
   let selectedOtherStarter = false
 
-  // if no args are passed, prompt user for path and starter
+  // 引数が渡されなかった場合は、パスとスターターをユーザーに尋ねる
   if (!starterPath && !rootPath) {
     const response = await prompts.prompt([
       {
@@ -239,7 +239,7 @@ const getPaths = async (
         initial: 0,
       },
     ])
-    // exit gracefully if responses aren't provided
+    // 回答が得られなかった場合は、正常に終了する
     if (!response.starter || !response.path.trim()) {
       throw new Error(
         `Please mention both starter package and project name along with path(if its not in the root)`
@@ -251,7 +251,7 @@ const getPaths = async (
     rootPath = response.path
   }
 
-  // set defaults if no root or starter has been set yet
+  // root または starter がまだ設定されていなければ、デフォルト値を設定する
   rootPath = rootPath || process.cwd()
   starterPath = starterPath || `gatsbyjs/gatsby-starter-default`
 
@@ -268,7 +268,7 @@ Your new Gatsby site has been successfully bootstrapped. Start developing it by 
 }
 
 /**
- * Main function that clones or copies the starter.
+ * スターターをクローンまたはコピーするメインの関数。
  */
 export async function initStarter(
   starter?: string,

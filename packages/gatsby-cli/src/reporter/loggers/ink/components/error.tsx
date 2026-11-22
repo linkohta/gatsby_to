@@ -33,8 +33,8 @@ interface IDocsLinkProps {
 }
 
 const DocsLink: FunctionComponent<IDocsLinkProps> = ({ docsUrl }) => {
-  // TODO: when there's no specific docsUrl, add helpful message describing how
-  // to submit an issue
+  // TODO: 個別の docsUrl がない場合は、Issue の出し方を説明する
+  // 親切なメッセージを追加する
   if (docsUrl === `https://gatsby.dev/issue-how-to`) return null
   return (
     <Box marginTop={1}>
@@ -75,7 +75,7 @@ export const Error: FunctionComponent<IErrorProps> = React.memo(
         </Box>
         <DocsLink docsUrl={details.docsUrl} />
       </Box>
-      {/* TODO: use this to replace errorFormatter.render in reporter.error func
+      {/* TODO: reporter.error 関数の errorFormatter.render をこれで置き換える
       {stackLength > 0 && (
         <Box>
           <Color>

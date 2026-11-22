@@ -197,7 +197,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.UNKNOWN,
   },
-  // default parsing error
+  // デフォルトの解析エラー
   "85915": {
     text: (context): string =>
       `There was a problem parsing the GraphQL query in file: ${context.filePath}`,
@@ -231,7 +231,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
-  // Duplicate fragment
+  // フラグメントの重複
   "85919": {
     text: (context): string =>
       stripIndent(`
@@ -247,7 +247,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
-  // Undefined variables in Queries
+  // クエリ内の未定義の変数
   "85920": {
     text: (context): string => {
       const staticQueryMessage = stripIndents(`Suggestion 1:
@@ -354,7 +354,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
-  // Config errors
+  // 設定のエラー
   "10122": {
     text: (context): string =>
       `The site's gatsby-config failed validation:\n\n${context.sourceMessage}`,
@@ -375,7 +375,7 @@ const errors: Record<string, IErrorMapEntry> = {
         context.nearMatch
       }" to "${context.configName}.${context.isTSX ? `ts` : `js`}"`,
     type: Type.API_CONFIG_LOADING,
-    // TODO: Make this a warning? Needs to be also changed where this error is called + tests
+    // TODO: これを警告にするか。その場合は、このエラーを呼び出している箇所とテストも変更が必要
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
@@ -383,7 +383,7 @@ const errors: Record<string, IErrorMapEntry> = {
     text: (context): string =>
       `Your ${context.configName} file is in the wrong place. You've placed it in the src/ directory. It must instead be at the root of your site next to your package.json file.`,
     type: Type.API_CONFIG_LOADING,
-    // TODO: Make this a warning? Needs to be also changed where this error is called + tests
+    // TODO: これを警告にするか。その場合は、このエラーを呼び出している箇所とテストも変更が必要
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
@@ -430,7 +430,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
-  // Plugin errors
+  // プラグインのエラー
   "11321": {
     text: (context): string =>
       `"${context.pluginName}" threw an error while running the ${
@@ -528,7 +528,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.API_NODE_VALIDATION,
     docsUrl: `https://www.gatsbyjs.com/docs/reference/config-files/actions#createPage`,
   },
-  // invalid or deprecated APIs
+  // 無効または非推奨の API
   "11329": {
     text: (context): string =>
       [
@@ -554,7 +554,7 @@ const errors: Record<string, IErrorMapEntry> = {
     category: ErrorCategory.USER,
     type: Type.API_NODE_VALIDATION,
   },
-  // "X" is not defined in Gatsby's node APIs
+  // "X" は Gatsby の node API に定義されていない
   "11330": {
     text: (context): string =>
       `"${context.pluginName}" threw an error while running the ${
@@ -572,7 +572,7 @@ const errors: Record<string, IErrorMapEntry> = {
     level: Level.ERROR,
     category: ErrorCategory.USER,
   },
-  // Invalid plugin options
+  // 無効なプラグインオプション
   "11331": {
     text: (context): string =>
       [
@@ -599,7 +599,7 @@ const errors: Record<string, IErrorMapEntry> = {
     category: ErrorCategory.USER,
     docsUrl: `https://www.gatsbyjs.com/docs/reference/functions/`,
   },
-  // slices
+  // スライス
   "11333": {
     text: (context): string =>
       `${
@@ -705,7 +705,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.HTML_COMPILATION,
     docsUrl: `https://gatsbyjs.com/docs/reference/config-files/actions#createSlice`,
   },
-  // node object didn't pass validation
+  // ノードオブジェクトが検証を通らなかった
   "11467": {
     text: (context): string =>
       [
@@ -722,7 +722,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.API_NODE_VALIDATION,
     docsUrl: `https://www.gatsbyjs.com/docs/reference/config-files/actions#createNode`,
   },
-  // local SSL certificate errors
+  // ローカルの SSL 証明書のエラー
   "11521": {
     text: (): string =>
       `for custom ssl --https, --cert-file, and --key-file must be used together`,
@@ -738,7 +738,7 @@ const errors: Record<string, IErrorMapEntry> = {
     docsUrl: `https://www.gatsbyjs.com/docs/local-https#setup`,
     type: Type.CLI_VALIDATION,
   },
-  // cli new command errors
+  // cli の new コマンドのエラー
   "11610": {
     text: (context): string =>
       `It looks like you gave wrong argument orders. Try running instead "gatsby new ${context.starter} ${context.rootPath}"`,
@@ -800,7 +800,7 @@ const errors: Record<string, IErrorMapEntry> = {
     category: ErrorCategory.SYSTEM,
     type: Type.HTML_GENERATION_DEV_SSR,
   },
-  // Watchdog
+  // ウォッチドッグ
   "11701": {
     text: (context): string =>
       `Terminating the process (due to GATSBY_WATCHDOG_STUCK_STATUS_TIMEOUT):\n\nGatsby is in "${
@@ -817,7 +817,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.UNKNOWN,
     docsUrl: `https://support.gatsbyjs.com/hc/en-us/articles/360056811354`,
   },
-  // Node Manifest warnings
+  // Node Manifest の警告
   "11801": {
     text: ({ inputManifest }): string => `${getSharedNodeManifestWarning(
       inputManifest
@@ -861,7 +861,7 @@ const errors: Record<string, IErrorMapEntry> = {
     category: ErrorCategory.USER,
     type: Type.API_NODE_VALIDATION,
   },
-  // Parcel Compilation Errors
+  // Parcel のコンパイルエラー
   "11901": {
     text: (context): string =>
       stripIndent(`
@@ -924,7 +924,7 @@ const errors: Record<string, IErrorMapEntry> = {
     category: ErrorCategory.USER,
     docsUrl: `https://gatsby.dev/graphql-typegen`,
   },
-  // Gatsby Adapters
+  // Gatsby アダプター
   "12200": {
     text: (): string =>
       `Tried to create adapter routes for webpack assets but failed. If the issue persists, please open an issue with a reproduction at https://gatsby.dev/bug-report for more help.`,
@@ -932,9 +932,9 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.ADAPTER,
     category: ErrorCategory.SYSTEM,
   },
-  // Currently not used, as the error was turned into warning
-  // Might be used in next major version of gatsby, but we still have to keep it
-  // because older gatsby versions might try to use this error ID
+  // このエラーは警告に変更されたため、現在は使われていない
+  // gatsby の次のメジャーバージョンで使う可能性がある。また、古いバージョンの gatsby が
+  // このエラー ID を使おうとする可能性があるので、残しておく必要がある
   "12201": {
     text: (context): string =>
       `Adapter "${
@@ -946,7 +946,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: Type.ADAPTER,
     category: ErrorCategory.THIRD_PARTY,
   },
-  // Partial hydration
+  // 部分的なハイドレーション
   "80000": {
     text: (context): string =>
       stripIndents(`Building partial HTML failed${
@@ -988,14 +988,14 @@ export const defaultError = errorMap[``]
 
 export interface IErrorMapEntry {
   text: (context) => string
-  // Public facing API (e.g. used by setErrorMap) doesn't rely on enum but gives an union with string interpolation
+  // 公開 API（setErrorMap で使われるものなど）は enum に依存せず、文字列補間によるユニオン型を提供する
   level: `${Level}`
   type: `${Type}` | ((context) => `${Type}`)
   category: `${ErrorCategory}`
   docsUrl?: string
 }
 
-// Make level and type optional for plugins
+// プラグイン向けに level と type を省略可能にする
 export interface IErrorMapEntryPublicApi
   extends Omit<IErrorMapEntry, "level" | "type"> {
   level?: `${Level}`

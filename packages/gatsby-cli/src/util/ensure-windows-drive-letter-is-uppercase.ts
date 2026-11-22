@@ -2,23 +2,23 @@ import { tmpdir } from "os"
 import report from "../reporter"
 
 /**
- * This function ensures that the current working directory on Windows
- * always has an uppercase drive letter (i.e., C: vs. c:).
+ * この関数は、Windows でのカレントディレクトリのドライブレターが
+ * 常に大文字（c: ではなく C:）になるようにする。
  *
- * Why?
- * 1. Different utils like "true-case-path", "normalize-path", "slash" treat Windows
- * drive letter differently. "true-case-path" will uppercase, others usually don't care.
- * As a result path normalization produces different results depending on current cwd (c: vs. C:)
- * which manifests in weird bugs that are very hard to debug.
+ * 理由
+ * 1. "true-case-path"、"normalize-path"、"slash" などのユーティリティは、Windows の
+ * ドライブレターの扱いがそれぞれ異なる。"true-case-path" は大文字にするが、ほかはたいてい気にしない。
+ * その結果、パスの正規化の結果がカレントディレクトリ（c: か C: か）によって変わり、
+ * デバッグがとても難しい奇妙なバグとして現れる。
  *
- * We can't control community plugins or site code, so everything should be working
- * even with a different set of libraries.
+ * コミュニティのプラグインやサイトのコードはこちらで制御できないので、ライブラリの
+ * 組み合わせが異なっていても、すべてが動くようにしておくべきである。
  *
- * Related: https://github.com/Profiscience/true-case-path/issues/3
+ * 関連: https://github.com/Profiscience/true-case-path/issues/3
  *
- * 2. Builds save some paths in a cache. If you run the first build from "c:" shell
- * and then the next one from "C:" shell, you may get a bunch of webpack warnings
- * because it expects module paths to be case-sensitive.
+ * 2. ビルドは一部のパスをキャッシュに保存する。最初のビルドを "c:" のシェルから実行し、
+ * 次のビルドを "C:" のシェルから実行すると、webpack の警告が大量に出ることがある。
+ * webpack はモジュールのパスの大文字と小文字を区別するためである。
  */
 export function ensureWindowsDriveLetterIsUppercase(): void {
   const cwd = process.cwd()
@@ -26,12 +26,12 @@ export function ensureWindowsDriveLetterIsUppercase(): void {
 
   if (cwd !== normalizedCwd) {
     try {
-      // When cwd is "c:\dir" then command "cd C:\dir" won't do anything
-      // You have to change the dir twice to actually change the casing of the path
+      // カレントディレクトリが "c:\dir" のとき、"cd C:\dir" コマンドは何もしない
+      // パスの大文字と小文字を実際に変えるには、ディレクトリを 2 回移動する必要がある
       process.chdir(tmpdir())
       process.chdir(normalizedCwd)
     } catch {
-      // rollback
+      // 元に戻す
       process.chdir(cwd)
     }
 
