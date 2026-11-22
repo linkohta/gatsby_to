@@ -1,25 +1,25 @@
 /**
- * Lets plugins implementing support for other compile-to-js add to the list
- * of "resolvable" file extensions. Gatsby supports `.js` and `.jsx` by default.
- * @returns {Array<string>} array of extensions
+ * JS にコンパイルされる他の言語への対応を実装するプラグインが、「解決できる」
+ * 拡張子の一覧に追加できるようにする。Gatsby はデフォルトで `.js` と `.jsx` に対応している。
+ * @returns {Array<string>} 拡張子の配列
  */
 export const resolvableExtensions = true
 
 /**
- * Create pages dynamically. This extension point is called only after the initial
- * sourcing and transformation of nodes plus creation of the GraphQL schema are
- * complete so you can query your data in order to create pages.
+ * ページを動的に作成する。この拡張ポイントは、最初のノードの取得と変換、
+ * および GraphQL スキーマの作成が完了した後にだけ呼ばれるので、
+ * ページを作成するためにデータをクエリできる。
  *
- * You can also fetch data from remote or local sources to create pages.
+ * リモートまたはローカルのソースからデータを取得してページを作成することもできる。
  *
- * See also [the documentation for the action `createPage`](/docs/actions/#createPage).
+ * [アクション `createPage` のドキュメント](/docs/actions/#createPage) も参照。
  *
- * @param {object} $0 See the [documentation for `Node API Helpers` for more details](/docs/node-api-helpers)
- * @param {Actions} $0.actions See the [list of documented actions](/docs/actions)
- * @param {function} $0.actions.createPage [Documentation for this action](/docs/actions/#createPage)
- * @param {function} $0.graphql: Query GraphQL API. See [examples here](/docs/creating-and-modifying-pages/#creating-pages-in-gatsby-nodejs)
- * @param {GatsbyReporter} $0.reporter Log issues. See [GatsbyReporter documentation](/docs/node-api-helpers/#GatsbyReporter) for more details
- * @returns {Promise<void>} No return value required, but the caller will `await` any promise that's returned
+ * @param {object} $0 詳しくは [`Node API Helpers` のドキュメント](/docs/node-api-helpers) を参照
+ * @param {Actions} $0.actions [ドキュメント化されているアクションの一覧](/docs/actions) を参照
+ * @param {function} $0.actions.createPage [このアクションのドキュメント](/docs/actions/#createPage)
+ * @param {function} $0.graphql: GraphQL API にクエリする。[こちらの例](/docs/creating-and-modifying-pages/#creating-pages-in-gatsby-nodejs) を参照
+ * @param {GatsbyReporter} $0.reporter 問題をログに出力する。詳しくは [GatsbyReporter のドキュメント](/docs/node-api-helpers/#GatsbyReporter) を参照
+ * @returns {Promise<void>} 戻り値は不要だが、Promise が返された場合、呼び出し側はそれを `await` する
  *
  * @example
  * const path = require(`path`)
@@ -73,34 +73,34 @@ export const resolvableExtensions = true
 export const createPages = true
 
 /**
- * Like `createPages` but for plugins who want to manage creating and removing
- * pages themselves in response to changes in data *not* managed by Gatsby.
- * Plugins implementing `createPages` will get called regularly to recompute
- * page information as Gatsby's data changes but those implementing
- * `createPagesStatefully` will not.
+ * `createPages` に似ているが、Gatsby が管理して *いない* データの変更に応じて、
+ * ページの作成と削除を自分で管理したいプラグインのためのものである。
+ * `createPages` を実装するプラグインは、Gatsby のデータが変わるたびにページの情報を
+ * 再計算するために定期的に呼ばれるが、`createPagesStatefully` を
+ * 実装するプラグインは呼ばれない。
  *
- * An example of a plugin that uses this extension point is the plugin
+ * この拡張ポイントを使うプラグインの例として、
  * [gatsby-plugin-page-creator](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-page-creator)
- * which monitors the `src/pages` directory for the adding and removal of JS
- * pages. As its source of truth, files in the pages directory, is not known by
- * Gatsby, it needs to keep its own state about its world to know when to
- * add and remove pages.
+ * がある。このプラグインは、`src/pages` ディレクトリを監視して、JS のページの
+ * 追加と削除を検出する。その情報源である pages ディレクトリのファイルを Gatsby は
+ * 把握していないので、ページをいつ追加して削除するかを知るために、
+ * 自分の状態を自分で保持する必要がある。
  */
 export const createPagesStatefully = true
 
 /**
- * Extension point to tell plugins to source nodes. This API is called during
- * the Gatsby bootstrap sequence. Source plugins use this hook to create nodes.
- * This API is called exactly once per plugin (and once for your site's
- * `gatsby-config.js` file). If you define this hook in `gatsby-node.js` it
- * will be called exactly once after all of your source plugins have finished
- * creating nodes.
+ * プラグインにノードの取得を指示する拡張ポイント。この API は、Gatsby の
+ * bootstrap の処理の中で呼ばれる。ソースプラグインは、このフックを使ってノードを作成する。
+ * この API は、プラグインごとにちょうど 1 回（およびサイトの
+ * `gatsby-config.js` ファイルに対して 1 回）呼ばれる。このフックを `gatsby-node.js` で
+ * 定義した場合は、すべてのソースプラグインがノードの作成を終えた後に、
+ * ちょうど 1 回呼ばれる。
  *
- * The [Creating a Source
- * Plugin](/docs/how-to/plugins-and-themes/creating-a-source-plugin/) tutorial
- * demonstrates a way a plugin or site might use this API.
+ * チュートリアルの [Creating a Source
+ * Plugin](/docs/how-to/plugins-and-themes/creating-a-source-plugin/) で、
+ * プラグインやサイトがこの API を使う方法の一例を紹介している。
  *
- * See also the documentation for [`createNode`](/docs/actions/#createNode).
+ * [`createNode`](/docs/actions/#createNode) のドキュメントも参照。
  * @example
  * exports.sourceNodes = ({ actions, createNodeId, createContentDigest }) => {
  *   const { createNode } = actions
@@ -133,15 +133,15 @@ export const createPagesStatefully = true
 export const sourceNodes = true
 
 /**
- * Called when a new node is created. Plugins wishing to extend or
- * transform nodes created by other plugins should implement this API.
+ * 新しいノードが作成されたときに呼ばれる。他のプラグインが作成したノードを
+ * 拡張または変換したいプラグインは、この API を実装する。
  *
- * See also the documentation for [`createNode`](/docs/actions/#createNode)
- * and [`createNodeField`](/docs/actions/#createNodeField)
+ * [`createNode`](/docs/actions/#createNode) と
+ * [`createNodeField`](/docs/actions/#createNodeField) のドキュメントも参照
  *
- * The [Creating a Source
- * Plugin](/docs/how-to/plugins-and-themes/creating-a-source-plugin/) tutorial
- * demonstrates a way a plugin or site might use this API.
+ * チュートリアルの [Creating a Source
+ * Plugin](/docs/how-to/plugins-and-themes/creating-a-source-plugin/) で、
+ * プラグインやサイトがこの API を使う方法の一例を紹介している。
  *
  * @example
  * exports.onCreateNode = ({ node, actions }) => {
@@ -153,9 +153,9 @@ export const sourceNodes = true
 export const onCreateNode = true
 
 /**
- * Called before scheduling a `onCreateNode` callback for a plugin. If it returns falsy
- * then Gatsby will not schedule the `onCreateNode` callback for this node for this plugin.
- * Note: this API does not receive the regular `api` that other callbacks get as first arg.
+ * プラグインの `onCreateNode` コールバックを予約する前に呼ばれる。falsy な値を返すと、
+ * Gatsby は、このノードとこのプラグインについての `onCreateNode` コールバックを予約しない。
+ * 注: この API は、他のコールバックが第 1 引数として受け取る通常の `api` を受け取らない。
  *
  * @gatsbyVersion 5.0.0
  * @example
@@ -165,43 +165,43 @@ export const onCreateNode = true
 export const shouldOnCreateNode = true
 
 /**
- * Called when a new page is created. This extension API is useful
- * for programmatically manipulating pages created by other plugins e.g.
- * if you want paths without trailing slashes.
+ * 新しいページが作成されたときに呼ばれる。この拡張 API は、他のプラグインが
+ * 作成したページをプログラムから操作するのに役立つ。たとえば、
+ * 末尾のスラッシュがないパスにしたい場合など。
  *
- * There is a mechanism in Gatsby to prevent calling onCreatePage for pages
- * created by the same gatsby-node.js to avoid infinite loops/callback.
+ * Gatsby には、無限ループや無限のコールバックを避けるために、同じ gatsby-node.js が
+ * 作成したページに対して onCreatePage を呼ばないようにする仕組みがある。
  *
- * See the guide [Creating and Modifying Pages](/docs/creating-and-modifying-pages/)
- * for more on this API.
+ * この API について詳しくは、ガイドの [Creating and Modifying Pages](/docs/creating-and-modifying-pages/)
+ * を参照。
  */
 export const onCreatePage = true
 
 /**
- * Called during the creation of the GraphQL schema. Allows plugins
- * to add new fields to the types created from data nodes. It will be called
- * separately for each type.
+ * GraphQL スキーマの作成中に呼ばれる。プラグインが、データノードから
+ * 作成された型に新しいフィールドを追加できるようにする。型ごとに
+ * 別々に呼ばれる。
  *
- * This function should return an object in the shape of
+ * この関数は、
  * [GraphQLFieldConfigMap](https://graphql.org/graphql-js/type/#graphqlobjecttype)
- * which will be appended to fields inferred by Gatsby from data nodes.
+ * の形のオブジェクトを返すこと。返したものは、Gatsby がデータノードから推論したフィールドに追加される。
  *
- * *Note:* Import GraphQL types from `gatsby/graphql` and don't add the `graphql`
- * package to your project/plugin dependencies to avoid `Schema must
- * contain unique named types but contains multiple types named` errors.
- * `gatsby/graphql` exports all builtin GraphQL types as well as the `GraphQLJSON`
- * type.
+ * *注:* GraphQL の型は `gatsby/graphql` から import し、`graphql`
+ * パッケージをプロジェクトやプラグインの依存に追加しないこと。`Schema must
+ * contain unique named types but contains multiple types named` のエラーを避けるためである。
+ * `gatsby/graphql` は、すべての組み込みの GraphQL の型に加えて、`GraphQLJSON`
+ * 型も export している。
  *
- * Many transformer plugins use this to add fields that take arguments.
+ * 多くのトランスフォーマープラグインが、引数を取るフィールドを追加するためにこれを使っている。
  *
  * * [`gatsby-transformer-remark`](/plugins/gatsby-transformer-remark/)
- * adds an "excerpt" field where the user when writing their query can specify
- * how many characters to prune the markdown source to.
- * * [`gatsby-transformer-sharp`](/plugins/gatsby-transformer-sharp/) exposes
- * many image transformation options as GraphQL fields.
+ * は "excerpt" フィールドを追加する。ユーザーはクエリを書くときに、
+ * markdown のソースを何文字に切り詰めるかを指定できる。
+ * * [`gatsby-transformer-sharp`](/plugins/gatsby-transformer-sharp/) は、
+ * 多くの画像変換のオプションを GraphQL のフィールドとして公開している。
  *
  * @param {object} $0
- * @param {object} $0.type Object containing `name` and `nodes`
+ * @param {object} $0.type `name` と `nodes` を含むオブジェクト
  * @example
  * import { GraphQLString } from "gatsby/graphql"
  *
@@ -230,18 +230,18 @@ export const onCreatePage = true
 export const setFieldsOnGraphQLNodeType = true
 
 /**
- * Customize Gatsby's GraphQL schema by creating type definitions, field
- * extensions or adding third-party schemas.
+ * 型定義やフィールド拡張の作成、サードパーティーのスキーマの追加によって、
+ * Gatsby の GraphQL スキーマをカスタマイズする。
  *
- * The [`createTypes`](/docs/actions/#createTypes),
- * [`createFieldExtension`](/docs/actions/#createFieldExtension) and
- * [`addThirdPartySchema`](/docs/actions/#addThirdPartySchema) actions
- * are only available in this API. For details on their usage please refer to
- * the actions documentation.
+ * [`createTypes`](/docs/actions/#createTypes)、
+ * [`createFieldExtension`](/docs/actions/#createFieldExtension)、
+ * [`addThirdPartySchema`](/docs/actions/#addThirdPartySchema) のアクションは、
+ * この API の中でだけ使える。使い方の詳細については、
+ * アクションのドキュメントを参照。
  *
- * This API runs immediately before schema generation. For modifications of the
- * generated schema, e.g. to customize added third-party types, use the
- * [`createResolvers`](/docs/node-apis/#createResolvers) API.
+ * この API は、スキーマの生成の直前に実行される。生成されたスキーマを
+ * 変更する（たとえば、追加されたサードパーティーの型をカスタマイズする）には、
+ * [`createResolvers`](/docs/node-apis/#createResolvers) API を使う。
  *
  * @gatsbyVersion 2.12.0
  * @param {object} $0
@@ -279,45 +279,45 @@ export const setFieldsOnGraphQLNodeType = true
 export const createSchemaCustomization = true
 
 /**
- * Add custom field resolvers to the GraphQL schema.
+ * GraphQL スキーマに独自のフィールドリゾルバーを追加する。
  *
- * Allows adding new fields to types by providing field configs, or adding resolver
- * functions to existing fields.
+ * フィールドの設定を渡して型に新しいフィールドを追加したり、既存のフィールドに
+ * リゾルバー関数を追加したりできる。
  *
- * Things to note:
- * * Overriding field types is disallowed, instead use the `createTypes`
- *   action. In case of types added from third-party schemas, where this is not
- *   possible, overriding field types is allowed.
- * * New fields will not be available on `filter` and `sort` input types. Extend
- *   types defined with `createTypes` if you need this.
- * * In field configs, types can be referenced as strings.
- * * When extending a field with an existing field resolver, the original
- *   resolver function is available from `info.originalResolver`.
- * * The `createResolvers` API is called as the last step in schema generation.
- *   Thus, an intermediate schema is made available on the `intermediateSchema` property.
- *   In resolver functions themselves, it is recommended to access the final
- *   built schema from `info.schema`.
- * * Gatsby's data layer, including all internal query capabilities, is
- *   exposed on [`context.nodeModel`](/docs/node-model/). The node store can be
- *   queried directly with `findOne`, `getNodeById` and `getNodesByIds`,
- *   while more advanced queries can be composed with `findAll`.
- * * It is possible to add fields to the root `Query` type.
- * * When using the first resolver argument (`source` in the example below,
- *   often also called `parent` or `root`), take care of the fact that field
- *   resolvers can be called more than once in a query, e.g. when the field is
- *   present both in the input filter and in the selection set. This means that
- *   foreign-key fields on `source` can be either resolved or not-resolved.
+ * 注意点:
+ * * フィールドの型の上書きは許可されていない。代わりに `createTypes`
+ *   アクションを使う。サードパーティーのスキーマから追加された型では、それが
+ *   できないので、フィールドの型の上書きが許可されている。
+ * * 新しいフィールドは、`filter` と `sort` の入力型では使えない。必要な場合は、
+ *   `createTypes` で定義した型を拡張する。
+ * * フィールドの設定では、型を文字列で参照できる。
+ * * 既存のフィールドリゾルバーを持つフィールドを拡張する場合、元の
+ *   リゾルバー関数は `info.originalResolver` から利用できる。
+ * * `createResolvers` API は、スキーマの生成の最後のステップとして呼ばれる。
+ *   そのため、`intermediateSchema` プロパティで中間のスキーマを利用できる。
+ *   リゾルバー関数自体の中では、最終的にビルドされたスキーマに
+ *   `info.schema` からアクセスすることを推奨する。
+ * * すべての内部のクエリ機能を含む Gatsby のデータレイヤーは、
+ *   [`context.nodeModel`](/docs/node-model/) で公開されている。ノードストアには、
+ *   `findOne`、`getNodeById`、`getNodesByIds` で直接クエリでき、
+ *   より高度なクエリは `findAll` で組み立てられる。
+ * * ルートの `Query` 型にフィールドを追加することもできる。
+ * * リゾルバーの第 1 引数（下の例では `source`。
+ *   `parent` や `root` と呼ばれることも多い）を使うときは、1 つのクエリの中で
+ *   フィールドリゾルバーが複数回呼ばれうることに注意する。たとえば、そのフィールドが
+ *   入力のフィルターと選択セットの両方にある場合である。つまり、
+ *   `source` の外部キーのフィールドは、解決済みのこともあれば未解決のこともある。
  *
- * For fuller examples, see [`using-type-definitions`](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-type-definitions).
+ * より詳しい例については、[`using-type-definitions`](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-type-definitions) を参照。
  *
  * @gatsbyVersion 2.2.0
  * @param {object} $0
- * @param {GraphQLSchema} $0.intermediateSchema Current GraphQL schema
- * @param {function} $0.createResolvers Add custom resolvers to GraphQL field configs
+ * @param {GraphQLSchema} $0.intermediateSchema 現在の GraphQL スキーマ
+ * @param {function} $0.createResolvers GraphQL のフィールドの設定に独自のリゾルバーを追加する
  * @param {object} $1
- * @param {object} $1.resolvers An object map of GraphQL type names to custom resolver functions
- * @param {object} $1.options Optional createResolvers options
- * @param {object} $1.options.ignoreNonexistentTypes Silences the warning when trying to add resolvers for types that don't exist. Useful for optional extensions.
+ * @param {object} $1.resolvers GraphQL の型名から独自のリゾルバー関数へのオブジェクトのマップ
+ * @param {object} $1.options createResolvers のオプション（省略可能）
+ * @param {object} $1.options.ignoreNonexistentTypes 存在しない型にリゾルバーを追加しようとしたときの警告を抑止する。省略可能な拡張で役に立つ。
  * @example
  * exports.createResolvers = ({ createResolvers }) => {
  *   const resolvers = {
@@ -346,20 +346,20 @@ export const createSchemaCustomization = true
 export const createResolvers = true
 
 /**
- * Ask compile-to-js plugins to process source to JavaScript so the query
- * runner can extract out GraphQL queries for running.
+ * JS にコンパイルするプラグインに、ソースを JavaScript へ変換するよう依頼する。
+ * クエリランナーが、実行する GraphQL クエリを抽出できるようにするためである。
  */
 export const preprocessSource = true
 
 /**
- * Let plugins extend/mutate the site's Babel configuration by calling
- * [`setBabelPlugin`](/docs/actions/#setBabelPlugin) or
- * [`setBabelPreset`](/docs/actions/#setBabelPreset).
+ * プラグインが、
+ * [`setBabelPlugin`](/docs/actions/#setBabelPlugin) または
+ * [`setBabelPreset`](/docs/actions/#setBabelPreset) を呼ぶことで、サイトの Babel の設定を拡張または変更できるようにする。
  * @param {object} $0
- * @param {string} $0.stage The current build stage. One of 'develop', 'develop-html',
- * 'build-javascript', or 'build-html'
+ * @param {string} $0.stage 現在のビルドのステージ。'develop'、'develop-html'、
+ * 'build-javascript'、'build-html' のいずれか
  * @param {object} $0.actions
- * @param {object} options The Babel configuration
+ * @param {object} options Babel の設定
  * @example
  * exports.onCreateBabelConfig = ({ actions }) => {
  *   actions.setBabelPlugin({
@@ -371,17 +371,17 @@ export const preprocessSource = true
 export const onCreateBabelConfig = true
 
 /**
- * Let plugins extend/mutate the site's webpack configuration. This method can be used by any Gatsby site, app, or plugin, not just plugins.
+ * プラグインが、サイトの webpack の設定を拡張または変更できるようにする。このメソッドは、プラグインに限らず、あらゆる Gatsby のサイト、アプリ、プラグインから使える。
  *
- * See also the documentation for [`setWebpackConfig`](/docs/actions/#setWebpackConfig).
+ * [`setWebpackConfig`](/docs/actions/#setWebpackConfig) のドキュメントも参照。
  *
  * @param {object} $0
- * @param {string} $0.stage The current build stage. One of 'develop', 'develop-html',
- * 'build-javascript', or 'build-html'
- * @param {function} $0.getConfig Returns the current webpack config
- * @param {object} $0.rules A set of preconfigured webpack config rules
- * @param {object} $0.loaders A set of preconfigured webpack config loaders
- * @param {object} $0.plugins A set of preconfigured webpack config plugins
+ * @param {string} $0.stage 現在のビルドのステージ。'develop'、'develop-html'、
+ * 'build-javascript'、'build-html' のいずれか
+ * @param {function} $0.getConfig 現在の webpack の設定を返す
+ * @param {object} $0.rules あらかじめ設定された webpack の設定のルール一式
+ * @param {object} $0.loaders あらかじめ設定された webpack の設定のローダー一式
+ * @param {object} $0.plugins あらかじめ設定された webpack の設定のプラグイン一式
  * @param {object} $0.actions
  * @example
  * exports.onCreateWebpackConfig = ({
@@ -402,7 +402,7 @@ export const onCreateBabelConfig = true
 export const onCreateWebpackConfig = true
 
 /**
- * The first API called during Gatsby execution, runs as soon as plugins are loaded, before cache initialization and bootstrap preparation.
+ * Gatsby の実行中に最初に呼ばれる API。プラグインが読み込まれるとすぐに、キャッシュの初期化と bootstrap の準備より前に実行される。
  *
  * @param {object} $0
  * @param {object} $0.actions
@@ -414,7 +414,7 @@ export const onCreateWebpackConfig = true
 export const onPreInit = true
 
 /**
- * Lifecycle executed in each process (one time per process). Used to store actions etc for later use.
+ * 各プロセスで（プロセスごとに 1 回）実行されるライフサイクル。アクションなどを後で使うために保存するのに使う。
  *
  * @example
  * let createJobV2
@@ -427,23 +427,23 @@ export const onPreInit = true
 export const onPluginInit = true
 
 /**
- * Called once Gatsby has initialized itself and is ready to bootstrap your site.
+ * Gatsby が自身の初期化を終え、サイトの bootstrap を始める準備ができたときに呼ばれる。
  */
 export const onPreBootstrap = true
 
 /**
- * Called at the end of the bootstrap process after all other extension APIs have been called.
+ * bootstrap の処理の最後に、他のすべての拡張 API が呼ばれた後で呼ばれる。
  */
 export const onPostBootstrap = true
 
 /**
- * The first extension point called during the build process. Called after the bootstrap has completed but before the build steps start.
+ * ビルドの処理の中で最初に呼ばれる拡張ポイント。bootstrap が完了した後、ビルドのステップが始まる前に呼ばれる。
  */
 export const onPreBuild = true
 
 /**
- * The last extension point called after all other parts of the build process
- * are complete.
+ * ビルドの処理の他のすべての部分が完了した後に呼ばれる、
+ * 最後の拡張ポイント。
  *
  * @example
  * exports.onPostBuild = ({ reporter, basePath, pathPrefix }) => {
@@ -455,18 +455,18 @@ export const onPreBuild = true
 export const onPostBuild = true
 
 /**
- * Run before GraphQL queries/fragments are extracted from JavaScript files. Useful for plugins
- * to add more JavaScript files with queries/fragments e.g. from node_modules.
+ * JavaScript ファイルから GraphQL のクエリやフラグメントが抽出される前に実行される。プラグインが、
+ * クエリやフラグメントを含む JavaScript ファイル（たとえば node_modules の中のもの）を追加するのに役立つ。
  *
- * See gatsby-transformer-sharp and gatsby-source-contentful for examples.
+ * 例については、gatsby-transformer-sharp と gatsby-source-contentful を参照。
  */
 export const onPreExtractQueries = true
 
 /**
- * Run when the `gatsby develop` server is started. It can be used for adding proxies and Express middleware
- * to the server.
+ * `gatsby develop` のサーバーが起動したときに実行される。サーバーにプロキシや Express のミドルウェアを
+ * 追加するために使える。
  * @param {object} $0
- * @param {Express} $0.app The [Express app](https://expressjs.com/en/4x/api.html#app) used to run the dev server
+ * @param {Express} $0.app 開発サーバーの実行に使われる [Express の app](https://expressjs.com/en/4x/api.html#app)
  * @example
  * exports.onCreateDevServer = ({ app }) => {
  *   app.get('/hello', function (req, res) {
@@ -477,11 +477,11 @@ export const onPreExtractQueries = true
 export const onCreateDevServer = true
 
 /**
- * Run during the bootstrap phase. Plugins can use this to define a schema for their options using
- * [Joi](https://joi.dev) to validate the options users pass to the plugin.
+ * bootstrap の段階で実行される。プラグインはこれを使って、
+ * [Joi](https://joi.dev) でオプションのスキーマを定義し、ユーザーがプラグインに渡すオプションを検証できる。
  * @gatsbyVersion 2.25.0
  * @param {object} $0
- * @param {Joi} $0.Joi The instance of [Joi](https://joi.dev) to define the schema
+ * @param {Joi} $0.Joi スキーマを定義するための [Joi](https://joi.dev) のインスタンス
  * @example
  * exports.pluginOptionsSchema = ({ Joi }) => {
  *   return Joi.object({
