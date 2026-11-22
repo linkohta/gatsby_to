@@ -36,9 +36,9 @@ module.exports = (nodeApiArgs, pluginOptions = {}) => {
 
   nodeApiArgs.actions.createTypes(typeDefs)
 
-  // This allows subplugins to use Node APIs bound to `gatsby-transformer-remark`
-  // to customize the GraphQL schema. This makes it possible for subplugins to
-  // modify types owned by `gatsby-transformer-remark`.
+  // これにより、サブプラグインは `gatsby-transformer-remark` にバインドされた Node API を使って
+  // GraphQL スキーマをカスタマイズできる。その結果、サブプラグインが
+  // `gatsby-transformer-remark` の所有する型を変更できるようになる。
   plugins.forEach(plugin => {
     const resolvedPlugin = plugin.module
 

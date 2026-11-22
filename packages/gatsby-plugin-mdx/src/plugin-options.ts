@@ -56,7 +56,7 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
     typeof import("remark-unwrap-images")
   >(`remark-unwrap-images`)
 
-  // Set jsxRuntime & jsxImportSource based on Gatsby project config
+  // Gatsby プロジェクトの設定をもとに jsxRuntime と jsxImportSource を設定する
   const { config } = helpers.store.getState()
   const { jsxRuntime, jsxImportSource } = config
   options.mdxOptions.jsxRuntime = jsxRuntime || `classic`
@@ -66,11 +66,11 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
     options.mdxOptions.remarkPlugins = []
   }
 
-  // The unwrapping has to happen before any other remark plugins are run (especially gatsby-remark-images)
-  // Otherwise remark-unwrap-images would operate on the already transformed images
+  // アンラップは、他の remark プラグイン（特に gatsby-remark-images）が実行される前に行う必要がある
+  // そうしないと、remark-unwrap-images が変換済みの画像を処理してしまう
   options.mdxOptions.remarkPlugins.push(remarkUnwrapImages)
 
-  // Inject Gatsby path prefix if needed
+  // 必要に応じて Gatsby のパスプレフィックスを注入する
   if (helpers.pathPrefix) {
     options.mdxOptions.remarkPlugins.push([
       remarkPathPlugin,
@@ -78,7 +78,7 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
     ])
   }
 
-  // Support gatsby-remark-* plugins
+  // gatsby-remark-* プラグインに対応する
   if (
     options.gatsbyRemarkPlugins &&
     Object.keys(options.gatsbyRemarkPlugins).length
@@ -87,7 +87,7 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
       options.mdxOptions.remarkPlugins = []
     }
 
-    // Parser plugins
+    // パーサープラグイン
     for (const plugin of options.gatsbyRemarkPlugins) {
       const requiredPlugin = plugin.module
 
@@ -105,7 +105,7 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
       }
     }
 
-    // Transformer plugins
+    // トランスフォーマープラグイン
     const gatsbyRemarkPlugins = await getSourcePluginsAsRemarkPlugins({
       gatsbyRemarkPlugins: options.gatsbyRemarkPlugins,
       ...helpers,
@@ -127,7 +127,7 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
   }
   options.mdxOptions.remarkRehypeOptions.passThrough = passThrough
 
-  // Extract metadata generated from by rehype-infer-* and similar plugins
+  // rehype-infer-* などのプラグインが生成したメタデータを取り出す
   options.mdxOptions.rehypePlugins.push(rehypeMdxMetadataExtractor)
 
   return options.mdxOptions

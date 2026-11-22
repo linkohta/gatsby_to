@@ -52,7 +52,7 @@ export default Counter
     const processed = highlightCode(language, code, {}, lineNumbersHighlight)
 
     expect(processed).toMatchSnapshot()
-    // expect spans to not contain \n as it would break line highlighting
+    // 行のハイライトが壊れるので、span に \n が含まれないことを期待する
     expect(/<span[^>]*>[^<]*\n[^<]*<\/span>/g.exec(processed)).not.toBeTruthy()
   })
 

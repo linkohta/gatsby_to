@@ -59,14 +59,14 @@ exports.pluginOptionsSchema = function ({ Joi }) {
         Joi.object({
           turnPolicy: Joi.string()
             .valid(
-              // this plugin also allow to use key names and not exact values
+              // このプラグインでは、正確な値ではなくキー名を使うこともできる
               `TURNPOLICY_BLACK`,
               `TURNPOLICY_WHITE`,
               `TURNPOLICY_LEFT`,
               `TURNPOLICY_RIGHT`,
               `TURNPOLICY_MINORITY`,
               `TURNPOLICY_MAJORITY`,
-              // it also allow using actual policy values
+              // 実際のポリシーの値を使うこともできる
               `black`,
               `white`,
               `left`,

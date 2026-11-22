@@ -55,7 +55,7 @@ const createNode = content => {
   }
 
   markdownNode.frontmatter = {
-    title: ``, // always include a title
+    title: ``, // 常に title を含める
     parent: node.id,
   }
 

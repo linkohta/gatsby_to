@@ -14,10 +14,10 @@ module.exports = (language = `javascript`) => {
 
   // Gatsby Prism Show Invisibles Plugin
   //
-  // This file serves as an adapter module
-  // for the original Prism Show Invisibles
-  // implementation. The ported plugin code
-  // is from npm's prismjs@1.17.1.
+  // このファイルは、元の Prism Show Invisibles の
+  // 実装に対するアダプターモジュールである。
+  // 移植したプラグインのコードは、
+  // npm の prismjs@1.17.1 のものである。
   //
   // @see https://github.com/PrismJS/prism/blob/v1.17.1/plugins/show-invisibles/prism-show-invisibles.js
   //

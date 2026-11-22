@@ -117,7 +117,7 @@ yadda yadda
   })
 
   describe(`process graphql correctly`, () => {
-    // given a set of nodes and a query, return the result of the query
+    // ノードの集合とクエリを受け取り、クエリの結果を返す
     async function queryResult(nodes, fragment) {
       const {
         createSchemaComposer,

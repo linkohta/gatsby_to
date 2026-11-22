@@ -1,11 +1,11 @@
 import type { Node } from "unist"
 import { cachedImport } from "./cache-helpers"
 
-// ensure only one `/` in new url
+// 新しい URL で `/` が 1 つだけになるようにする
 const withPathPrefix = (url: string, pathPrefix: string): string =>
   (pathPrefix + url).replace(/\/\//, `/`)
 
-// Ensure relative links include `pathPrefix`
+// 相対リンクに `pathPrefix` が含まれるようにする
 export const remarkPathPlugin = ({ pathPrefix }: { pathPrefix: string }) =>
   async function transformer(markdownAST: Node): Promise<Node> {
     if (!pathPrefix) {

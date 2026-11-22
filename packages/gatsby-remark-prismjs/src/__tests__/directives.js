@@ -159,9 +159,9 @@ describe(`highlighting lines`, () => {
              <span class=\\"token builtin\\">super</span><span class=\\"token punctuation\\">(</span><span class=\\"token punctuation\\">)</span><span class=\\"token punctuation\\">.</span>__init__<span class=\\"token punctuation\\">(</span><span class=\\"token string\\">'bbue'</span><span class=\\"token punctuation\\">)</span>"
     `)
 
-    // Each line need to have same amount of opening and closing spans, otherwise formatting can produce
-    // weird results. If there is multiline span (like triple-quote-string or plain-text) and we highlight some of it
-    // we add closing spans on line ends and add opening tags on new lines to avoid broken markup
+    // 各行の開始 span と終了 span の数は同じでなければならない。そうでないと、整形の結果が
+    // おかしくなることがある。複数行にまたがる span（triple-quote-string や plain-text など）の一部をハイライトする場合は、
+    // マークアップが壊れないよう、行末に終了 span を、新しい行に開始タグを追加する
     const numberOfSpansInLines = [6, 5, 1, 1, 1, 5, 7]
     const lines = highlights.split(`\n`)
     lines.forEach((line, index) => {

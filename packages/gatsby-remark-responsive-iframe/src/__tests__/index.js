@@ -103,12 +103,12 @@ describe(`gatsby-remark-responsive-iframe`, () => {
   <${tag} url="http://www.example.com/" width="${width}" height="${height}"></${tag}>
       `)
         const transformed = await plugin({ markdownAST })
-        // Note: Remark treats iframes (block level) and object (inline) tags
-        // differently, wrapping an object tag in <p></p> tags. It also parses
-        // out the object tag into three separate nodes - one for the opening
-        // tag, one for the closing tag and one for a newline inside. So for any
-        // tests that receive untransformed node back from the plugin, we strip
-        // the p tags and combine the nodes into a single html string.
+        // Note: Remark は iframe（ブロックレベル）と object（インライン）のタグを
+        // 別々に扱い、object タグを <p></p> タグで包む。また、object タグを
+        // 3 つの別々のノードにパースする。開始タグ用、終了タグ用、
+        // 内側の改行用の 3 つである。そのため、プラグインから未変換のノードが
+        // 返ってくるテストでは、p タグを取り除き、ノードを 1 つの html 文字列に
+        // 結合している。
         if (tag === `iframe`) {
           const iframeHTML = extractIframeTag(transformed)
           expect(iframeHTML).toBeDefined()

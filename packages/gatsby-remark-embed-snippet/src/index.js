@@ -6,8 +6,8 @@ const normalizePath = require(`normalize-path`)
 const visit = require(`unist-util-visit`)
 const rangeParser = require(`parse-numeric-range`)
 
-// Language defaults to extension.toLowerCase();
-// This map tracks languages that don't match their extension.
+// 言語のデフォルトは extension.toLowerCase() である。
+// この map は、拡張子と一致しない言語を保持する。
 const FILE_EXTENSION_TO_LANGUAGE_MAP = {
   js: `jsx`,
   md: `markup`,
@@ -51,7 +51,7 @@ module.exports = ({ markdownAST, markdownNode }, { directory } = {}) => {
       const file = value.slice(6)
       let snippetPath = normalizePath(path.join(directory, file))
 
-      // Embed specific lines numbers of a file
+      // ファイルの特定の行番号だけを埋め込む
       let lines = []
       let sname = ``
       const rangePrefixIndex = snippetPath.indexOf(`#L`)
@@ -62,12 +62,12 @@ module.exports = ({ markdownAST, markdownNode }, { directory } = {}) => {
         } else {
           lines = rangeParser(range)
         }
-        // Remove everything after the range prefix from file path
+        // ファイルパスから、範囲のプレフィックス以降をすべて取り除く
         snippetPath = snippetPath.slice(0, rangePrefixIndex)
       } else {
-        // Check to see if there is a {snippet: "snippetName"} following the file path.
-        // This syntax could support additional options in the future - for now, only
-        // handle a string that contains a `snippet :` option.
+        // ファイルパスの後に {snippet: "snippetName"} が続いているかを確認する。
+        // この構文は将来、追加のオプションに対応する可能性があるが、今のところは
+        // `snippet :` オプションを含む文字列だけを扱う。
         const optionIndex = snippetPath.indexOf(`{`)
         if (optionIndex > -1) {
           const optionStr = snippetPath.slice(optionIndex)
@@ -122,15 +122,15 @@ module.exports = ({ markdownAST, markdownNode }, { directory } = {}) => {
         }
       }
 
-      // PrismJS's theme styles are targeting pre[class*="language-"]
-      // to apply its styles. We do the same here so that users
-      // can apply a PrismJS theme and get the expected, ready-to-use
-      // outcome without any additional CSS.
+      // PrismJS のテーマのスタイルは、pre[class*="language-"] を対象に
+      // スタイルを適用する。ここでも同じようにして、ユーザーが
+      // PrismJS のテーマを適用するだけで、追加の CSS なしに、期待どおりの
+      // すぐに使える結果を得られるようにする。
       //
       // @see https://github.com/PrismJS/prism/blob/1d5047df37aacc900f8270b1c6215028f6988eb1/themes/prism.css#L49-L54
       const language = getLanguage(snippetPath)
 
-      // Change the node type to code, insert our file as value and set language.
+      // ノードの種類を code に変更し、ファイルの内容を value に入れて、言語を設定する。
       node.type = `code`
       node.value = code
       node.lang = language

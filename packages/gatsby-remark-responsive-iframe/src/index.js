@@ -6,18 +6,18 @@ const _ = require(`lodash`)
 const needsSemicolon = str => !str.endsWith(`;`)
 
 /**
- * Convert anything to number, except for % value.
- * We don't have to check for other values (em, vw, etc.)
- * because the browsers will treat them as px anyway.
- * @param {*} n something to be converted to number
+ * % の値を除き、あらゆるものを数値に変換する。
+ * 他の値（em、vw など）を確認する必要はない。
+ * ブラウザはいずれにせよ px として扱うためである。
+ * @param {*} n 数値に変換する対象
  * @returns {number}
  */
 const convert = n =>
   typeof n === `string` && n.trim().endsWith(`%`) ? NaN : parseInt(n, 10)
 
 /**
- * Check whether all passed in arguments are valid number or not
- * @param  {...number} args dimension to check
+ * 渡されたすべての引数が有効な数値かどうかを確認する
+ * @param  {...number} args 確認する寸法
  * @returns {boolean}
  */
 const isValidDimensions = (...args) => args.every(n => _.isFinite(n))
@@ -40,9 +40,9 @@ module.exports = async ({ markdownAST }, pluginOptions = {}) => {
       return
     }
 
-    let fullStyle = $(`iframe`).attr(`style`) || `` // Other plugins might set border: 0
-    // so we make sure that we maintain those existing styles. If other styles like height or
-    // width are already defined they will be overridden anyway.
+    let fullStyle = $(`iframe`).attr(`style`) || `` // 他のプラグインが border: 0 を設定していることがある
+    // そのため、既存のスタイルを確実に維持する。height や width など、
+    // 他のスタイルがすでに定義されていても、いずれにせよ上書きされる。
 
     if (fullStyle.length > 0 && needsSemicolon(fullStyle)) {
       fullStyle = `${fullStyle};`
@@ -62,9 +62,9 @@ module.exports = async ({ markdownAST }, pluginOptions = {}) => {
       .attr(`width`, null)
       .attr(`height`, null)
 
-    const newIframe = $(`body`).html() // fix for cheerio v1
+    const newIframe = $(`body`).html() // cheerio v1 向けの修正
 
-    // TODO add youtube preview image as background-image.
+    // TODO: youtube のプレビュー画像を background-image として追加する。
 
     const rawHTML = oneLine`
       <div

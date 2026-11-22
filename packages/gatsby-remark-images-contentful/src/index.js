@@ -1,5 +1,5 @@
 const { selectAll } = require(`unist-util-select`)
-// TODO(v5): use gatsby/sharp
+// TODO(v5): gatsby/sharp を使う
 const getSharpInstance = require(`./safe-sharp`)
 const axios = require(`axios`)
 const _ = require(`lodash`)
@@ -8,12 +8,12 @@ const cheerio = require(`cheerio`)
 const chalk = require(`chalk`)
 const { buildResponsiveSizes } = require(`./utils`)
 
-// If the image is hosted on contentful
-// 1. Find the image file
-// 2. Find the image's size
-// 3. Filter out any responsive image sizes that are greater than the image's width
-// 4. Create the responsive images.
-// 5. Set the html w/ aspect ratio helper.
+// 画像が contentful でホストされている場合
+// 1. 画像ファイルを見つける
+// 2. 画像のサイズを調べる
+// 3. レスポンシブ画像のサイズのうち、画像の幅より大きいものを取り除く
+// 4. レスポンシブ画像を作成する。
+// 5. アスペクト比のヘルパー付きの html を設定する。
 
 module.exports = async (
   {
@@ -39,10 +39,10 @@ module.exports = async (
     loading: `lazy`,
   }
 
-  // This will only work for markdown syntax image tags
+  // これは markdown 構文の画像タグでしか動作しない
   const markdownImageNodes = selectAll(`image`, markdownAST)
 
-  // This will also allow the use of html image tags
+  // これにより html の image タグも使えるようになる
   const rawHtmlNodes = selectAll(`html`, markdownAST)
 
   const generateImagesAndUpdateNode = async function (node) {
@@ -66,12 +66,12 @@ module.exports = async (
     const sharp = await getSharpInstance()
     const metaReader = sharp()
 
-    // @todo to increase reliablility, this should use the asset downloading function from gatsby-source-contentful
+    // @todo 信頼性を高めるために、gatsby-source-contentful のアセットダウンロード関数を使うべきである
     let response
     try {
       response = await axios({
         method: `GET`,
-        url: originalImg, // for some reason there is a './' prefix
+        url: originalImg, // なぜか './' というプレフィックスが付いている
         responseType: `stream`,
       })
     } catch (err) {
@@ -106,14 +106,14 @@ module.exports = async (
       reporter
     )
 
-    // Calculate the paddingBottom %
+    // paddingBottom の % を計算する
     const ratio = `${(1 / responsiveSizesResult.aspectRatio) * 100}%`
 
     const fallbackSrc = originalImg
     const srcSet = responsiveSizesResult.srcSet
     const presentationWidth = responsiveSizesResult.presentationWidth
 
-    // Generate default alt tag
+    // デフォルトの alt を生成する
     const fileNameNoExt = fileName.replace(/\.[^/.]+$/, ``)
     const defaultAlt = fileNameNoExt.replace(/[^A-Z0-9]/gi, ` `)
 
@@ -129,7 +129,7 @@ module.exports = async (
       )
     }
 
-    // Create our base image tag
+    // ベースになる image タグを作成する
     let imageTag = `
       <img
         class="gatsby-resp-image-image"
@@ -145,7 +145,7 @@ module.exports = async (
       />
    `.trim()
 
-    // if options.withWebp is enabled, generate a webp version and change the image tag to a picture tag
+    // options.withWebp が有効な場合は、webp 版を生成し、image タグを picture タグに変更する
     if (options.withWebp) {
       imageTag = `
         <picture>
@@ -172,7 +172,7 @@ module.exports = async (
       `.trim()
     }
 
-    // Construct new image node w/ aspect ratio placeholder
+    // アスペクト比のプレースホルダー付きの新しい画像ノードを組み立てる
     let rawHTML = `
       <span
         class="gatsby-resp-image-wrapper"
@@ -187,7 +187,7 @@ module.exports = async (
       </span>
     `.trim()
 
-    // Make linking to original image optional.
+    // 元の画像へのリンクを任意にする。
     if (options.linkImagesToOriginal) {
       rawHTML = `
         <a
@@ -202,7 +202,7 @@ module.exports = async (
       `.trim()
     }
 
-    // Wrap in figure and use title as caption
+    // figure で包み、title をキャプションとして使う
 
     if (options.showCaptions && node.title) {
       rawHTML = `
@@ -215,14 +215,14 @@ ${rawHTML}
     return rawHTML
   }
   return Promise.all(
-    // Simple because there is no nesting in markdown
+    // markdown には入れ子がないので単純である
     markdownImageNodes.map(
       node =>
         new Promise(resolve => {
           if (node.url.indexOf(`images.ctfassets.net`) !== -1) {
             return generateImagesAndUpdateNode(node).then(rawHTML => {
               if (rawHTML) {
-                // Replace the image node with an inline HTML node.
+                // 画像ノードをインラインの HTML ノードに置き換える。
                 node.type = `html`
                 node.value = rawHTML
               }
@@ -230,15 +230,15 @@ ${rawHTML}
               return resolve(node)
             })
           } else {
-            // Image isn't relative so there's nothing for us to do.
+            // 画像が相対パスではないので、何もすることがない。
             return resolve()
           }
         })
     )
   ).then(markdownImageNodes =>
-    // HTML image node stuff
+    // HTML の画像ノードに関する処理
     Promise.all(
-      // Complex because HTML nodes can contain multiple images
+      // HTML ノードは複数の画像を含むことがあるので複雑である
       rawHtmlNodes.map(
         node =>
           // eslint-disable-next-line no-async-promise-executor
@@ -249,7 +249,7 @@ ${rawHTML}
 
             const $ = cheerio.load(node.value)
             if ($(`img`).length === 0) {
-              // No img tags
+              // img タグがない
               return resolve()
             }
 
@@ -260,7 +260,7 @@ ${rawHTML}
             })
 
             for (const thisImg of imageRefs) {
-              // Get the details we need.
+              // 必要な詳細を取得する。
               const formattedImgTag = {}
               formattedImgTag.url = thisImg.attr(`src`)
               formattedImgTag.title = thisImg.attr(`title`)
@@ -277,7 +277,7 @@ ${rawHTML}
                 )
 
                 if (rawHTML) {
-                  // Replace the image string
+                  // 画像の文字列を置き換える
                   thisImg.replaceWith(rawHTML)
                 } else {
                   return resolve()
@@ -285,9 +285,9 @@ ${rawHTML}
               }
             }
 
-            // Replace the image node with an inline HTML node.
+            // 画像ノードをインラインの HTML ノードに置き換える。
             node.type = `html`
-            node.value = $(`body`).html() // fix for cheerio v1
+            node.value = $(`body`).html() // cheerio v1 向けの修正
 
             return resolve(node)
           })

@@ -12,17 +12,17 @@ const DEPLOY_DIR = `public`
 const invalidDestinationDirMessage = dir =>
   `[gatsby-remark-copy-linked-files You have supplied an invalid destination directory. The destination directory must be a child but was: ${dir}`
 
-// dest must be a child
+// dest は子でなければならない
 const destinationIsValid = dest => !path.relative(`./`, dest).startsWith(`..`)
 
 const validateDestinationDir = dir => {
   if (typeof dir === `undefined`) {
     return true
   } else if (typeof dir === `string`) {
-    // need to pass dummy data for validation to work
+    // 検証が動作するよう、ダミーのデータを渡す必要がある
     return destinationIsValid(`${dir}/n/h/a`)
   } else if (_.isFunction(dir)) {
-    // need to pass dummy data for validation to work
+    // 検証が動作するよう、ダミーのデータを渡す必要がある
     return destinationIsValid(
       `${dir({ name: `n`, hash: `h`, absolutePath: `a` })}`
     )
@@ -88,8 +88,8 @@ module.exports = (
   const options = _.defaults({}, pluginOptions, defaults)
 
   const filesToCopy = new Map()
-  // Copy linked files to the destination directory and modify the AST to point
-  // to new location of the files.
+  // リンクされたファイルを出力先のディレクトリへコピーし、AST がファイルの
+  // 新しい場所を指すよう変更する。
   const visitor = link => {
     if (isRelativeUrl(link.url) && getNode(markdownNode.parent).dir) {
       const linkPath = path.posix.join(
@@ -105,7 +105,7 @@ module.exports = (
       if (linkNode && linkNode.absolutePath) {
         const newFilePath = newPath(linkNode, options)
 
-        // Prevent unneeded copying
+        // 不要なコピーを防ぐ
         if (linkPath === newFilePath) return
 
         const linkURL = newLinkURL(linkNode, options, pathPrefix)
@@ -115,8 +115,8 @@ module.exports = (
     }
   }
 
-  // Takes a node and generates the needed images and then returns
-  // the needed HTML replacement for the image
+  // ノードを受け取って必要な画像を生成し、
+  // 画像を置き換えるための HTML を返す
   const generateImagesAndUpdateNode = function (image, node) {
     const imagePath = path.posix.join(
       getNode(markdownNode.parent).dir,
@@ -133,8 +133,8 @@ module.exports = (
     }
 
     const initialImageSrc = image.attr(`src`)
-    // The link object will be modified to the new location so we'll
-    // use that data to update our ref
+    // link オブジェクトは新しい場所を指すよう変更されるので、
+    // そのデータを使って ref を更新する
     const link = { url: image.attr(`src`) }
     visitor(link)
     node.value = node.value.replace(
@@ -150,7 +150,7 @@ module.exports = (
       )
     }
 
-    // Generate default alt tag
+    // デフォルトの alt を生成する
     const srcSplit = initialImageSrc.split(`/`)
     const fileName = srcSplit[srcSplit.length - 1]
     const fileNameNoExt = fileName.replace(/\.[^/.]+$/, ``)
@@ -185,14 +185,14 @@ module.exports = (
     visitor(definition)
   })
 
-  // This will only work for markdown img tags
+  // これは markdown の img タグでしか動作しない
   visit(markdownAST, `image`, image => {
     const ext = image.url.split(`.`).pop()
     if (options.ignoreFileExtensions.includes(ext)) {
       return
     }
 
-    // Just make sure the parent node has dir
+    // 親ノードが dir を持っていることだけを確認する
     if (markdownNode.parent && !getNode(markdownNode.parent).dir) {
       return
     }
@@ -213,7 +213,7 @@ module.exports = (
     }
   })
 
-  // For each HTML Node
+  // 各 HTML ノードについて
   visit(markdownAST, [`html`, `jsx`], node => {
     const $ = cheerio.load(node.value)
 
@@ -221,22 +221,22 @@ module.exports = (
       try {
         const ext = url.split(`.`).pop()
         if (!options.ignoreFileExtensions.includes(ext) || isRequired) {
-          // The link object will be modified to the new location so we'll
-          // use that data to update our ref
+          // link オブジェクトは新しい場所を指すよう変更されるので、
+          // そのデータを使って ref を更新する
           const link = { url }
           visitor(link)
           node.value = node.value.replace(new RegExp(url, `g`), link.url)
         }
       } catch (err) {
-        // Ignore
+        // 無視する
       }
     }
 
-    // extracts all elements that have the provided url attribute
+    // 指定された url 属性を持つ要素をすべて取り出す
     function extractUrlAttributeAndElement(selection, attribute) {
       return (
         selection
-          // extract the elements that have the attribute
+          // その属性を持つ要素を取り出す
           .map(function () {
             const element = $(this)
             const url = $(this).attr(attribute)
@@ -245,14 +245,14 @@ module.exports = (
             }
             return undefined
           })
-          // cheerio object -> array
+          // cheerio のオブジェクト -> 配列
           .toArray()
-          // filter out empty or undefined values
+          // 空の値や undefined の値を取り除く
           .filter(Boolean)
       )
     }
 
-    // Handle Images
+    // 画像を処理する
     extractUrlAttributeAndElement($(`img[src]`), `src`).forEach(
       ({ url, element }) => {
         try {
@@ -261,35 +261,35 @@ module.exports = (
             generateImagesAndUpdateNode(element, node)
           }
         } catch (err) {
-          // Ignore
+          // 無視する
         }
       }
     )
 
-    // Handle video tags.
+    // video タグを処理する。
     extractUrlAttributeAndElement(
       $(`video source[src], video[src]`),
       `src`
     ).forEach(processUrl)
 
-    // Handle video poster.
+    // video の poster を処理する。
     extractUrlAttributeAndElement($(`video[poster]`), `poster`).forEach(
       extractedUrlAttributeAndElement =>
         processUrl({ ...extractedUrlAttributeAndElement, isRequired: true })
     )
 
-    // Handle audio tags.
+    // audio タグを処理する。
     extractUrlAttributeAndElement(
       $(`audio source[src], audio[src]`),
       `src`
     ).forEach(processUrl)
 
-    // Handle flash embed tags.
+    // flash の embed タグを処理する。
     extractUrlAttributeAndElement($(`object param[value]`), `value`).forEach(
       processUrl
     )
 
-    // Handle a tags.
+    // a タグを処理する。
     extractUrlAttributeAndElement($(`a[href]`), `href`).forEach(processUrl)
 
     return
@@ -297,7 +297,7 @@ module.exports = (
 
   return Promise.all(
     Array.from(filesToCopy, async ([linkPath, newFilePath]) => {
-      // Don't copy anything if the file already exists at the location.
+      // その場所にファイルがすでに存在する場合は、何もコピーしない。
       if (!fsExtra.existsSync(newFilePath)) {
         try {
           await fsExtra.ensureDir(path.dirname(newFilePath))

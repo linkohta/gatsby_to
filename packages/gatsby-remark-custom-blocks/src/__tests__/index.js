@@ -2,7 +2,7 @@ const Remark = require(`remark`)
 const find = require(`unist-util-find`)
 const plugin = require(`../index`)
 
-// TODO: re-enable when https://github.com/zestedesavoir/zmarkdown/issues/416 is done
+// TODO: https://github.com/zestedesavoir/zmarkdown/issues/416 が解決したら再度有効にする
 describe.skip(`gatsby-remark-custom-blocks`, () => {
   let remark
 

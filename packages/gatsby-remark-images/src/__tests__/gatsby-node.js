@@ -2,7 +2,7 @@ import { testPluginOptionsSchema } from "gatsby-plugin-utils"
 import { pluginOptionsSchema } from "../gatsby-node"
 
 const warnSpy = jest.spyOn(console, `warn`).mockImplementation(() => {
-  // silence warnings
+  // 警告を抑制する
 })
 
 beforeEach(() => {
@@ -316,7 +316,7 @@ describe(`pluginOptionsSchema`, () => {
       })
 
       describe(`threshold`, () => {
-        // valid settings
+        // 有効な設定
         it.each([
           [
             `THRESHOLD_AUTO`,
@@ -345,7 +345,7 @@ describe(`pluginOptionsSchema`, () => {
           ],
         ])(`Allow setting %s`, async (titleAndMaybeValue, { value }) => {
           if (typeof value === `undefined`) {
-            // if value wasn't explicitly set use title
+            // 値が明示的に設定されていなければ title を使う
             value = titleAndMaybeValue
           }
 
@@ -364,7 +364,7 @@ describe(`pluginOptionsSchema`, () => {
           expect(errors).toEqual([])
         })
 
-        // invalid settings
+        // 無効な設定
         it.each([
           [
             -5,
@@ -384,7 +384,7 @@ describe(`pluginOptionsSchema`, () => {
           `Doesn't allow setting %s`,
           async (titleAndMaybeValue, { value, errorMessage }) => {
             if (typeof value === `undefined`) {
-              // if value wasn't explicitly set use title
+              // 値が明示的に設定されていなければ title を使う
               value = titleAndMaybeValue
             }
 

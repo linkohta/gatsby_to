@@ -22,14 +22,14 @@ export interface IGatsbyLayoutLoaderOptions {
   reporter: NodePluginArgs["reporter"]
 }
 
-// Wrap MDX content with Gatsby Layout component
+// MDX のコンテンツを Gatsby の Layout コンポーネントで包む
 const gatsbyLayoutLoader: LoaderDefinition = async function (
   source
 ): Promise<string | Buffer> {
   const { nodeExists, reporter } =
     this.getOptions() as IGatsbyLayoutLoaderOptions
-  // Figure out if the path to the MDX file is passed as a
-  // resource query param or if the MDX file is directly loaded as path.
+  // MDX ファイルのパスがリソースクエリのパラメーターとして渡されたのか、
+  // MDX ファイルがパスとして直接読み込まれたのかを判別する。
   const mdxPath = getPathToContentComponent(
     `${this.resourcePath}${this.resourceQuery}`
   )
@@ -44,7 +44,7 @@ const gatsbyLayoutLoader: LoaderDefinition = async function (
     })
   }
 
-  // add mdx dependency to webpack
+  // mdx を webpack の依存に追加する
   this.addDependency(path.resolve(mdxPath))
 
   const acorn = await cachedImport<typeof import("acorn")>(`acorn`)
@@ -66,7 +66,7 @@ const gatsbyLayoutLoader: LoaderDefinition = async function (
 
     const AST = tree as unknown as Program
 
-    // Throw when tree is not a Program
+    // ツリーが Program でない場合は throw する
     if (!AST.body && !AST.sourceType) {
       reporter.panicOnBuild({
         id: ERROR_CODES.InvalidAcornAST,
@@ -78,10 +78,10 @@ const gatsbyLayoutLoader: LoaderDefinition = async function (
     }
 
     /**
-     * Inject import to actual MDX file at the top of the file
-     * Input:
-     * [none]
-     * Output:
+     * ファイルの先頭に、実際の MDX ファイルの import を注入する
+     * 入力:
+     * [なし]
+     * 出力:
      * import GATSBY_COMPILED_MDX from "/absolute/path/to/content.mdx"
      */
     AST.body.unshift({
@@ -105,10 +105,10 @@ const gatsbyLayoutLoader: LoaderDefinition = async function (
     let hasClassicReactImport = false
 
     /**
-     * Replace default export with wrapper function that injects compiled MDX as children
-     * Input:
+     * デフォルトエクスポートを、コンパイル済みの MDX を children として注入するラッパー関数に置き換える
+     * 入力:
      * export default PageTemplate
-     * Output:
+     * 出力:
      * export default (props) => <PageTemplate {...props}>{GATSBY_COMPILED_MDX}</PageTemplate>
      **/
     const newBody: Array<any> = []

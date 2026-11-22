@@ -48,9 +48,9 @@ exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {
     }
   `
 
-  // This script used to have `let scrollTop` and `let clientTop` instead of
-  // current ones which are `var`. It is changed due to incompatibility with
-  // older browsers (that do not implement `let`). See:
+  // このスクリプトでは以前、現在の `var` ではなく `let scrollTop` と
+  // `let clientTop` を使っていた。（`let` を実装していない）古いブラウザとの
+  // 互換性の問題のために変更した。参照:
   //  - https://github.com/gatsbyjs/gatsby/issues/21058
   //  - https://github.com/gatsbyjs/gatsby/pull/21083
   const script = `

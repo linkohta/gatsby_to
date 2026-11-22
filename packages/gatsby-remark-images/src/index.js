@@ -17,7 +17,7 @@ const cheerio = require(`cheerio`)
 const { slash } = require(`gatsby-core-utils`)
 const chalk = require(`chalk`)
 
-// Should be the same as https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-transformer-sharp/src/supported-extensions.js
+// https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-transformer-sharp/src/supported-extensions.js と同じ内容にすること
 const supportedExtensions = {
   jpeg: true,
   jpg: true,
@@ -28,12 +28,12 @@ const supportedExtensions = {
   avif: true,
 }
 
-// If the image is relative (not hosted elsewhere)
-// 1. Find the image file
-// 2. Find the image's size
-// 3. Filter out any responsive image fluid sizes that are greater than the image's width
-// 4. Create the responsive images.
-// 5. Set the html w/ aspect ratio helper.
+// 画像が相対パスの（他の場所でホストされていない）場合
+// 1. 画像ファイルを見つける
+// 2. 画像のサイズを調べる
+// 3. レスポンシブ画像の fluid のサイズのうち、画像の幅より大きいものを取り除く
+// 4. レスポンシブ画像を作成する。
+// 5. アスペクト比のヘルパー付きの html を設定する。
 module.exports = (
   {
     files,
@@ -57,10 +57,10 @@ module.exports = (
         node.type === `link`
     )
 
-  // Get all the available definitions in the markdown tree
+  // markdown ツリー内の利用可能な定義をすべて取得する
   const definitions = getDefinitions(markdownAST)
 
-  // This will allow the use of html image tags
+  // これにより html の image タグを使えるようになる
   // const rawHtmlNodes = select(markdownAST, `html`)
   const rawHtmlNodes = []
   visitWithParents(markdownAST, [`html`, `jsx`], (node, ancestors) => {
@@ -69,7 +69,7 @@ module.exports = (
     rawHtmlNodes.push({ node, inLink })
   })
 
-  // This will only work for markdown syntax image tags
+  // これは markdown 構文の画像タグでしか動作しない
   const markdownImageNodes = []
 
   visitWithParents(
@@ -134,20 +134,20 @@ module.exports = (
     return compiler.generateHTML(await compiler.parseString(captionString))
   }
 
-  // Takes a node and generates the needed images and then returns
-  // the needed HTML replacement for the image
+  // ノードを受け取って必要な画像を生成し、
+  // 画像を置き換えるための HTML を返す
   const generateImagesAndUpdateNode = async function (
     node,
     resolve,
     inLink,
     overWrites = {}
   ) {
-    // Check if this markdownNode has a File parent. This plugin
-    // won't work if the image isn't hosted locally.
+    // この markdownNode が File の親を持つかを確認する。画像が
+    // ローカルでホストされていなければ、このプラグインは動作しない。
     let parentNode = getNode(markdownNode.parent)
-    // check if the parent node is a File node, otherwise go up the chain and
-    // search for the closest parent File node. This is necessary in case
-    // you have markdown in child nodes (e.g. gatsby-plugin-json-remark).
+    // 親ノードが File ノードかを確認し、そうでなければ親をたどって
+    // 最も近い File の親ノードを探す。子ノードに markdown がある場合
+    // （gatsby-plugin-json-remark など）に必要である。
     if (
       parentNode &&
       parentNode.internal &&
@@ -184,7 +184,7 @@ module.exports = (
         },
       })
     } else {
-      // Legacy: no context, slower version of image query
+      // レガシー: context がなく、画像クエリの遅いほうのバージョン
       imageNode = _.find(files, file => {
         if (file && file.absolutePath) {
           return file.absolutePath === imagePath
@@ -213,7 +213,7 @@ module.exports = (
     const srcSet = fluidResult.srcSet
     const presentationWidth = fluidResult.presentationWidth
 
-    // Generate default alt tag
+    // デフォルトの alt を生成する
     const srcSplit = getImageInfo(node.url).url.split(`/`)
     const fileName = srcSplit[srcSplit.length - 1]
     const fileNameNoExt = fileName.replace(/\.[^/.]+$/, ``)
@@ -261,7 +261,7 @@ module.exports = (
       top: 0;
       left: 0;`.replace(/\s*(\S+:)\s*/g, `$1`)
 
-    // Create our base image tag
+    // ベースになる image タグを作成する
     let imageTag = `
       <img
         class="${imageClass}"
@@ -298,7 +298,7 @@ module.exports = (
             file: imageNode,
             args: _.defaults(
               { toFormat: format },
-              // override options if it's an object, otherwise just pass through defaults
+              // オブジェクトであればオプションを上書きし、そうでなければデフォルトをそのまま渡す
               options[propertyName] === true ? {} : options[propertyName],
               options
             ),
@@ -357,7 +357,7 @@ module.exports = (
         ? options.wrapperStyle(fluidResult)
         : options.wrapperStyle
 
-    // Construct new image node w/ aspect ratio placeholder
+    // アスペクト比のプレースホルダー付きの新しい画像ノードを組み立てる
     const imageCaption =
       options.showCaptions && (await getImageCaption(node, overWrites))
 
@@ -382,7 +382,7 @@ module.exports = (
   ${imageTag}
   `.trim()
 
-    // Make linking to original image optional.
+    // 元の画像へのリンクを任意にする。
     if (!inLink && options.linkImagesToOriginal) {
       rawHTML = `
   <a
@@ -408,7 +408,7 @@ module.exports = (
     </span>
     `.trim()
 
-    // Wrap in figure and use title as caption
+    // figure で包み、title をキャプションとして使う
     if (imageCaption) {
       rawHTML = `
   <figure class="gatsby-resp-image-figure" style="${wrapperStyle}">
@@ -422,7 +422,7 @@ module.exports = (
   }
 
   return Promise.all(
-    // Simple because there is no nesting in markdown
+    // markdown には入れ子がないので単純である
     markdownImageNodes.map(
       ({ node, inLink }) =>
         new Promise(resolve => {
@@ -432,20 +432,20 @@ module.exports = (
             !node.hasOwnProperty(`url`) &&
             node.hasOwnProperty(`identifier`)
           ) {
-            // consider as imageReference node
+            // imageReference ノードとして扱う
             refNode = node
             node = definitions(refNode.identifier)
-            // pass original alt from referencing node
+            // 参照元のノードの元の alt を渡す
             overWrites.alt = refNode.alt
             if (!node) {
-              // no definition found for image reference,
-              // so there's nothing for us to do.
+              // 画像の参照に対応する定義が見つからないので、
+              // 何もすることがない。
               return resolve()
             }
           }
           const fileType = getImageInfo(node.url).ext
 
-          // Only attempt to convert supported extensions
+          // 対応している拡張子だけを変換の対象にする
           if (isRelativeUrl(node.url) && supportedExtensions[fileType]) {
             return generateImagesAndUpdateNode(
               node,
@@ -454,7 +454,7 @@ module.exports = (
               overWrites
             ).then(rawHTML => {
               if (rawHTML) {
-                // Replace the image or ref node with an inline HTML node.
+                // 画像または ref のノードを、インラインの HTML ノードに置き換える。
                 if (refNode) {
                   node = refNode
                 }
@@ -465,15 +465,15 @@ module.exports = (
               return resolve(node)
             })
           } else {
-            // Image isn't relative so there's nothing for us to do.
+            // 画像が相対パスではないので、何もすることがない。
             return resolve()
           }
         })
     )
   ).then(markdownImageNodes =>
-    // HTML image node stuff
+    // HTML の画像ノードに関する処理
     Promise.all(
-      // Complex because HTML nodes can contain multiple images
+      // HTML ノードは複数の画像を含むことがあるので複雑である
       rawHtmlNodes.map(
         ({ node, inLink }) =>
           // eslint-disable-next-line no-async-promise-executor
@@ -484,7 +484,7 @@ module.exports = (
 
             const $ = cheerio.load(node.value)
             if ($(`img`).length === 0) {
-              // No img tags
+              // img タグがない
               return resolve()
             }
 
@@ -495,7 +495,7 @@ module.exports = (
             })
 
             for (const thisImg of imageRefs) {
-              // Get the details we need.
+              // 必要な詳細を取得する。
               const formattedImgTag = {}
               formattedImgTag.url = thisImg.attr(`src`)
               formattedImgTag.title = thisImg.attr(`title`)
@@ -507,7 +507,7 @@ module.exports = (
 
               const fileType = getImageInfo(formattedImgTag.url).ext
 
-              // Only attempt to convert supported extensions
+              // 対応している拡張子だけを変換の対象にする
               if (
                 isRelativeUrl(formattedImgTag.url) &&
                 supportedExtensions[fileType]
@@ -519,7 +519,7 @@ module.exports = (
                 )
 
                 if (rawHTML) {
-                  // Replace the image string
+                  // 画像の文字列を置き換える
                   thisImg.replaceWith(rawHTML)
                 } else {
                   return resolve()
@@ -527,9 +527,9 @@ module.exports = (
               }
             }
 
-            // Replace the image node with an inline HTML node.
+            // 画像ノードをインラインの HTML ノードに置き換える。
             node.type = `html`
-            node.value = $(`body`).html() // fix for cheerio v1
+            node.value = $(`body`).html() // cheerio v1 向けの修正
 
             return resolve(node)
           })

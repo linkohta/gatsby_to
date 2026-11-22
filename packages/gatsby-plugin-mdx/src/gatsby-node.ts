@@ -14,7 +14,7 @@ import { ERROR_MAP } from "./error-utils"
 import { cachedImport, createFileToMdxCacheKey } from "./cache-helpers"
 
 /**
- * Add support for MDX files including using Gatsby layout components
+ * Gatsby のレイアウトコンポーネントの利用を含め、MDX ファイルへの対応を追加する
  */
 export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] =
   async (
@@ -94,8 +94,8 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] =
   }
 
 /**
- * Add the MDX extensions as resolvable. This is how the page creator
- * determines which files in the pages/ directory get built as pages.
+ * MDX の拡張子を解決可能なものとして追加する。page creator はこれをもとに、
+ * pages/ ディレクトリのどのファイルをページとしてビルドするかを決める。
  */
 export const resolvableExtensions: GatsbyNode["resolvableExtensions"] = (
   _data,
@@ -103,7 +103,7 @@ export const resolvableExtensions: GatsbyNode["resolvableExtensions"] = (
 ) => defaultOptions(pluginOptions).extensions
 
 /**
- * Convert MDX to JSX so that Gatsby can extract the GraphQL queries and render the pages.
+ * Gatsby が GraphQL クエリを抽出してページをレンダリングできるよう、MDX を JSX に変換する。
  */
 export const preprocessSource: GatsbyNode["preprocessSource"] = async (
   { filename, getNode, getNodesByType, pathPrefix, reporter, cache, store },
@@ -291,7 +291,7 @@ export const shouldOnCreateNode: GatsbyNode["shouldOnCreateNode"] = (
 }
 
 /**
- * Create Mdx nodes from MDX files.
+ * MDX ファイルから Mdx ノードを作成する。
  */
 export const onCreateNode: GatsbyNode<FileSystemNode>["onCreateNode"] = async ({
   node,
@@ -325,7 +325,7 @@ export const onCreateNode: GatsbyNode<FileSystemNode>["onCreateNode"] = async ({
 }
 
 /**
- * Add frontmatter as page context for MDX pages
+ * MDX ページのページコンテキストとして frontmatter を追加する
  */
 export const onCreatePage: GatsbyNode["onCreatePage"] = async (
   { page, actions, getNodesByType },
@@ -337,7 +337,7 @@ export const onCreatePage: GatsbyNode["onCreatePage"] = async (
   const mdxPath = getPathToContentComponent(page.component)
   const ext = path.extname(mdxPath)
 
-  // Only apply on pages based on .mdx files
+  // .mdx ファイルをもとにしたページにだけ適用する
   if (!extensions.includes(ext)) {
     return
   }
@@ -349,7 +349,7 @@ export const onCreatePage: GatsbyNode["onCreatePage"] = async (
     throw new Error(`Could not locate File node for ${mdxPath}`)
   }
 
-  // Avoid loops
+  // ループを避ける
   if (!page.context?.frontmatter) {
     const content = await fs.readFile(mdxPath, `utf8`)
     const { frontmatter } = parseFrontmatter(
@@ -374,7 +374,7 @@ export const onPluginInit: GatsbyNode["onPluginInit"] = ({ reporter }) => {
 }
 
 /**
- * Plugin option validation
+ * プラグインオプションの検証
  */
 export const pluginOptionsSchema: GatsbyNode["pluginOptionsSchema"] = ({
   Joi,

@@ -1,9 +1,9 @@
 const sanitizeHTML = require(`sanitize-html`)
 const _ = require(`lodash`)
 
-// Unicode ranges for Han (Chinese) and Hiragana/Katakana (Japanese) characters
+// 漢字（中国語）と、ひらがな、カタカナ（日本語）の Unicode の範囲
 const cjRanges = [
-  [11904, 11930], // Han
+  [11904, 11930], // 漢字
   [11931, 12020],
   [12032, 12246],
   [12293, 12294],
@@ -20,11 +20,11 @@ const cjRanges = [
   [178208, 183970],
   [183984, 191457],
   [194560, 195102],
-  [12353, 12439], // Hiragana
+  [12353, 12439], // ひらがな
   [12445, 12448],
   [110593, 110879],
   [127488, 127489],
-  [12449, 12539], // Katakana
+  [12449, 12539], // カタカナ
   [12541, 12544],
   [12784, 12800],
   [13008, 13055],
@@ -55,8 +55,8 @@ export const timeToRead = html => {
     }
   }
 
-  // Multiply non-latin character string length by 0.56, because
-  // on average one word consists of 2 characters in both Chinese and Japanese
+  // 非ラテン文字の文字列の長さに 0.56 を掛ける。
+  // 中国語でも日本語でも、1 語は平均して 2 文字で構成されるためである
   const wordCount = _.words(latinChars.join(``)).length + cjChars.length * 0.56
 
   timeToRead = Math.round(wordCount / avgWPM)

@@ -55,21 +55,21 @@ const getCacheKey = (cacheType, node, options = {}) => {
   return `transformer-remark-markdown-${cacheType}-${keyVars.join(`-`)}`
 }
 
-// ensure only one `/` in new url
+// 新しい URL で `/` が 1 つだけになるようにする
 const withPathPrefix = (url, pathPrefix) =>
   (pathPrefix + url).replace(/\/\//, `/`)
 
 /**
- * Map that keeps track of generation of AST to not generate it multiple
- * times in parallel.
+ * AST の生成状況を記録する Map。並行して何度も生成しないように
+ * するためである。
  *
  * @type {Map<string,Promise>}
  */
 const ASTPromiseMap = new Map()
 
 /**
- * Set of all Markdown node types which, when encountered, generate an extra to
- * separate text.
+ * Markdown のノードタイプのうち、出現したときにテキストを区切るための
+ * 余分な空白を生成するものすべての Set。
  *
  * @type {Set<string>}
  */
@@ -105,7 +105,7 @@ module.exports = function remarkExtendNodeType(
   pathPrefixCacheStr = basePath || ``
 
   return new Promise((resolve, reject) => {
-    // Setup Remark.
+    // Remark をセットアップする。
     const {
       blocks,
       footnotes = true,
@@ -125,12 +125,12 @@ module.exports = function remarkExtendNodeType(
     let remark = new Remark().data(`settings`, remarkOptions)
 
     if (gfm) {
-      // TODO: deprecate `gfm` option in favor of explicit remark-gfm as a plugin?
+      // TODO: `gfm` オプションを非推奨にして、remark-gfm を明示的にプラグインとして使う形にする？
       remark = remark.use(remarkGfm)
     }
 
     if (footnotes) {
-      // TODO: deprecate `footnotes` option in favor of explicit remark-footnotes as a plugin?
+      // TODO: `footnotes` オプションを非推奨にして、remark-footnotes を明示的にプラグインとして使う形にする？
       remark = remark.use(remarkFootnotes, { inlineNotes: true })
     }
 
@@ -163,13 +163,13 @@ module.exports = function remarkExtendNodeType(
         type: `File`,
       })
 
-      // if we can't find it, just hand off the response of findOne
+      // 見つからない場合は、findOne の結果をそのまま返す
       if (!depNode) {
         return depNode
       }
 
-      // get the current dependencies of the markdownNode using the in memory cache
-      // we do this so we don't overwrite during concurrent remark plugins
+      // インメモリーのキャッシュを使って、markdownNode の現在の依存関係を取得する
+      // 並行して動く remark プラグインの間で上書きしないようにするためである
       const depCacheKey = getCacheKey(CACHE_TYPE_NODE_DEPS, markdownNode)
       const dependencies = inMemoryNodeDependencyCache
 
@@ -191,23 +191,23 @@ module.exports = function remarkExtendNodeType(
 
       if (dependencies && context) {
         for (const depNodeId of Object.keys(dependencies)) {
-          // get current contentDigest
+          // 現在の contentDigest を取得する
           const depNode = context.nodeModel.getNodeById({
             id: depNodeId,
             type: `File`,
           })
 
           if (!depNode) {
-            // the depNode was not found, probably deleted
-            // invalidate the cache so we can re-map dependencies
+            // depNode が見つからなかった。おそらく削除されている
+            // 依存関係を対応付け直せるよう、キャッシュを無効化する
             return undefined
           }
 
           const curDepDigest = depNode.internal.contentDigest
           const prevDepDigest = dependencies[depNodeId]
 
-          // if the contentDigests don't match, we'll invalidate the cache
-          // this also causes a check of the depNodes, so we don't need to set them here
+          // contentDigest が一致しない場合は、キャッシュを無効化する
+          // これにより depNodes の確認も行われるので、ここで設定する必要はない
           if (prevDepDigest !== curDepDigest) {
             return undefined
           }
@@ -223,7 +223,7 @@ module.exports = function remarkExtendNodeType(
 
       const promise = ASTPromiseMap.get(cacheKey)
       if (promise) {
-        // We are already generating AST, so let's wait for it
+        // すでに AST を生成中なので、それを待つ
         return promise
       }
 
@@ -239,8 +239,8 @@ module.exports = function remarkExtendNodeType(
       const ASTGenerationPromise = getMarkdownAST(markdownNode, context)
       ASTPromiseMap.set(cacheKey, ASTGenerationPromise)
 
-      // Return the promise that will cache the result if good, and deletes the promise from local cache either way
-      // Note that if this cache hits for another parse, it won't have to wait for the cache
+      // 結果が正常であればキャッシュする promise を返す。いずれの場合も、promise はローカルキャッシュから削除される
+      // Note: 別のパースでこのキャッシュにヒットした場合は、キャッシュを待つ必要がない
       try {
         const markdownAST = await ASTGenerationPromise
 
@@ -252,11 +252,11 @@ module.exports = function remarkExtendNodeType(
       }
     }
 
-    // Parse a markdown string and its AST representation, applying the remark plugins if necessary
+    // markdown の文字列とその AST 表現をパースし、必要に応じて remark プラグインを適用する
     async function parseString(string, markdownNode, context) {
-      // compiler to inject in the remark plugins
-      // so that they can use our parser/generator
-      // with all the options and plugins from the user
+      // remark プラグインに注入するコンパイラー
+      // これにより、プラグインはユーザーのすべてのオプションとプラグインを
+      // 反映したパーサーとジェネレーターを使える
       const compiler = {
         parseString: string => parseString(string, markdownNode, context),
         generateHTML: ast =>
@@ -268,7 +268,7 @@ module.exports = function remarkExtendNodeType(
       const markdownAST = remark.parse(string)
 
       if (basePath) {
-        // Ensure relative links include `pathPrefix`
+        // 相対リンクに `pathPrefix` が含まれるようにする
         visit(markdownAST, [`link`, `definition`], node => {
           if (
             node.url &&
@@ -284,18 +284,18 @@ module.exports = function remarkExtendNodeType(
         fileNodes = getNodesByType(`File`)
       }
 
-      // Used to track dependencies for a given markDown node
-      // Enables rebuilding of a markdown even if it's contents don't change,
-      // but a dependency does. We use a copy of the local cache here
-      // to avoid multiple processes overwriting this value.
+      // ある markDown ノードの依存関係を追跡するために使う
+      // markdown の内容が変わらなくても、依存先が変われば
+      // 再ビルドできるようにする。複数のプロセスがこの値を上書きしないよう、
+      // ここではローカルキャッシュのコピーを使う。
       // type {[depNodeId: string]: string}
       const inMemoryNodeDependencyCache = {}
 
-      // Use a for loop to run remark plugins serially.
+      // remark プラグインを直列に実行するため、for ループを使う。
       for (const plugin of pluginOptions.plugins) {
         const requiredPlugin = plugin.module
 
-        // Allow both exports = function(), and exports.default = function()
+        // exports = function() と exports.default = function() の両方を許可する
         const defaultFunction = _.isFunction(requiredPlugin)
           ? requiredPlugin
           : _.isFunction(requiredPlugin.default)
@@ -330,7 +330,7 @@ module.exports = function remarkExtendNodeType(
         }
       }
 
-      // Set up dependency cache for this markdownNode
+      // この markdownNode の依存関係のキャッシュをセットアップする
       const depCacheKey = getCacheKey(CACHE_TYPE_NODE_DEPS, markdownNode)
       await cache.set(depCacheKey, inMemoryNodeDependencyCache)
 
@@ -342,10 +342,10 @@ module.exports = function remarkExtendNodeType(
         fileNodes = getNodesByType(`File`)
       }
 
-      // Execute the remark plugins that can mutate the node
-      // before parsing its content
+      // 内容をパースする前に、ノードを変更しうる
+      // remark プラグインを実行する
       //
-      // Use for loop to run remark plugins serially.
+      // remark プラグインを直列に実行するため、for ループを使う。
       for (const plugin of pluginOptions.plugins) {
         const requiredPlugin = plugin.module
 
@@ -418,7 +418,7 @@ module.exports = function remarkExtendNodeType(
     }
 
     async function getTableOfContents(markdownNode, gqlTocOptions, context) {
-      // fetch defaults
+      // デフォルト値を取得する
       const appliedTocOptions = { ...tocOptions, ...gqlTocOptions }
 
       const tocKey = getCacheKey(
@@ -427,7 +427,7 @@ module.exports = function remarkExtendNodeType(
         appliedTocOptions
       )
 
-      // get cached toc
+      // キャッシュ済みの toc を取得する
       const cachedToc = await getCacheWithNodeDependencyValidation(
         tocKey,
         markdownNode,
@@ -456,7 +456,7 @@ module.exports = function remarkExtendNodeType(
           )
         }
 
-        // addSlugToUrl may clear the map
+        // addSlugToUrl が map を消去することがある
         if (tocAst.map) {
           toc = hastToHTML(toHAST(tocAst.map, { allowDangerousHtml: true }), {
             allowDangerousHtml: true,
@@ -488,7 +488,7 @@ module.exports = function remarkExtendNodeType(
         const ast = await getAST(markdownNode, context)
         const htmlAst = markdownASTToHTMLAst(ast)
 
-        // Save new HTML AST to cache and return
+        // 新しい HTML AST をキャッシュに保存して返す
         await cache.set(key, htmlAst)
         return htmlAst
       }
@@ -505,12 +505,12 @@ module.exports = function remarkExtendNodeType(
         return cachedHTML
       } else {
         const ast = await getHTMLAst(markdownNode, context)
-        // Save new HTML to cache and return
+        // 新しい HTML をキャッシュに保存して返す
         const html = hastToHTML(ast, {
           allowDangerousHtml: true,
         })
 
-        // Save new HTML to cache
+        // 新しい HTML をキャッシュに保存する
         await cache.set(cacheKey, html)
 
         return html
@@ -592,7 +592,7 @@ module.exports = function remarkExtendNodeType(
       truncate,
       excerptSeparator
     ) {
-      // if excerptSeparator in options and excerptSeparator in content then we will get an excerpt from grayMatter that we can use
+      // オプションに excerptSeparator があり、内容にも excerptSeparator が含まれていれば、grayMatter から抜粋が得られるので、それを使える
       if (excerptSeparator && markdownNode.excerpt !== ``) {
         return markdownNode.excerpt
       }
@@ -629,7 +629,7 @@ module.exports = function remarkExtendNodeType(
           } else if (node.type === `image`) {
             excerptNodes.push(node.alt)
           } else if (SpaceMarkdownNodeTypesSet.has(node.type)) {
-            // Add a space when encountering one of these node types.
+            // これらのノードタイプのいずれかが出現したら、空白を追加する。
             excerptNodes.push(` `)
           }
         }
@@ -791,7 +791,7 @@ module.exports = function remarkExtendNodeType(
           return getTableOfContents(markdownNode, args, context)
         },
       },
-      // TODO add support for non-latin languages https://github.com/wooorm/remark/issues/251#issuecomment-296731071
+      // TODO: 非ラテン系の言語への対応を追加する https://github.com/wooorm/remark/issues/251#issuecomment-296731071
       wordCount: {
         type: `MarkdownWordCount`,
         resolve(markdownNode) {
