@@ -31,7 +31,7 @@ const webpackRemoveExportsLoader: LoaderDefinitionFunction<IOptions> =
                 {
                   useBuiltIns: true,
                   pragma: `React.createElement`,
-                  // jsx is used only in develop, so for now this is fine
+                  // jsx は develop でしか使われないので、今のところはこれで問題ない
                   development: true,
                 },
               ],

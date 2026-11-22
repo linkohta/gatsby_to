@@ -18,6 +18,6 @@ export async function loadConfigAndPlugins(
   const config = await loadConfig(...args)
   await loadPlugins(config, siteDirectory)
 
-  // Cache is already initialized
+  // キャッシュはすでに初期化されている
   await apiRunnerNode(`onPluginInit`)
 }

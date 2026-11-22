@@ -14,7 +14,7 @@ export function setInferenceMetadata(): void {
 export async function buildSchema(): Promise<void> {
   const workerStore = store.getState()
 
-  // pathPrefix: '' will at least be defined when config is loaded
+  // pathPrefix: '' は、少なくとも設定の読み込み時には定義されている
   if ((workerStore?.config?.pathPrefix ?? null) === null) {
     throw Error(
       `Config loading didn't finish before attempting to build schema in worker`
@@ -36,6 +36,6 @@ export async function buildSchema(): Promise<void> {
 
   await apiRunnerNode(`createSchemaCustomization`)
 
-  // build() runs other lifecycles like "createResolvers" or "setFieldsOnGraphQLNodeType" internally
+  // build() は "createResolvers" や "setFieldsOnGraphQLNodeType" といったほかのライフサイクルを内部で実行する
   await build({ fullMetadataBuild: false, parentSpan: {} })
 }

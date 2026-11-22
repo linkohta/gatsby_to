@@ -18,7 +18,7 @@ export interface IPageOrSliceQueryResult {
 
 export interface IStaticQueryResult {
   id: string
-  result: unknown // TODO: Improve this once we understand what the type is
+  result: unknown // TODO: 型が何であるかが分かったら改善する
 }
 
 type QueryResultsMap = Map<string, IStaticQueryResult>
@@ -36,13 +36,13 @@ export class WebsocketManager {
   websocket: SocketIO | undefined
 
   init = ({ server }: { server: HTTPSServer | HTTPServer }): SocketIO => {
-    // make typescript happy, else it complained about this.websocket being undefined
+    // TypeScript の型チェックを通すためのもの。これがないと this.websocket が undefined だとエラーになる
     const websocket = new SocketIO(server, {
-      // we see ping-pong timeouts on gatsby-cloud when socket.io is running for a while
-      // increasing it should help
+      // socket.io をしばらく動かしていると、gatsby-cloud で ping-pong のタイムアウトが発生する
+      // 値を大きくすれば改善するはずである
       // @see https://github.com/socketio/socket.io/issues/3259#issuecomment-448058937
       pingTimeout: 30000,
-      // whitelist all (https://github.com/expressjs/cors#configuration-options)
+      // すべてを許可する (https://github.com/expressjs/cors#configuration-options)
       cors: {
         origin: true,
       },
@@ -80,8 +80,8 @@ export class WebsocketManager {
           )
 
           if (page) {
-            // when it's SSR we don't want to return the page path but the actualy url used,
-            // this is necessary when matchPaths are used.
+            // SSR の場合はページのパスではなく、実際に使われた URL を返したい。
+            // matchPath を使っている場合に必要である。
             if (getPageMode(page) === `SSR`) {
               activePagePath = newActivePath
             } else {
@@ -123,7 +123,7 @@ export class WebsocketManager {
     })
 
     if (process.env.GATSBY_QUERY_ON_DEMAND) {
-      // page-data marked stale due to dirty query tracking
+      // ダーティなクエリの追跡により、古いとマークされた page-data
       const boundEmitStalePageDataPathsFromDirtyQueryTracking =
         this.emitStalePageDataPathsFromDirtyQueryTracking.bind(this)
       emitter.on(
@@ -144,7 +144,7 @@ export class WebsocketManager {
       )
     }
 
-    // page-data marked stale due to static query hashes change
+    // 静的クエリのハッシュの変更により、古いとマークされた page-data
     emitter.on(
       `ADD_PENDING_TEMPLATE_DATA_WRITE`,
       this.emitStalePageDataPathsFromStaticQueriesAssignment.bind(this)

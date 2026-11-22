@@ -24,12 +24,12 @@ interface IDirective {
 export const PARTIAL_HYDRATION_CHUNK_REASON = `PartialHydration client module`
 
 /**
- * inspiration and code mostly comes from https://github.com/facebook/react/blob/3f70e68cea8d2ed0f53d35420105ae20e22ce428/packages/react-server-dom-webpack/src/ReactFlightWebpackPlugin.js
+ * 着想とコードの大部分は https://github.com/facebook/react/blob/3f70e68cea8d2ed0f53d35420105ae20e22ce428/packages/react-server-dom-webpack/src/ReactFlightWebpackPlugin.js による
  */
 export class PartialHydrationPlugin {
   name = `PartialHydrationPlugin`
 
-  _manifestPath: string // Absolute path to where the manifest file should be written
+  _manifestPath: string // マニフェストファイルの書き込み先の絶対パス
   _reporter: typeof Reporter
 
   _collectedCssModules = new Set<webpack.Module>()
@@ -265,12 +265,12 @@ export class PartialHydrationPlugin {
                 ) {
                   asyncRequires = connection.originModule
 
-                  // Remove page template "import" from async-requires.
-                  // Note that if other imports to a template will remain it will remain in the bundle:
-                  // that can happen if template is marked with "use client" or if other client component
-                  // will import it. We don't want to force remove template - we just want to remove the
-                  // import from async-requires and let webpack remove it rom the bundle (or rather just not add it)
-                  // if it's not used anywhere else
+                  // ページテンプレートの "import" を async-requires から削除する。
+                  // なお、テンプレートへの import がほかに残っている場合は、バンドルにも残る:
+                  // テンプレートに "use client" が付いている場合や、別のクライアントコンポーネントが
+                  // それを import している場合である。テンプレートを強制的に取り除きたいわけではない。
+                  // async-requires からの import だけを削除し、ほかのどこからも使われていなければ
+                  // webpack がバンドルから取り除く（というより、そもそも追加しない）ようにしたい
                   compilation.moduleGraph.removeConnection(
                     connection.dependency
                   )
@@ -279,7 +279,7 @@ export class PartialHydrationPlugin {
             }
           }
 
-          // find css modules that are imported by this module
+          // このモジュールが import している css モジュールを探す
           collectCssModules(module)
         }
       }
@@ -358,7 +358,7 @@ export class PartialHydrationPlugin {
   }
 
   apply(compiler: webpack.Compiler): void {
-    // Restore manifest from the previous compilation, otherwise it will be wiped since files aren't visited on cached builds
+    // 前回のコンパイルのマニフェストを復元する。キャッシュを使ったビルドではファイルを走査しないため、そうしないとマニフェストが消えてしまう
     compiler.hooks.beforeCompile.tap(this.name, () => {
       try {
         const previousManifest = fs.existsSync(this._manifestPath)
@@ -381,7 +381,7 @@ export class PartialHydrationPlugin {
 
     compiler.hooks.finishMake.tapPromise(this.name, async compilation => {
       if (compilation.compiler.parentCompilation) {
-        // child compilation happen for css modules for example, we only care about the main compilation
+        // 子コンパイルは css モジュールなどで発生するが、対象はメインのコンパイルだけである
         return
       }
       await this.addClientModuleEntries(compiler, compilation)
@@ -401,8 +401,8 @@ export class PartialHydrationPlugin {
             const module = parser.state.module
 
             if (hasClientExportDirective) {
-              // this metadata will be preserved on warm builds, so we don't need to force parse modules
-              // each time, as webpack will manage going through parsing of module is invalidated
+              // このメタデータはウォームビルドでも保持されるので、モジュールの解析を毎回強制する
+              // 必要はない。モジュールが無効化された場合の解析は webpack が管理する
               module.buildInfo!.rsc = true
             }
           })
@@ -418,7 +418,7 @@ export class PartialHydrationPlugin {
           .for(`javascript/dynamic`)
           .tap(this.name, parserCallback)
 
-        // add dangling css modules to the app entry
+        // どこからも参照されていない css モジュールを app エントリーに追加する
         compilation.hooks.optimizeChunks.tap(this.name, () => {
           let appChunk: webpack.Chunk | null = null
           for (const chunk of compilation.chunks) {
@@ -473,7 +473,7 @@ export class PartialHydrationPlugin {
           }
         })
 
-        // generate client components manifest
+        // クライアントコンポーネントのマニフェストを生成する
         compilation.hooks.processAssets.tap(
           {
             name: this.name,
@@ -486,7 +486,7 @@ export class PartialHydrationPlugin {
             )
 
             /**
-             * `emitAsset` is unclear about what the path should be relative to and absolute paths don't work. This works so we'll go with that.
+             * `emitAsset` では、パスが何に対する相対パスであるべきかがはっきりせず、絶対パスも使えない。この方法なら動くので、これを採用する。
              * @see {@link https://webpack.js.org/api/compilation-object/#emitasset}
              */
             const emitManifestPath = `..${this._manifestPath.replace(

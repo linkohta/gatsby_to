@@ -28,7 +28,7 @@ export class WebpackLoggingPlugin {
       profile: true,
     }).apply(compiler)
 
-    // if webpack bundle analyzer is installed lets use it
+    // webpack bundle analyzer がインストールされていれば、それを使う
     const webpackBundleAnalyzerPath = resolveFrom.silent(
       this.rootDir,
       `webpack-bundle-analyzer`

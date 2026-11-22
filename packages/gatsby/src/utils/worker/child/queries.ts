@@ -23,8 +23,8 @@ export function setComponents(): void {
 }
 
 export async function saveQueriesDependencies(): Promise<void> {
-  // Drop `queryNodes` from query state - it can be restored from other pieces of state
-  // and is there only as a perf optimization
+  // クエリの状態から `queryNodes` を取り除く。これは状態のほかの部分から復元でき、
+  // パフォーマンスの最適化のためだけに存在する
   const pickNecessaryQueryState = <T extends DeepPartial<IGatsbyState>>(
     state: T
   ): T => {
@@ -37,7 +37,7 @@ export async function saveQueriesDependencies(): Promise<void> {
     pickNecessaryQueryState
   )
 
-  // make sure page query results we put in lmdb-store are flushed
+  // lmdb-store に入れたページクエリの結果が確実にフラッシュされるようにする
   await waitUntilPageQueryResultsAreStored()
 }
 
@@ -71,8 +71,8 @@ export async function runQueries(
       action.type === `QUERY_START` ||
       action.type === `PAGE_QUERY_RUN` ||
       action.type === `ADD_PENDING_PAGE_DATA_WRITE`
-      // Note: Instead of saving/replaying `CREATE_COMPONENT_DEPENDENCY` action
-      // we do state merging once at the end of the query running (replaying this action is expensive)
+      // Note: `CREATE_COMPONENT_DEPENDENCY` アクションを保存して再生する代わりに、
+      // クエリの実行が終わった時点で一度だけ状態をマージする（このアクションの再生はコストが高い）
     ) {
       actionsToReplay.push(action)
     }
@@ -89,7 +89,7 @@ export async function runQueries(
 async function doRunQueries(queryIds: IGroupedQueryIds): Promise<void> {
   const workerStore = store.getState()
 
-  // If buildSchema() didn't run yet, execute it
+  // buildSchema() がまだ実行されていなければ実行する
   if (workerStore.schemaCustomization.composer === null) {
     await buildSchema()
   }

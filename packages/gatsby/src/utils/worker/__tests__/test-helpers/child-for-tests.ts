@@ -15,11 +15,11 @@ import reporter from "gatsby-cli/lib/reporter"
 import apiRunner from "../../../api-runner-node"
 import withResolverContext from "../../../../schema/context"
 
-// re-export all usual methods from production worker
+// 本番用のワーカーが持つ通常のメソッドをすべて再エクスポートする
 export * from "../../child"
 export { setState } from "../../child/state"
 
-// additional functions to be able to write assertions that won't be available in production code
+// アサーションを書くための追加の関数。本番のコードでは利用できない
 
 // test: datastore
 export function getNodeFromWorker(nodeId: string): ReturnType<typeof getNode> {

@@ -1,3 +1,3 @@
-// spawning processing will occasionally exceed default time for test
-// this sets up a bit longer time for each test to avoid flakiness due to tests not being executed within short time frame
+// プロセスの起動には、テストのデフォルトの制限時間を超える時間がかかることがある
+// 短い時間内にテストが終わらないことによる不安定さを避けるため、各テストの制限時間を少し長くする
 jest.setTimeout(70000)

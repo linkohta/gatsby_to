@@ -8,7 +8,7 @@ export function build(webpackConfig: webpack.Configuration): Promise<{
 
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
-      // stats can only be empty when an error occurs. Adding it to the if makes typescript happy.
+      // stats が空になるのはエラーが発生したときだけである。if の条件に加えておくと TypeScript の型チェックが通る。
       if (err || !stats) {
         return compiler.close(() => {
           reject(err)
@@ -46,7 +46,7 @@ export function watch(
   const compiler = webpack(webpackConfig)
 
   const watcher = compiler.watch(watchOptions, (err, stats) => {
-    // this runs multiple times
+    // これは複数回実行される
     onWatch(err, stats)
   })
 
