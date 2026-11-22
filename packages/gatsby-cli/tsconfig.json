@@ -2,7 +2,15 @@
   "extends": "../../tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // ink 3 は React 18 が必要なので、このパッケージだけ React 18 の型定義を使う。
+    // 他のパッケージの型定義（`gatsby` など）経由でルートの React 19 の型定義が
+    // 混ざらないよう、`react` の解決先をこのパッケージの `@types/react` に固定する
+    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
+    "paths": {
+      "@reach/router/*": ["../../node_modules/@gatsbyjs/reach-router/*"],
+      "react": ["./node_modules/@types/react"]
+    }
   },
   "exclude": ["**/__tests__/**/*", "./src/index.ts"]
 }

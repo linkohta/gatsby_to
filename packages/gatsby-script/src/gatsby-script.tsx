@@ -47,8 +47,8 @@ export const scriptCallbackCache: Map<
 > = new Map()
 
 // Gatsby Link でも同じパターンを使っている
-function GatsbyScriptLocationWrapper(props: ScriptProps): JSX.Element {
-  return <Location>{(): JSX.Element => <GatsbyScript {...props} />}</Location>
+function GatsbyScriptLocationWrapper(props: ScriptProps): ReactElement {
+  return <Location>{(): ReactElement => <GatsbyScript {...props} />}</Location>
 }
 
 function GatsbyScript(props: ScriptProps): ReactElement | null {

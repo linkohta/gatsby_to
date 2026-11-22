@@ -4,8 +4,18 @@ import { Placeholder } from "./placeholder"
 import { MainImage, MainImageProps } from "./main-image"
 import { LayoutWrapper } from "./layout-wrapper"
 import PropTypes from "prop-types"
-import type { FunctionComponent, WeakValidationMap } from "react"
+import type { FunctionComponent } from "react"
 import type { GatsbyImageProps, IGatsbyImageData } from "./gatsby-image.browser"
+
+// @types/react 19 で削除された `WeakValidationMap` と同じ定義。
+// React 19 は propTypes を参照しないが、React 18 向けに propTypes を残している。
+type WeakValidationMap<T> = {
+  [K in keyof T]?: null extends T[K]
+    ? PropTypes.Validator<T[K] | null | undefined>
+    : undefined extends T[K]
+    ? PropTypes.Validator<T[K] | null | undefined>
+    : PropTypes.Validator<T[K]>
+}
 
 const removeNewLines = (str: string): string => str.replace(/\n/g, ``)
 
