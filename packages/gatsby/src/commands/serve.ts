@@ -114,7 +114,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
 
   const app = express()
 
-  // Proxy gatsby-script using off-main-thread strategy
+  // off-main-thread 戦略を使う gatsby-script をプロキシする
   const { partytownProxiedURLs = [] } = config || {}
 
   app.use(thirdPartyProxyPath, partytownProxy(partytownProxiedURLs))
@@ -159,7 +159,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
       fs.readFileSync(path.join(compiledFunctionsDir, `manifest.json`), `utf-8`)
     )
   } catch (e) {
-    // ignore
+    // 無視する
   }
 
   if (functions) {
@@ -170,11 +170,11 @@ module.exports = async (program: IServeProgram): Promise<void> => {
     })
 
     router.use(`/api/*`, ...functionMiddlewaresInstances)
-    // TODO(v6) remove handler from app and only keep it on router (router is setup on pathPrefix, while app is always root)
+    // TODO(v6) ハンドラーを app から削除し、router にだけ残す（router は pathPrefix に設定されるが、app は常にルートである）
     app.use(`/api/*`, ...functionMiddlewaresInstances)
   }
 
-  // Handle SSR & DSG Pages
+  // SSR と DSG のページを処理する
   let graphqlEnginePath: string | undefined
   let pageSSRModule: string | undefined
   try {
@@ -185,7 +185,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
       path.posix.join(slash(program.directory), `.cache`, `page-ssr`)
     )
   } catch (error) {
-    // TODO: Handle case of engine not being generated
+    // TODO: エンジンが生成されていない場合を処理する
   }
 
   if (graphqlEnginePath && pageSSRModule) {
@@ -320,7 +320,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
   const matchPaths = await readMatchPaths(program)
   router.use(matchPathRouter(matchPaths, { root }))
 
-  // TODO: Remove/merge with above same block
+  // TODO: 上の同じブロックと統合する、または削除する
   router.use((req, res, next) => {
     if (req.accepts(`html`)) {
       return res.status(404).sendFile(`404.html`, { root })

@@ -14,12 +14,12 @@ export interface IDebugInfo {
 
 export interface IProgram {
   _: `develop` | `build` | `clean` | `feedback` | `repl` | `serve`
-  status?: string // I think this type should not exist here. It seems to be added in the reducer, but not applicable to the caller site from gatsby-cli
+  status?: string // この型はここに存在すべきではないと思う。reducer で追加されているようだが、gatsby-cli の呼び出し側には当てはまらない
   useYarn: boolean
   open: boolean
   openTracingConfigFile: string
   port: number
-  // TODO(v5): remove
+  // TODO(v5): 削除する
   proxyPort: number
   host: string
   report: Reporter
@@ -45,7 +45,7 @@ export interface IProgram {
 
 /**
  * @deprecated
- * Use `Stage` instead
+ * 代わりに `Stage` を使うこと
  */
 
 export enum BuildHTMLStage {

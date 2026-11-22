@@ -7,10 +7,10 @@ import { store } from "../redux"
 import { IProgram } from "./types"
 
 module.exports = async (program: IProgram): Promise<void> => {
-  // run bootstrap
+  // ブートストラップを実行する
   await bootstrap({ program })
 
-  // get all the goodies from the store
+  // store から必要なものをすべて取得する
   const { schema, config, babelrc, pages, components, staticQueryComponents } =
     store.getState()
 
@@ -26,12 +26,12 @@ module.exports = async (program: IProgram): Promise<void> => {
     console.log(`query result: ${JSON.stringify(result)}`)
   }
 
-  // init new repl
+  // 新しい REPL を初期化する
   const _ = repl.start({
     prompt: `gatsby > `,
   })
 
-  // set some globals to make life easier
+  // 作業を楽にするために、いくつかグローバルを設定する
   _.context.babelrc = babelrc
   _.context.components = components
   _.context.getNode = getNode

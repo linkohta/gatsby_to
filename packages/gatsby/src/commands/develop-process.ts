@@ -23,18 +23,18 @@ const tracer = globalTracer()
 
 // const isInteractive = process.stdout.isTTY
 
-// Watch the static directory and copy files to public as they're added or
-// changed. Wait 10 seconds so copying doesn't interfere with the regular
-// bootstrap.
+// static ディレクトリを監視し、ファイルが追加または変更されたら public へ
+// コピーする。コピーが通常のブートストラップを妨げないよう、
+// 10 秒待つ。
 setTimeout(() => {
   syncStaticDir()
 }, 10000)
 
-// Time for another story...
-// When the parent process is killed by SIGKILL, Node doesm't kill spawned child processes
-// Hence, we peiodically send a heart beat to the parent to check if it is still alive
-// This will crash with Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed
-// and kill the orphaned child process as a result
+// また別の話になるが...
+// 親プロセスが SIGKILL で終了させられたとき、Node は spawn した子プロセスを終了させない
+// そのため、親がまだ生きているかを確認するために、定期的にハートビートを親へ送る
+// 親がいなければ Error [ERR_IPC_CHANNEL_CLOSED]: Channel closed でクラッシュし、
+// その結果、孤児になった子プロセスが終了する
 if (process.send) {
   setInterval(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -62,7 +62,7 @@ interface IDevelopArgs extends IProgram {
 
 const openDebuggerPort = (debugInfo: IDebugInfo): void => {
   if (inspector.url() !== undefined) {
-    return // fixes #26708
+    return // #26708 を修正する
   }
 
   if (debugInfo.break) {
@@ -75,7 +75,7 @@ const openDebuggerPort = (debugInfo: IDebugInfo): void => {
 }
 
 module.exports = async (program: IDevelopArgs): Promise<void> => {
-  // provide global Gatsby object
+  // グローバルな Gatsby オブジェクトを用意する
   global.__GATSBY = process.env.GATSBY_NODE_GLOBALS
     ? JSON.parse(process.env.GATSBY_NODE_GLOBALS)
     : {}
@@ -89,9 +89,9 @@ module.exports = async (program: IDevelopArgs): Promise<void> => {
     openDebuggerPort(program.debugInfo)
   }
 
-  // We want to prompt the feedback request when users quit develop
-  // assuming they pass the heuristic check to know they are a user
-  // we want to request feedback from, and we're not annoying them.
+  // ユーザーが develop を終了するときに、フィードバックの依頼を表示したい。
+  // ただし、フィードバックを依頼したいユーザーかどうかを判定するヒューリスティックな
+  // チェックを通り、かつ煩わせない場合に限る。
   process.on(`SIGINT`, async (): Promise<void> => {
     if (await userGetsSevenDayFeedback()) {
       showSevenDayFeedbackRequest()

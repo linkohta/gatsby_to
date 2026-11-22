@@ -83,7 +83,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
   it(`nothing changed`, () => {
     const state = generateStateToTestHelper({
-      // page not dirty - we can reuse, so shouldn't be regenerated, deleted or cleaned up
+      // ページは dirty ではない。再利用できるので、再生成、削除、クリーンアップのいずれもすべきではない
       "/to-reuse/": {
         dirty: 0,
       },
@@ -91,7 +91,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
     const results = calcDirtyHtmlFiles(state)
 
-    // as nothing changed nothing should be regenerated, deleted or cleaned up
+    // 何も変わっていないので、再生成、削除、クリーンアップのいずれもすべきではない
     expect(results.toRegenerate.sort()).toEqual([])
     expect(results.toDelete.sort()).toEqual([])
     expect(Array.from(results.toCleanupFromTrackedState).sort()).toEqual([])
@@ -99,7 +99,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
   it(`content for few pages changed`, () => {
     const state = generateStateToTestHelper({
-      // pages were marked as dirty for whatever reason
+      // ページが何らかの理由で dirty とマークされた
       "/to-regenerate/": {
         dirty: 42,
       },
@@ -110,7 +110,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
     const results = calcDirtyHtmlFiles(state)
 
-    // as pages are marked as dirty, artifacts for those should be (re)generated
+    // ページが dirty とマークされているので、その成果物は（再）生成されるべきである
     expect(results.toRegenerate.sort()).toEqual([
       `/to-regenerate/`,
       `/to-regenerate/nested/`,
@@ -121,7 +121,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
   it(`few pages were deleted`, () => {
     const state = generateStateToTestHelper({
-      // pages were deleted with `deletePage` action
+      // ページが `deletePage` アクションで削除された
       "/deleted/": {
         dirty: 0,
         removedOrDeleted: `deleted`,
@@ -134,7 +134,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
     const results = calcDirtyHtmlFiles(state)
 
-    // as pages are marked as deleted, artifacts for those should be deleted
+    // ページが削除済みとマークされているので、その成果物は削除されるべきである
     expect(results.toRegenerate.sort()).toEqual([])
     expect(results.toDelete.sort()).toEqual([`/deleted/`, `/deleted/nested/`])
     expect(Array.from(results.toCleanupFromTrackedState).sort()).toEqual([])
@@ -142,7 +142,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
   it(`few pages were not re-created`, () => {
     const state = generateStateToTestHelper({
-      // pages are tracked, but were not recreated
+      // ページは追跡されているが、再作成されなかった
       "/not-recreated/": {
         dirty: 0,
         removedOrDeleted: `not-recreated`,
@@ -155,7 +155,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
     const results = calcDirtyHtmlFiles(state)
 
-    // as pages are not recreated, artifacts for those should be deleted
+    // ページが再作成されていないので、その成果物は削除されるべきである
     expect(results.toRegenerate.sort()).toEqual([])
     expect(results.toDelete.sort()).toEqual([
       `/not-recreated/`,
@@ -167,8 +167,8 @@ describe(`calcDirtyHtmlFiles`, () => {
   describe(`onCreatePage + deletePage + createPage that change path of a page (remove trailing slash)`, () => {
     it(`page is dirty`, () => {
       const state = generateStateToTestHelper({
-        // page was created, then deleted and similar page with slightly different path was created for it
-        // both page paths would result in same artifacts
+        // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+        // どちらのページパスも同じ成果物になる
         "/remove-trailing-slashes-dirty/": {
           dirty: 0,
           removedOrDeleted: `deleted`,
@@ -180,9 +180,9 @@ describe(`calcDirtyHtmlFiles`, () => {
 
       const results = calcDirtyHtmlFiles(state)
 
-      // as pages would generate artifacts with same filenames - we expect artifact for
-      // deleted page NOT to be deleted, but instead just tracking state clean up
-      // and regeneration of new page with adjusted path
+      // ページが同じファイル名の成果物を生成するので、削除されたページの成果物は
+      // 削除されないことを期待する。代わりに、追跡している状態のクリーンアップと、
+      // パスを調整した新しいページの再生成だけが行われる
       expect(results.toRegenerate.sort()).toEqual([
         `/remove-trailing-slashes-dirty`,
       ])
@@ -194,8 +194,8 @@ describe(`calcDirtyHtmlFiles`, () => {
 
     it(`page is NOT dirty`, () => {
       const state = generateStateToTestHelper({
-        // page was created, then deleted and similar page with slightly different path was created for it
-        // both page paths would result in same artifacts
+        // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+        // どちらのページパスも同じ成果物になる
         "/remove-trailing-slashes-not-dirty/": {
           dirty: 0,
           removedOrDeleted: `deleted`,
@@ -207,9 +207,9 @@ describe(`calcDirtyHtmlFiles`, () => {
 
       const results = calcDirtyHtmlFiles(state)
 
-      // as pages would generate artifacts with same filenames - we expect artifact for
-      // deleted page NOT to be deleted, but instead just tracking state clean up
-      // adjusted page is not marked as dirty so it shouldn't regenerate ()
+      // ページが同じファイル名の成果物を生成するので、削除されたページの成果物は
+      // 削除されないことを期待する。代わりに、追跡している状態のクリーンアップだけが行われる
+      // 調整後のページは dirty とマークされていないので、再生成されるべきではない ()
       expect(results.toRegenerate.sort()).toEqual([])
       expect(results.toDelete.sort()).toEqual([])
       expect(Array.from(results.toCleanupFromTrackedState).sort()).toEqual([
@@ -220,9 +220,9 @@ describe(`calcDirtyHtmlFiles`, () => {
 
   it(`slash was removed between builds (without onCreatePage + deletePage combination)`, () => {
     const state = generateStateToTestHelper({
-      // page was created in previous build, but not recreated in current one
-      // instead page with slightly different path is created
-      // both page paths would result in same artifacts
+      // ページは前回のビルドで作成されたが、今回は再作成されなかった
+      // 代わりに、パスが少しだけ異なるページが作成された
+      // どちらのページパスも同じ成果物になる
       "/slash-removed-without-onCreatePage/": {
         dirty: 0,
         removedOrDeleted: `not-recreated`,
@@ -254,8 +254,8 @@ describe(`calcDirtyHtmlFiles`, () => {
       })
 
       const state = generateStateToTestHelper({
-        // page was created, then deleted and similar page with slightly different path was created for it
-        // different artifacts would be created for them
+        // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+        // それぞれ異なる成果物が作成される
         "/TEST/": {
           dirty: 0,
           removedOrDeleted: `deleted`,
@@ -267,7 +267,7 @@ describe(`calcDirtyHtmlFiles`, () => {
 
       const results = isolatedCalcDirtyHtmlFiles(state)
 
-      // on case sensitive file systems /test/ and /TEST/ are different files so we do need to delete a file
+      // 大文字と小文字を区別するファイルシステムでは /test/ と /TEST/ は別のファイルなので、ファイルを削除する必要がある
       expect(results.toRegenerate.sort()).toEqual([`/test/`])
       expect(results.toDelete.sort()).toEqual([`/TEST/`])
       expect(Array.from(results.toCleanupFromTrackedState).sort()).toEqual([])
@@ -283,8 +283,8 @@ describe(`calcDirtyHtmlFiles`, () => {
       })
 
       const state = generateStateToTestHelper({
-        // page was created, then deleted and similar page with slightly different path was created for it
-        // both page paths would result in same artifacts
+        // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+        // どちらのページパスも同じ成果物になる
         "/TEST/": {
           dirty: 0,
           removedOrDeleted: `deleted`,
@@ -296,8 +296,8 @@ describe(`calcDirtyHtmlFiles`, () => {
 
       const results = isolatedCalcDirtyHtmlFiles(state)
 
-      // on case insensitive file systems /test/ and /TEST/ are NOT different files so we should
-      // not delete files, but still we should cleanup tracked state
+      // 大文字と小文字を区別しないファイルシステムでは /test/ と /TEST/ は別のファイルではないので、
+      // ファイルは削除すべきではない。ただし、追跡している状態はクリーンアップすべきである
       expect(results.toRegenerate.sort()).toEqual([`/test/`])
       expect(results.toDelete.sort()).toEqual([])
       expect(Array.from(results.toCleanupFromTrackedState).sort()).toEqual([
@@ -306,16 +306,16 @@ describe(`calcDirtyHtmlFiles`, () => {
     })
   })
 
-  // cases above are to be able to pinpoint exact failure, kitchen sink case is to test all of above in one go
-  // and make sure that various conditions mixed together are handled correctly
+  // 上のケースは、失敗の箇所を正確に特定できるようにするためのものである。全部入りのケースは、上記すべてを一度にテストし、
+  // さまざまな条件が混在しても正しく処理されることを確認する
   it(`kitchen sink`, () => {
     const state = generateStateToTestHelper({
-      // page not dirty - we can reuse, so shouldn't be regenerated, deleted or cleaned up
+      // ページは dirty ではない。再利用できるので、再生成、削除、クリーンアップのいずれもすべきではない
       "/to-reuse/": {
         dirty: 0,
       },
 
-      // pages were marked as dirty for whatever reason
+      // ページが何らかの理由で dirty とマークされた
       "/to-regenerate/": {
         dirty: 42,
       },
@@ -323,7 +323,7 @@ describe(`calcDirtyHtmlFiles`, () => {
         dirty: 42,
       },
 
-      // pages were deleted with `deletePage` action
+      // ページが `deletePage` アクションで削除された
       "/deleted/": {
         dirty: 0,
         removedOrDeleted: `deleted`,
@@ -333,7 +333,7 @@ describe(`calcDirtyHtmlFiles`, () => {
         removedOrDeleted: `deleted`,
       },
 
-      // pages are tracked, but were not recreated
+      // ページは追跡されているが、再作成されなかった
       "/not-recreated/": {
         dirty: 0,
         removedOrDeleted: `not-recreated`,
@@ -343,8 +343,8 @@ describe(`calcDirtyHtmlFiles`, () => {
         removedOrDeleted: `not-recreated`,
       },
 
-      // page was created, then deleted and similar page with slightly different path was created for it
-      // both page paths would result in same artifacts
+      // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+      // どちらのページパスも同じ成果物になる
       "/remove-trailing-slashes-dirty/": {
         dirty: 0,
         removedOrDeleted: `deleted`,
@@ -353,8 +353,8 @@ describe(`calcDirtyHtmlFiles`, () => {
         dirty: 42,
       },
 
-      // page was created, then deleted and similar page with slightly different path was created for it
-      // both page paths would result in same artifacts
+      // ページが作成され、その後削除され、パスが少しだけ異なる似たページが代わりに作成された
+      // どちらのページパスも同じ成果物になる
       "/remove-trailing-slashes-not-dirty/": {
         dirty: 0,
         removedOrDeleted: `deleted`,
@@ -363,9 +363,9 @@ describe(`calcDirtyHtmlFiles`, () => {
         dirty: 0,
       },
 
-      // page was created in previous build, but not recreated in current one
-      // instead page with slightly different path is created
-      // both page paths would result in same artifacts
+      // ページは前回のビルドで作成されたが、今回は再作成されなかった
+      // 代わりに、パスが少しだけ異なるページが作成された
+      // どちらのページパスも同じ成果物になる
       "/slash-removed-without-onCreatePage/": {
         dirty: 0,
         removedOrDeleted: `not-recreated`,

@@ -29,31 +29,31 @@ export enum DbComparator {
   GLOB = `$glob`,
 }
 
-// TODO: merge with DbComparatorValue
+// TODO: DbComparatorValue と統合する
 export type FilterValueNullable =
   | string
   | number
   | boolean
   | null
   | undefined
-  | RegExp // Only valid for $regex
+  | RegExp // $regex でだけ有効
   | Array<string | number | boolean | null | undefined>
 
-// This is filter value in most cases
+// ほとんどの場合、これがフィルターの値である
 export type FilterValue =
   | string
   | number
   | boolean
-  | RegExp // Only valid for $regex
+  | RegExp // $regex でだけ有効
   | Array<string | number | boolean>
 
-// The value is an object with arbitrary keys that are either filter values or,
-// recursively, an object with the same struct. Ie. `{a: {a: {a: 2}}}`
+// 値は任意のキーを持つオブジェクトで、各キーの値はフィルターの値か、
+// 再帰的に同じ構造を持つオブジェクトである。例: `{a: {a: {a: 2}}}`
 export interface IInputQuery {
   [key: string]: FilterValueNullable | IInputQuery
 }
-// Similar to IInputQuery except the comparator leaf nodes will have their
-// key prefixed with `$` and their value, in some cases, normalized.
+// IInputQuery に似ているが、比較演算子にあたる末端のノードは
+// キーに `$` の接頭辞が付き、場合によっては値が正規化されている。
 export interface IPreparedQueryArg {
   [key: string]: FilterValueNullable | IPreparedQueryArg
 }
@@ -72,9 +72,9 @@ export interface IDbFilterStatement {
 }
 
 /**
- * Converts a nested mongo args object into array of DbQuery objects,
- * structured representation of each distinct path of the query. We convert
- * nested objects with multiple keys to separate instances.
+ * ネストした mongo の引数オブジェクトを DbQuery オブジェクトの配列に変換する。
+ * これは、クエリの個々のパスを構造化して表したものである。複数のキーを持つ
+ * ネストしたオブジェクトは、別々のインスタンスに変換する。
  */
 export function createDbQueriesFromObject(
   filter: Record<string, any>
@@ -115,9 +115,9 @@ function createDbQueriesFromObjectNested(
 }
 
 /**
- * Takes a DbQuery structure and returns a dotted representation of a field referenced in this query.
+ * DbQuery の構造を受け取り、このクエリが参照するフィールドのドット区切りの表現を返す。
  *
- * Example:
+ * 例:
  * ```js
  *   const query = createDbQueriesFromObject({
  *     foo: { $elemMatch: { id: { $eq: 5 }, test: { $gt: 42 } } },
@@ -125,7 +125,7 @@ function createDbQueriesFromObjectNested(
  *   })
  *   const result = query.map(dbQueryToDottedField)
  * ```
- * Returns:
+ * 戻り値:
  *   [`foo.id`, `foo.test`, `bar`]
  */
 export function dbQueryToDottedField(query: DbQuery): string {
@@ -167,10 +167,10 @@ export function prefixResolvedFields(
 }
 
 /**
- * Transforms filters coming from input GraphQL query to mongodb-compatible format
- * (by prefixing comparators with "$").
+ * 入力の GraphQL クエリから来るフィルターを mongodb 互換の形式に変換する
+ * （比較演算子に "$" の接頭辞を付ける）。
  *
- * Example:
+ * 例:
  *   { foo: { eq: 5 } } -> { foo: { $eq: 5 }}
  */
 export function prepareQueryArgs(

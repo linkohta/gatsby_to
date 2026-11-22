@@ -392,7 +392,7 @@ describe(`GatsbyIterable.mergeSorted`, () => {
     // @ts-ignore
     for (const value of bar) {
       if (i++ >= 5) {
-        // Early exit from our iterator must close the other iterator as well
+        // こちらのイテレーターを途中で抜けたときは、もう一方のイテレーターも閉じなければならない
         break
       }
       result.push(value)
@@ -419,13 +419,13 @@ describe(`GatsbyIterable.mergeSorted`, () => {
       // @ts-ignore
       for (const value of bar) {
         if (i++ >= 5) {
-          // Error in our iterator must close the other iterator as well
+          // こちらのイテレーターでエラーが起きたときは、もう一方のイテレーターも閉じなければならない
           throw new Error(`Throw error`)
         }
         result.push(value)
       }
     } catch (e) {
-      // no-op
+      // 何もしない
     }
     expect(closed1).toEqual(true)
     expect(closed2).toEqual(true)
@@ -540,7 +540,7 @@ describe(`GatsbyIterable.intersectSorted`, () => {
     // @ts-ignore
     for (const value of bar) {
       if (i++ >= 5) {
-        // Early exit from our iterator must close the other iterator as well
+        // こちらのイテレーターを途中で抜けたときは、もう一方のイテレーターも閉じなければならない
         break
       }
       result.push(value)
@@ -569,13 +569,13 @@ describe(`GatsbyIterable.intersectSorted`, () => {
       // @ts-ignore
       for (const value of bar) {
         if (i++ >= 5) {
-          // Error in our iterator must close the other iterator as well
+          // こちらのイテレーターでエラーが起きたときは、もう一方のイテレーターも閉じなければならない
           throw new Error(`Throw error`)
         }
         result.push(value)
       }
     } catch (e) {
-      // no-op
+      // 何もしない
     }
     expect(closed1).toEqual(true)
     expect(closed2).toEqual(true)

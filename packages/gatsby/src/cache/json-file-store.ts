@@ -1,4 +1,4 @@
-// Initial file from https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d
+// 最初のファイルは https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d から取得した
 /* !
 The MIT License (MIT)
 
@@ -35,13 +35,13 @@ interface IExternalBuffer {
 exports.write = async function (path, data, options): Promise<void> {
   const externalBuffers: Array<IExternalBuffer> = []
   let dataString = JSON.stringify(data, function replacerFunction(_k, value) {
-    // Buffers searilize to {data: [...], type: "Buffer"}
+    // Buffer は {data: [...], type: "Buffer"} にシリアライズされる
     if (
       value &&
       value.type === `Buffer` &&
       value.data &&
       value.data.length >=
-        1024 /* only save bigger Buffers external, small ones can be inlined */
+        1024 /* 大きな Buffer だけを外部に保存する。小さなものはインライン化できる */
     ) {
       const buffer = Buffer.from(value.data)
       externalBuffers.push({
@@ -65,14 +65,14 @@ exports.write = async function (path, data, options): Promise<void> {
     zipExtension = `.gz`
     dataString = await promisify(zlib.deflate)(dataString)
   }
-  // save main json file
+  // メインの JSON ファイルを保存する
   await promisify(fs.writeFile)(
     path + `.json` + zipExtension,
     dataString,
     `utf8`
   )
 
-  // save external buffers
+  // 外部の Buffer を保存する
   await Promise.all(
     externalBuffers.map(async function (externalBuffer) {
       let buffer = externalBuffer.buffer
@@ -94,7 +94,7 @@ exports.read = async function (path, options): Promise<string> {
     zipExtension = `.gz`
   }
 
-  // read main json file
+  // メインの JSON ファイルを読み込む
   let dataString
   if (options.zip) {
     const compressedData = await promisify(fs.readFile)(
@@ -120,7 +120,7 @@ exports.read = async function (path, options): Promise<string> {
         typeof value.index === `number` &&
         typeof value.size === `number`
       ) {
-        // JSON.parse is sync so we need to return a buffer sync, we will fill the buffer later
+        // JSON.parse は同期的なので、Buffer を同期的に返す必要がある。中身は後で埋める
         const buffer = Buffer.alloc(value.size)
         externalBuffers.push({
           index: +value.index,
@@ -144,7 +144,7 @@ exports.read = async function (path, options): Promise<string> {
     )
   }
 
-  // read external buffers
+  // 外部の Buffer を読み込む
   await Promise.all(
     externalBuffers.map(async function (externalBuffer) {
       if (options.zip) {
@@ -180,14 +180,14 @@ exports.delete = async function (path, options): Promise<void> {
 
   await promisify(fs.unlink)(path + `.json` + zipExtension)
 
-  // delete binary files
+  // バイナリファイルを削除する
   try {
     for (let i = 0; i < Infinity; i++) {
       await promisify(fs.unlink)(path + `-` + i + `.bin` + zipExtension)
     }
   } catch (err) {
     if (err.code === `ENOENT`) {
-      // every binary is deleted, we are done
+      // すべてのバイナリを削除したので完了
     } else {
       throw err
     }
