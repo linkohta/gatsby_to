@@ -45,9 +45,9 @@ export const dispatch = (action: ActionsUnion | Thunk): void => {
   action = {
     ...action,
     // @ts-ignore this is a typescript no-no..
-    // And i'm pretty sure this timestamp isn't used anywhere.
-    // but for now, the structured logs integration tests expect it
-    // so it's easier to leave it and then explore as a follow up
+    // このタイムスタンプは、おそらくどこからも使われていない。
+    // ただし今のところ、構造化ログの統合テストがこれを期待しているので、
+    // このまま残しておき、後で調べるほうが簡単である
     timestamp: new Date().toJSON(),
   } as ActionsUnion
 
@@ -56,8 +56,8 @@ export const dispatch = (action: ActionsUnion | Thunk): void => {
   diagnosticsMiddleware(action)
 
   if (isInternalAction(action)) {
-    // consumers (ipc, yurnalist, json logger) shouldn't have to
-    // deal with actions needed just for internal tracking of status
+    // 利用側（ipc、yurnalist、json ロガー）が、ステータスの内部的な追跡のためだけに
+    // 必要なアクションを扱わなくて済むようにする
     return
   }
   for (const fn of onLogActionListeners) {

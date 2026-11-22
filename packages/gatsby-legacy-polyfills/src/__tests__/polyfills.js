@@ -51,7 +51,7 @@ describe(`polyfills`, () => {
       source.replace(/.*\/node_modules\//, ``)
     )
 
-    // check if all polyfills are in the bundle
+    // すべてのポリフィルがバンドルに含まれているかを確認する
     expect(sources).toEqual(
       expect.arrayContaining(fileMap.map(file => expect.stringContaining(file)))
     )

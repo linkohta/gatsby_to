@@ -29,7 +29,7 @@ function addEsmImport(j, root, tag) {
     existingImport.find(j.ImportSpecifier, { imported: { name: `graphql` } })
       .length
   )
-    return // already exists
+    return // すでに存在する
 
   if (!existingImport.length) {
     const first = root.find(j.Program).get(`body`, 0)
@@ -67,7 +67,7 @@ function addEsmImport(j, root, tag) {
 function addRequire(j, root, tag) {
   const existingImport = findGatsbyRequire(root, j)
 
-  if (existingImport.find(j.Identifier, { value: IMPORT_NAME }).length) return // already exists
+  if (existingImport.find(j.Identifier, { value: IMPORT_NAME }).length) return // すでに存在する
 
   if (!existingImport.length) {
     root

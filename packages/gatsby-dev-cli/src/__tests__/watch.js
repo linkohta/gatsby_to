@@ -65,7 +65,7 @@ beforeEach(() => {
   })
 })
 
-// get list of packages from monorepo
+// モノレポからパッケージの一覧を取得する
 const packageNameToPath = new Map()
 const monoRepoPackages = fs
   .readdirSync(path.join(process.cwd(), `packages`))
@@ -85,7 +85,7 @@ const monoRepoPackages = fs
         return localPkg.name
       }
     } catch (error) {
-      // fallback to generic one
+      // 汎用のものにフォールバックする
     }
 
     packageNameToPath.set(
@@ -496,7 +496,7 @@ describe(`dependency changes`, () => {
 
       const filePath = path.join(process.cwd(), `packages/gatsby/package.json`)
       await callEventCallback(`add`, filePath)
-      // no deps changes in gatsby-plugin-sharp, just copy files over
+      // gatsby-plugin-sharp の依存に変更はないので、ファイルをコピーするだけである
       await callEventCallback(
         `add`,
         path.join(process.cwd(), `packages/gatsby-plugin-sharp/index.js`)

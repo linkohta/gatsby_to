@@ -28,7 +28,7 @@ export function ProgressBar({
     getLength(current) -
     getLength(total) -
     getLength(percentage) -
-    11 // margins + extra characters
+    11 // マージンと余分な文字の分
 
   const progressBarWidth = Math.max(
     minWidth,

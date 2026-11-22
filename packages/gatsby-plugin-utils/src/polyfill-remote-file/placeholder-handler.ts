@@ -69,9 +69,9 @@ const queue = Queue<
 
   if (type === PlaceholderType.TRACED_SVG) {
     if (!didShowTraceSVGRemovalWarning) {
-      // we should not hit this code path, field resolver should fallback earlier, this is just in-case.
-      // also this falls back to BLURRED because the shape is compatible. DOMINANT_COLOR is not compatible
-      // and fallback to DOMINANT_COLOR need to happen very early on and not when already generating value
+      // このコードパスには到達しないはずである。フィールドリゾルバーがもっと早い段階でフォールバックするので、これは念のための処理である。
+      // また、ここでは形式に互換性がある BLURRED にフォールバックする。DOMINANT_COLOR は互換性がなく、
+      // DOMINANT_COLOR へのフォールバックは、値の生成中ではなく、かなり早い段階で行う必要がある
       console.warn(
         `"TRACED_SVG" placeholder is no longer supported, falling back to "BLURRED". See https://gatsby.dev/tracesvg-removal/`
       )
@@ -212,7 +212,7 @@ async function runPlaceholder({
   await mutex.acquire()
 
   try {
-    // check cache again after mutex is acquired
+    // ミューテックスを取得した後に、もう一度キャッシュを確認する
     cachedValue = await cache.get(cacheKey)
     if (cachedValue) {
       return cachedValue

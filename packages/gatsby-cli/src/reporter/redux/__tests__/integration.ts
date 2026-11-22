@@ -41,8 +41,8 @@ describe(`integration`, () => {
 
     let dispatchedSetStatusActions = getDispatchedSetStatusActions()
 
-    // we don't expect to see SET_STATUS other than initial IN_PROGRESS
-    // as we still have pending activity
+    // 保留中のアクティビティがまだあるので、最初の IN_PROGRESS 以外の
+    // SET_STATUS は現れないはずである
     expect(dispatchedSetStatusActions.length).toEqual(1)
     expect(dispatchedSetStatusActions[0]).toEqual({
       type: `SET_STATUS`,

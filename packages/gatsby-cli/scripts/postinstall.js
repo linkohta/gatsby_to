@@ -8,7 +8,7 @@ const showSuccessMessage = () => {
 }
 
 try {
-  // check if it's a global installation of gatsby-cli
+  // gatsby-cli がグローバルにインストールされているかを調べる
   const npmArgs = JSON.parse(process.env[`npm_config_argv`]);
   if (npmArgs.cooked && npmArgs.cooked.includes(`--global`)) {
     const createCli = require(`../lib/create-cli`);

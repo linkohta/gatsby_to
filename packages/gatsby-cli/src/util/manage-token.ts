@@ -18,6 +18,6 @@ export const setToken = (token: string | null, expiration: string): void => {
   const store = getConfigStore()
 
   store.set(tokenKey, token)
-  // we would be able to decode an expiration off the JWT, but the auth service isn't set up to attach it to the token
+  // JWT から有効期限をデコードできるはずだが、認証サービスはトークンに有効期限を付ける設定になっていない
   store.set(tokenExpirationKey, expiration)
 }

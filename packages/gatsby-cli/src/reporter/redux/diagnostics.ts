@@ -13,21 +13,21 @@ function calculateTimeoutDelay(
   if (!envVarValue) {
     return 0
   } else if (envVarValue === `1`) {
-    // Toggling env vars with "1" is quite common - because we allow to set
-    // specific timeout values with env var, this special case is added
-    // (1ms timeout makes little sense - that's too low value to be used as-is)
+    // 環境変数を "1" で切り替えるのはよくある使い方である。環境変数で
+    // 具体的なタイムアウト値を指定できるようにしているため、この特別扱いを入れている
+    // （1ms のタイムアウトはほとんど意味がなく、そのまま使うには小さすぎる）
     return defaultValue
   }
 
   const parsedToNumber = parseInt(envVarValue, 10)
   if (isNaN(parsedToNumber)) {
-    // It's truthy, but not a number - let's enable it with default value
+    // truthy だが数値ではないので、デフォルト値で有効にする
     return defaultValue
   }
 
-  // Allow to custom specific timeout value, but also put some minimal
-  // timeout bound as there is little usefulness of setting it to
-  // something less than few seconds.
+  // 具体的なタイムアウト値を指定できるようにするが、数秒未満に
+  // 設定してもほとんど役に立たないので、タイムアウトの下限も
+  // 設けている。
   return Math.max(parsedToNumber, min)
 }
 
@@ -69,18 +69,18 @@ export function createStructuredLoggingDiagnosticsMiddleware(
 ): DiagnosticsMiddleware {
   const stuckStatusDiagnosticTimeoutDelay = calculateTimeoutDelay(
     process.env.GATSBY_DIAGNOSTIC_STUCK_STATUS_TIMEOUT,
-    FIVE_MINUTES, // default timeout
-    FIVE_SECONDS // minimal timeout (this is mostly useful for debugging diagnostic code itself)
+    FIVE_MINUTES, // デフォルトのタイムアウト
+    FIVE_SECONDS // タイムアウトの下限（主に診断コード自体のデバッグに役立つ）
   )
 
   const stuckStatusWatchdogTimeoutDelay = calculateTimeoutDelay(
     process.env.GATSBY_WATCHDOG_STUCK_STATUS_TIMEOUT,
-    TEN_MINUTES, // default timeout
-    TEN_SECONDS // minimal timeout (this is mostly useful for debugging diagnostic code itself)
+    TEN_MINUTES, // デフォルトのタイムアウト
+    TEN_SECONDS // タイムアウトの下限（主に診断コード自体のデバッグに役立つ）
   )
 
   if (!stuckStatusDiagnosticTimeoutDelay && !stuckStatusWatchdogTimeoutDelay) {
-    // none of timers are enabled, so this is no-op middleware
+    // どのタイマーも有効ではないので、これは何もしないミドルウェアになる
     return (): void => {}
   }
 
@@ -119,14 +119,14 @@ export function createStructuredLoggingDiagnosticsMiddleware(
   }
 
   return function diagnosticMiddleware(action: ActionsUnion): void {
-    // ignore diagnostic logs, otherwise diagnostic message itself will reset
-    // the timers
+    // 診断ログは無視する。そうしないと、診断メッセージ自体がタイマーを
+    // リセットしてしまう
     if (!displayingStuckStatusDiagnosticWarning) {
       const currentStatus = getStore().getState().logs.status
 
       if (!reporter) {
-        // yuck, we have situation of circular dependencies here
-        // so this `reporter` import is delayed until it's actually needed
+        // 残念ながら、ここには循環依存がある
+        // そのため、この `reporter` の import は実際に必要になるまで遅らせている
         reporter = require(`../reporter`).reporter
       }
 
@@ -137,8 +137,8 @@ export function createStructuredLoggingDiagnosticsMiddleware(
         }
 
         if (displayedStuckStatusDiagnosticWarning) {
-          // using nextTick here to prevent infinite recursion (report.warn would
-          // result in another call of this function and so on)
+          // 無限再帰を防ぐために nextTick を使っている（report.warn が
+          // この関数をもう一度呼び出し、それが繰り返されてしまう）
           process.nextTick(() => {
             const activitiesDiagnosticsMessage =
               generateStuckStatusDiagnosticMessage()

@@ -8,7 +8,7 @@ export const fetchFragments = async () =>
 
 export const fetcher = createGraphiQLFetcher({ url: GRAPHIQL_URL })
 
-// Produce a Location query string from a parameter object.
+// パラメーターのオブジェクトから Location のクエリ文字列を作る。
 export const locationQuery = params =>
   `?` +
   Object.keys(params)

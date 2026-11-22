@@ -13,7 +13,7 @@ if (useJsonLogger) {
   process.env.GATSBY_LOGGER = `json`
 }
 
-// Ensure stable runs on Windows when started from different shells (i.e. c:\dir vs C:\dir)
+// Windows で、異なるシェルから起動した場合（c:\dir と C:\dir など）でも安定して動くようにする
 if (os.platform() === `win32`) {
   ensureWindowsDriveLetterIsUppercase()
 }
@@ -57,11 +57,11 @@ if (semver.prerelease(version)) {
 // }
 
 process.on(`unhandledRejection`, reason => {
-  // This will exit the process in newer Node anyway so lets be consistent
-  // across versions and crash
+  // 新しい Node ではいずれにせよプロセスが終了するので、バージョン間で
+  // 挙動をそろえてクラッシュさせる
 
-  // reason can be anything, it can be a message, an object, ANYTHING!
-  // we convert it to an error object so we don't crash on structured error validation
+  // reason には何でも入り得る。メッセージかもしれないし、オブジェクトかもしれない。本当に何でもあり得る
+  // 構造化エラーの検証でクラッシュしないよう、エラーオブジェクトに変換する
   if (!(reason instanceof Error)) {
     reason = new Error(util.format(reason))
   }

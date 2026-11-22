@@ -92,7 +92,7 @@ gatsby-dev --set-path-to-repo /path/to/my/cloned/version/gatsby
   process.exit()
 }
 
-// get list of packages from monorepo
+// モノレポからパッケージの一覧を取得する
 const packageNameToPath = new Map()
 const monoRepoPackages = fs
   .readdirSync(path.join(gatsbyLocation, `packages`))
@@ -112,7 +112,7 @@ const monoRepoPackages = fs
         return localPkg.name
       }
     } catch (error) {
-      // fallback to generic one
+      // 汎用のものにフォールバックする
     }
 
     packageNameToPath.set(
@@ -123,7 +123,7 @@ const monoRepoPackages = fs
   })
 
 const localPkg = JSON.parse(fs.readFileSync(`package.json`))
-// intersect dependencies with monoRepoPackages to get list of packages that are used
+// 依存と monoRepoPackages の共通部分を取り、使われているパッケージの一覧を得る
 const localPackages = _.intersection(
   monoRepoPackages,
   Object.keys(_.merge({}, localPkg.dependencies, localPkg.devDependencies))

@@ -39,7 +39,7 @@ describe(`useScrollRestoration`, () => {
     const wrapper = render(<div>hello</div>)
     htmlElementPrototype = wrapper.container.constructor.prototype
 
-    // jsdom doesn't support .scrollTo(), lets fix this temporarily
+    // jsdom は .scrollTo() に対応していないので、一時的に補う
     if (typeof htmlElementPrototype.scrollTo === `undefined`) {
       htmlElementPrototype.scrollTo = function scrollTo(
         optionsOrX?: ScrollToOptions | number,

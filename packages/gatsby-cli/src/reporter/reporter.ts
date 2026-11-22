@@ -46,12 +46,12 @@ function isLogIntentMessage(msg: any): msg is ILogIntent {
 }
 
 /**
- * Reporter module.
+ * レポーターモジュール。
  * @module reporter
  */
 class Reporter {
   /**
-   * Strip initial indentation template function.
+   * 先頭のインデントを取り除くテンプレート関数。
    */
   stripIndent = stripIndent
   format = chalk
@@ -59,10 +59,10 @@ class Reporter {
   errorMap: Record<ErrorId, IErrorMapEntryPublicApi> = {}
 
   /**
-   * Set a custom error map to the reporter. This allows
-   * the reporter to extend the internal error map
+   * レポーターにカスタムのエラーマップを設定する。これにより、
+   * レポーターの内部のエラーマップを拡張できる
    *
-   * Please note: The entered IDs ideally should be different from the ones we internally use:
+   * 注意: 指定する ID は、内部で使っているものと重ならないのが望ましい:
    * https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-cli/src/structured-errors/error-map.ts
    */
 
@@ -74,7 +74,7 @@ class Reporter {
   }
 
   /**
-   * Toggle verbosity.
+   * 詳細出力を切り替える。
    */
   setVerbose = (_isVerbose: boolean = true): void => {
     isVerbose = _isVerbose
@@ -82,26 +82,26 @@ class Reporter {
   }
 
   /**
-   * Turn off colors in error output.
+   * エラー出力の色付けを無効にする。
    */
   setNoColor = (isNoColor: boolean = false): void => {
     if (isNoColor) {
       errorFormatter.withoutColors()
     }
 
-    // disables colors in popular terminal output coloring packages
-    //  - chalk: see https://www.npmjs.com/package/chalk#chalksupportscolor
-    //  - ansi-colors: see https://github.com/doowb/ansi-colors/blob/8024126c7115a0efb25a9a0e87bc5e29fd66831f/index.js#L5-L7
+    // ターミナル出力の色付けによく使われるパッケージで、色を無効にする
+    //  - chalk: https://www.npmjs.com/package/chalk#chalksupportscolor を参照
+    //  - ansi-colors: https://github.com/doowb/ansi-colors/blob/8024126c7115a0efb25a9a0e87bc5e29fd66831f/index.js#L5-L7 を参照
     if (isNoColor) {
       process.env.FORCE_COLOR = `0`
-      // chalk determines color level at import time. Before we reach this point,
-      // chalk was already imported, so we need to retroactively adjust level
+      // chalk は import の時点で色のレベルを決める。ここに到達する前に
+      // chalk はすでに import されているので、後からレベルを調整する必要がある
       chalk.level = 0
     }
   }
 
   /**
-   * Log arguments and exit process with status 1.
+   * 引数をログに出力し、ステータス 1 でプロセスを終了する。
    */
   panic = (
     errorMeta: ErrorMeta,
@@ -135,7 +135,7 @@ class Reporter {
       context: {},
     }
 
-    // Many paths to retain backcompat :scream:
+    // 後方互換性を保つため、経路がたくさんある :scream:
     // 1.
     //   reporter.error(any, Error);
     //   reporter.error(any, [Error]);
@@ -159,7 +159,7 @@ class Reporter {
       // 3.
       //    reporter.error([Error]);
     } else if (Array.isArray(errorMeta)) {
-      // when we get an array of messages, call this function once for each error
+      // メッセージの配列を受け取った場合は、エラーごとにこの関数を 1 回ずつ呼び出す
       return errorMeta.map(errorItem =>
         this.error(errorItem)
       ) as Array<IStructuredError>
@@ -193,8 +193,8 @@ class Reporter {
       reporterActions.createLog(structuredError)
     }
 
-    // TODO: remove this once Error component can render this info
-    // log formatted stacktrace
+    // TODO: Error コンポーネントでこの情報を描画できるようになったら削除する
+    // 整形したスタックトレースをログに出力する
     if (structuredError.error) {
       this.log(errorFormatter.render(structuredError.error))
     }
@@ -202,7 +202,7 @@ class Reporter {
   }
 
   /**
-   * Set prefix on uptime.
+   * 稼働時間に接頭辞を設定する。
    */
   uptime = (prefix: string): void => {
     this.verbose(`${prefix}: ${(process.uptime() * 1000).toFixed(3)}ms`)
@@ -236,7 +236,7 @@ class Reporter {
   }
 
   /**
-   * Time an activity.
+   * アクティビティの時間を計測する。
    */
   activityTimer = (
     text: string,
@@ -262,14 +262,14 @@ class Reporter {
   }
 
   /**
-   * Create an Activity that is not visible to the user
+   * ユーザーには見えないアクティビティを作成する
    *
-   * During the lifecycle of the Gatsby process, sometimes we need to do some
-   * async work and wait for it to complete. A typical example of this is a job.
-   * This work should set the status of the process to `in progress` while running and
-   * `complete` (or `failure`) when complete. Activities do just this! However, they
-   * are visible to the user. So this function can be used to create a _hidden_ activity
-   * that while not displayed in the CLI, still triggers a change in process status.
+   * Gatsby のプロセスのライフサイクルの中では、非同期の処理を行い、その完了を
+   * 待つ必要が生じることがある。典型的な例はジョブである。
+   * こうした処理は、実行中はプロセスのステータスを `in progress` にし、完了したら
+   * `complete`（または `failure`）にすべきである。アクティビティはまさにこれを行う。
+   * ただし、アクティビティはユーザーに表示される。そこでこの関数を使うと、CLI には
+   * 表示されないがプロセスのステータスは変化させる _非表示の_ アクティビティを作成できる。
    */
   phantomActivity = (
     text: string,
@@ -287,7 +287,7 @@ class Reporter {
   }
 
   /**
-   * Create a progress bar for an activity
+   * アクティビティ用のプログレスバーを作成する
    */
   createProgress = (
     text: string,
@@ -315,19 +315,19 @@ class Reporter {
     })
   }
 
-  // This method was called in older versions of gatsby, so we need to keep it to avoid
-  // "reporter._setStage is not a function" error when gatsby@<2.16 is used with gatsby-cli@>=2.8
+  // このメソッドは古いバージョンの gatsby から呼ばれていたので、gatsby@<2.16 を gatsby-cli@>=2.8 と組み合わせたときに
+  // "reporter._setStage is not a function" エラーが出ないよう、残しておく必要がある
   _setStage = (): void => {}
 
-  // This method is called by core when initializing worker process, so it can communicate with main process
-  // and dispatch structured logs created by workers to parent process.
+  // このメソッドは、コアがワーカープロセスを初期化するときに呼び出す。これにより、ワーカーはメインプロセスと通信し、
+  // ワーカーが作成した構造化ログを親プロセスへディスパッチできる。
   _initReporterMessagingInWorker(sendMessage: (msg: ILogIntent) => void): void {
     const intentifiedActionCreators = {}
     for (const actionCreatorName of Object.keys(reduxReporterActions) as Array<
       keyof typeof reduxReporterActions
     >) {
-      // swap each reporter action creator with function that send intent
-      // to main process
+      // reporter の各アクションクリエイターを、意図をメインプロセスへ送る関数に
+      // 差し替える
       intentifiedActionCreators[actionCreatorName] = (...args): void => {
         sendMessage({
           type: `LOG_INTENT`,
@@ -341,8 +341,8 @@ class Reporter {
     reporterActions = intentifiedActionCreators as typeof reduxReporterActions
   }
 
-  // This method is called by core when initializing worker pool, so main process can receive
-  // messages from workers and dispatch structured logs created by workers to parent process.
+  // このメソッドは、コアがワーカープールを初期化するときに呼び出す。これにより、メインプロセスはワーカーからの
+  // メッセージを受け取り、ワーカーが作成した構造化ログを親プロセスへディスパッチできる。
   _initReporterMessagingInMain(
     onMessage: (listener: (msg: ILogIntent | unknown) => void) => void
   ): void {

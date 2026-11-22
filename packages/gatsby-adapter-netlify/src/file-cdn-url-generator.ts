@@ -13,7 +13,7 @@ export const generateFileUrl: FileCdnUrlGeneratorFn = function generateFileUrl(
   source: FileCdnSourceImage,
   pathPrefix: string
 ): string {
-  // use image cdn for images and file lambda for other files
+  // 画像には image cdn を使い、その他のファイルには file lambda を使う
   let baseURL: URL
   if (isImage(source)) {
     baseURL = new URL(`${placeholderOrigin}/.netlify/images`)

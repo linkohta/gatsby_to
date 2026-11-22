@@ -1,9 +1,9 @@
 /*
- * Service lock: handles service discovery for Gatsby develop processes
- * The problem:  the develop process starts a proxy server, the actual develop process and a websocket server for communication. The two latter ones have random ports that need to be discovered. We also cannot run multiple of the same site at the same time.
- * The solution: lockfiles! We create a folder in `.config/gatsby/sites/${sitePathHash} and then for each service write a JSON file with its data (e.g. developstatusserver.json) and lock that file (with developstatusserver.json.lock) so nobody can start the same service again.
+ * サービスロック: Gatsby の develop プロセスのサービスディスカバリーを担う
+ * 問題: develop プロセスは、プロキシサーバー、実際の develop プロセス、通信用の websocket サーバーを起動する。後ろの 2 つはポートがランダムなので、探し出す必要がある。また、同じサイトを同時に複数起動することはできない。
+ * 解決策: ロックファイルを使う。`.config/gatsby/sites/${sitePathHash} にフォルダーを作り、サービスごとにそのデータを JSON ファイル（developstatusserver.json など）に書き出し、そのファイルを（developstatusserver.json.lock で）ロックして、同じサービスを誰も再び起動できないようにする。
  *
- * NOTE(@mxstbr): This is NOT EXPORTED from the main index.ts due to this relying on Node.js-specific APIs but core-utils also being used in browser environments. See https://github.com/jprichardson/node-fs-extra/issues/743
+ * NOTE(@mxstbr): これは Node.js 固有の API に依存しているが、core-utils はブラウザー環境でも使われるので、メインの index.ts からは export していない。https://github.com/jprichardson/node-fs-extra/issues/743 を参照
  */
 import path from "path"
 import tmp from "tmp"
@@ -25,13 +25,13 @@ const getDataFilePath = (siteDir: string, serviceName: string): string =>
   path.join(siteDir, `${serviceName}${DATA_FILE_EXTENSION}`)
 
 const lockfileOptions = {
-  // Use the minimum stale duration
+  // stale とみなすまでの時間は最小値を使う
   stale: 5000,
 }
 
 export type UnlockFn = () => Promise<void>
 
-// proper-lockfile has a side-effect that we only want to set when needed
+// proper-lockfile には副作用があるので、必要なときにだけ設定したい
 function getLockFileInstance(): typeof import("proper-lockfile") {
   return import(`proper-lockfile`)
 }
@@ -42,8 +42,8 @@ export const createServiceLock = async (
   serviceName: string,
   content: Record<string, any>
 ): Promise<UnlockFn | null> => {
-  // NOTE(@mxstbr): In CI, we cannot reliably access the global config dir and do not need cross-process coordination anyway
-  // so we fall back to storing the services in memory instead!
+  // NOTE(@mxstbr): CI ではグローバルの設定ディレクトリに確実にアクセスできるとは限らず、そもそもプロセス間の調整も必要ない
+  // そのため、代わりにサービスをメモリ上に保存する
   if (isCI()) {
     if (memoryServices[serviceName]) return null
 

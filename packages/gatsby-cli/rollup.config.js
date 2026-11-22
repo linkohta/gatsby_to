@@ -8,8 +8,8 @@ import internal from "rollup-plugin-internal"
 
 import path from "path"
 
-// Rollup hoists Ink's dynamic require of react-devtools-core which causes
-// a window not found error so we exclude Ink's devtools file for now.
+// Rollup は Ink による react-devtools-core の動的 require を巻き上げるため、
+// window が見つからないというエラーになる。今のところ Ink の devtools ファイルを除外している。
 function excludeDevTools() {
   const re = /ink/
   return {
@@ -81,10 +81,10 @@ export default {
   ],
   external: [
     `yoga-layout-prebuilt`,
-    // Next one deserve explanation: ... it's because ink logger imports
-    // getStore, onLogAction from higher up (../../redux). But we don't want
-    // two copies of it - one bundled and one not, because it would result
-    // in multiple store copies
+    // 次の項目には説明が必要である: ... これは、ink のロガーが getStore と onLogAction を
+    // 上の階層（../../redux）から import しているためである。バンドルされたものと
+    // そうでないものの 2 つができるのは避けたい。ストアのコピーが
+    // 複数できてしまうからである
     `../../redux`
   ]
 }

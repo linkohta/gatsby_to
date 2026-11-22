@@ -32,12 +32,12 @@ export async function updateInternalSiteMetadata(
   )
 }
 
-// TODO(v5): Remove again - Necessary because of renaming in https://github.com/gatsbyjs/gatsby/pull/34094
+// TODO(v5): 再び削除する。https://github.com/gatsbyjs/gatsby/pull/34094 での名前変更のために必要
 export { updateInternalSiteMetadata as updateSiteMetadata }
 
 /**
- * Does a string replace by searching for beginning of "siteMetadata"
- * Then it adds the name + value as the next key of that object
+ * "siteMetadata" の先頭を探して文字列置換を行う
+ * そして、名前と値をそのオブジェクトの次のキーとして追加する
  */
 function addField(
   src: string,

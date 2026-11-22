@@ -3,7 +3,7 @@ import { ObjectSchema, Joi } from "./joi"
 import { IPluginInfoOptions } from "./types"
 
 const validationOptions: ValidationOptions = {
-  // Show all errors at once, rather than only the first one every time
+  // 毎回最初の 1 件だけではなく、すべてのエラーをまとめて表示する
   abortEarly: false,
   cache: true,
 }

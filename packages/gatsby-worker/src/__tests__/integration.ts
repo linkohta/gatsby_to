@@ -40,8 +40,8 @@ describe(`gatsby-worker`, () => {
 
     const exposedMethodsSingle = Object.keys(workerPool.single).sort()
     const exposedMethodsAll = Object.keys(workerPool.all).sort()
-    // we expect that `notAFunction` even tho is exported in child module is not exposed
-    // as it's not a function
+    // `notAFunction` は子モジュールで export されているが、関数ではないので
+    // 公開されないはずである
     expect(exposedMethodsSingle).toMatchInlineSnapshot(`
       Array [
         "async",
@@ -56,7 +56,7 @@ describe(`gatsby-worker`, () => {
         "syncThrow",
       ]
     `)
-    // .all and .single should have same methods
+    // .all と .single は同じメソッドを持つはずである
     expect(exposedMethodsSingle).toEqual(exposedMethodsAll)
   })
 
@@ -67,7 +67,7 @@ describe(`gatsby-worker`, () => {
       }
 
       const returnValue = workerPool.single.sync(`.single sync`)
-      // turns sync function into async
+      // 同期関数を非同期に変える
       expect(isPromise(returnValue)).toEqual(true)
 
       const resolvedValue = await returnValue
@@ -80,7 +80,7 @@ describe(`gatsby-worker`, () => {
       }
 
       const returnValue = workerPool.single.async(`.single async`)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(isPromise(returnValue)).toEqual(true)
 
       const resolvedValue = await returnValue
@@ -95,7 +95,7 @@ describe(`gatsby-worker`, () => {
       expect.assertions(2)
 
       const returnValue = workerPool.single.syncThrow(`.single syncThrow`)
-      // turns sync function into async
+      // 同期関数を非同期に変える
       expect(isPromise(returnValue)).toEqual(true)
 
       try {
@@ -114,7 +114,7 @@ describe(`gatsby-worker`, () => {
       expect.assertions(2)
 
       const returnValue = workerPool.single.asyncThrow(`.single asyncThrow`)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(isPromise(returnValue)).toEqual(true)
 
       try {
@@ -137,7 +137,7 @@ describe(`gatsby-worker`, () => {
       })
 
       expect(returnValue).toBeArrayOfSize(numWorkers)
-      // turns sync function into async
+      // 同期関数を非同期に変える
       expect(returnValue).toSatisfyAll(isPromise)
 
       const resolvedValue = await Promise.all(returnValue)
@@ -159,7 +159,7 @@ describe(`gatsby-worker`, () => {
       })
 
       expect(returnValue).toBeArrayOfSize(numWorkers)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(returnValue).toSatisfyAll(isPromise)
 
       const resolvedValue = await Promise.all(returnValue)
@@ -183,7 +183,7 @@ describe(`gatsby-worker`, () => {
         throwOnWorker: 2,
       })
       expect(returnValue).toBeArrayOfSize(numWorkers)
-      // turns sync function into async
+      // 同期関数を非同期に変える
       expect(returnValue).toSatisfyAll(isPromise)
 
       try {
@@ -206,7 +206,7 @@ describe(`gatsby-worker`, () => {
         throwOnWorker: 2,
       })
       expect(returnValue).toBeArrayOfSize(numWorkers)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(returnValue).toSatisfyAll(isPromise)
 
       try {
@@ -226,8 +226,8 @@ describe(`gatsby-worker`, () => {
 
       expect.assertions(numWorkers * 2)
 
-      // queueing 2 * numWorkers task, so that currently executed tasks reject
-      // as well as pending tasks
+      // 2 * numWorkers 個のタスクをキューに入れ、実行中のタスクだけでなく
+      // 保留中のタスクも reject されるようにする
       for (let i = 0; i < numWorkers * 2; i++) {
         workerPool.single
           .neverEnding()
@@ -253,7 +253,7 @@ describe(`gatsby-worker`, () => {
 
       const initialPids = await Promise.all(workerPool.all.pid())
 
-      // sanity checks:
+      // 念のための確認:
       expect(initialPids).toBeArrayOfSize(numWorkers)
       expect(initialPids).toSatisfyAll(value => typeof value === `number`)
 
@@ -270,7 +270,7 @@ describe(`gatsby-worker`, () => {
 
       const initialPids = await Promise.all(workerPool.all.pid())
 
-      // sanity checks:
+      // 念のための確認:
       expect(initialPids).toBeArrayOfSize(numWorkers)
       expect(initialPids).toSatisfyAll(pid => isRunning(pid))
 
@@ -284,7 +284,7 @@ describe(`gatsby-worker`, () => {
       }
 
       const returnValue = workerPool.single.async(`.single async`)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(isPromise(returnValue)).toEqual(true)
 
       const resolvedValue = await returnValue
@@ -301,7 +301,7 @@ describe(`gatsby-worker`, () => {
       })
 
       expect(returnValue).toBeArrayOfSize(numWorkers)
-      // promise is preserved
+      // Promise はそのまま保たれる
       expect(returnValue).toSatisfyAll(isPromise)
 
       const resolvedValue = await Promise.all(returnValue)
@@ -320,8 +320,8 @@ describe(`gatsby-worker`, () => {
 
       expect.assertions(numWorkers * 2)
 
-      // queueing 2 * numWorkers task, so that currently executed tasks reject
-      // as well as pending tasks
+      // 2 * numWorkers 個のタスクをキューに入れ、実行中のタスクだけでなく
+      // 保留中のタスクも reject されるようにする
       for (let i = 0; i < numWorkers * 2; i++) {
         workerPool.single
           .neverEnding()
@@ -370,12 +370,12 @@ describe(`gatsby-worker`, () => {
       const executedOnWorker1 = resultsOrder.filter(res => res.workerId === `1`)
       const executedOnWorker2 = resultsOrder.filter(res => res.workerId === `2`)
 
-      // each worker executed some tasks - we can't ensure that task are evenly split
-      // so just making sure there are some tasks executed in each worker
+      // 各ワーカーがいくつかのタスクを実行した。タスクが均等に分かれることは保証できないので、
+      // 各ワーカーで何らかのタスクが実行されたことだけを確認する
       expect(executedOnWorker1.length).toBeGreaterThan(0)
       expect(executedOnWorker2.length).toBeGreaterThan(0)
 
-      // results from each worker came in order of being called
+      // 各ワーカーの結果は、呼び出した順に返ってきた
       expect(executedOnWorker1).toEqual(
         executedOnWorker1.sort((a, b) => a.taskId - b.taskId)
       )
@@ -400,7 +400,7 @@ describe(`gatsby-worker`, () => {
         }
       })
 
-      // baseline - workers shouldn't be PONGed yet
+      // 基準となる状態。ワーカーはまだ PONG を返していないはずである
       expect(await Promise.all(workerPool.all.getWasPonged()))
         .toMatchInlineSnapshot(`
         Array [

@@ -28,12 +28,12 @@ const alreadyCopiedFiles = new Set<string>()
 export type { IFetchRemoteFileOptions }
 
 /**
- * Downloads a remote file to disk
+ * リモートファイルをディスクへダウンロードする
  */
 export async function fetchRemoteFile(
   args: IFetchRemoteFileOptions
 ): Promise<string> {
-  // when cachekey is present we can do more persistance
+  // cachekey がある場合は、より多くを永続化できる
   if (args.cacheKey) {
     const storage = getStorage(getDatabaseDir())
     const info = storage.remoteFileInfo.get(args.url)
@@ -47,8 +47,8 @@ export async function fetchRemoteFile(
       const downloadPath = path.join(fileDirectory, info.path)
 
       if (await fs.pathExists(cachedPath)) {
-        // If the cached directory is not part of the public directory, we don't need to copy it
-        // as it won't be part of the build.
+        // キャッシュ先のディレクトリが public ディレクトリに含まれない場合は、ビルドの一部に
+        // ならないのでコピーする必要はない。
         if (isPublicPath(downloadPath) && cachedPath !== downloadPath) {
           return copyCachedPathToDownloadPath({ cachedPath, downloadPath })
         }
@@ -74,7 +74,7 @@ async function copyCachedPathToDownloadPath({
   cachedPath: string
   downloadPath: string
 }): Promise<string> {
-  // Create a mutex to do our copy - we could do a md5 hash check as well but that's also expensive
+  // コピーのためにミューテックスを作る。md5 ハッシュで確認する方法もあるが、それもコストが高い
   if (!alreadyCopiedFiles.has(downloadPath)) {
     const copyFileMutex = createMutex(
       `gatsby-core-utils:copy-fetch:${downloadPath}`,
@@ -98,7 +98,7 @@ const queue = Queue<null, ITask, string>(
   /**
    * fetchWorker
    * --
-   * Handle fetch requests that are pushed in to the Queue
+   * キューに入れられた fetch リクエストを処理する
    */
   async function fetchWorker(task, cb): Promise<void> {
     try {
@@ -113,9 +113,9 @@ const queue = Queue<null, ITask, string>(
 /**
  * pushTask
  * --
- * pushes a task in to the Queue and the processing cache
+ * タスクをキューと処理中のキャッシュに入れる
  *
- * Promisfy a task in queue
+ * キュー内のタスクを Promise 化する
  * @param {CreateRemoteFileNodePayload} task
  * @return {Promise<Buffer | string>}
  */
@@ -142,7 +142,7 @@ async function fetchFile({
   cacheKey,
   excludeDigest,
 }: IFetchRemoteFileOptions): Promise<string> {
-  // global introduced in gatsby 4.0.0
+  // gatsby 4.0.0 で導入されたグローバル
   const BUILD_ID = global.__GATSBY?.buildId ?? ``
   const fileDirectory = (cache ? cache.directory : directory) as string
   const storage = getStorage(getDatabaseDir())
@@ -154,7 +154,7 @@ async function fetchFile({
   const fetchFileMutex = createMutex(`gatsby-core-utils:fetch:${url}`)
   await fetchFileMutex.acquire()
 
-  // Fetch the file.
+  // ファイルを取得する。
   try {
     const digest = createContentDigest(url)
     const finalDirectory = excludeDigest
@@ -184,8 +184,8 @@ async function fetchFile({
       })
     }
 
-    // Add htaccess authentication if passed in. This isn't particularly
-    // extensible. We should define a proper API that we validate.
+    // htaccess 認証が渡されていれば追加する。これは拡張性があまり
+    // 高くない。検証付きの適切な API を定義すべきである。
     const httpOptions: Options = {}
     if (auth && (auth.htaccess_pass || auth.htaccess_user)) {
       httpOptions.username = auth.htaccess_user
@@ -197,8 +197,8 @@ async function fetchFile({
     const tmpFilename = createFilePath(fileDirectory, `tmp-${digest}`, ext)
     let filename = createFilePath(finalDirectory, name, ext)
 
-    // See if there's response headers for this url
-    // from a previous request.
+    // この URL について、以前のリクエストのレスポンスヘッダーが
+    // あるかを調べる。
     const headers = { ...httpHeaders }
 
     if (cachedEntry?.headers?.etag && (await fs.pathExists(filename))) {
@@ -214,10 +214,10 @@ async function fetchFile({
     )
 
     if (response.statusCode === 200) {
-      // Save the response headers for future requests.
-      // If the user did not provide an extension and we couldn't get one from remote file, try and guess one
+      // 今後のリクエストのためにレスポンスヘッダーを保存する。
+      // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、推測を試みる
       if (!ext) {
-        // if this is fresh response - try to guess extension and cache result for future
+        // 新しいレスポンスの場合は、拡張子を推測し、今後のために結果をキャッシュする
         const filetype = await fileType.fromFile(tmpFilename)
         if (filetype) {
           ext = `.${filetype.ext}`
@@ -253,7 +253,7 @@ function getInFlightObject(key: string, buildId?: string): string | undefined {
   }
 
   const remoteFile = getStorage(getDatabaseDir()).remoteFileInfo.get(key)
-  // if buildId match we know it's the same build and it already processed this url this build
+  // buildId が一致すれば同じビルドであり、このビルドでこの URL はすでに処理済みである
   if (remoteFile && remoteFile.buildId === buildId) {
     return path.join(remoteFile.directory, remoteFile.path)
   }

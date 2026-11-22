@@ -11,7 +11,7 @@ import type {
 } from "../types"
 import type { Store } from "gatsby"
 
-// this is an arbitrary origin that we use #branding so we can construct a full url for the URL constructor
+// これは、URL コンストラクターに渡す完全な URL を組み立てるために使う、任意のオリジンである（ブランディングも兼ねている）
 const ORIGIN = `https://gatsbyjs.com`
 
 export enum ImageCDNUrlKeys {

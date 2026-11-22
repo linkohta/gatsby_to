@@ -1,21 +1,21 @@
-// Returns true for `true`, true, positive numbers
-// Returns false for `false`, false, 0, negative integers and anything else
+// `true`、true、正の数に対して true を返す
+// `false`、false、0、負の整数、その他すべてに対して false を返す
 export function isTruthy(value: any): boolean {
-  // Return if Boolean
+  // Boolean の場合はそのまま返す
   if (typeof value === `boolean`) return value
 
-  // Return false if null or undefined
+  // null または undefined の場合は false を返す
   if (value === undefined || value === null) return false
 
-  // If the String is true or false
+  // 文字列が true または false の場合
   if (value.toLowerCase() === `true`) return true
   if (value.toLowerCase() === `false`) return false
 
-  // Now check if it's a number
+  // 次に数値かどうかを調べる
   const number = parseInt(value, 10)
   if (isNaN(number)) return false
   if (number > 0) return true
 
-  // Default to false
+  // デフォルトは false
   return false
 }

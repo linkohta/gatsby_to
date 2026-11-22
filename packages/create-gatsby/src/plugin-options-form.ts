@@ -9,7 +9,7 @@ import colors from "ansi-colors"
 const supportedOptionTypes = [`string`, `boolean`, `number`]
 
 type Schema = Joi.Description & {
-  // Limitation in Joi typings
+  // Joi の型定義の制約
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   flags?: Record<string, any>
 }
@@ -35,7 +35,7 @@ interface IFormPrompt {
 }
 
 function getName(key: string): string | undefined {
-  const plugins = [cmses, styles] // "features" doesn't map to names
+  const plugins = [cmses, styles] // "features" は名前に対応していない
   for (const types of plugins) {
     if (key in types) {
       return types[key as keyof typeof types].message

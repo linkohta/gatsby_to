@@ -2,10 +2,10 @@ import { NodePath, PluginObj, Visitor } from "@babel/core"
 import * as BabelTypes from "@babel/types"
 import { Program } from "@babel/types"
 
-// matches any hook-like (the default)
+// フックらしい名前のものすべてに一致する（デフォルト）
 const isHook = /^use[A-Z]/
 
-// matches only built-in hooks provided by React et al
+// React などが提供する組み込みのフックだけに一致する
 const isBuiltInHook =
   /^use(Callback|Context|DebugValue|Effect|ImperativeHandle|LayoutEffect|Memo|Reducer|Ref|State)$/
 
@@ -25,31 +25,31 @@ export default function ({
     CallExpression(path, state: IState): void {
       const onlyBuiltIns = state.opts?.onlyBuiltIns || false
 
-      // if specified, options.lib is a list of libraries that provide hook functions
+      // options.lib が指定されている場合、それはフック関数を提供するライブラリの一覧である
       const libs =
         state.opts?.lib === true ? [`react`, `preact/hooks`] : [state.opts!.lib]
 
-      // skip function calls that are not the init of a variable declaration:
+      // 変数宣言の初期化子ではない関数呼び出しは飛ばす:
       if (!t.isVariableDeclarator(path.parent)) return
 
-      // skip function calls where the return value is not Array-destructured:
+      // 戻り値が配列の分割代入で受け取られていない関数呼び出しは飛ばす:
       if (!t.isArrayPattern(path.parent.id)) return
 
-      // name of the (hook) function being called:
+      // 呼び出されている（フック）関数の名前:
       const hookName = (path.node.callee as BabelTypes.Identifier).name
 
       if (libs) {
         const binding = path.scope.getBinding(hookName)
-        // not an import
+        // import ではない
         if (!binding || binding.kind !== `module`) return
 
         const specifier = (binding.path.parent as BabelTypes.ImportDeclaration)
           .source.value
-        // not a match
+        // 一致しない
         if (!libs.some(lib => lib === specifier)) return
       }
 
-      // only match function calls with names that look like a hook
+      // フックらしい名前の関数呼び出しだけを対象にする
       if (!(onlyBuiltIns ? isBuiltInHook : isHook).test(hookName)) return
 
       path.parent.id = t.objectPattern(
@@ -74,7 +74,7 @@ export default function ({
   return {
     name: `optimize-hook-destructuring`,
     visitor: {
-      // this is a workaround to run before preset-env destroys destructured assignments
+      // preset-env が分割代入を壊す前に実行するための回避策
       Program<Program>(path: NodePath<Program>, state: any): void {
         path.traverse(visitor, state)
       },

@@ -3,8 +3,8 @@ const path = require(`path`)
 
 /**
  * @typedef {Object} TraversePackagesDepsReturn
- * @property {Object} depTree Lookup table to check dependants for given package.
- * Used to determine which packages need to be published.
+ * @property {Object} depTree 指定したパッケージに依存するパッケージを調べるためのルックアップテーブル。
+ * どのパッケージを公開する必要があるかの判断に使う。
  * @example
  * ```
  * {
@@ -17,19 +17,19 @@ const path = require(`path`)
  */
 
 /**
- * Compile final list of packages to watch
- * This will include packages explicitly defined packages and all their dependencies
- * Also creates dependency graph that is used later to determine which packages
- * would need to be published when their dependencies change
+ * 監視するパッケージの最終的な一覧を組み立てる
+ * 明示的に指定されたパッケージと、そのすべての依存が含まれる
+ * あわせて、依存が変更されたときにどのパッケージを公開する必要があるかを
+ * 後で判断するための依存グラフも作成する
  * @param {Object} $0
- * @param {String} $0.root Path to root of Gatsby monorepo repository
- * @param {String[]} $0.packages Initial array of packages to watch
- * This can be extracted from project dependencies or explicitly set by `--packages` flag
- * @param {String[]} $0.monoRepoPackages Array of packages in Gatsby monorepo
- * @param {String[]} [$0.seenPackages] Array of packages that were already traversed.
- * This makes sure dependencies are extracted one time for each package and avoid any
- * infinite loops.
- * @param {DepTree} [$0.depTree] Used internally to recursively construct dependency graph.
+ * @param {String} $0.root Gatsby のモノレポのリポジトリのルートへのパス
+ * @param {String[]} $0.packages 監視するパッケージの最初の配列
+ * プロジェクトの依存から取り出すことも、`--packages` フラグで明示的に指定することもできる
+ * @param {String[]} $0.monoRepoPackages Gatsby のモノレポにあるパッケージの配列
+ * @param {String[]} [$0.seenPackages] すでに走査したパッケージの配列。
+ * これにより、依存の取り出しが各パッケージにつき 1 回になり、
+ * 無限ループを避けられる。
+ * @param {DepTree} [$0.depTree] 依存グラフを再帰的に組み立てるために内部で使う。
  * @return {TraversePackagesDepsReturn}
  */
 const traversePackagesDeps = ({
@@ -47,13 +47,13 @@ const traversePackagesDeps = ({
         pkgJson = require(path.join(packageRoot, `package.json`))
       } else {
         console.error(`"${p}" package doesn't exist in monorepo.`)
-        // remove from seenPackages
+        // seenPackages から取り除く
         seenPackages = seenPackages.filter(seenPkg => seenPkg !== p)
         return
       }
     } catch (e) {
       console.error(`"${p}" package doesn't exist in monorepo.`, e)
-      // remove from seenPackages
+      // seenPackages から取り除く
       seenPackages = seenPackages.filter(seenPkg => seenPkg !== p)
       return
     }
@@ -67,7 +67,7 @@ const traversePackagesDeps = ({
       depTree[pkgName] = (depTree[pkgName] || new Set()).add(p)
     })
 
-    // only traverse not yet seen packages to avoid infinite loops
+    // 無限ループを避けるため、まだ見ていないパッケージだけを走査する
     const newPackages = _.difference(fromMonoRepo, seenPackages)
 
     if (newPackages.length) {

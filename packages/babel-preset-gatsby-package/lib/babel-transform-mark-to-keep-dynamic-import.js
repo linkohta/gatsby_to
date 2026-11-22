@@ -42,10 +42,10 @@ module.exports = function keepDynamicImports(
         }
 
         if (absolutePaths.includes(filename)) {
-          // this is big hack - it relies on some babel plugins internal to basically
-          // do early return ( https://github.com/babel/babel/blob/3526b79c87863052f1c61ec0c49c0fc287ba32e6/packages/babel-plugin-transform-modules-commonjs/src/index.ts#L174 )
-          // on top of that `BabelFile` doesn't expose delete for the metadata,
-          // so we reach into internal `_map` to delete it
+          // これは大がかりなハックである。Babel プラグインの内部実装に頼って、実質的に
+          // 早期リターンさせている ( https://github.com/babel/babel/blob/3526b79c87863052f1c61ec0c49c0fc287ba32e6/packages/babel-plugin-transform-modules-commonjs/src/index.ts#L174 )
+          // さらに、`BabelFile` はメタデータを削除する手段を公開していないので、
+          // 内部の `_map` に直接アクセスして削除している
           this.file._map.delete("@babel/plugin-proposal-dynamic-import")
         }
       }

@@ -5,8 +5,7 @@ import Url from "url"
 /**
  * getParsedPath
  * --
- * Parses remote url to a path object
- *
+ * リモートの URL を解析してパスオブジェクトにする
  */
 function getParsedPath(url: string): path.ParsedPath {
   return path.parse(Url.parse(url).pathname || ``)
@@ -15,8 +14,7 @@ function getParsedPath(url: string): path.ParsedPath {
 /**
  * getRemoteFileExtension
  * --
- * Parses remote url to retrieve remote file extension
- *
+ * リモートの URL を解析してリモートファイルの拡張子を取得する
  */
 export function getRemoteFileExtension(url: string): string {
   return getParsedPath(url).ext
@@ -25,8 +23,7 @@ export function getRemoteFileExtension(url: string): string {
 /**
  * getRemoteFileName
  * --
- * Parses remote url to retrieve remote file name
- *
+ * リモートの URL を解析してリモートファイルの名前を取得する
  */
 export function getRemoteFileName(url: string): string {
   return decodeURIComponent(getParsedPath(url).name)
@@ -45,7 +42,7 @@ const filenamePurgeRegex = /:|\/|\*|\?|"|<|>|\||\\/g
 /**
  * createFilePath
  * --
- * Gets full file path while replacing forbidden characters with a `-`
+ * 使えない文字を `-` に置き換えたうえで、完全なファイルパスを取得する
  */
 export function createFilePath(
   directory: string,

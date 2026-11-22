@@ -5,7 +5,7 @@ interface ITaskQueueNode<ValueType> {
 }
 
 /**
- * Task queue implemented with doubly linked list
+ * 双方向連結リストで実装したタスクキュー
  */
 export class TaskQueue<ValueType> {
   private head?: ITaskQueueNode<ValueType>
@@ -20,8 +20,8 @@ export class TaskQueue<ValueType> {
   }
 
   /**
-   * Puts new task at the end of the list
-   * @param task Task to add to the queue
+   * 新しいタスクをリストの末尾に追加する
+   * @param task キューに追加するタスク
    */
   enqueue(task: ValueType): void {
     const newNode: ITaskQueueNode<ValueType> = {
@@ -38,8 +38,8 @@ export class TaskQueue<ValueType> {
   }
 
   /**
-   * Remove a task node from the queue
-   * @param taskNode Queue's node to remove
+   * キューからタスクのノードを取り除く
+   * @param taskNode 取り除くキューのノード
    */
   remove(taskNode: ITaskQueueNode<ValueType>): void {
     if (taskNode === this.head) {
@@ -47,17 +47,17 @@ export class TaskQueue<ValueType> {
       if (this.head) {
         this.head.prev = undefined
       } else {
-        // if we don't have head, we also don't have tail
+        // head がなければ、tail もない
         this.tail = undefined
       }
     } else {
       if (taskNode === this.tail) {
         this.tail = taskNode.prev
       } else {
-        // if node is not the tail then it will have .next
+        // ノードが tail でなければ、.next を持つ
         taskNode.next!.prev = taskNode.prev
       }
-      // if node is not the head then it will have .prev
+      // ノードが head でなければ、.prev を持つ
       taskNode.prev!.next = taskNode.next
     }
   }

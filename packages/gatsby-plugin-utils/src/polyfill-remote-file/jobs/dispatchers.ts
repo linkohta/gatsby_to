@@ -51,7 +51,7 @@ export function dispatchLocalFileServiceJob(
   ).split(`/`)
 
   publicUrl.unshift(`public`)
-  // get filename and remove querystring
+  // ファイル名を取得し、クエリ文字列を取り除く
   const outputFilename = decodeURI(publicUrl.pop()?.split(`?`)?.[0] as string)
 
   const httpHeaders = getRequestHeadersForUrl(url, store)
@@ -60,7 +60,7 @@ export function dispatchLocalFileServiceJob(
     {
       name: `FILE_CDN`,
       inputPaths: [],
-      // we know it's an image so we just mimic an image
+      // 画像であることは分かっているので、画像を模倣するだけでよい
       outputDir: path.join(
         global.__GATSBY?.root || process.cwd(),
         ...publicUrl.filter(Boolean)
@@ -109,7 +109,7 @@ export function dispatchLocalImageServiceJob(
     store
   ).split(`/`)
   publicUrl.unshift(`public`)
-  // get filename and remove querystring
+  // ファイル名を取得し、クエリ文字列を取り除く
   const outputFilename = decodeURI(publicUrl.pop()?.split(`?`)?.[0] as string)
 
   const httpHeaders = getRequestHeadersForUrl(url, store) as

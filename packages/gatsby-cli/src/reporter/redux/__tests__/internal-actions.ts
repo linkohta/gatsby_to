@@ -56,7 +56,7 @@ describe(`setStatus action creator`, () => {
     setStatusWithDispatch(ActivityStatuses.InProgress)
     setStatusWithDispatch(ActivityStatuses.Success)
 
-    // we should only emit initial IN_PROGRESS event
+    // 最初の IN_PROGRESS イベントだけが送られるはずである
     expect(dispatch).toHaveBeenCalledTimes(1)
     expect(dispatch).toHaveBeenNthCalledWith(1, {
       type: `SET_STATUS`,
@@ -78,7 +78,7 @@ describe(`setStatus action creator`, () => {
     setStatusWithDispatch(ActivityStatuses.InProgress)
     setStatusWithDispatch(ActivityStatuses.Failed)
 
-    // we should only emit initial IN_PROGRESS event
+    // 最初の IN_PROGRESS イベントだけが送られるはずである
     expect(dispatch).toHaveBeenCalledTimes(1)
     expect(dispatch).toHaveBeenNthCalledWith(1, {
       type: `SET_STATUS`,
@@ -107,7 +107,7 @@ describe(`setStatus action creator`, () => {
 
     jest.runOnlyPendingTimers()
 
-    // we are still in progress, so we shouldn't emit anything other than initial IN_PROGRESS
+    // まだ進行中なので、最初の IN_PROGRESS 以外は何も送られないはずである
     expect(dispatch).toHaveBeenCalledTimes(1)
   })
 })

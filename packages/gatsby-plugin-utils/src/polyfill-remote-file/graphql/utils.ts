@@ -6,7 +6,7 @@ export function validateAndNormalizeFormats(
 ): Set<ImageFormat> {
   const formatSet = new Set<ImageFormat>(formats)
 
-  // convert auto in format of source image
+  // auto を元画像のフォーマットに変換する
   if (formatSet.has(`auto`)) {
     formatSet.delete(`auto`)
     formatSet.add(sourceFormat)
@@ -20,7 +20,7 @@ export function validateAndNormalizeFormats(
 }
 
 /**
- * Generate correct width and height like sharp will do
+ * sharp と同じ方法で、正しい幅と高さを求める
  * @see https://sharp.pixelplumbing.com/api-resize#resize
  */
 export function calculateImageDimensions(
@@ -32,7 +32,7 @@ export function calculateImageDimensions(
     aspectRatio: requestedAspectRatio,
   }: { fit: ImageFit; aspectRatio: number } & WidthOrHeight
 ): { width: number; height: number; aspectRatio: number } {
-  // Calculate the eventual width/height of the image.
+  // 画像の最終的な幅と高さを計算する。
   let imageAspectRatio
   if (requestedAspectRatio) {
     imageAspectRatio = requestedAspectRatio

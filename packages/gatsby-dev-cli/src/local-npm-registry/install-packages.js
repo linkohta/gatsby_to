@@ -18,12 +18,12 @@ const installPackages = async ({
   )
   let installCmd
   if (yarnWorkspaceRoot) {
-    // this is very hacky - given root, we run `yarn workspaces info`
-    // to get list of all workspaces and their locations, and manually
-    // edit package.json file for packages we want to install
-    // to make sure there are no mismatched versions of same package
-    // in workspaces which should preserve node_modules structure
-    // (packages being mostly hoisted to top-level node_modules)
+    // これはかなり強引な方法である。root を受け取って `yarn workspaces info` を実行し、
+    // すべてのワークスペースとその場所の一覧を取得する。そして、インストールしたい
+    // パッケージの package.json ファイルを手動で編集し、ワークスペース内で
+    // 同じパッケージのバージョンが食い違わないようにする。
+    // これで node_modules の構造が保たれるはずである
+    // （パッケージの大部分がトップレベルの node_modules に巻き上げられる）
 
     const { stdout } = await promisifiedSpawn([
       `yarn`,
@@ -36,7 +36,7 @@ const installPackages = async ({
       workspacesLayout = JSON.parse(JSON.parse(stdout).data)
     } catch (e) {
       /*
-      Yarn 1.22 doesn't output pure json - it has leading and trailing text:
+      Yarn 1.22 は純粋な json を出力せず、前後にテキストが付く:
       ```
       $ yarn workspaces info --json
       yarn workspaces v1.22.0
@@ -54,14 +54,14 @@ const installPackages = async ({
       }
       Done in 0.48s.
       ```
-      So we need to do some sanitization. We find JSON by matching substring
-      that starts with `{` and ends with `}`
+      そのため、整形が必要になる。`{` で始まり `}` で終わる部分文字列に
+      一致させて JSON を取り出す
     */
 
       const regex = /^[^{]*({.*})[^}]*$/gs
       const sanitizedStdOut = regex.exec(stdout)
       if (sanitizedStdOut?.length >= 2) {
-        // pick content of first (and only) capturing group
+        // 最初の（唯一の）キャプチャーグループの内容を取り出す
         const jsonString = sanitizedStdOut[1]
         try {
           workspacesLayout = JSON.parse(jsonString)
@@ -69,7 +69,7 @@ const installPackages = async ({
           console.error(
             `Failed to parse "sanitized" output of "yarn workspaces info" command.\n\nSanitized string: "${jsonString}`
           )
-          // not exitting here, because we have general check for `workspacesLayout` being set below
+          // ここでは終了しない。下に `workspacesLayout` が設定されているかの全体的な確認があるため
         }
       }
     }
@@ -118,8 +118,8 @@ const installPackages = async ({
       }
     })
 
-    // package.json files are changed - so we just want to install
-    // using verdaccio registry
+    // package.json ファイルが変更されているので、verdaccio レジストリを使って
+    // インストールするだけでよい
     const yarnCommands = [`install`]
 
     if (!externalRegistry) {

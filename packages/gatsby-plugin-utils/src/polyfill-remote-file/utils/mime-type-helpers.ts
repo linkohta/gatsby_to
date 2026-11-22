@@ -9,6 +9,6 @@ export function getImageFormatFromMimeType(mimeType: string): ImageFormat {
 }
 
 export function getFileExtensionFromMimeType(mimeType: string): string {
-  // convert jpeg to jpg and make up extension if we return null
+  // jpeg を jpg に変換する。null を返す場合は拡張子を補う
   return mime.getExtension(mimeType)?.replace(`jpeg`, `jpg`) ?? `gatsby`
 }

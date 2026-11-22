@@ -8,7 +8,7 @@ jest.mock(`../utils/reporter`)
 jest.mock(
   `somewhere-virtually-existing`,
   () => {
-    // Make sure not to resolve `addPlugins` in order to safely handle error
+    // エラーを安全に処理するため、`addPlugins` を resolve しないようにする
     return {}
   },
   { virtual: true }
@@ -24,7 +24,7 @@ describe(`install-plugins`, () => {
 
     await installPlugins([], {}, `not-existing-path`, [])
 
-    // Test function behaviour but improves the DX, it probably worth it
+    // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
     expect(reporter.error).toBeCalledWith(
       `Could not find "gatsby" in not-existing-path. Perhaps it wasn't installed properly?`
     )
@@ -43,7 +43,7 @@ describe(`install-plugins`, () => {
 
     await installPlugins([], {}, `not-existing-path`, [])
 
-    // Test function behaviour but improves the DX, it probably worth it
+    // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
     expect(reporter.error).toBeCalledWith(
       `Could not find a suitable version of gatsby-cli. Please report this issue at https://www.github.com/gatsbyjs/gatsby/issues`
     )
@@ -56,7 +56,7 @@ describe(`install-plugins`, () => {
 
     await installPlugins([], {}, `not-existing-path`, [])
 
-    // Test function behaviour but improves the DX, it probably worth it
+    // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
     expect(reporter.error).toBeCalledWith(
       `Something went wrong when trying to add the plugins to the project: addPlugins is not a function`
     )

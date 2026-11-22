@@ -3,7 +3,7 @@ import { TextInput } from "./text"
 import { SelectInput, MultiSelectInput } from "./select"
 
 /**
- * Enquirer plugin to add custom fields
+ * カスタムフィールドを追加する Enquirer プラグイン
  *
  * @param enquirer {import("enquirer")}
  * @returns {import("enquirer")}

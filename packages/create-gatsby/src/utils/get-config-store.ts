@@ -2,9 +2,9 @@ import Configstore from "configstore"
 
 let config: Configstore
 /**
- * Copied from gatsby-core-utils to avoid depending on it
- * Gets the configstore instance related to gatsby
- * @return the ConfigStore instance for gatsby
+ * 依存を避けるため、gatsby-core-utils からコピーしたもの
+ * gatsby に関連する configstore のインスタンスを取得する
+ * @return gatsby 用の ConfigStore インスタンス
  */
 
 export const getConfigStore = (): Configstore => {

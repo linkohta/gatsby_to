@@ -3,12 +3,12 @@ import { PluginOptionsSchemaJoi } from "./utils/plugin-options-schema-joi-type"
 
 export * from "./utils/plugin-options-schema-joi-type"
 export const Joi: PluginOptionsSchemaJoi = joi.extend({
-  // This tells Joi to extend _all_ types with .dotenv(), see
+  // これは Joi に、_すべての_ 型を .dotenv() で拡張するよう指示する。次を参照
   // https://github.com/sideway/joi/commit/03adf22eb1f06c47d1583617093edee3a96b3873
   // @ts-ignore Joi types weren't updated with that commit, PR: https://github.com/sideway/joi/pull/2477
   type: /^s/,
   rules: {
-    // NOTE(@mxstbr): Disabled until we decide on the necessity for this API.
+    // NOTE(@mxstbr): この API が必要かどうかを決めるまで無効にしている。
     // dotenv: {
     //   args: [`name`],
     //   validate(value, helpers, args): void {

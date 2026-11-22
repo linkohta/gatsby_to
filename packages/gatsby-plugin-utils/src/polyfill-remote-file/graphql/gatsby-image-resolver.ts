@@ -177,9 +177,9 @@ export async function gatsbyImageResolver(
     (a, b) => getFormatValue(b) - getFormatValue(a)
   )
 
-  // Result will be used like this
+  // 結果は次のように使われる
   // <picture>
-  // for each result.sources we create a <source srcset="..." /> tag
+  // result.sources のそれぞれについて <source srcset="..." /> タグを作る
   // <img src="fallbacksrc" srcset="fallbacksrcset" />
   // </picture>
   for (const format of sortedFormats) {
@@ -230,7 +230,7 @@ export async function gatsbyImageResolver(
       }
     })
 
-    // The latest format (by default will be jpg/png) is the fallback and doesn't need sources
+    // 最後のフォーマット（デフォルトでは jpg/png）はフォールバックなので、sources は不要である
     if (format === sortedFormats[sortedFormats.length - 1] && fallbackSrc) {
       result.fallback = {
         src: fallbackSrc,
@@ -262,7 +262,7 @@ export async function gatsbyImageResolver(
     }
   }
 
-  // Check if addGatsbyImageSourceUrl for backwards compatibility with older Gatsby versions
+  // 古いバージョンの Gatsby との後方互換性のため、addGatsbyImageSourceUrl があるかを確認する
   if (GATSBY_SHOULD_TRACK_IMAGE_CDN_URLS && actions.addGatsbyImageSourceUrl) {
     actions.addGatsbyImageSourceUrl(source.url)
   }
@@ -480,13 +480,13 @@ function calculateFixedImageSizes({
     aspectRatio = sourceMetadata.width / sourceMetadata.height
   }
 
-  // make sure output outputPixelDensities has a value of 1
+  // 出力する outputPixelDensities に 1 が含まれるようにする
   outputPixelDensities.push(1)
   const densities = new Set<number>(
     outputPixelDensities.sort(sortNumeric).filter(Boolean)
   )
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = calculateImageDimensions(sourceMetadata, {
       width,
@@ -498,7 +498,7 @@ function calculateFixedImageSizes({
     height = calculated.height
     aspectRatio = calculated.aspectRatio
   } else {
-    // if we only get one value calculate the other value based on aspectRatio
+    // 値が 1 つしか渡されなかった場合は、もう一方を aspectRatio から計算する
     if (!width) {
       width = Math.round((height as number) * aspectRatio)
     } else {
@@ -506,12 +506,12 @@ function calculateFixedImageSizes({
     }
   }
 
-  const presentationWidth = width // will use this for presentationWidth, don't want to lose it
+  const presentationWidth = width // presentationWidth に使うので、失わないようにする
   const isRequestedSizeLargerThanOriginal =
     sourceMetadata.width < width || sourceMetadata.height < (height as number)
 
-  // If the image is smaller than requested, warn the user that it's being processed as such
-  // print out this message with the necessary information before we overwrite it for sizing
+  // 画像が要求されたサイズより小さい場合は、そのように処理されることをユーザーに警告する
+  // サイズ計算のために上書きする前に、必要な情報とともにこのメッセージを出力する
   if (isRequestedSizeLargerThanOriginal) {
     const invalidDimension = sourceMetadata.width < width ? `width` : `height`
     console.warn(`
@@ -534,7 +534,7 @@ function calculateFixedImageSizes({
 
   const sizes = new Set<number>()
   for (const density of densities) {
-    // Screen densities can only be higher or equal to 1
+    // 画面のピクセル密度は 1 以上でなければならない
     if (density >= 1) {
       const widthFromDensity = density * width
       sizes.add(Math.min(widthFromDensity, sourceMetadata.width))
@@ -567,12 +567,12 @@ function calculateResponsiveImageSizes({
   } else {
     aspectRatio = sourceMetadata.width / sourceMetadata.height
   }
-  // Sort, dedupe and ensure there's a 1
+  // ソートし、重複を取り除き、1 が含まれるようにする
   const densities = new Set<number>(
     outputPixelDensities.sort(sortNumeric).filter(Boolean)
   )
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = calculateImageDimensions(sourceMetadata, {
       width,
@@ -591,7 +591,7 @@ function calculateResponsiveImageSizes({
     }
   }
 
-  // width of height were passed in, make sure it isn't larger than the actual image
+  // width か height が渡されたので、実際の画像より大きくならないようにする
   width = width ? Math.round(Math.min(width, sourceMetadata.width)) : undefined
   height = height ? Math.min(height, sourceMetadata.height) : undefined
 
@@ -601,7 +601,7 @@ function calculateResponsiveImageSizes({
   if (breakpoints && breakpoints.length > 0) {
     sizes = breakpoints.filter(size => size <= sourceMetadata.width)
 
-    // If a larger breakpoint has been filtered-out, add the actual image width instead
+    // 大きいブレークポイントが取り除かれた場合は、代わりに実際の画像の幅を追加する
     if (
       sizes.length < breakpoints.length &&
       !sizes.includes(sourceMetadata.width)
@@ -615,7 +615,7 @@ function calculateResponsiveImageSizes({
     sizes = sizes.filter(size => size <= sourceMetadata.width)
   }
 
-  // ensure that the size passed in is included in the final output
+  // 渡されたサイズが最終的な出力に含まれるようにする
   if (layout === `constrained` && !sizes.includes(nonNullableWidth)) {
     sizes.push(nonNullableWidth)
   }
@@ -634,16 +634,16 @@ function calculateResponsiveImageSizes({
 // eslint-disable-next-line consistent-return
 function getSizesAttrFromLayout(layout: ImageLayout, width: number): string {
   switch (layout) {
-    // If screen is wider than the max size, image width is the max size,
-    // otherwise it's the width of the screen
+    // 画面が最大サイズより広い場合、画像の幅は最大サイズになり、
+    // そうでない場合は画面の幅になる
     case `constrained`:
       return `(min-width: ${width}px) ${width}px, 100vw`
 
-    // Image is always the same width, whatever the size of the screen
+    // 画面のサイズにかかわらず、画像の幅は常に同じである
     case `fixed`:
       return `${width}px`
 
-    // Image is always the width of the screen
+    // 画像の幅は常に画面の幅である
     case `fullWidth`:
       return `100vw`
   }

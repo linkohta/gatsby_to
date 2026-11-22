@@ -78,7 +78,7 @@ const addGatsbyImport = (j, root) => {
   })
 }
 
-// TODO: make work with existing gatsby requires (e.g. `const { StaticQuery } = require('gatsby');`)
+// TODO: 既存の gatsby の require（例: `const { StaticQuery } = require('gatsby');`）でも動くようにする
 const addGatsbyRequire = (j, root, requires) => {
   const gatsbyRequire = requires.find(j.CallExpression, {
     arguments: [{ value: MODULE_NAME }],

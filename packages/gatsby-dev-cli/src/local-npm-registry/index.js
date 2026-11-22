@@ -16,7 +16,7 @@ const startServer = () => {
 
   console.log(`Starting local verdaccio server`)
 
-  // clear storage
+  // ストレージを消去する
   fs.removeSync(verdaccioConfig.storage)
 
   VerdaccioInitPromise = new Promise(resolve => {

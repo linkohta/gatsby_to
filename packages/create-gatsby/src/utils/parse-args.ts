@@ -1,8 +1,8 @@
 import { reporter } from "./reporter"
 
 enum Flag {
-  yes = `-y`, // Skip prompts
-  ts = `-ts`, // Use TypeScript
+  yes = `-y`, // プロンプトを省略する
+  ts = `-ts`, // TypeScript を使う
 }
 
 export interface IFlags {
@@ -16,13 +16,13 @@ interface IArgs {
 }
 
 /**
- * Parse arguments without considering position. Both cases should work the same:
+ * 位置を考慮せずに引数を解析する。次のどちらも同じように動くべきである:
  *
  * - `npm init gatsby hello-world -y`
  * - `npm init gatsby -y hello-world`
  *
- * We deliberately trade the edge case of a user attempting to create a directory name
- * prepended with a dash (e.g. `-my-project`) for flags that work regardless of position.
+ * 位置に関係なくフラグが使えることを優先し、ダッシュで始まる名前（例: `-my-project`）の
+ * ディレクトリを作ろうとするエッジケースは意図的に切り捨てている。
  */
 export function parseArgs(args: Array<string>): IArgs {
   const { flags, dirName } = args.reduce(

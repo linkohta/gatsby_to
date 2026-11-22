@@ -41,15 +41,15 @@ const addPluginToConfig = (
       configFile: false,
     }
 
-    // Use the Babel TS preset if we're operating on `gatsby-config.ts`
+    // `gatsby-config.ts` を扱っている場合は、Babel の TS プリセットを使う
     if (srcPath.endsWith(`ts`)) {
       transformOptions.presets = [require.resolve(`@babel/preset-typescript`)]
     }
 
     code = transform(src, transformOptions)?.code
 
-    // Add back stripped type import, do light formatting, remove added empty module export.
-    // Use semicolon since Babel does that anyway, and we might as well be consistent.
+    // 取り除かれた型の import を戻し、簡単な整形を行い、追加された空の module export を削除する。
+    // どのみち Babel がセミコロンを付けるので、一貫性を保つためにセミコロンを使う。
     if (srcPath.endsWith(`ts`)) {
       code = `import type { GatsbyConfig } from "gatsby";\n\n${code}`
       code = code.replace(`export {};`, ``)
@@ -106,7 +106,7 @@ const generateClientCommands = ({
   const commands: Array<string> = []
   if (packageManager === `yarn`) {
     commands.push(`add`)
-    // Needed for Yarn Workspaces and is a no-opt elsewhere.
+    // Yarn Workspaces で必要になる。それ以外では何もしない。
     commands.push(`-W`)
     if (depType === `development`) {
       commands.push(`--dev`)
@@ -133,9 +133,9 @@ const executeInstalls = async (root: string): Promise<void> => {
   // @ts-ignore - fix me
   const types = _.groupBy(installs, c => c.resource.dependencyType)
 
-  // Grab the key of the first install & delete off installs these packages
-  // then run intall
-  // when done, check again & call executeInstalls again.
+  // 最初のインストールのキーを取り出して installs から削除し、そのパッケージの
+  // インストールを実行する
+  // 終わったらもう一度確認し、executeInstalls を再び呼び出す。
   // @ts-ignore - fix me
   const depType = installs[0].resource.dependencyType
   const packagesToInstall = types[depType]
@@ -160,7 +160,7 @@ const executeInstalls = async (root: string): Promise<void> => {
       cwd: root,
     })
   } catch (e) {
-    // A package failed so call the rejects
+    // パッケージのインストールに失敗したので、各 reject を呼び出す
     return packagesToInstall.forEach(p => {
       // @ts-ignore - fix me
       p.outsideReject(
@@ -176,7 +176,7 @@ const executeInstalls = async (root: string): Promise<void> => {
   // @ts-ignore - fix me
   packagesToInstall.forEach(p => p.outsideResolve())
 
-  // Run again if there's still more installs.
+  // まだインストールが残っていれば、もう一度実行する。
   if (installs.length > 0) {
     executeInstalls(root)
   }

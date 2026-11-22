@@ -23,7 +23,7 @@ export interface IGatsbyWorkerMessenger<
 }
 
 /**
- * Used to check wether current context is executed in worker process
+ * 現在のコンテキストがワーカープロセスで実行されているかを調べるために使う
  */
 let isWorker = false
 let getMessenger = function <
@@ -46,7 +46,7 @@ if (
   const inFlightMessages = new Set<ChildMessageUnion>()
   signalExit(() => {
     if (inFlightMessages.size > 0) {
-      // this need to be sync
+      // これは同期的である必要がある
       fs.outputJsonSync(
         workerInFlightsDumpLocation,
         Array.from(inFlightMessages)

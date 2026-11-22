@@ -17,11 +17,11 @@ const { registerCleanupTask } = require(`./cleanup-tasks`)
 const DEPENDENCY_FIELDS = [`dependencies`, `optionalDependencies`]
 
 /**
- * Edit package.json to:
- *  - adjust version to temporary one
- *  - change version selectors for dependencies that
- *    will be published, to make sure that yarn
- *    install them in local site
+ * package.json を次のように編集する:
+ *  - バージョンを一時的なものに変更する
+ *  - 公開される依存のバージョン指定を変更し、
+ *    yarn がローカルのサイトにそれらを
+ *    インストールするようにする
  */
 const adjustPackageJson = ({
   monoRepoPackageJsonPath,
@@ -31,9 +31,9 @@ const adjustPackageJson = ({
   ignorePackageJSONChanges,
   packageNameToPath,
 }) => {
-  // we need to check if package depend on any other package to will be published and
-  // adjust version selector to point to dev version of package so local registry is used
-  // for dependencies.
+  // このパッケージが、公開されるほかのパッケージに依存しているかを調べ、
+  // バージョン指定をそのパッケージの開発版に向け直して、依存にローカルレジストリが
+  // 使われるようにする必要がある。
 
   const monorepoPKGjsonString = fs.readFileSync(
     monoRepoPackageJsonPath,
@@ -43,10 +43,10 @@ const adjustPackageJson = ({
 
   monorepoPKGjson.version = `${monorepoPKGjson.version}-dev-${versionPostFix}`
   packagesToPublish.forEach(packageThatWillBePublished => {
-    // `optionalDependencies` matters as much as `dependencies` here: a range left
-    // pointing at a version that isn't on npm yet (as on a release PR) can't be
-    // satisfied from the local registry either, because what we publish there is a
-    // `-dev-` prerelease and a caret range won't match a prerelease.
+    // ここでは `optionalDependencies` も `dependencies` と同じくらい重要である。まだ npm に
+    // ないバージョンを指したままの範囲（リリース PR の場合など）は、ローカルレジストリからも
+    // 満たせない。そこへ公開するのは `-dev-` のプレリリースであり、キャレット範囲は
+    // プレリリースに一致しないためである。
     const fieldsToAdjust = DEPENDENCY_FIELDS.filter(
       field =>
         monorepoPKGjson[field] &&
@@ -81,13 +81,13 @@ const adjustPackageJson = ({
     temporaryMonorepoPKGjsonString,
   ])
 
-  // change version and dependency versions
+  // バージョンと依存のバージョンを変更する
   fs.outputFileSync(monoRepoPackageJsonPath, temporaryMonorepoPKGjsonString)
 
   return {
     newPackageVersion: monorepoPKGjson.version,
     unadjustPackageJson: registerCleanupTask(() => {
-      // restore original package.json
+      // 元の package.json を復元する
       fs.outputFileSync(monoRepoPackageJsonPath, monorepoPKGjsonString)
       unignorePackageJSONChanges()
     }),
@@ -95,10 +95,10 @@ const adjustPackageJson = ({
 }
 
 /**
- * Anonymous publishing require dummy .npmrc
- * See https://github.com/verdaccio/verdaccio/issues/212#issuecomment-308578500
- * This is `npm publish` (as in linked comment) and `yarn publish` requirement.
- * This is not verdaccio restriction.
+ * 匿名での公開にはダミーの .npmrc が必要である
+ * https://github.com/verdaccio/verdaccio/issues/212#issuecomment-308578500 を参照
+ * これは（リンク先のコメントにあるとおり）`npm publish` と `yarn publish` の要件であり、
+ * verdaccio の制約ではない。
  */
 const createTemporaryNPMRC = ({ pathToPackage, root }) => {
   const NPMRCPathInPackage = path.join(pathToPackage, `.npmrc`)

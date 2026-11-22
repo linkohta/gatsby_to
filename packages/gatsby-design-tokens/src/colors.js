@@ -1,8 +1,8 @@
 import preval from "preval.macro"
 
-// we need to wrap this file inside preval to retain tree-shaking.
-// using syntaxes like const x = { ...var } adds side-effects to the export
-// preval precompiles it so we just return a single object.
+// tree-shaking を維持するため、このファイルを preval で包む必要がある。
+// const x = { ...var } のような構文を使うと、export に副作用が加わる
+// preval が事前にコンパイルするので、単一のオブジェクトを返すだけになる。
 
 export const colors = preval`
   const palette = {

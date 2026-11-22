@@ -3,10 +3,10 @@ import { join } from "path"
 import { addPlugins } from "../../handlers/plugin-add"
 
 /**
- * Copy files from minimal starters instead of testing against static gatsby-configs
- * in fixtues so that these break if we change the starter configs in a breaking way.
+ * フィクスチャ内の固定の gatsby-config でテストするのではなく、minimal スターターからファイルをコピーする。
+ * スターターの設定に破壊的な変更を加えた場合に、これらのテストが失敗するようにするためである。
  *
- * Not using `jest.each` since I find that much harder to read and debug.
+ * `jest.each` を使っていないのは、読みにくくデバッグもしにくいと感じるからである。
  * @see {@link https://jestjs.io/docs/api#testeachtablename-fn-timeout}
  */
 

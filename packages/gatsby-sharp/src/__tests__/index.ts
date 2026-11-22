@@ -33,7 +33,7 @@ describe(`getSharpInstance`, () => {
     exec.mockClear()
   })
 
-  // jest mocking is making this impossible to test
+  // jest のモックのせいで、これはテストできない
   it(`should give you the bare sharp module`, async () => {
     const sharpInstance = await getSharpInstance()
 
@@ -62,7 +62,7 @@ describe(`getSharpInstance`, () => {
         expect(sharpInstance).toBeDefined()
         expect(sharpInstance.versions).toBeDefined()
       } catch (err) {
-        // ignore
+        // 無視する
       }
 
       expect(exec).toHaveBeenCalledWith(

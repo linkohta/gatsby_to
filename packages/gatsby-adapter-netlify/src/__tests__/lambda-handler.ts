@@ -26,9 +26,9 @@ test(`produced handler is correct`, async () => {
     requiredFiles: [requiredFile],
   })
   const handlerCode = writeFileSpy.mock.calls[0][1]
-  // expect require in produced code (this is to mostly to make sure handlerCode is actual handler code)
+  // 生成されたコードに require が含まれるはずである（主に、handlerCode が実際のハンドラーのコードであることを確かめるため）
   expect(handlerCode).toMatch(/require\(["'][^"']*["']\)/)
-  // require paths should not have backward slashes (win paths)
+  // require のパスにバックスラッシュ（Windows のパス）が含まれていてはならない
   expect(handlerCode).not.toMatch(/require\(["'][^"']*\\[^"']*["']\)/)
 
   expect(writeJsonSpy).toBeCalledWith(

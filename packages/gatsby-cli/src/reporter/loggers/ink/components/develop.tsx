@@ -22,15 +22,15 @@ const getLabel = (
   }
 }
 
-// Track the width and height of the terminal. Responsive app design baby!
+// ターミナルの幅と高さを追跡する。レスポンシブなアプリデザインというわけだ
 const useTerminalResize = (): Array<number> => {
   const { stdout } = useStdout()
 
-  // stdout type is nullable, so we need to handle case where it is undefined for type checking.
-  // In practice this shouldn't happen ever, because AFAIK type is only nullable
-  // because Ink's StdoutContext is initiated with `undefined`:
+  // stdout の型は nullable なので、型チェックのために undefined の場合を扱う必要がある。
+  // 実際には起こらないはずである。知る限り、型が nullable なのは
+  // Ink の StdoutContext が `undefined` で初期化されているからにすぎない:
   // https://github.com/vadimdemedes/ink/blob/83894963727cf40ccac2256ec346e5ff3381c918/src/components/StdoutContext.ts#L20-L23
-  // but ContextProvider requires stdout to be set:
+  // 一方、ContextProvider では stdout の指定が必須である:
   // https://github.com/vadimdemedes/ink/blob/83894963727cf40ccac2256ec346e5ff3381c918/src/components/App.tsx#L18
   // https://github.com/vadimdemedes/ink/blob/83894963727cf40ccac2256ec346e5ff3381c918/src/components/App.tsx#L79-L84
   if (!stdout) {

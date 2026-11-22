@@ -117,7 +117,7 @@ const createNetlifyAdapter: AdapterInit<INetlifyAdapterOptions> = options => {
         headerRoutes
       )
 
-      // functions handling
+      // 関数の処理
       for (const fun of functionsManifest) {
         await prepareFunctionVariants(
           fun,
@@ -129,7 +129,7 @@ const createNetlifyAdapter: AdapterInit<INetlifyAdapterOptions> = options => {
       reporter.verbose(
         `[gatsby-adapter-netlify] version: ${packageJson?.version ?? `unknown`}`
       )
-      // excludeDatastoreFromEngineFunction can be enabled either via options or via env var (to preserve handling of env var that existed in Netlify build plugin).
+      // excludeDatastoreFromEngineFunction は、オプションと環境変数のどちらでも有効にできる（Netlify のビルドプラグインにあった環境変数の扱いを維持するため）。
       let excludeDatastoreFromEngineFunction =
         options?.excludeDatastoreFromEngineFunction
 

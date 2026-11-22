@@ -1,7 +1,7 @@
 import type { AvailableFeatures } from "gatsby"
 
 /**
- * Check the readme for a list of available features.
+ * 利用できる機能の一覧は readme を参照。
  */
 export function hasFeature(name: AvailableFeatures): boolean {
   try {

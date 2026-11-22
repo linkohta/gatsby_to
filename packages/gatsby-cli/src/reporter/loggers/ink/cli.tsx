@@ -48,7 +48,7 @@ class CLI extends React.Component<ICLIProps, ICLIState> {
     const { hasError, error } = this.state
 
     if (hasError && error) {
-      // You can render any custom fallback UI
+      // 任意のフォールバック UI を描画できる
       return (
         <Box flexDirection="row">
           <Message

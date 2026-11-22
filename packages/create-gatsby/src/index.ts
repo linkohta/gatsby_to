@@ -36,32 +36,32 @@ interface IAnswers {
 }
 
 /**
- * Interface for plugin JSON files
+ * プラグインの JSON ファイル用のインターフェース
  */
 interface IPluginEntry {
   /**
-   * Message displayed in the menu when selecting the plugin
+   * プラグインを選ぶときにメニューに表示されるメッセージ
    */
   message: string
   /**
-   * Extra NPM packages to install
+   * 追加でインストールする NPM パッケージ
    */
   dependencies?: Array<string>
   /**
-   * Items are either the plugin name, or the plugin name and key, separated by a colon (":")
-   * This allows duplicate entries for plugins such as gatsby-source-filesystem.
+   * 各項目は、プラグイン名、またはプラグイン名とキーをコロン (":") で区切ったものである
+   * これにより、gatsby-source-filesystem のようなプラグインを重複して登録できる。
    */
   plugins?: Array<string>
   /**
-   * Keys must match plugin names or name:key combinations from the plugins array
+   * キーは、plugins 配列にあるプラグイン名、または name:key の組み合わせと一致しなければならない
    */
   options?: PluginConfigMap
   /**
-   * If the item is not a valid Gatsby plugin, set this to `false`
+   * この項目が有効な Gatsby プラグインでない場合は、これを `false` にする
    */
   isGatsbyPlugin?: boolean
   /**
-   * Additional files that should be written to the filesystem
+   * ファイルシステムへ書き出す追加のファイル
    */
   files?: Array<IFile>
 }
@@ -77,7 +77,7 @@ export async function run(): Promise<void> {
 
   reporter.info(colors.grey(`create-gatsby version ${version}`))
 
-  // Wecome message
+  // ウェルカムメッセージ
   reporter.info(
     `
 
@@ -88,7 +88,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
 `
   )
 
-  // If we aren't skipping prompts, communicate we'll ask setup questions
+  // プロンプトを省略しない場合は、セットアップの質問をすることを伝える
   if (!flags.yes) {
     reporter.info(
       wrap(
@@ -105,7 +105,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
   const enquirer = new Enquirer<IAnswers>()
   enquirer.use(plugin)
 
-  // If we aren't skipping prompts, get a site name first to use as a default folder name
+  // プロンプトを省略しない場合は、デフォルトのフォルダー名として使うサイト名を最初に尋ねる
   let npmSafeSiteName
   let siteName = ``
 
@@ -131,13 +131,13 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
     npmSafeSiteName = makeNpmSafe(dirName)
   }
 
-  // Prompt user with questions and gather answers
+  // ユーザーに質問を表示し、回答を集める
   const questions = generateQuestions(npmSafeSiteName, flags)
   const answers = await enquirer.prompt(questions)
 
   answers.project = answers.project.trim()
 
-  // Language selection
+  // 言語の選択
   if (flags.yes) {
     answers.language = `js`
   }
@@ -145,7 +145,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
     answers.language = `ts`
   }
 
-  // Collect a report of things we will do to present to the user once the questions are complete
+  // 質問が終わった後にユーザーへ提示する、これから行う作業の一覧を集める
   const messages: Array<string> = [
     `${maybeUseEmoji(
       `🛠  `
@@ -158,7 +158,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
   const packages: Array<string> = []
   let pluginConfig: PluginConfigMap = {}
 
-  // If a CMS is selected, ask CMS config questions after the main question set is complete
+  // CMS が選ばれた場合は、メインの質問セットが終わった後に CMS の設定の質問をする
   if (answers.cms && answers.cms !== `none`) {
     messages.push(
       `${maybeUseEmoji(
@@ -177,7 +177,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
     pluginConfig = { ...pluginConfig, ...cmses[answers.cms].options }
   }
 
-  // If a styling system is selected, ask styling config questions after the main question set is complete
+  // スタイリングの仕組みが選ばれた場合は、メインの質問セットが終わった後にスタイリングの設定の質問をする
   if (answers.styling && answers.styling !== `none`) {
     messages.push(
       `${maybeUseEmoji(`🎨 `)}Get you set up to use ${colors.magenta(
@@ -185,7 +185,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
       )} for styling your site`
     )
     const extraPlugins = styles[answers.styling].plugins || []
-    // If the key is not a valid Gatsby plugin, don't add it to the plugins array
+    // キーが有効な Gatsby プラグインでない場合は、plugins 配列に追加しない
     if (styles[answers.styling]?.isGatsbyPlugin === false) {
       plugins.push(...extraPlugins)
     } else {
@@ -199,7 +199,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
     pluginConfig = { ...pluginConfig, ...styles[answers.styling].options }
   }
 
-  // If additional features are selected, install required dependencies in install step
+  // 追加機能が選ばれた場合は、必要な依存をインストールの段階でインストールする
   if (answers.features?.length) {
     messages.push(
       `${maybeUseEmoji(`🔌 `)}Install ${answers.features
@@ -211,25 +211,25 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
       const extraPlugins = features[featureKey].plugins || []
       plugins.push(...extraPlugins)
       return [
-        // Spread in extra dependencies
+        // 追加の依存を展開する
         ...(features[featureKey].dependencies || []),
-        // Spread in plugins
+        // プラグインを展開する
         ...extraPlugins,
       ]
     })
     const flattenedDependencies = ([] as Array<string>).concat.apply(
       [],
       featureDependencies
-    ) // here until we upgrade to node 11 and can use flatMap
+    ) // node 11 に上げて flatMap を使えるようになるまでの暫定
 
     packages.push(...answers.features, ...flattenedDependencies)
-    // Merge plugin options
+    // プラグインオプションをマージする
     pluginConfig = answers.features.reduce((prev, key) => {
       return { ...prev, ...features[key].options }
     }, pluginConfig)
   }
 
-  // Ask additional config questions if any
+  // 追加の設定の質問があれば尋ねる
   const config = makePluginConfigQuestions(plugins)
 
   if (config.length) {
@@ -243,7 +243,7 @@ ${center(colors.blueBright.bold.underline(`Welcome to Gatsby!`))}
     pluginConfig = { ...pluginConfig, ...(await enquirer.prompt(config)) }
   }
 
-  // If we're not skipping prompts, give the user a report of what we're about to do
+  // プロンプトを省略しない場合は、これから行う作業の一覧をユーザーに示す
   if (!flags.yes) {
     reporter.info(`
 
@@ -266,10 +266,10 @@ ${colors.bold(`Thanks! Here's what we'll now do:`)}
     }
   }
 
-  // Decide starter
+  // スターターを決める
   const starter = DEFAULT_STARTERS[answers.language || `js`]
 
-  // Do all the things
+  // すべての処理を実行する
   await initStarter(
     starter,
     answers.project,

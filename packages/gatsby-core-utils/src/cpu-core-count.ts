@@ -1,18 +1,18 @@
 import { getPhysicalCpuCount } from "./physical-cpu-count"
 
 /**
- * Calculate CPU core count
+ * CPU コア数を計算する
  *
- * @param ignoreEnvVar Ignore the 'GATSBY_CPU_COUNT' env var to calculate the requested type of CPU cores
- * @return Count of the requested type of CPU cores. Defaults to number of physical cores or 1
+ * @param ignoreEnvVar 環境変数 'GATSBY_CPU_COUNT' を無視して、要求された種類の CPU コア数を計算する
+ * @return 要求された種類の CPU コア数。デフォルトは物理コア数、または 1
  */
 export const cpuCoreCount = (ignoreEnvVar?: boolean): number => {
   try {
     let coreCount = getPhysicalCpuCount() || 1
 
     if (ignoreEnvVar) {
-      // Return the physical CPU count,
-      // or default to 1 if we can't detect
+      // 物理 CPU 数を返す。
+      // 検出できない場合のデフォルトは 1
       return coreCount
     }
 
@@ -22,10 +22,10 @@ export const cpuCoreCount = (ignoreEnvVar?: boolean): number => {
 
       switch (typeof coreCountArg) {
         case `string`:
-          // Leave at Default CPU count if coreCountArg === `physical_cores`
+          // coreCountArg === `physical_cores` の場合は、デフォルトの CPU 数のままにする
 
-          // CPU count === logical CPU count
-          // throw error if we have a problem counting logical cores
+          // CPU 数 === 論理 CPU 数
+          // 論理コアの数え上げで問題があればエラーを投げる
           if (coreCountArg === `logical_cores`) {
             coreCount = require(`os`).cpus().length
 
@@ -38,7 +38,7 @@ export const cpuCoreCount = (ignoreEnvVar?: boolean): number => {
           break
 
         case `number`:
-          // CPU count === passed in count
+          // CPU 数 === 渡された数
           coreCount = coreCountArg
           break
 

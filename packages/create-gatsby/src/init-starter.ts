@@ -30,9 +30,9 @@ export const getPackageManager = (
   return `npm`
 }
 
-// Checks the existence of yarn package
-// We use yarnpkg instead of yarn to avoid conflict with Hadoop yarn
-// Refer to https://github.com/yarnpkg/yarn/issues/673
+// yarn パッケージが存在するかを調べる
+// Hadoop の yarn との衝突を避けるため、yarn ではなく yarnpkg を使う
+// https://github.com/yarnpkg/yarn/issues/673 を参照
 const checkForYarn = (): boolean => {
   try {
     execSync(`yarnpkg --version`, { stdio: `ignore` })
@@ -45,13 +45,13 @@ const checkForYarn = (): boolean => {
   }
 }
 
-// Initialize newly cloned directory as a git repo
+// クローンしたばかりのディレクトリを git リポジトリとして初期化する
 const gitInit = async (
   rootPath: string
 ): Promise<execa.ExecaReturnBase<string>> =>
   await execa(`git`, [`init`], { cwd: rootPath })
 
-// Create a .gitignore file if it is missing in the new directory
+// 新しいディレクトリに .gitignore ファイルがなければ作成する
 const maybeCreateGitIgnore = async (rootPath: string): Promise<void> => {
   if (fs.existsSync(path.join(rootPath, `.gitignore`))) {
     return
@@ -63,17 +63,17 @@ const maybeCreateGitIgnore = async (rootPath: string): Promise<void> => {
   )
 }
 
-// Create an initial git commit in the new directory
+// 新しいディレクトリで最初の git コミットを作成する
 const createInitialGitCommit = async (rootPath: string): Promise<void> => {
   await execa(`git`, [`add`, `-A`], { cwd: rootPath })
-  // use execSync instead of spawn to handle git clients using
-  // pgp signatures (with password)
+  // （パスワード付きの）pgp 署名を使う git クライアントに対応するため、
+  // spawn ではなく execSync を使う
   try {
     execSync(`git commit -m "Initial commit from gatsby"`, {
       cwd: rootPath,
     })
   } catch {
-    // Remove git support if initial commit fails
+    // 最初のコミットに失敗した場合は、git の設定を取り除く
     reporter.info(`Initial git commit failed - removing git support\n`)
     fs.removeSync(path.join(rootPath, `.git`))
   }
@@ -102,7 +102,7 @@ const setNameInPackage = async (
   await fs.writeJSON(packageJsonPath, packageJson, { spaces: 2 })
 }
 
-// Executes `npm install` or `yarn install` in rootPath.
+// rootPath で `npm install` または `yarn install` を実行する。
 const install = async (
   rootPath: string,
   packages: Array<string>
@@ -166,7 +166,7 @@ const install = async (
   }
 }
 
-// Clones starter from URI.
+// URI からスターターをクローンする。
 const clone = async (
   url: string,
   rootPath: string,
@@ -205,7 +205,7 @@ export async function gitSetup(rootPath: string): Promise<void> {
 }
 
 /**
- * Main function that clones or copies the starter.
+ * スターターをクローンまたはコピーするメインの関数。
  */
 export async function initStarter(
   starter: string,

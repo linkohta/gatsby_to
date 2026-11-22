@@ -2,21 +2,21 @@ import { Level } from "../../structured-errors/types"
 import { reporter } from "../reporter"
 import * as reporterActions from "../redux/actions"
 
-// TODO: report.error now DOES return something. Get rid of this spying mocking stuff
+// TODO: 現在の report.error は値を返す。このスパイとモックの仕組みをなくす
 
-// report.error doesn't return anything, it creates a `structuredError` object and
-// calls reporterInstance.error(structuredError)
+// report.error は何も返さない。`structuredError` オブジェクトを作成して
+// reporterInstance.error(structuredError) を呼び出す
 
-// Spy on reporterInstance.error and mock its implementation so it
-// returns structuredError
+// reporterInstance.error をスパイし、structuredError を返すように
+// 実装をモックする
 
-// We can then use the returned structuredError for snapshots.
+// こうすれば、返された structuredError をスナップショットに使える。
 jest
   .spyOn(reporterActions, `createLog`)
   // @ts-ignore
   .mockImplementation(structuredLog => structuredLog)
 
-// We don't care about this
+// これは対象外である
 reporter.log = jest.fn()
 
 const getErrorMessages = (fn: jest.Mock): any =>
@@ -66,7 +66,7 @@ describe(`report.error`, () => {
 
     expect(generatedErrors.length).toEqual(3)
 
-    // get final generated object
+    // 最終的に生成されたオブジェクトを取得する
     const generatedError = generatedErrors[2]
     expect(generatedError).toMatchSnapshot({
       stack: expect.any(Array),
@@ -147,8 +147,8 @@ describe(`report.error`, () => {
     })
   })
 
-  // This is how it's potentially called from api-runner-node.js
-  // It'll prefix the errorMap and then pass the pluginName as third arg
+  // api-runner-node.js からは、このように呼び出される可能性がある
+  // errorMap に接頭辞を付け、第 3 引数として pluginName を渡す
   it(`uses custom error from errorMap with pluginName`, () => {
     reporter.setErrorMap({
       "gatsby-plugin-foo-bar_1337": {

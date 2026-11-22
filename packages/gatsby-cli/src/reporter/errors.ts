@@ -12,12 +12,12 @@ const packagesToSkipTest = new RegExp(
   `node_modules[\\/](${packagesToSkip.join(`|`)})`
 )
 
-// TO-DO: move this this out of this file (and probably delete this file completely)
-// it's here because it re-implements similar thing as `pretty-error` already does
+// TO-DO: これをこのファイルの外へ移す（おそらくこのファイル自体を削除する）
+// ここにあるのは、`pretty-error` がすでに行っているのと似た処理を再実装しているためである
 export const sanitizeStructuredStackTrace = (
   stack: Array<stackTrace.StackFrame>
 ): Array<IStructuredStackFrame> => {
-  // first filter out not useful call sites
+  // まず、役に立たないコールサイトを除外する
   stack = stack.filter(callSite => {
     if (!callSite.getFileName()) {
       return false
@@ -38,8 +38,8 @@ export const sanitizeStructuredStackTrace = (
     return true
   })
 
-  // then sanitize individual call site objects to make sure we don't
-  // emit objects with extra fields that won't be handled by consumers
+  // 次に、個々のコールサイトのオブジェクトを整理し、利用側が扱えない
+  // 余分なフィールドを持つオブジェクトを出力しないようにする
   return stack.map(callSite => {
     return {
       fileName: callSite.getFileName(),
@@ -113,8 +113,8 @@ type ErrorWithPotentialForcedLocation = Error & {
 }
 
 /**
- * Convert a stringified webpack compilation error back into
- * an Error instance so it can be formatted properly
+ * 文字列化された webpack のコンパイルエラーを Error インスタンスに戻し、
+ * 正しく整形できるようにする
  */
 export function createErrorFromString(
   errorOrErrorStack: string | ErrorWithPotentialForcedLocation = ``,
@@ -123,8 +123,8 @@ export function createErrorFromString(
   if (typeof errorOrErrorStack === `string`) {
     const errorStr = errorOrErrorStack
     let [message, ...rest] = errorStr.split(/\r\n|[\n\r]/g)
-    // pull the message from the first line then remove the `Error:` prefix
-    // FIXME: when https://github.com/AriaMinaei/pretty-error/pull/49 is merged
+    // 最初の行からメッセージを取り出し、`Error:` の接頭辞を取り除く
+    // FIXME: https://github.com/AriaMinaei/pretty-error/pull/49 がマージされたら対応する
 
     message = message.replace(/^(Error:)/, ``)
 
@@ -138,7 +138,7 @@ export function createErrorFromString(
         return prepareStackTrace(error, sourceMapFile)
       }
     } catch (err) {
-      // don't shadow a real error because of a parsing issue
+      // 解析の問題のせいで本来のエラーを隠さないようにする
     }
     return error
   } else {
@@ -180,7 +180,7 @@ export function createErrorFromString(
           }
         )
       } catch (e) {
-        // failed to generate codeframe, we still should show an error so we keep going
+        // コードフレームの生成に失敗しても、エラーは表示すべきなので処理を続ける
       }
 
       return error

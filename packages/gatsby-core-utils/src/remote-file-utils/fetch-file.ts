@@ -3,7 +3,7 @@ import type { IncomingMessage } from "http"
 import type { Headers, Options } from "got"
 import type { GatsbyCache } from "gatsby"
 
-// keeping the I for backward compatibility
+// 後方互換性のために I を残している
 export type IFetchRemoteFileOptions = {
   url: string
   auth?: {
@@ -41,7 +41,7 @@ const INCOMPLETE_RETRY_LIMIT = process.env.GATSBY_INCOMPLETE_RETRY_LIMIT
   ? parseInt(process.env.GATSBY_INCOMPLETE_RETRY_LIMIT, 10)
   : 3
 
-// jest doesn't allow us to run all timings infinitely, so we set it 0  in tests
+// jest ではすべてのタイマーを無限に動かせないので、テストでは 0 にしている
 const BACKOFF_TIME = process.env.NODE_ENV === `test` ? 0 : 1000
 
 function range(start: number, end: number): Array<number> {
@@ -50,7 +50,7 @@ function range(start: number, end: number): Array<number> {
     .map((_, i) => start + i)
 }
 
-// Based on the defaults of https://github.com/JustinBeckwith/retry-axios
+// https://github.com/JustinBeckwith/retry-axios のデフォルト値に基づく
 const STATUS_CODES_TO_RETRY = [...range(100, 200), 429, ...range(500, 600)]
 const ERROR_CODES_TO_RETRY = [
   `ETIMEDOUT`,
@@ -68,14 +68,14 @@ const ERROR_CODES_TO_RETRY = [
 /**
  * requestRemoteNode
  * --
- * Download the requested file
+ * 要求されたファイルをダウンロードする
  *
  * @param  {String}   url
  * @param  {Headers}  headers
  * @param  {String}   tmpFilename
  * @param  {Object}   httpOptions
  * @param  {number}   attempt
- * @return {Promise<Object>}  Resolves with the [http Result Object]{@link https://nodejs.org/api/http.html#http_class_http_serverresponse}
+ * @return {Promise<Object>}  [http Result Object]{@link https://nodejs.org/api/http.html#http_class_http_serverresponse} で解決される
  */
 export async function requestRemoteNode(
   url: string | URL,
@@ -84,7 +84,7 @@ export async function requestRemoteNode(
   httpOptions?: Options,
   attempt: number = 1
 ): Promise<IncomingMessage> {
-  // TODO(v5): use dynamic import syntax - it's currently blocked because older v4 versions have V8-compile-cache
+  // TODO(v5): 動的 import の構文を使う。古い v4 のバージョンに V8-compile-cache があるため、現在はできない
   // const { default: got, RequestError } = await import(`got`)
   const { default: got, RequestError } = require(`got`)
 
@@ -99,18 +99,18 @@ export async function requestRemoteNode(
       reject(error)
     })
 
-    // Called if we stall for 30s without receiving any data
+    // データを何も受信しないまま 30 秒間止まった場合に呼ばれる
     const handleTimeout = async (): Promise<void> => {
       fsWriteStream.close()
       await fs.remove(tmpFilename)
 
       if (attempt < STALL_RETRY_LIMIT) {
-        // Retry by calling ourself recursively
+        // 自分自身を再帰的に呼び出してリトライする
         resolve(
           requestRemoteNode(url, headers, tmpFilename, httpOptions, attempt + 1)
         )
       } else {
-        // TODO move to new Error type
+        // TODO 新しい Error 型に移行する
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(`Failed to download ${url} after ${STALL_RETRY_LIMIT} attempts`)
       }
@@ -132,10 +132,10 @@ export async function requestRemoteNode(
     })
 
     let haveAllBytesBeenWritten = false
-    // Fixes a bug in latest got where progress.total gets reset when stream ends, even if it wasn't complete.
+    // 最新の got にある、ストリームの終了時に（完了していなくても）progress.total がリセットされるバグを修正する。
     let totalSize: number | null = null
     responseStream.on(`downloadProgress`, progress => {
-      // reset the timeout on each progress event to make sure large files don't timeout
+      // 大きなファイルがタイムアウトしないよう、progress イベントのたびにタイムアウトをリセットする
       resetTimeout()
 
       if (
@@ -152,8 +152,8 @@ export async function requestRemoteNode(
 
     responseStream.pipe(fsWriteStream)
 
-    // If there's a 400/500 response or other error.
-    // it will trigger a finish event on fsWriteStream
+    // 400/500 のレスポンスやその他のエラーがあった場合。
+    // fsWriteStream で finish イベントが発生する
     responseStream.on(`error`, async error => {
       if (timeout) {
         clearTimeout(timeout)
@@ -166,17 +166,17 @@ export async function requestRemoteNode(
         return reject(error)
       }
 
-      // This is a replacement for the stream retry logic of got
-      // till we can update all got instances to v12
+      // これは、すべての got のインスタンスを v12 に更新できるまでのあいだ、
+      // got のストリームのリトライ処理の代わりに使うものである
       // https://github.com/sindresorhus/got/blob/main/documentation/7-retry.md
       // https://github.com/sindresorhus/got/blob/main/documentation/3-streams.md#retry
       const statusCode = error.response?.statusCode
-      const errorCode = error.code || error.message // got gives error.code, but msw/node returns the error codes in the message only
+      const errorCode = error.code || error.message // got は error.code を渡すが、msw/node はエラーコードをメッセージの中でしか返さない
 
       if (
-        // HTTP STATUS CODE ERRORS
+        // HTTP ステータスコードのエラー
         (statusCode && STATUS_CODES_TO_RETRY.includes(statusCode)) ||
-        // GENERAL NETWORK ERRORS
+        // 一般的なネットワークエラー
         (errorCode && ERROR_CODES_TO_RETRY.includes(errorCode))
       ) {
         if (attempt < INCOMPLETE_RETRY_LIMIT) {
@@ -194,7 +194,7 @@ export async function requestRemoteNode(
 
           return undefined
         }
-        // Throw user friendly error
+        // ユーザーに分かりやすいエラーを投げる
         error.message = [
           `Unable to fetch:`,
           url,
@@ -203,7 +203,7 @@ export async function requestRemoteNode(
           `---`,
         ].join(`\n`)
 
-        // Gather details about what went wrong from the error object and the request
+        // エラーオブジェクトとリクエストから、何が問題だったかの詳細を集める
         const details = Object.entries({
           attempt,
           method: error.options?.method,
@@ -213,7 +213,7 @@ export async function requestRemoteNode(
           requestHeaders: error.options?.headers,
           responseHeaders: error.response?.headers,
         })
-          // Remove undefined values from the details to keep it clean
+          // 詳細をすっきりさせるため、undefined の値を取り除く
           .reduce((a, [k, v]) => (v === undefined ? a : ((a[k] = v), a)), {})
 
         if (Object.keys(details).length) {
@@ -237,12 +237,12 @@ export async function requestRemoteNode(
           clearTimeout(timeout)
         }
 
-        // We have an incomplete download
+        // ダウンロードが不完全である
         if (!haveAllBytesBeenWritten) {
           await fs.remove(tmpFilename)
 
           if (attempt < INCOMPLETE_RETRY_LIMIT) {
-            // let's give node time to remove the file
+            // node がファイルを削除する時間を与える
             setImmediate(() =>
               resolve(
                 requestRemoteNode(
@@ -257,7 +257,7 @@ export async function requestRemoteNode(
 
             return undefined
           } else {
-            // TODO move to new Error type
+            // TODO 新しい Error 型に移行する
             // eslint-disable-next-line prefer-promise-reject-errors
             return reject(
               `Failed to download ${url} after ${INCOMPLETE_RETRY_LIMIT} attempts`

@@ -2,7 +2,7 @@
 
 import apiHandler, { waitForAPI } from "./api-handler"
 
-// TODO(v6): Remove this command
+// TODO(v6): このコマンドを削除する
 Cypress.Commands.add(`getTestElement`, (selector, options = {}) =>
   cy.get(`[data-testid="${selector}"]`, options)
 )

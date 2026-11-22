@@ -1,6 +1,6 @@
 /*
- * This module is used to patch console through our reporter so we can track
- * these logs
+ * このモジュールは、console を reporter 経由にするパッチを当て、それらのログを
+ * 追跡できるようにするために使う
  */
 import util from "util"
 import { reporter as gatsbyReporter } from "./reporter"

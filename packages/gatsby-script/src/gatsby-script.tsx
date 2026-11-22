@@ -30,7 +30,7 @@ const handledProps = new Set([
   `onError`,
 ])
 
-// Used for de-duplication
+// 重複の排除に使う
 export const scriptCache: Set<string> = new Set()
 export const scriptCallbackCache: Map<
   string,
@@ -46,7 +46,7 @@ export const scriptCallbackCache: Map<
   }
 > = new Map()
 
-// Same pattern is used in Gatsby Link
+// Gatsby Link でも同じパターンを使っている
 function GatsbyScriptLocationWrapper(props: ScriptProps): JSX.Element {
   return <Location>{(): JSX.Element => <GatsbyScript {...props} />}</Location>
 }
@@ -150,8 +150,8 @@ function injectScript(props: ScriptProps): IInjectedScriptDetails | null {
 
   if (scriptKey) {
     /**
-     * If a duplicate script is already loaded/errored, we replay load/error callbacks with the original event.
-     * If it's not yet loaded/errored, keep track of callbacks so we can call load/error callbacks for each when the event occurs.
+     * 重複するスクリプトがすでに読み込み済み、またはエラーになっている場合は、元のイベントで load/error コールバックを再生する。
+     * まだ読み込みもエラーも起きていない場合は、コールバックを記録しておき、イベントが発生したときにそれぞれの load/error コールバックを呼び出せるようにする。
      */
     for (const name of callbackNames) {
       if (currentCallbacks?.[name]) {
@@ -172,7 +172,7 @@ function injectScript(props: ScriptProps): IInjectedScriptDetails | null {
       }
     }
 
-    // Avoid injecting duplicate scripts into the DOM
+    // 重複するスクリプトを DOM に挿入しないようにする
     if (scriptCache.has(scriptKey)) {
       return null
     }
@@ -205,7 +205,7 @@ function injectScript(props: ScriptProps): IInjectedScriptDetails | null {
     {}
 
   if (scriptKey) {
-    // Add listeners on injected scripts so events are cached for use in de-duplicated script callbacks
+    // 挿入したスクリプトにリスナーを追加し、重複を排除したスクリプトのコールバックで使えるようにイベントをキャッシュする
     for (const name of callbackNames) {
       const wrappedEventCallback = (event: Event | ErrorEvent): void =>
         onEventCallback(event, scriptKey, name)

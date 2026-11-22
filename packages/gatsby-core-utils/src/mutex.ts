@@ -5,7 +5,7 @@ interface IMutex {
   release(): Promise<void>
 }
 
-// Random number to re-check if mutex got released
+// ミューテックスが解放されたかを再確認する間隔に使う乱数
 const DEFAULT_MUTEX_INTERVAL = 3000
 
 async function waitUntilUnlocked(
@@ -29,9 +29,9 @@ async function waitUntilUnlocked(
 }
 
 /**
- * Creates a mutex, make sure to call `release` when you're done with it.
+ * ミューテックスを作成する。使い終わったら必ず `release` を呼び出すこと。
  *
- * @param {string} key A unique key
+ * @param {string} key 一意なキー
  */
 export function createMutex(
   key: string,

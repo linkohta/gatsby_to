@@ -303,7 +303,7 @@ export default function ({ types: t }): PluginObj {
           JSXIdentifier(path2: NodePath<JSXIdentifier>): void {
             if (
               (process.env.NODE_ENV === `test` ||
-                // When Storybook is running, we need to process the queries
+                // Storybook の実行中は、クエリを処理する必要がある
                 process.env.npm_lifecycle_script?.includes(`storybook`) ||
                 state.opts.stage === `develop-html`) &&
               path2.isJSXIdentifier({ name: `StaticQuery` }) &&
@@ -316,7 +316,7 @@ export default function ({ types: t }): PluginObj {
                 state.opts.staticQueryDir || `page-data/sq/d`
               const shortResultPath = `public/${staticQueryDir}/${this.queryHash}.json`
               const resultPath = nodePath.join(process.cwd(), shortResultPath)
-              // Add query
+              // クエリを追加する
               const parent = path2.parent as JSXOpeningElement
               parent.attributes.push(
                 t.jSXAttribute(
@@ -324,7 +324,7 @@ export default function ({ types: t }): PluginObj {
                   t.jSXExpressionContainer(identifier)
                 )
               )
-              // Add import
+              // import を追加する
               const importDefaultSpecifier =
                 t.importDefaultSpecifier(identifier)
               const importDeclaration = t.importDeclaration(
@@ -358,15 +358,15 @@ export default function ({ types: t }): PluginObj {
               const shortResultPath = `public/${staticQueryDir}/${this.queryHash}.json`
               const resultPath = nodePath.join(process.cwd(), shortResultPath)
 
-              // only remove the import if its like:
+              // import を削除するのは、次のような場合だけである:
               // import { useStaticQuery } from 'gatsby'
-              // but not if its like:
+              // 次のような場合は削除しない:
               // import * as Gatsby from 'gatsby'
-              // because we know we can remove the useStaticQuery import,
-              // but we don't know if other 'gatsby' exports are used, so we
-              // cannot remove all 'gatsby' imports.
+              // useStaticQuery の import は削除できると分かっているが、
+              // 'gatsby' のほかの export が使われているかどうかは分からないので、
+              // 'gatsby' の import をすべて削除することはできない。
               if (path2.node.callee.type !== `MemberExpression`) {
-                // Remove imports to useStaticQuery
+                // useStaticQuery の import を削除する
                 const importPath = (
                   path2.scope.getBinding(`useStaticQuery`) as Binding
                 ).path
@@ -383,12 +383,12 @@ export default function ({ types: t }): PluginObj {
                   }
               }
 
-              // Add query
+              // クエリを追加する
               path2.replaceWith(
                 t.memberExpression(identifier, t.identifier(`data`))
               )
 
-              // Add import
+              // import を追加する
               const importDefaultSpecifier =
                 t.importDefaultSpecifier(identifier)
               const importDeclaration = t.importDeclaration(
@@ -423,16 +423,16 @@ export default function ({ types: t }): PluginObj {
 
           const tag = templatePath.get(`tag`)
           if (!isGlobal) {
-            // Enqueue import removal. If we would remove it here, subsequent named exports
-            // wouldn't be handled properly
+            // import の削除をキューに入れる。ここで削除してしまうと、後続の名前付き export が
+            // 正しく処理されなくなる
             tagsToRemoveImportsFrom.add(tag)
           }
 
-          // Replace the query with the hash of the query.
+          // クエリをクエリのハッシュに置き換える。
           templatePath.replaceWith(t.StringLiteral(queryHash))
 
-          // traverse upwards until we find top-level JSXOpeningElement or Program
-          // this handles exported queries and variable queries
+          // トップレベルの JSXOpeningElement か Program が見つかるまで上へたどる
+          // これで、export されたクエリと変数に入ったクエリを処理できる
           let parent: null | NodePath = templatePath as NodePath
           while (
             parent &&
@@ -441,14 +441,14 @@ export default function ({ types: t }): PluginObj {
             parent = parent.parentPath
           }
 
-          // modify StaticQuery elements and import data only if query is inside StaticQuery
+          // クエリが StaticQuery の中にある場合だけ、StaticQuery 要素を書き換えてデータを import する
           if (parent) {
             parent.traverse(nestedJSXVistor, {
               queryHash,
               query,
             })
 
-            // modify useStaticQuery elements and import data only if query is inside useStaticQuery
+            // クエリが useStaticQuery の中にある場合だけ、useStaticQuery 要素を書き換えてデータを import する
             parent.traverse(nestedHookVisitor, {
               queryHash,
               query,
@@ -459,7 +459,7 @@ export default function ({ types: t }): PluginObj {
           return null
         }
 
-        // Traverse for <StaticQuery/> instances
+        // <StaticQuery/> のインスタンスを探して走査する
         path.traverse({
           JSXElement(jsxElementPath: NodePath<JSXElement>) {
             const jsxIdentifier = jsxElementPath.node.openingElement
@@ -509,7 +509,7 @@ export default function ({ types: t }): PluginObj {
           },
         })
 
-        // Traverse once again for useStaticQuery instances
+        // useStaticQuery のインスタンスを探してもう一度走査する
         path.traverse({
           CallExpression(hookPath: NodePath<CallExpression>) {
             if (!isUseStaticQuery(hookPath)) return
@@ -520,8 +520,8 @@ export default function ({ types: t }): PluginObj {
               setImportForStaticQuery(templatePath)
             }
 
-            // See if the query is a variable that's being passed in
-            // and if it is, go find it.
+            // クエリが変数として渡されているかを調べ、
+            // そうであればその変数を探しに行く。
             if (
               hookPath.node.arguments.length === 1 &&
               hookPath.node.arguments[0].type === `Identifier`
@@ -538,13 +538,13 @@ export default function ({ types: t }): PluginObj {
             }
 
             hookPath.traverse({
-              // Assume the query is inline in the component and extract that.
+              // クエリはコンポーネント内にインラインで書かれているとみなして取り出す。
               TaggedTemplateExpression,
             })
           },
         })
 
-        // Run it again to remove non-staticquery versions
+        // StaticQuery 以外のものを削除するためにもう一度実行する
         path.traverse({
           TaggedTemplateExpression(path2: NodePath<TaggedTemplateExpression>) {
             const { ast, hash, isGlobal } = getGraphQLTag(path2)
@@ -553,11 +553,11 @@ export default function ({ types: t }): PluginObj {
 
             const queryHash = hash.toString()
 
-            // In order to properly support FastRefresh, we need to remove the page query export
-            // from the built page. With FastRefresh, it looks up the parents of the imports from modules
-            // and since page queries are never used, FastRefresh doesn't know if it's safe to apply the
-            // update or not.
-            // By removing the page query export, FastRefresh works properly with page components
+            // FastRefresh に正しく対応するには、ビルドしたページからページクエリの export を
+            // 削除する必要がある。FastRefresh はモジュールの import の親をたどるが、
+            // ページクエリはどこからも使われないので、FastRefresh は更新を適用してよいかどうかを
+            // 判断できない。
+            // ページクエリの export を削除すれば、ページコンポーネントでも FastRefresh が正しく動く
             const potentialExportPath = path2.parentPath?.parentPath?.parentPath
             if (
               path2?.parentPath?.parentPath &&
@@ -568,20 +568,20 @@ export default function ({ types: t }): PluginObj {
 
             const tag = path2.get(`tag`)
             if (!isGlobal) {
-              // Enqueue import removal. If we would remove it here, subsequent named exports
-              // wouldn't be handled properly
+              // import の削除をキューに入れる。ここで削除してしまうと、後続の名前付き export が
+              // 正しく処理されなくなる
               tagsToRemoveImportsFrom.add(tag)
             }
 
-            // When graphql tag is found inside config function, we replace it with global call, e.g.:
+            // config 関数の中に graphql タグがある場合は、グローバルの呼び出しに置き換える。例:
             //   export async function config() {
             //     const { data } = graphql`{ __typename }`
             //   }
-            // is replaced with:
+            // これを次のように置き換える:
             //   export async function config() {
             //     const { data } = await global.__gatsbyGraphql(`{ __typename }`)
             //   }
-            // Note: isWithinConfigExport will throw if "config" export is not async
+            // Note: "config" の export が async でない場合、isWithinConfigExport は例外を投げる
             if (isWithinConfigExport(path2)) {
               const globalCall = t.awaitExpression(
                 t.callExpression(

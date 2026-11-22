@@ -52,7 +52,7 @@ export const getActivity = (id: string): IActivity | null =>
   getStore().getState().logs.activities[id]
 
 /**
- * @returns {Number} Milliseconds from activity start
+ * @returns {Number} アクティビティの開始からのミリ秒数
  */
 export const getElapsedTimeMS = (activity: IActivity): number => {
   const elapsed = process.hrtime(activity.startTime)
@@ -74,7 +74,7 @@ export const isInternalAction = (action: ActionsUnion): boolean => {
 }
 
 /**
- * Like setTimeout, but also handle signalExit
+ * setTimeout と同様だが、signalExit も処理する
  */
 export const delayedCall = (fn: () => void, timeout: number): (() => void) => {
   const fnWrap = (): void => {

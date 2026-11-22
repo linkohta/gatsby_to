@@ -1,6 +1,6 @@
 /**
- * Recursively get set of packages that depend on given package.
- * Set also includes passed package.
+ * 指定したパッケージに依存するパッケージの集合を再帰的に取得する。
+ * 集合には、渡されたパッケージ自身も含まれる。
  */
 const getDependantPackages = ({
   packageName,
@@ -8,7 +8,7 @@ const getDependantPackages = ({
   packagesToPublish = new Set(),
 }) => {
   if (packagesToPublish.has(packageName)) {
-    // bail early if package was already handled
+    // パッケージが処理済みであれば早めに抜ける
     return packagesToPublish
   }
 

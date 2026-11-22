@@ -18,7 +18,7 @@ export class FormInput extends Form {
     if (this.align === `right`) msg = msg.padStart(this.longest + 1, ` `)
     if (this.align === `left`) msg = msg.padEnd(this.longest + 1, ` `)
 
-    // re-populate the form values (answers) object
+    // フォームの値（回答）のオブジェクトを入れ直す
     const value = (this.values[name] = input || initial)
     let color = input ? `success` : `dark`
 

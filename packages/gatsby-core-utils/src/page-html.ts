@@ -5,7 +5,7 @@ const checkForHtmlSuffix = (pagePath: string): boolean =>
   !/\.(html?)$/i.test(pagePath)
 
 export function generateHtmlPath(dir: string, outputPath: string): string {
-  let outputFileName = outputPath.replace(/^(\/|\\)/, ``) //  Remove leading slashes for webpack-dev-server
+  let outputFileName = outputPath.replace(/^(\/|\\)/, ``) //  先頭のスラッシュを取り除く（webpack-dev-server 用）
 
   if (checkForHtmlSuffix(outputPath)) {
     outputFileName = path.join(outputFileName, `index.html`)

@@ -59,9 +59,9 @@ export class ScrollHandler extends React.Component<
       scrollPosition = this._stateStorage.read(this.props.location, key)
     }
 
-    /** If a hash is present in the browser url as the component mounts (i.e. the user is navigating
-     * from an external website) then scroll to the hash instead of any previously stored scroll
-     * position. */
+    /** コンポーネントのマウント時にブラウザーの URL にハッシュがある場合（つまり、ユーザーが外部のサイトから
+     * 移動してきた場合）は、以前に保存したスクロール位置ではなく、そのハッシュの位置へ
+     * スクロールする。 */
     if (hash) {
       this.scrollToHash(decodeURI(hash), undefined)
     } else if (scrollPosition) {
@@ -81,13 +81,13 @@ export class ScrollHandler extends React.Component<
       scrollPosition = this._stateStorage.read(this.props.location, key)
     }
 
-    /**  There are two pieces of state: the browser url and
-     * history state which keeps track of scroll position
-     * Native behaviour prescribes that we ought to restore scroll position
-     * when a user navigates back in their browser (this is the `POP` action)
-     * Currently, reach router has a bug that prevents this at https://github.com/reach/router/issues/228
-     * So we _always_ stick to the url as a source of truth — if the url
-     * contains a hash, we scroll to it
+    /**  状態は 2 つある。ブラウザーの URL と、
+     * スクロール位置を記録している history の state である
+     * ネイティブの挙動では、ユーザーがブラウザーで戻ったとき（`POP` アクション）に
+     * スクロール位置を復元することになっている
+     * 現在、reach router にはこれを妨げるバグがある: https://github.com/reach/router/issues/228
+     * そのため、_常に_ URL を信頼できる情報源として扱う。URL に
+     * ハッシュが含まれていれば、そこへスクロールする
      */
 
     if (hash) {
@@ -126,7 +126,7 @@ export class ScrollHandler extends React.Component<
       return true
     }
 
-    // Hack to allow accessing this._stateStorage.
+    // this._stateStorage にアクセスできるようにするためのハック。
     return shouldUpdateScroll.call(this, prevRouterProps, routerProps)
   }
 

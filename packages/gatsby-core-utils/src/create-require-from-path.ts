@@ -1,8 +1,8 @@
 import Module from "module"
 
 /**
- * @deprecated Use `createRequire` from Node's built-in `module` instead. This
- * was a polyfill for Node < 10.12, which is far below the minimum supported
- * version, and is now just an alias. To be removed in the next major.
+ * @deprecated 代わりに Node 組み込みの `module` の `createRequire` を使うこと。これは
+ * Node < 10.12 向けのポリフィルだったが、サポート対象の最低バージョンよりはるかに
+ * 古く、今は単なるエイリアスである。次のメジャーバージョンで削除する。
  */
 export const createRequireFromPath = Module.createRequire

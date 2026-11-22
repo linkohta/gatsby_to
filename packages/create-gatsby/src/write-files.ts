@@ -7,9 +7,9 @@ export interface IFile {
 }
 
 async function writeFile({ source, targetPath }: IFile): Promise<void> {
-  // Read the stub
+  // スタブを読み込む
   const stubData = await fs.readFile(source)
-  // Write stub to targetPath
+  // スタブを targetPath へ書き出す
   await fs.outputFile(targetPath, stubData)
 }
 
@@ -21,9 +21,9 @@ export async function writeFiles(
     return
   }
 
-  // Necessary to grab files from the stub/ dir
+  // stub/ ディレクトリからファイルを取得するために必要
   const createGatsbyRoot = path.join(__dirname, `..`)
-  // Creating files in parallel
+  // ファイルを並列に作成する
   const results = []
 
   for (const file of files) {

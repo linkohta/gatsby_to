@@ -43,7 +43,7 @@ function preset(context, options = {}) {
 
   let parsedCompilerOptions = {}
   if (COMPILER_OPTIONS) {
-    // COMPILER_OPTIONS syntax is key=value,key2=value2
+    // COMPILER_OPTIONS の書式は key=value,key2=value2 である
     parsedCompilerOptions = COMPILER_OPTIONS.split(`,`).reduce((acc, curr) => {
       const [key, value] = curr.split(`=`)
 

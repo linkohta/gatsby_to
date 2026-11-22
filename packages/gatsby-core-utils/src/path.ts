@@ -2,8 +2,8 @@ import path from "path"
 import os from "os"
 
 /**
- * Joins all given path segments and converts
- * @param paths A sequence of path segments
+ * 渡されたすべてのパスセグメントを結合して変換する
+ * @param paths パスセグメントの並び
  */
 export function joinPath(...paths: Array<string>): string {
   const joinedPath = path.join(...paths)
@@ -14,8 +14,8 @@ export function joinPath(...paths: Array<string>): string {
   return joinedPath
 }
 
-// copied from https://runpkg.com/?pretty-error@2.1.1/lib/nodePaths.js
-// and added `^internal/` test
+// https://runpkg.com/?pretty-error@2.1.1/lib/nodePaths.js からコピーし、
+// `^internal/` の判定を追加したもの
 const nodePaths = [
   /^_debugger.js$/,
   /^_http_agent.js$/,
@@ -71,17 +71,17 @@ const nodePaths = [
 ]
 
 /**
- * Checks if the file name matches a node path
- * @param fileName File name
+ * ファイル名が node のパスに一致するかを調べる
+ * @param fileName ファイル名
  */
 export const isNodeInternalModulePath = (fileName: string): boolean =>
   nodePaths.some(regTest => regTest.test(fileName))
 
 /**
- * Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
+ * Windows のバックスラッシュ区切りのパスをスラッシュ区切りに変換する: foo\\bar ➔ foo/bar
  *
  * @param  path
- * @return  slashed path
+ * @return  スラッシュ区切りに変換したパス
  */
 export function slash(path: string): string {
   const isExtendedLengthPath = /^\\\\\?\\/.test(path)

@@ -1,5 +1,5 @@
 import stringLength from "string-length"
-// ansi and emoji-safe string length
+// ANSI と絵文字を考慮した文字列の長さ
 import wordWrap from "ansi-wordwrap"
 
 const DEFAULT_WIDTH = process.stdout.columns

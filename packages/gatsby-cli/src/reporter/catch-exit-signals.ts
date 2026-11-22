@@ -1,6 +1,6 @@
 /*
- * This module is used to catch if the user kills the gatsby process via cmd+c
- * When this happens, there is some clean up logic we need to fire offf
+ * このモジュールは、ユーザーが cmd+c で gatsby のプロセスを終了させたことを検知するために使う
+ * その場合に実行しなければならない後始末の処理がある
  */
 import signalExit from "signal-exit"
 import { getStore } from "./redux"
@@ -22,9 +22,9 @@ const interruptActivities = (): void => {
 }
 
 export const prematureEnd = (): void => {
-  // hack so at least one activity is surely failed, so
-  // we are guaranteed to generate FAILED status
-  // if none of activity did explicitly fail
+  // 少なくとも 1 つのアクティビティを確実に失敗させるためのハック。
+  // 明示的に失敗したアクティビティが 1 つもない場合でも、
+  // FAILED ステータスが必ず生成されるようにする
   createPendingActivity({
     id: `panic`,
     status: ActivityStatuses.Failed,

@@ -1,4 +1,4 @@
-// Forked from physical-cpu-count package from npm
+// npm の physical-cpu-count パッケージからフォークしたもの
 import os from "os"
 import childProcess from "child_process"
 
@@ -8,7 +8,7 @@ function exec(command: string): string {
 }
 
 /*
- * Fallback if child process fails to receive CPU count
+ * 子プロセスが CPU 数を取得できなかった場合のフォールバック
  */
 function fallbackToNodeJSCheck(): number {
   const cores = os.cpus().filter(function (cpu, index) {
@@ -45,7 +45,7 @@ export function getPhysicalCpuCount(): number {
         .reduce((sum, number) => sum + number, 0)
     }
   } catch (err) {
-    // carry on
+    // そのまま続行する
   }
 
   return fallbackToNodeJSCheck()

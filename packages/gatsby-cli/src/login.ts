@@ -48,8 +48,8 @@ const getTicket = async (ticketId: string): Promise<ITicket> => {
 }
 
 const handleOpenBrowser = (url): void => {
-  // TODO: this will break if run from the CLI
-  // for ideas see https://github.com/netlify/cli/blob/908f285fb80f04bf2635da73381c94387b9c8b0d/src/utils/open-browser.js
+  // TODO: CLI から実行すると壊れる
+  // 参考になる実装は https://github.com/netlify/cli/blob/908f285fb80f04bf2635da73381c94387b9c8b0d/src/utils/open-browser.js を参照
   console.log(``)
   reporter.info(`Opening Gatsby Cloud for you to login from, copy this`)
   reporter.info(`url into your browser if it doesn't open automatically:`)
@@ -59,7 +59,7 @@ const handleOpenBrowser = (url): void => {
 }
 
 /**
- * Main function that logs in to Gatsby Cloud using Gatsby Cloud's authentication service.
+ * Gatsby Cloud の認証サービスを使って Gatsby Cloud にログインするメインの関数。
  */
 export async function login(): Promise<void> {
   const tokenFromStore = await getToken()
@@ -72,15 +72,15 @@ export async function login(): Promise<void> {
   const webUrl = `https://gatsbyjs.com`
   reporter.info(`Logging into your Gatsby Cloud account...`)
 
-  // Create "ticket" for auth (like an expiring session)
+  // 認証用の「チケット」（期限付きのセッションのようなもの）を作成する
   const ticketId = await createTicket()
 
-  // Open browser for authentication
+  // 認証のためにブラウザーを開く
   const authUrl = `${webUrl}/dashboard/login?authType=EXTERNAL_AUTH&ticketId=${ticketId}&noredirect=1`
 
   await handleOpenBrowser(authUrl)
 
-  // Poll until the ticket has been verified, and should have the token attached
+  // チケットが検証されるまでポーリングする。検証されるとトークンが付いているはずである
   function pollForTicket(): Promise<ITicket> {
     return new Promise(function (resolve): void {
       // eslint-disable-next-line consistent-return

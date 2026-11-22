@@ -38,7 +38,7 @@ async function installPluginConfig(
   options: Record<string, unknown> | undefined,
   root: string
 ): Promise<void> {
-  // Plugins can optionally include a key, to allow duplicates
+  // 重複を許すため、プラグインには任意でキーを付けられる
   const [pluginName, pluginKey] = plugin.split(`:`)
 
   const installTimer = reporter.activityTimer(

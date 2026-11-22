@@ -15,9 +15,9 @@ function isTestFile(filePath: string): boolean {
 }
 
 export function validatePath(path: string): boolean {
-  // Disallow paths starting with an underscore (_) or dot (.)
-  // and template-.
-  // and .d.ts
+  // アンダースコア (_) またはドット (.) で始まるパスは許可しない
+  // template- も同様
+  // .d.ts も同様
   const parsedPath = parse(path)
   return (
     parsedPath.name.slice(0, 1) !== `_` &&

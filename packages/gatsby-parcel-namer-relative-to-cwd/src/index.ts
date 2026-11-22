@@ -9,13 +9,13 @@ const defaultNamerOpts = defaultNamer[CONFIG] as NamerOpts<unknown>
 
 export default new Namer({
   async name(opts): Promise<FilePath | null | undefined> {
-    // @parcel/namer-default will find "most common denominator" directory
-    // depending on entries and make it a "relative root" for output.
-    // This means that output is not deterministic based JUST on configuration
-    // as adding/removing entries can change output directory structure.
-    // To make it deterministic we add "middleware" namer which will use
-    // @parcel/namer-default for filename, but (possibly) adjust directory
-    // structure.
+    // @parcel/namer-default は、エントリーに応じて「共通の最上位」のディレクトリを探し、
+    // それを出力の「相対ルート」にする。
+    // つまり、エントリーを追加または削除すると出力のディレクトリ構造が変わり得るので、
+    // 設定「だけ」では出力が決まらない。
+    // 出力を決定的にするため、「ミドルウェア」の namer を追加している。ファイル名には
+    // @parcel/namer-default を使うが、ディレクトリ構造は（場合によって）
+    // 調整する。
 
     const relativePathFromDefaultNamer = await defaultNamerOpts.name(opts)
     if (relativePathFromDefaultNamer) {
@@ -24,9 +24,9 @@ export default new Namer({
         return null
       }
 
-      // For now treating CWD as root. For current gatsby use case
-      // this is enough, for various other projects it might need to be configurable
-      // or just smarter (for example cover common dirs like `src` or `lib` etc)
+      // 今のところ CWD をルートとして扱う。現在の gatsby の用途では
+      // これで十分だが、ほかのさまざまなプロジェクトでは、設定可能にするか、
+      // もっと賢くする（たとえば `src` や `lib` などのよくあるディレクトリに対応する）必要があるかもしれない
       const root = slash(process.cwd())
 
       const sourceRelativeToRoot = path.posix.relative(
@@ -34,9 +34,9 @@ export default new Namer({
         slash(path.dirname(mainEntry.filePath))
       )
 
-      // newPath will be output relative to "distDir".
-      // we want to preserve directory structure in distDir that we have
-      // between entries and root
+      // newPath は "distDir" からの相対パスとして出力される。
+      // エントリーとルートの間にあるディレクトリ構造を、distDir の中でも
+      // 保ちたい
       const newPath = path.posix.join(
         sourceRelativeToRoot,
         path.basename(relativePathFromDefaultNamer)

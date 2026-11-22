@@ -59,7 +59,7 @@ export function validateProjectName(value: string): boolean {
   return true
 }
 
-// Enquirer types are not exported and are out of date
+// Enquirer の型は export されておらず、内容も古い
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const generateQuestions = (
   initialFolderName: string,
@@ -109,12 +109,12 @@ export const generateQuestions = (
     },
   ]
 
-  // Skip all questions
+  // すべての質問を省略する
   if (flags.yes) {
     return siteNameQuestion
   }
 
-  // Skip language question
+  // 言語の質問を省略する
   if (flags.ts) {
     return [siteNameQuestion, ...otherQuestions]
   }

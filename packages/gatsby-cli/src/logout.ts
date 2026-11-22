@@ -2,7 +2,7 @@ import reporter from "./reporter"
 import { setToken } from "./util/manage-token"
 
 /**
- * Main function that logs out of Gatsby Cloud by removing the token from the config store.
+ * 設定ストアからトークンを削除して Gatsby Cloud からログアウトするメインの関数。
  */
 export async function logout(): Promise<void> {
   await setToken(null, ``)

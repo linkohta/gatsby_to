@@ -1,13 +1,13 @@
-// Since gatsby-plugin-mdx v4, we are using the resourceQuery feature
-// of webpack's loaders to inject a content file into a page component.
-// These helper functions are used to simplify working with these new
-// page component path URI's.
+// gatsby-plugin-mdx v4 以降は、webpack のローダーの resourceQuery 機能を使って、
+// コンテンツファイルをページコンポーネントに注入している。
+// 以下のヘルパー関数は、この新しいページコンポーネントのパスの URI を
+// 扱いやすくするためのものである。
 
 const CONTENT_FILE_PATH_QUERY = `?__contentFilePath=`
 
-// Split the path component URI without using the expensive URI.parse()
+// コストの高い URI.parse() を使わずに、パスコンポーネントの URI を分割する
 export const splitComponentPath = (componentPath: string): Array<string> => {
-  // If the path does not include the contentFilePath query, we can assume its a regular path
+  // パスに contentFilePath クエリが含まれていなければ、通常のパスとみなせる
   if (!componentPath.includes(CONTENT_FILE_PATH_QUERY)) {
     return [componentPath]
   }
@@ -18,7 +18,7 @@ export const splitComponentPath = (componentPath: string): Array<string> => {
   )
   const splitPath = cleanedComponentPath.split(CONTENT_FILE_PATH_QUERY)
 
-  // We only support URI paths with the `?__contentFilePath=` parameter
+  // `?__contentFilePath=` パラメーター付きの URI パスにだけ対応している
   if (splitPath.length !== 2) {
     throw new Error(
       `The following page component must contain '${CONTENT_FILE_PATH_QUERY}':\n${cleanedComponentPath}`
@@ -28,12 +28,12 @@ export const splitComponentPath = (componentPath: string): Array<string> => {
   return splitPath
 }
 
-// Get the path to the actual js page component
+// 実際の js のページコンポーネントのパスを取得する
 export const getPathToLayoutComponent = (componentPath: string): string =>
   splitComponentPath(componentPath)[0]
 
-// Get the path to the content file, falling back to the js component if no content file is given.
-// Pages directly created from `.mdx` files
+// コンテンツファイルのパスを取得する。コンテンツファイルが指定されていなければ js コンポーネントを使う。
+// `.mdx` ファイルから直接作られたページ
 export const getPathToContentComponent = (componentPath: string): string => {
   const splitPath = splitComponentPath(componentPath)
   if (splitPath.length === 1) {

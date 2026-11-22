@@ -2,7 +2,7 @@ import { generateFileUrl } from "../file-cdn-url-generator"
 
 describe(`generateFileUrl`, () => {
   describe(`image`, () => {
-    // pathPrefix is not used for images
+    // pathPrefix は画像には使われない
     const pathPrefix = `/prefix`
 
     it(`should return a file based url`, () => {

@@ -44,7 +44,7 @@ export const createProgressReporter = ({
   let lastUpdateTime = 0
   let unflushedProgress = 0
   let unflushedTotal = 0
-  const progressUpdateDelay = Math.round(1000 / 10) // 10 fps *shrug*
+  const progressUpdateDelay = Math.round(1000 / 10) // 10 fps（なんとなく）
 
   const updateProgress = (forced: boolean = false): void => {
     const t = Date.now()
@@ -80,7 +80,7 @@ export const createProgressReporter = ({
     },
 
     tick(increment: number = 1): void {
-      unflushedProgress += increment // Have to manually track this :/
+      unflushedProgress += increment // これは手動で追跡するしかない :/
       updateProgress()
     },
 
@@ -117,7 +117,7 @@ export const createProgressReporter = ({
       })
     },
 
-    // @deprecated - use end()
+    // @deprecated - end() を使うこと
     done(): void {
       updateProgress(true)
       span.finish()
