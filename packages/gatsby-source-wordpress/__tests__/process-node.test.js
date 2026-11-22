@@ -125,8 +125,11 @@ test(`Gatsby Image service works in html fields via replaceNodeHtmlImages`, with
   const imageMatches = execall(/\/_gatsby\/image/gm, updatedNodeString)
   expect(imageMatches.length).toBe(15)
 
+  // React 19 の `renderToString` は、遅延読み込みでない <img> に対して
+  // <link rel="preload" as="image"> も出力する。そのため、変換できない画像 1 枚につき、
+  // この URL は <img> の `src` と <link> の `href` の 2 か所に現れる
   const fileMatches = execall(/\/_gatsby\/file/gm, updatedNodeString)
-  expect(fileMatches.length).toBe(1)
+  expect(fileMatches.length).toBe(2)
 
 
   const transformedNodeStringNoHtmlImages = await replaceNodeHtmlImages({

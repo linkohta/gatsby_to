@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "@gatsbyjs/reach-router": "^2.0.1",
-    "@testing-library/react": "^11.2.7",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "cross-env": "^7.0.3",
     "del-cli": "^5.1.0",
     "microbundle": "^0.15.1",
