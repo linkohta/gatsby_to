@@ -19,6 +19,13 @@ jest.mock(`gatsby/package.json`, () => {
     version: `2.0.0`,
   }
 })
+// Partial Hydration が無効のとき（デフォルト）、webpack は `react-server-dom-webpack` を
+// null-loader で空のモジュールに置き換える（`src/utils/webpack.config.js`）。
+// 実験的ビルドに固定しているこのモジュールは React 19 では読み込めないので、
+// テストでも同じように空のモジュールへ置き換える。
+jest.mock(`react-server-dom-webpack/writer.node.server`, () => {
+  return {}
+})
 jest.mock(
   `$virtual/ssr-sync-requires`,
   () => {
@@ -135,10 +142,11 @@ const checkNonEmptyHeadersPlugin = {
 const fakeStylesPlugin = {
   plugin: {
     onRenderBody: ({ setHeadComponents }) =>
+      // React 19 は <style> の子が配列だと中身を出力しないので、1 つの文字列として渡す
       setHeadComponents([
-        <style key="style1"> .style1 {} </style>,
-        <style key="style2"> .style2 {} </style>,
-        <style key="style3"> .style3 {} </style>,
+        <style key="style1">{` .style1 `}</style>,
+        <style key="style2">{` .style2 `}</style>,
+        <style key="style3">{` .style3 `}</style>,
       ]),
   },
 }

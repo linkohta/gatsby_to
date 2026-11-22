@@ -44,6 +44,8 @@ describe(`GatsbyImage browser`, () => {
     image = generateImage()
 
     beforeHydrationContent = document.createElement(`div`)
+    // React 19 は、ハイドレーション時に余分なテキストノードがあるとクライアントで
+    // 描画し直すので、ラッパーの前後に空白を残さない
     beforeHydrationContent.innerHTML = `
       <div
         class="gatsby-image-wrapper gatsby-image-wrapper-constrained"
@@ -77,7 +79,7 @@ describe(`GatsbyImage browser`, () => {
           sizes="192x192"
           style="opacity: 0;"
         />
-      </div>`
+      </div>`.trim()
   })
 
   afterEach(() => {

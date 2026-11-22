@@ -60,7 +60,7 @@
     "cross-env": "^7.0.3",
     "gatsby-plugin-image": "^3.17.0-next.0",
     "identity-obj-proxy": "^3.0.0",
-    "react-test-renderer": "^16.14.0",
+    "react-test-renderer": "^19.3.1",
     "rimraf": "^3.0.2",
     "tree-kill": "^1.2.2"
   },
