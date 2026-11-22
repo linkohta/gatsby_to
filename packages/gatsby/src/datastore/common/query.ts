@@ -204,9 +204,9 @@ export function prepareQueryArgs(
   return filters
 }
 
-// Converts a nested mongo args object into a dotted notation. acc
-// (accumulator) must be a reference to an empty object. The converted
-// fields will be added to it. E.g
+// ネストした mongo の引数オブジェクトをドット記法に変換する。acc
+// （アキュムレーター）は空のオブジェクトへの参照でなければならない。変換した
+// フィールドはそこに追加される。例:
 //
 // {
 //   internal: {
@@ -222,7 +222,7 @@ export function prepareQueryArgs(
 //   }
 // }
 //
-// After execution, acc would be:
+// 実行後、acc は次のようになる:
 //
 // {
 //   "internal.type": {
@@ -236,7 +236,7 @@ export function prepareQueryArgs(
 //   }
 // }
 
-// Like above, but doesn't handle $elemMatch
+// 上と同様だが、$elemMatch は扱わない
 export function objectToDottedField(
   obj: Record<string, unknown>,
   path: Array<string> = []
