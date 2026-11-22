@@ -37,10 +37,10 @@ export const getCustomOptions = (stage: Stage): IBabelStage["options"] => {
 
 /**
  * https://babeljs.io/docs/en/babel-core#createconfigitem
- * If this function is called multiple times for a given plugin,
- * Babel will call the plugin's function itself multiple times.
- * If you have a clear set of expected plugins and presets to inject,
- * pre-constructing the config items would be recommended.
+ * あるプラグインについてこの関数が複数回呼ばれると、
+ * Babel はそのプラグインの関数自体を複数回呼ぶ。
+ * 注入するプラグインとプリセットがはっきり決まっている場合は、
+ * 設定アイテムをあらかじめ作成しておくことを推奨する。
  */
 const configItemsMemoCache = new Map()
 
@@ -70,13 +70,13 @@ export const prepareOptions = (
 
   const pluginBabelConfig = loadCachedConfig()
 
-  // Required plugins/presets
+  // 必須のプラグインとプリセット
   const requiredPlugins = [
     babel.createConfigItem(
       [
         resolve(`babel-plugin-remove-graphql-queries`),
-        // packages/babel-plugin-remove-graphql-queries/src/index.ts sets a default value for staticQueryDir
-        // They should be identical
+        // packages/babel-plugin-remove-graphql-queries/src/index.ts が staticQueryDir のデフォルト値を設定している
+        // 両者は同じ値でなければならない
         { stage, staticQueryDir: `page-data/sq/d` },
       ],
       {
@@ -142,7 +142,7 @@ export const prepareOptions = (
     )
   }
 
-  // Fallback preset
+  // フォールバックのプリセット
   const fallbackPresets: Array<ConfigItem> = []
 
   fallbackPresets.push(
@@ -161,7 +161,7 @@ export const prepareOptions = (
     )
   )
 
-  // Go through babel state and create config items for presets/plugins from.
+  // babel の状態を順に見て、そこからプリセットとプラグインの設定アイテムを作成する。
   const reduxPlugins: Array<PluginItem> = []
   const reduxPresets: Array<PluginItem> = []
 
@@ -203,8 +203,8 @@ export const addRequiredPresetOptions = (
   options: { stage?: Stage } = {},
   resolve: RequireResolve = require.resolve
 ): Array<PluginItem> => {
-  // Always pass `stage` option to babel-preset-gatsby
-  //  (even if defined in custom babelrc)
+  // `stage` オプションは常に babel-preset-gatsby に渡す
+  //  （独自の babelrc で定義されている場合でも）
   const gatsbyPresetResolved = resolve(`babel-preset-gatsby`)
   const index = presets.findIndex(
     p => p.file!.resolved === gatsbyPresetResolved
@@ -238,7 +238,7 @@ export const mergeConfigItemOptions = ({
     i => i.file?.resolved === itemToMerge.file?.resolved
   )
 
-  // If this exist, merge the options, otherwise, add it to the array
+  // これが存在する場合はオプションをマージし、そうでなければ配列に追加する
   if (index !== -1) {
     items[index] = babel.createConfigItem(
       [

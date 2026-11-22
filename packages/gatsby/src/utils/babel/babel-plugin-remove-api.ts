@@ -4,7 +4,7 @@ import type { PluginObj, ConfigAPI, NodePath } from "@babel/core"
 import { removeExportProperties } from "./babel-module-exports-helpers"
 
 /**
- * Remove specified module exports from files.
+ * 指定されたモジュールの export をファイルから取り除く。
  */
 export default declare(function removeApiCalls(
   api: ConfigAPI,
@@ -29,21 +29,21 @@ export default declare(function removeApiCalls(
             return
           }
 
-          // babel doesn't remove references very well so we loop until nothing gets removed
+          // babel は参照をあまりうまく取り除けないので、何も取り除かれなくなるまでループする
           let removed = false
 
-          // remove all unreferenced bindings
+          // 参照されていないバインディングをすべて取り除く
           do {
             removed = false
-            // make sure all references are up to date
+            // すべての参照が最新になっているようにする
             path.scope.crawl()
 
             Object.keys(path.scope.bindings).forEach(refName => {
               const ref = path.scope.bindings[refName]
 
               if (ref.referenced) {
-                // Functions can reference themselves, so we need to check if there's a
-                // binding outside the function scope or not.
+                // 関数は自分自身を参照できるので、関数スコープの外に
+                // バインディングがあるかどうかを確認する必要がある。
                 if (ref.path.type === `FunctionDeclaration`) {
                   const isSelfReferenced = ref.referencePaths.every(
                     refPath => !!refPath.findParent(p => p === ref.path)
@@ -55,7 +55,7 @@ export default declare(function removeApiCalls(
                   }
                 }
               } else {
-                // if const {x,y} is used, we remove the property
+                // const {x,y} が使われている場合は、プロパティを取り除く
                 if (
                   t.isVariableDeclarator(ref.path) &&
                   t.isObjectPattern(
@@ -74,7 +74,7 @@ export default declare(function removeApiCalls(
                             .name !== refName
                   )
 
-                  // if all properties got removed thus the object pattern is empty, we remove the whole declaration
+                  // すべてのプロパティが取り除かれてオブジェクトパターンが空になった場合は、宣言全体を取り除く
                   if (!objectPattern.properties.length) {
                     ref.path.remove()
                   }
@@ -82,7 +82,7 @@ export default declare(function removeApiCalls(
                   ref.path.remove()
                 }
 
-                // if it's a module and all specifiers are removed, remove the full binding
+                // モジュールであり、すべての specifier が取り除かれた場合は、バインディング全体を取り除く
                 if (
                   ref.kind === `module` &&
                   !(ref.path.parent as t.ImportDeclaration).specifiers.length &&
@@ -98,7 +98,7 @@ export default declare(function removeApiCalls(
         },
       },
 
-      // Remove export statements
+      // export 文を取り除く
 
       ExportDefaultDeclaration(path, state): void {
         if (apisToRemove.includes(`default`)) {
@@ -116,7 +116,7 @@ export default declare(function removeApiCalls(
             | t.ExportSpecifier
           > = []
 
-          // Remove `export { foo } = [...]` and `export { foo } from "X"` shaped exports
+          // `export { foo } = [...]` と `export { foo } from "X"` の形の export を取り除く
           path.node.specifiers.forEach(specifier => {
             if (
               t.isExportSpecifier(specifier) &&
@@ -124,7 +124,7 @@ export default declare(function removeApiCalls(
               apisToRemove.includes(specifier.exported.name)
             ) {
               const binding = path.scope.bindings[specifier.local.name]
-              // binding will not exist for `export { foo } from "X"` cases
+              // `export { foo } from "X"` の場合は、バインディングが存在しない
               if (binding) {
                 binding.path.remove()
               }
@@ -136,13 +136,13 @@ export default declare(function removeApiCalls(
           path.node.specifiers = specifiersToKeep
         }
 
-        // Remove `export function foo() {}` shaped exports
+        // `export function foo() {}` の形の export を取り除く
         let apiToCheck
         if (t.isFunctionDeclaration(declaration) && declaration.id) {
           apiToCheck = declaration.id.name
         }
 
-        // Remove `export const foo = () => {}` shaped exports
+        // `export const foo = () => {}` の形の export を取り除く
         if (
           t.isVariableDeclaration(declaration) &&
           t.isIdentifier(declaration.declarations[0].id)
@@ -155,7 +155,7 @@ export default declare(function removeApiCalls(
           path.remove()
         }
 
-        // Remove `export const { foo } = () => {}` shaped exports
+        // `export const { foo } = () => {}` の形の export を取り除く
         if (t.isVariableDeclaration(declaration)) {
           for (let i = 0; i < declaration?.declarations.length; i++) {
             if (declaration?.declarations[i].id.type === `ObjectPattern`) {
@@ -166,7 +166,7 @@ export default declare(function removeApiCalls(
             }
           }
         }
-        // Remove `export const { foo } from "X"` shaped exports
+        // `export const { foo } from "X"` の形の export を取り除く
         else if (path.node?.source) {
           if (path.node.specifiers.length === 0) {
             path.remove()
@@ -174,7 +174,7 @@ export default declare(function removeApiCalls(
         }
       },
 
-      // Remove `module.exports = { foo }` and `exports.foo = {}` shaped exports
+      // `module.exports = { foo }` と `exports.foo = {}` の形の export を取り除く
       ExpressionStatement(path, state): void {
         if (
           !t.isAssignmentExpression(path.node.expression) ||

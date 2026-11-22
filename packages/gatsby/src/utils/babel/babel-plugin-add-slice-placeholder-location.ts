@@ -4,10 +4,10 @@ import { ObjectProperty } from "@babel/types"
 import { store } from "../../redux"
 
 /**
- * This is a plugin that finds Slice placeholder components and injects the __renderedByLocation prop
- * with filename and location in the file where the placeholder was found. This is later used to provide
- * more useful error messages when the user props are invalid showing codeframe where user tries to render it
- * instead of codeframe of the Slice component itself (internals of gatsby) that is not useful for the user.
+ * これは、Slice のプレースホルダーコンポーネントを見つけて、プレースホルダーが見つかった
+ * ファイル名とファイル内の位置を持つ __renderedByLocation prop を注入するプラグインである。これは後で、
+ * ユーザーの props が無効なときに、より役に立つエラーメッセージを出すために使われる。ユーザーにとって役に立たない
+ * Slice コンポーネント自体（gatsby の内部）のコードフレームではなく、ユーザーがレンダリングしようとした箇所のコードフレームを表示する。
  */
 
 export default function addSlicePlaceholderLocation(

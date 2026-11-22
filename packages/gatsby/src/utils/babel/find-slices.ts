@@ -18,8 +18,8 @@ function mergePreviouslyCollectedSlice(
 ): ICollectedSlice {
   return {
     name: newInfo.name,
-    // it's enough for one use of slice that doesn't allow empty
-    // to require passing everyhing
+    // 空を許可しない slice の使用箇所が 1 つでもあれば、
+    // すべてを渡すことが必須になる
     allowEmpty:
       previousInfo?.allowEmpty === false
         ? false

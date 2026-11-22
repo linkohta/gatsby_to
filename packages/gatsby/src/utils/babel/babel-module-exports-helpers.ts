@@ -2,7 +2,7 @@ import { ExportNamedDeclaration, ObjectPattern } from "@babel/types"
 import { NodePath } from "@babel/core"
 
 /**
- * Check the node has at least one sibling.
+ * ノードに兄弟が少なくとも 1 つあることを確認する。
  */
 export function hasSibling(path: NodePath): boolean {
   return (
@@ -11,19 +11,19 @@ export function hasSibling(path: NodePath): boolean {
 }
 
 /**
- * Remove specific properties from a destructured variable named export.
+ * 分割代入された変数の名前付き export から、特定のプロパティを取り除く。
  *
- * If there are no other properties or declarations, the entire export declaration will be removed.
- * If there are other properties, only the matching properties will be removed.
+ * 他にプロパティも宣言もなければ、export 宣言全体を取り除く。
+ * 他にプロパティがあれば、一致するプロパティだけを取り除く。
  *
- * Matches exports like these:
+ * 次のような export に一致する:
  * ```
  * export const { foo } = {} // or `let`/`var`
  * export const { foo, bar: baz } = {} // or `let`/`var`
  * ```
  *
- * This is cheaper than using a nested visitor and traversing upwards to check distance
- * from the export declaration.
+ * これは、ネストしたビジターを使い、上へたどって export 宣言からの距離を
+ * 確認するよりもコストが低い。
  */
 export function removeExportProperties(
   exportPath: NodePath<ExportNamedDeclaration>,

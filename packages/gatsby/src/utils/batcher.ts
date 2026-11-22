@@ -5,7 +5,7 @@ export default class Batcher<Callback extends (...args: Array<any>) => any> {
 
   constructor(private threshold: number) {}
 
-  /** Add a call to the batcher */
+  /** バッチャーに呼び出しを追加する */
   add(...args: Parameters<Callback>): void {
     this.queue.push(args)
 
@@ -14,28 +14,28 @@ export default class Batcher<Callback extends (...args: Array<any>) => any> {
     }
   }
 
-  /** Call all of our callbacks and clear out the queue */
+  /** すべてのコールバックを呼び、キューを空にする */
   flush(): void {
-    // call each callback for each item in the queue
+    // キューの中のそれぞれの項目について、それぞれのコールバックを呼ぶ
     this.queue.forEach(args =>
       this.callbacks.forEach(callback => callback(...args))
     )
 
-    // pass the entire queue to all bulk callbacks
+    // すべての一括コールバックにキュー全体を渡す
     this.bulkCallbacks.forEach(callback => {
       callback(this.queue)
     })
 
-    // clear out the queue
+    // キューを空にする
     this.queue = []
   }
 
-  /** Sets up a callback for each batcher item */
+  /** バッチャーの項目ごとに呼ばれるコールバックを設定する */
   call(callback: (...args: Parameters<Callback>) => void): void {
     this.callbacks.push(callback)
   }
 
-  /** Sets up a bulk callback that takes the entire queue */
+  /** キュー全体を受け取る一括コールバックを設定する */
   bulkCall(callback: (args: Array<Parameters<Callback>>) => void): void {
     this.bulkCallbacks.push(callback)
   }

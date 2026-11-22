@@ -4,14 +4,14 @@
 const GatsbyReporter = {
   /**
    * @callback GatsbyReporterFn
-   * @param {string} message Message to display
+   * @param {string} message 表示するメッセージ
    * @returns {void}
    */
 
   /**
    * @callback GatsbyReporterFnWithError
-   * @param {string} message Message to display
-   * @param {Error}[error] Optional error object
+   * @param {string} message 表示するメッセージ
+   * @param {Error}[error] エラーオブジェクト（省略可能）
    * @returns {void}
    */
 
@@ -51,8 +51,8 @@ const GatsbyReporter = {
   panicOnBuild: true,
 
   /**
-   * Note that this method only works if the --verbose option has
-   * been passed to the CLI
+   * このメソッドは、CLI に --verbose オプションが渡されている
+   * 場合にだけ動くことに注意
    * @type {GatsbyReporterFn}
    * @example
    * reporter.verbose(`text`)
@@ -61,13 +61,13 @@ const GatsbyReporter = {
 
   /**
    * @callback GatsbyReporterActivityTimerFn
-   * @param {string} message Timer message to display
+   * @param {string} message 表示するタイマーのメッセージ
    * @returns {ITimerReporter}
    */
 
   /**
-   * Creates a new activity timer with the provided message.
-   * Check the full [return type definition here](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-cli/src/reporter/reporter-timer.ts#L19).
+   * 渡されたメッセージで新しいアクティビティタイマーを作成する。
+   * 完全な [戻り値の型定義はこちら](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-cli/src/reporter/reporter-timer.ts#L19) を参照。
    * @type {GatsbyReporterActivityTimerFn}
    * @example
    * const activity = reporter.activityTimer(`Timer text`)
@@ -82,28 +82,28 @@ const GatsbyReporter = {
 /***/
 const GatsbyCache = {
   /**
-   * Retrieve cached value
-   * @param {string} key Cache key
-   * @returns {Promise<any>} Promise resolving to cached value
+   * キャッシュされた値を取得する
+   * @param {string} key キャッシュのキー
+   * @returns {Promise<any>} キャッシュされた値で解決される Promise
    * @example
    * const value = await cache.get(`unique-key`)
    */
   get: true,
 
   /**
-   * Cache value
-   * @param {string} key Cache key
-   * @param {any} value Value to be cached
-   * @returns {Promise<any>} Promise resolving to cached value
+   * 値をキャッシュする
+   * @param {string} key キャッシュのキー
+   * @param {any} value キャッシュする値
+   * @returns {Promise<any>} キャッシュされた値で解決される Promise
    * @example
    * await cache.set(`unique-key`, value)
    */
   set: true,
 
   /**
-   * Deletes cached value
-   * @param {string} key Cache key
-   * @returns {Promise<void>} Promise resolving once key is deleted from cache
+   * キャッシュされた値を削除する
+   * @param {string} key キャッシュのキー
+   * @returns {Promise<void>} キーがキャッシュから削除されたときに解決される Promise
    * @example
    * await cache.del(`unique-key`)
    */
@@ -113,30 +113,30 @@ const GatsbyCache = {
 /***/
 const GatsbyTracing = {
   /**
-   * Global tracer instance. Check
-   * [opentracing Tracer documentation](https://opentracing-javascript.surge.sh/classes/tracer.html)
-   * for more details.
+   * グローバルな tracer のインスタンス。詳しくは
+   * [opentracing の Tracer のドキュメント](https://opentracing-javascript.surge.sh/classes/tracer.html)
+   * を参照。
    * @type {Opentracing.Tracer}
    */
   tracer: true,
 
   /**
-   * Tracer span representing API run. Check
-   * [opentracing Span documentation](https://opentracing-javascript.surge.sh/classes/span.html)
-   * for more details.
+   * API の実行を表す tracer のスパン。詳しくは
+   * [opentracing の Span のドキュメント](https://opentracing-javascript.surge.sh/classes/span.html)
+   * を参照。
    * @type {Opentracing.Span}
    */
   parentSpan: true,
 
   /**
    * @callback GatsbyTracing.StartSpan
-   * @param {string} spanName name of the span
+   * @param {string} spanName スパンの名前
    * @returns {Opentracing.Span}
    */
 
   /**
-   * Start a tracing span. The span will be created as a child of the currently
-   * running API span. This is a convenience wrapper for
+   * トレースのスパンを開始する。スパンは、現在実行中の API のスパンの子として
+   * 作成される。これは、次の呼び出しの便利なラッパーである
    * ```js
    * tracing.tracer.startSpan(`span-name`, { childOf: tracing.parentSpan}).
    * ```
@@ -157,27 +157,27 @@ const GatsbyTracing = {
 };
 
 /**
- * Get cache instance by name - this should only be used by plugins that
- * accept subplugins.
- * @param {string} id id of the node
- * @returns {GatsbyCache} See [`cache`](#cache) section for reference.
+ * 名前を指定してキャッシュのインスタンスを取得する。これは、サブプラグインを
+ * 受け付けるプラグインだけが使うべきである。
+ * @param {string} id ノードの ID
+ * @returns {GatsbyCache} [`cache`](#cache) の節を参照。
  */
 module.exports.getCache = true;
 
 /**
- * Key-value store used to persist results of time/memory/cpu intensive
- * tasks. All functions are async and return promises.
+ * 時間、メモリー、CPU を多く使うタスクの結果を永続化するための
+ * キーバリューストア。すべての関数は非同期で、Promise を返す。
  * @type {GatsbyCache}
  */
 module.exports.cache = true;
 
 /**
- * Create a stable content digest from a string or object, you can use the
- * result of this function to set the `internal.contentDigest` field
- * on nodes. Gatsby uses the value of this field to invalidate stale data
- * when your content changes.
+ * 文字列またはオブジェクトから、安定したコンテンツのダイジェストを作成する。
+ * この関数の結果は、ノードの `internal.contentDigest` フィールドの
+ * 設定に使える。Gatsby はこのフィールドの値を使って、コンテンツが
+ * 変わったときに古いデータを無効化する。
  * @param {(string|object)} input
- * @returns {string} Hash string
+ * @returns {string} ハッシュ文字列
  * @example
  * const node = {
  *   ...nodeData,
@@ -190,15 +190,15 @@ module.exports.cache = true;
 module.exports.createContentDigest = true;
 
 /**
- * Collection of functions used to programmatically modify Gatsby’s internal state.
+ * Gatsby の内部状態をプログラムから変更するための関数の集まり。
  *
- * See [`actions`](/docs/actions/) reference.
+ * [`actions`](/docs/actions/) のリファレンスを参照。
  * @type {Actions}
  */
 module.exports.actions = true;
 
 /**
- * Get content for a node from the plugin that created it.
+ * ノードを作成したプラグインから、そのノードのコンテンツを取得する。
  * @param {Node} node
  * @returns {Promise<string>}
  * @example
@@ -215,74 +215,74 @@ module.exports.actions = true;
 module.exports.loadNodeContent = true;
 
 /**
- * Internal redux state used for application state. Do not use, unless you
- * absolutely must. Store is considered a private API and can change with
- * any version.
+ * アプリケーションの状態に使われる内部の redux の状態。どうしても必要な
+ * 場合を除いて使わないこと。Store は非公開 API と見なされ、どのバージョンでも
+ * 変わる可能性がある。
  * @type {Redux.Store}
  */
 module.exports.store = true;
 
 /**
- * Internal event emitter / listener.  Do not use, unless you absolutely
- * must. Emitter is considered a private API and can change with any version.
+ * 内部のイベントエミッター / リスナー。どうしても必要な場合を除いて
+ * 使わないこと。Emitter は非公開 API と見なされ、どのバージョンでも変わる可能性がある。
  * @type {Emitter}
  */
 module.exports.emitter = true;
 
 /**
- * Get array of all nodes.
- * @returns {Node[]} Array of nodes.
+ * すべてのノードの配列を取得する。
+ * @returns {Node[]} ノードの配列。
  * @example
  * const allNodes = getNodes()
  */
 module.exports.getNodes = true;
 
 /**
- * Get single node by given ID.
- * Don't use this in graphql resolvers - see
- * [`getNodeAndSavePathDependency`](#getNodeAndSavePathDependency).
- * @param {string} ID id of the node.
- * @returns {Node} Single node instance.
+ * 指定した ID のノードを 1 つ取得する。
+ * graphql のリゾルバーではこれを使わないこと。
+ * [`getNodeAndSavePathDependency`](#getNodeAndSavePathDependency) を参照。
+ * @param {string} ID ノードの ID。
+ * @returns {Node} 1 つのノードのインスタンス。
  * @example
  * const node = getNode(id)
  */
 module.exports.getNode = true;
 
 /**
- * Get array of nodes of given type.
- * @param {string} Type of nodes
- * @returns {Node[]} Array of nodes.
+ * 指定した型のノードの配列を取得する。
+ * @param {string} Type ノードの型
+ * @returns {Node[]} ノードの配列。
  * @example
  * const markdownNodes = getNodesByType(`MarkdownRemark`)
  */
 module.exports.getNodesByType = true;
 
 /**
- * Set of utilities to output information to user
+ * ユーザーへ情報を出力するためのユーティリティ一式
  * @type {GatsbyReporter}
  */
 module.exports.reporter = true;
 
 /**
- * Get single node by given ID and create dependency for given path.
- * This should be used instead of `getNode` in graphql resolvers to enable
- * tracking dependencies for query results. If it's not used Gatsby will
- * not rerun query if node changes leading to stale query results. See
+ * 指定した ID のノードを 1 つ取得し、指定したパスに対する依存を作成する。
+ * クエリ結果の依存を追跡できるように、graphql のリゾルバーでは `getNode` の
+ * 代わりにこれを使うこと。使わないと、ノードが変わっても Gatsby は
+ * クエリを再実行せず、クエリ結果が古いままになる。詳しくは
  * [Page -> Node Dependency Tracking](/docs/page-node-dependencies/)
- * for more details.
- * @param {string} ID id of the node.
- * @param {string} path of the node.
- * @returns {Node} Single node instance.
+ * を参照。
+ * @param {string} ID ノードの ID。
+ * @param {string} path ノードのパス。
+ * @returns {Node} 1 つのノードのインスタンス。
  */
 module.exports.getNodeAndSavePathDependency = true;
 
 /**
- * Utility function useful to generate globally unique and stable node IDs.
- * It will generate different IDs for different plugins if they use same
- * input.
+ * グローバルに一意で安定したノード ID を生成するのに役立つユーティリティ関数。
+ * 同じ入力を使っても、プラグインが異なれば異なる ID を
+ * 生成する。
  *
  * @param {string} input
- * @returns {string} UUIDv5 ID string
+ * @returns {string} UUIDv5 の ID 文字列
  * @example
  * const node = {
  *   id: createNodeId(`${backendData.type}${backendData.id}`),
@@ -292,38 +292,38 @@ module.exports.getNodeAndSavePathDependency = true;
 module.exports.createNodeId = true;
 
 /**
- * Set of utilities that allow adding more detailed tracing for plugins.
- * Check
+ * プラグインにより詳細なトレースを追加できるようにするユーティリティ一式。
+ * 詳しくは
  * [Performance tracing](https://www.gatsbyjs.com/docs/performance-tracing)
- * page for more details.
+ * のページを参照。
  * @type {GatsbyTracing}
  */
 module.exports.tracing = true;
 
 /**
- * Use to prefix resources URLs. `pathPrefix` will be either empty string or
- * path that starts with slash and doesn't end with slash. `pathPrefix` also
- * becomes `<assetPrefix>/<pathPrefix>` when you pass both `assetPrefix` and
- * `pathPrefix` in your `gatsby-config.js`.
+ * リソースの URL にプレフィックスを付けるために使う。`pathPrefix` は、空文字列か、
+ * スラッシュで始まりスラッシュで終わらないパスのどちらかになる。`pathPrefix` は、
+ * `gatsby-config.js` で `assetPrefix` と `pathPrefix` の両方を渡した場合は
+ * `<assetPrefix>/<pathPrefix>` になる。
  *
- * See [Adding a Path Prefix](https://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/path-prefix/)
- * page for details about path prefixing.
+ * パスのプレフィックスについて詳しくは、[Adding a Path Prefix](https://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/path-prefix/)
+ * のページを参照。
  * @type {string}
  */
 module.exports.pathPrefix = true;
 
 /**
- * This is the same as `pathPrefix` passed in `gatsby-config.js`.
- * It's an empty string if you don't pass `pathPrefix`.
- * When using assetPrefix, you can use this instead of pathPrefix to recieve the string you set in `gatsby-config.js`.
- * It won't include the `assetPrefix`.
+ * これは、`gatsby-config.js` で渡された `pathPrefix` と同じである。
+ * `pathPrefix` を渡していない場合は空文字列になる。
+ * assetPrefix を使っている場合は、pathPrefix の代わりにこれを使うと、`gatsby-config.js` で設定した文字列を受け取れる。
+ * `assetPrefix` は含まれない。
  * @type {string}
  */
 module.exports.basePath = true;
 
 /**
- * Tracer span representing the passed through span from Gatsby to its plugins.
- * Learn more: [opentracing Span documentation](https://opentracing-javascript.surge.sh/classes/span.html)
+ * Gatsby からプラグインへ渡されたスパンを表す tracer のスパン。
+ * 詳しくは [opentracing の Span のドキュメント](https://opentracing-javascript.surge.sh/classes/span.html) を参照
  * @type {Opentracing.Span}
  */
 module.exports.parentSpan = true;

@@ -20,9 +20,9 @@ export default class GatsbyCache {
   public name: string
   public store: Store
   public directory: string
-  // TODO: remove `.cache` in v4. This is compat mode - cache-manager cache implementation
-  // expose internal cache that gives access to `.del` function that wasn't available in public
-  // cache interface (gatsby-plugin-sharp use it to clear no longer needed data)
+  // TODO: v4 で `.cache` を削除する。これは互換モードである。cache-manager のキャッシュ実装は
+  // 内部のキャッシュを公開しており、公開のキャッシュインターフェースにはなかった `.del` 関数を
+  // 使えるようにしていた（gatsby-plugin-sharp が、不要になったデータを消去するために使っている）
   public cache?: MultiCache
 
   // @ts-ignore - set & get types are missing from fsStore?
