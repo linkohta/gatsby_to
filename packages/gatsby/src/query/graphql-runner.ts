@@ -25,7 +25,7 @@ import { IGraphQLTelemetryRecord } from "../schema/type-definitions"
 import GraphQLSpanTracer from "./graphql-span-tracer"
 import { tranformDocument } from "./transform-document"
 
-// Preserve these caches across graphql instances.
+// これらのキャッシュは graphql のインスタンスをまたいで保持する。
 const _rootNodeMap = new WeakMap()
 const _trackedRootNodes = new WeakSet()
 
@@ -48,7 +48,7 @@ export class GraphQLRunner {
   parseCache: Map<Query, DocumentNode>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  nodeModel: any // TODO: convert "../schema/node-model" from Flow
+  nodeModel: any // TODO: "../schema/node-model" を Flow から変換する
 
   schema: GraphQLSchema
 
@@ -221,13 +221,13 @@ export class GraphQLRunner {
       this.parse(query)
     )
 
-    // Queries are usually executed in batch. But after the batch is finished
-    // cache just wastes memory without much benefits.
-    // TODO: consider a better strategy for cache purging/invalidation
+    // クエリは通常まとめて実行される。しかし、まとめての実行が終わった後は、
+    // キャッシュはあまり利点がなく、メモリーを浪費するだけである。
+    // TODO: キャッシュの消去や無効化について、より良い戦略を検討する
     this.scheduleClearCache()
 
     if (warnings.length > 0) {
-      // TODO: move those warnings to the caller side, e.g. query-runner.ts
+      // TODO: これらの警告を呼び出し側（query-runner.ts など）へ移す
       warnings.forEach(err => {
         const message = componentPath ? `\nQueried in ${componentPath}` : ``
         reporter.warn(err.message + message)
@@ -251,7 +251,7 @@ export class GraphQLRunner {
     }
 
     try {
-      // `execute` will return a promise
+      // `execute` は Promise を返す
       return await execute({
         schema,
         document,

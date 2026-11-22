@@ -111,7 +111,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
         })
 
         it(`single field, list with multiple orders`, () => {
-          // those extra orders are no-op, just testing that we process this also
+          // これらの余分な order は何もしない。これも処理されることをテストしているだけである
           expect(
             run(
               `allMarkdownRemark(sort: { 

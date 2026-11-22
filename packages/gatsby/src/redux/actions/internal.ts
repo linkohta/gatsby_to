@@ -40,8 +40,8 @@ import {
 import { getEngineContext } from "../../utils/engine-context"
 
 /**
- * Create a dependency between a page and data. Probably for
- * internal use only.
+ * ページとデータの間の依存を作成する。おそらく
+ * 内部専用。
  * @private
  */
 export const createPageDependencies = (
@@ -62,10 +62,10 @@ export const createPageDependencies = (
 }
 
 /**
- * Create a dependency between a page and data. Probably for
- * internal use only.
+ * ページとデータの間の依存を作成する。おそらく
+ * 内部専用。
  *
- * Shorthand for createPageDependencies.
+ * createPageDependencies の短縮形。
  * @private
  */
 export const createPageDependency = (
@@ -74,8 +74,8 @@ export const createPageDependency = (
 ): ICreatePageDependencyAction => createPageDependencies([payload], plugin)
 
 /**
- * Delete dependencies between an array of pages and data. Probably for
- * internal use only. Used when deleting pages.
+ * ページの配列とデータの間の依存を削除する。おそらく
+ * 内部専用。ページを削除するときに使う。
  * @private
  */
 export const deleteComponentsDependencies = (
@@ -90,8 +90,8 @@ export const deleteComponentsDependencies = (
 }
 
 /**
- * When the query watcher extracts a GraphQL query, it calls
- * this to store the query with its component.
+ * クエリウォッチャーは、GraphQL クエリを抽出すると、これを呼び出して
+ * クエリをそのコンポーネントと一緒に保存する。
  * @private
  */
 export const replaceComponentQuery = ({
@@ -120,8 +120,8 @@ export const apiFinished = (
 }
 
 /**
- * When the query watcher extracts a "static" GraphQL query from useStaticQuery
- * it calls this to store the query with its component.
+ * クエリウォッチャーは、useStaticQuery から「静的な」GraphQL クエリを抽出すると、
+ * これを呼び出してクエリをそのコンポーネントと一緒に保存する。
  * @private
  */
 export const replaceStaticQuery = (
@@ -143,8 +143,8 @@ export const replaceStaticQuery = (
 
 /**
  *
- * Report that a query has been extracted from a component. Used by
- * query-compiler.js.
+ * コンポーネントからクエリが抽出されたことを報告する。query-compiler.js が
+ * 使う。
  * @private
  */
 export const queryExtracted = (
@@ -161,11 +161,11 @@ export const queryExtracted = (
 }
 
 /**
- * Set Definitions for fragment extraction, etc.
+ * フラグメントの抽出などのために Definitions を設定する。
  *
- * Used by developer tools such as vscode-graphql & graphiql
+ * vscode-graphql や graphiql などの開発者ツールが使う
  *
- * query-compiler.js.
+ * query-compiler.js。
  * @private
  */
 export const setGraphQLDefinitions = (
@@ -179,7 +179,7 @@ export const setGraphQLDefinitions = (
 
 /**
  *
- * Report that the Relay Compiler found a graphql error when attempting to extract a query
+ * Relay Compiler がクエリを抽出しようとして graphql のエラーを見つけたことを報告する
  * @private
  */
 export const queryExtractionGraphQLError = (
@@ -197,8 +197,8 @@ export const queryExtractionGraphQLError = (
 
 /**
  *
- * Report that babel was able to extract the graphql query.
- * Indicates that the file is free of JS errors.
+ * babel が graphql クエリを抽出できたことを報告する。
+ * そのファイルに JS のエラーがないことを示す。
  * @private
  */
 export const queryExtractedBabelSuccess = (
@@ -216,7 +216,7 @@ export const queryExtractedBabelSuccess = (
 
 /**
  *
- * Report that the Relay Compiler found a babel error when attempting to extract a query
+ * Relay Compiler がクエリを抽出しようとして babel のエラーを見つけたことを報告する
  * @private
  */
 export const queryExtractionBabelError = (
@@ -233,7 +233,7 @@ export const queryExtractionBabelError = (
 }
 
 /**
- * Set overall program status e.g. `BOOTSTRAPING` or `BOOTSTRAP_FINISHED`.
+ * プログラム全体のステータスを設定する。たとえば `BOOTSTRAPING` や `BOOTSTRAP_FINISHED`。
  * @private
  */
 export const setProgramStatus = (
@@ -250,7 +250,7 @@ export const setProgramStatus = (
 }
 
 /**
- * Broadcast that a page's query was run.
+ * ページのクエリが実行されたことを通知する。
  * @private
  */
 export const pageQueryRun = (
@@ -287,7 +287,7 @@ export const clearDirtyQueriesListToEmitViaWebsocket =
   }
 
 /**
- * Remove jobs which are marked as stale (inputPath doesn't exists)
+ * 古くなったと印が付いているジョブ（inputPath が存在しない）を取り除く
  * @private
  */
 export const removeStaleJob = (
@@ -306,7 +306,7 @@ export const removeStaleJob = (
 }
 
 /**
- * Set gatsby config
+ * gatsby の config を設定する
  * @private
  */
 export const setSiteConfig = (config?: unknown): ISetSiteConfig => {
@@ -354,7 +354,7 @@ export const setSiteConfig = (config?: unknown): ISetSiteConfig => {
 }
 
 /**
- * Set gatsby functions
+ * gatsby の関数を設定する
  * @private
  */
 export const setFunctions = (
@@ -378,9 +378,9 @@ export const createJobV2FromInternalJob =
     const jobContentDigest = internalJob.contentDigest
     const currentState = getState()
 
-    // Check if we already ran this job before, if yes we return the result
-    // We have an inflight (in progress) queue inside the jobs manager to make sure
-    // we don't waste resources twice during the process
+    // このジョブを以前に実行したかを確認し、実行済みであれば結果を返す
+    // 処理中に同じリソースを二重に消費しないように、ジョブマネージャーの中に
+    // 実行中（進行中）のキューを持っている
     if (
       currentState.jobsV2 &&
       currentState.jobsV2.complete.has(jobContentDigest)
@@ -391,13 +391,13 @@ export const createJobV2FromInternalJob =
     }
     const engineContext = getEngineContext()
 
-    // Always set context, even if engineContext is undefined.
-    // We do this because the final list of jobs for a given engine request includes both:
-    //  - jobs with the same requestId
-    //  - jobs without requestId (technically with requestId === "")
+    // engineContext が undefined であっても、常にコンテキストを設定する。
+    // こうするのは、あるエンジンリクエストに対する最終的なジョブの一覧に、次の両方が含まれるためである。
+    //  - 同じ requestId を持つジョブ
+    //  - requestId を持たないジョブ（厳密には requestId === "" のジョブ）
     //
-    // See https://nodejs.org/dist/latest-v16.x/docs/api/async_context.html#async_context_troubleshooting_context_loss
-    // on cases when async context could be lost.
+    // 非同期コンテキストが失われるケースについては
+    // https://nodejs.org/dist/latest-v16.x/docs/api/async_context.html#async_context_troubleshooting_context_loss を参照。
     dispatch({
       type: `SET_JOB_V2_CONTEXT`,
       payload: {
@@ -421,7 +421,7 @@ export const createJobV2FromInternalJob =
 
     const enqueuedJobPromise = enqueueJob(internalJob)
     return enqueuedJobPromise.then(result => {
-      // store the result in redux so we have it for the next run
+      // 次回の実行で使えるように、結果を redux に保存する
       dispatch({
         type: `END_JOB_V2`,
         plugin: { name: internalJob.plugin.name },
@@ -431,8 +431,8 @@ export const createJobV2FromInternalJob =
         },
       })
 
-      // remove the job from our inProgressJobQueue as it's available in our done state.
-      // this is a perf optimisations so we don't grow our memory too much when using gatsby preview
+      // このジョブは done の状態から参照できるので、inProgressJobQueue から取り除く。
+      // これは、gatsby preview を使うときにメモリーが増えすぎないようにするためのパフォーマンス最適化である
       removeInProgressJob(jobContentDigest)
 
       return result

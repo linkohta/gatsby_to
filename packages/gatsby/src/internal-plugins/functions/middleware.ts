@@ -23,8 +23,8 @@ const expressBuiltinMiddleware = {
 interface IGatsbyRequestContext {
   functionObj: IGatsbyFunction
   fnToExecute: (req: Request, res: Response) => void | Promise<void>
-  // we massage params early in setContext middleware, but apparently other middlewares
-  // reset it, so we will store those on our context and restore later
+  // params は setContext ミドルウェアの早い段階で加工しているが、どうやら他のミドルウェアが
+  // リセットしてしまうようなので、自前のコンテキストに保存しておき、後で復元する
   params: Request["params"]
   config: IGatsbyFunctionConfigProcessed
   showDebugMessageInResponse: boolean
@@ -86,22 +86,22 @@ function createSetContextFunctionMiddleware({
     const functions = getFunctions()
     const { "0": pathFragment } = req.params
 
-    // Check first for exact matches.
+    // 最初に完全一致を確認する。
     let functionObj = functions.find(
       ({ functionRoute }) => functionRoute === pathFragment
     )
 
     if (!functionObj) {
-      // Check if there's any matchPaths that match.
-      // We loop until we find the first match.
+      // 一致する matchPath があるかを確認する。
+      // 最初の一致が見つかるまでループする。
       functions.some(f => {
         if (f.matchPath) {
           const matchResult = reachMatch(f.matchPath, pathFragment)
           if (matchResult) {
             req.params = matchResult.params
             if (req.params[`*`]) {
-              // Backwards compatability for v3
-              // TODO remove in v5
+              // v3 との後方互換性のため
+              // TODO v5 で削除する
               req.params[`0`] = req.params[`*`]
             }
             functionObj = f
@@ -211,7 +211,7 @@ async function executeFunction(
     req.params = req.context.params
     const start = Date.now()
     const context = req.context
-    // we don't want to leak internal context to actual request handler
+    // 内部のコンテキストを実際のリクエストハンドラーに漏らしたくない
     delete req.context
     try {
       await Promise.resolve(context.fnToExecute(req, res))
@@ -221,7 +221,7 @@ async function executeFunction(
       }
 
       reporter.error(e)
-      // Don't send the error if that would cause another error.
+      // エラーを送ることで別のエラーが起きる場合は送らない。
       if (!res.headersSent) {
         if (context.showDebugMessageInResponse) {
           res

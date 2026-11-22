@@ -38,10 +38,10 @@ import { wrapNode } from "../../utils/detect-node-mutations"
 const isNotTestEnv = process.env.NODE_ENV !== `test`
 const isTestEnv = process.env.NODE_ENV === `test`
 
-// Memoize function used to pick shadowed page components to avoid expensive I/O.
-// Ideally, we should invalidate memoized values if there are any FS operations
-// on files that are in shadowing chain, but webpack currently doesn't handle
-// shadowing changes during develop session, so no invalidation is not a deal breaker.
+// コストの高い I/O を避けるために、シャドーイングされたページコンポーネントを選ぶ関数をメモ化する。
+// 理想的には、シャドーチェーンにあるファイルに対してファイルシステムの操作があれば、メモ化した値を
+// 無効化すべきである。しかし、webpack は現状、develop セッション中のシャドーイングの変更を
+// 扱えないので、無効化しなくても致命的ではない。
 const shadowCreatePagePath = _.memoize(
   require(`../../internal-plugins/webpack-theme-component-shadowing/create-page`)
 )
@@ -130,10 +130,10 @@ type PageDataRemove = {
 }
 
 /**
- * Delete a page
- * @param {Object} page a page object
- * @param {string} page.path The path of the page
- * @param {string} page.component The absolute path to the page component
+ * ページを削除する
+ * @param {Object} page ページオブジェクト
+ * @param {string} page.path ページのパス
+ * @param {string} page.component ページコンポーネントへの絶対パス
  * @example
  * deletePage(page)
  */
@@ -157,19 +157,19 @@ const reservedFields = [
   `pluginCreatorId`,
 ]
 /**
- * Create a page. See [the guide on creating and modifying pages](/docs/creating-and-modifying-pages/)
- * for detailed documentation about creating pages.
- * @param {Object} page a page object
- * @param {string} page.path Any valid URL. Must start with a forward slash. Unicode characters should be passed directly and not encoded (eg. `á` not `%C3%A1`).
- * @param {string} page.matchPath Path that Reach Router uses to match the page on the client side.
- * Also see docs on [matchPath](/docs/gatsby-internals-terminology/#matchpath)
- * @param {string} page.ownerNodeId The id of the node that owns this page. This is used for routing users to previews via the unstable_createNodeManifest public action. Since multiple nodes can be queried on a single page, this allows the user to tell us which node is the main node for the page. Note that the ownerNodeId must be for a node which is queried on this page via a GraphQL query.
- * @param {string} page.component The absolute path to the component for this page
- * @param {Object} page.context Context data for this page. Passed as props
- * to the component `this.props.pageContext` as well as to the graphql query
- * as graphql arguments.
- * @param {Object} page.slices A mapping of alias-of-id for Slices rendered on this page. See the technical docs for the [Gatsby Slice API](/docs/reference/built-in-components/gatsby-slice).
- * @param {boolean} page.defer When set to `true`, Gatsby will exclude the page from the build step and instead generate it during the first HTTP request. Default value is `false`. Also see docs on [Deferred Static Generation](/docs/reference/rendering-options/deferred-static-generation/).
+ * ページを作成する。ページの作成についての詳しいドキュメントは、[ページの作成と変更のガイド](/docs/creating-and-modifying-pages/)
+ * を参照。
+ * @param {Object} page ページオブジェクト
+ * @param {string} page.path 任意の有効な URL。スラッシュで始まる必要がある。Unicode 文字はエンコードせずにそのまま渡す（例: `á` と書き、`%C3%A1` とは書かない）。
+ * @param {string} page.matchPath Reach Router がクライアントサイドでページの照合に使うパス。
+ * [matchPath](/docs/gatsby-internals-terminology/#matchpath) のドキュメントも参照
+ * @param {string} page.ownerNodeId このページを所有するノードの ID。公開アクション unstable_createNodeManifest を通じて、ユーザーをプレビューへ案内するために使われる。1 つのページで複数のノードをクエリできるので、どのノードがそのページの主となるノードかをユーザーが指定できるようにしている。ownerNodeId は、このページで GraphQL クエリによってクエリされているノードのものでなければならない。
+ * @param {string} page.component このページのコンポーネントへの絶対パス
+ * @param {Object} page.context このページのコンテキストデータ。props として
+ * コンポーネントの `this.props.pageContext` に渡されるほか、graphql クエリにも
+ * graphql の引数として渡される。
+ * @param {Object} page.slices このページでレンダリングされる Slice の、エイリアスから ID への対応。[Gatsby Slice API](/docs/reference/built-in-components/gatsby-slice) の技術ドキュメントを参照。
+ * @param {boolean} page.defer `true` にすると、Gatsby はそのページをビルドのステップから除外し、最初の HTTP リクエストのときに生成する。デフォルト値は `false`。[Deferred Static Generation](/docs/reference/rendering-options/deferred-static-generation/) のドキュメントも参照。
  * @example
  * createPage({
  *   path: `/my-sweet-new-page/`,
@@ -193,7 +193,7 @@ actions.createPage = (
   }
   if (!page.path) {
     const message = `${name} must set the page path when creating a page`
-    // Don't log out when testing
+    // テスト中はログを出さない
     if (isNotTestEnv) {
       report.panic({
         id: `11323`,
@@ -208,8 +208,8 @@ actions.createPage = (
     }
   }
 
-  // Validate that the context object doesn't overlap with any core page fields
-  // as this will cause trouble when running graphql queries.
+  // コンテキストオブジェクトが、コアのページフィールドと重なっていないことを検証する。
+  // 重なっていると、graphql クエリの実行時に問題が起きるためである。
   if (page.context && typeof page.context === `object`) {
     const invalidFields = reservedFields.filter(field => field in page.context)
 
@@ -243,9 +243,9 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
             `
       if (isTestEnv) {
         return error
-        // Only error if the context version is different than the page
-        // version.  People in v1 often thought that they needed to also pass
-        // the path to context for it to be available in GraphQL
+        // コンテキストの側の値がページの側の値と異なる場合にだけ
+        // エラーにする。v1 では、GraphQL で使えるようにするには path をコンテキストにも
+        // 渡す必要があると考えた人が多かった
       } else if (invalidFields.some(f => page.context[f] !== page[f])) {
         report.panic({
           id: `11324`,
@@ -262,7 +262,7 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
     }
   }
 
-  // Check if a component is set.
+  // コンポーネントが設定されているかを確認する。
   if (!page.component) {
     if (isNotTestEnv) {
       report.panic({
@@ -273,7 +273,7 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
         },
       })
     } else {
-      // For test
+      // テスト用
       return `A component must be set when creating a page`
     }
   }
@@ -310,11 +310,11 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
     return `${name} must set the absolute path to the page component when creating a page`
   }
 
-  // check if we've processed this component path
-  // before, before running the expensive "trueCasePath"
-  // operation
+  // コストの高い "trueCasePath" の処理を実行する前に、
+  // このコンポーネントパスを以前に処理したかを
+  // 確認する
   //
-  // Skip during testing as the paths don't exist on disk.
+  // テスト中は、パスがディスク上に存在しないのでスキップする。
   if (isNotTestEnv) {
     if (pageComponentCache.has(page.component)) {
       page.component = pageComponentCache.get(page.component)
@@ -322,21 +322,21 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
       const originalPageComponent = page.component
       const splitPath = splitComponentPath(page.component)
 
-      // normalize component path
+      // コンポーネントパスを正規化する
       page.component = slash(splitPath[0])
-      // check if path uses correct casing - incorrect casing will
-      // cause issues in query compiler and inconsistencies when
-      // developing on Mac or Windows and trying to deploy from
-      // linux CI/CD pipeline
+      // パスの大文字と小文字が正しいかを確認する。正しくないと、
+      // クエリコンパイラーで問題が起きるほか、Mac や Windows で
+      // 開発して Linux の CI/CD パイプラインからデプロイしようとしたときに
+      // 不整合が起きる
       let trueComponentPath
       try {
-        // most systems
+        // ほとんどのシステム
         trueComponentPath = slash(trueCasePathSync(page.component))
       } catch (e) {
-        // systems where user doesn't have access to /
+        // ユーザーが / にアクセスできないシステム
         const commonDir = getCommonDir(directory, page.component)
 
-        // using `path.win32` to force case insensitive relative path
+        // `path.win32` を使って、大文字と小文字を区別しない相対パスを強制する
         const relativePath = slash(
           path.win32.relative(commonDir, page.component)
         )
@@ -419,12 +419,12 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
     componentChunkName: generateComponentChunkName(page.component),
     isCreatedByStatefulCreatePages:
       actionOptions?.traceId === `initial-createPagesStatefully`,
-    // Ensure the page has a context object
+    // ページがコンテキストオブジェクトを持つようにする
     context: page.context || {},
     updatedAt: Date.now(),
     slices: page?.slices || {},
 
-    // Link page to its plugin.
+    // ページをそのプラグインに結び付ける。
     pluginCreator___NODE: plugin.id ?? ``,
     pluginCreatorId: plugin.id ?? ``,
   }
@@ -432,15 +432,15 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
   if (page.defer) {
     internalPage.defer = true
   }
-  // Note: mode is updated in the end of the build after we get access to all page components,
-  // see materializePageMode in utils/page-mode.ts
+  // 注: mode は、すべてのページコンポーネントにアクセスできるようになったビルドの最後に更新される。
+  // utils/page-mode.ts の materializePageMode を参照
   internalPage.mode = getPageMode(internalPage)
 
   if (page.ownerNodeId) {
     internalPage.ownerNodeId = page.ownerNodeId
   }
 
-  // If the path doesn't have an initial forward slash, add it.
+  // パスの先頭にスラッシュがなければ追加する。
   if (internalPage.path[0] !== `/`) {
     internalPage.path = `/${internalPage.path}`
   }
@@ -467,7 +467,7 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
     )
   }
 
-  // just so it's easier to c&p from createPage action creator for now - ideally it's DRYed
+  // 今のところは createPage アクションクリエイターからコピー＆ペーストしやすくするためだけのもの。理想的には重複をなくしたい
   const { updatedAt, ...node } = internalPage
   node.children = []
   node.internal = {
@@ -479,7 +479,7 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
 
   let deleteActions
   let updateNodeAction
-  // marking internal-data-bridge as owner of SitePage instead of plugin that calls createPage
+  // createPage を呼ぶプラグインではなく、internal-data-bridge を SitePage の所有者として印を付ける
   if (oldNode && !hasNodeChanged(node.id, node.internal.contentDigest)) {
     updateNodeAction = {
       ...actionOptions,
@@ -489,8 +489,8 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
       payload: node.id,
     }
   } else {
-    // Remove any previously created descendant nodes as they're all due
-    // to be recreated.
+    // 以前に作成された子孫ノードは、すべて作り直されることになるので、
+    // 取り除く。
     if (oldNode) {
       const createDeleteAction = node => {
         return {
@@ -517,7 +517,7 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
     }
   }
 
-  // Sanitize page object so we don't attempt to serialize user-provided objects that are not serializable later
+  // シリアライズできないユーザー提供のオブジェクトを後でシリアライズしようとしないように、ページオブジェクトをサニタイズする
   const sanitizedPayload = sanitizeNode(internalPage)
 
   const actions = [
@@ -542,16 +542,16 @@ ${reservedFields.map(f => `  * "${f}"`).join(`\n`)}
 }
 
 /**
- * Delete a node
- * @param {object} node A node object. See the "createNode" action for more information about the node object details.
+ * ノードを削除する
+ * @param {object} node ノードオブジェクト。ノードオブジェクトの詳細については "createNode" アクションを参照。
  * @example
  * deleteNode(node)
  */
 actions.deleteNode = (node: any, plugin?: Plugin) => {
   const id = node && node.id
 
-  // Always get node from the store, as the node we get as an arg
-  // might already have been deleted.
+  // ノードは常にストアから取得する。引数として受け取ったノードは、
+  // すでに削除されているかもしれないためである。
   const internalNode = getNode(id)
 
   const createDeleteAction = node => {
@@ -559,16 +559,16 @@ actions.deleteNode = (node: any, plugin?: Plugin) => {
       type: `DELETE_NODE`,
       plugin,
       payload: node,
-      // main node need to be owned by plugin that calls deleteNode
-      // child nodes should skip ownership check
+      // 主となるノードは、deleteNode を呼ぶプラグインが所有していなければならない
+      // 子ノードは所有権の確認をスキップする
       isRecursiveChildrenDelete: node !== internalNode,
     }
   }
 
   const deleteAction = createDeleteAction(internalNode)
 
-  // It's possible the file node was never created as sometimes tools will
-  // write and then immediately delete temporary files to the file system.
+  // ファイルノードが一度も作成されていないこともありうる。ツールによっては、
+  // 一時ファイルをファイルシステムに書き込んですぐに削除することがあるためである。
   const deleteDescendantsActions =
     internalNode &&
     findChildren(internalNode.children).map(getNode).map(createDeleteAction)
@@ -580,8 +580,8 @@ actions.deleteNode = (node: any, plugin?: Plugin) => {
   }
 }
 
-// We add a counter to node.internal for fast comparisons/intersections
-// of various node slices. The counter must increase even across builds.
+// さまざまなノードの部分集合を高速に比較したり積集合を求めたりするために、
+// node.internal にカウンターを追加する。カウンターはビルドをまたいでも増え続けなければならない。
 function getNextNodeCounter() {
   const lastNodeCounter = store.getState().status.LAST_NODE_COUNTER ?? 0
   if (lastNodeCounter >= Number.MAX_SAFE_INTEGER) {
@@ -592,64 +592,64 @@ function getNextNodeCounter() {
   return lastNodeCounter + 1
 }
 
-// memberof notation is added so this code can be referenced instead of the wrapper.
+// ラッパーではなくこのコードを参照できるように、memberof の記法を追加している。
 /**
- * Create a new node.
+ * 新しいノードを作成する。
  * @memberof actions
- * @param {Object} node a node object
- * @param {string} node.id The node's ID. Must be globally unique.
- * @param {string} node.parent The ID of the parent's node. If the node is
- * derived from another node, set that node as the parent. Otherwise it can
- * just be `null`.
- * @param {Array} node.children An array of children node IDs. If you're
- * creating the children nodes while creating the parent node, add the
- * children node IDs here directly. If you're adding a child node to a
- * parent node created by a plugin, you can't mutate this value directly
- * to add your node id, instead use the action creator `createParentChildLink`.
- * @param {Object} node.internal node fields that aren't generally
- * interesting to consumers of node data but are very useful for plugin writers
- * and Gatsby core. Only fields described below are allowed in `internal` object.
- * Using any type of custom fields will result in validation errors.
- * @param {string} node.internal.mediaType An optional field to indicate to
- * transformer plugins that your node has raw content they can transform.
- * Use either an official media type (we use mime-db as our source
- * (https://www.npmjs.com/package/mime-db) or a made-up one if your data
- * doesn't fit in any existing bucket. Transformer plugins use node media types
- * for deciding if they should transform a node into a new one. E.g.
- * markdown transformers look for media types of
- * `text/markdown`.
- * @param {string} node.internal.type An arbitrary globally unique type
- * chosen by the plugin creating the node. Should be descriptive of the
- * node as the type is used in forming GraphQL types so users will query
- * for nodes based on the type chosen here. Nodes of a given type can
- * only be created by one plugin.
- * @param {string} node.internal.content An optional field. This is rarely
- * used. It is used when a source plugin sources data it doesn't know how
- * to transform e.g. a markdown string pulled from an API. The source plugin
- * can defer the transformation to a specialized transformer plugin like
- * gatsby-transformer-remark. This `content` field holds the raw content
- * (so for the markdown case, the markdown string).
+ * @param {Object} node ノードオブジェクト
+ * @param {string} node.id ノードの ID。グローバルに一意でなければならない。
+ * @param {string} node.parent 親ノードの ID。このノードが別のノードから
+ * 派生している場合は、そのノードを親に設定する。そうでなければ
+ * `null` でよい。
+ * @param {Array} node.children 子ノードの ID の配列。親ノードを作成する
+ * ときに子ノードも作成する場合は、子ノードの ID をここに直接
+ * 追加する。プラグインが作成した親ノードに子ノードを追加する
+ * 場合は、この値を直接変更して自分のノードの ID を追加することは
+ * できない。代わりにアクションクリエイター `createParentChildLink` を使う。
+ * @param {Object} node.internal ノードのデータを利用する側にとっては
+ * 通常は関心がないが、プラグインの作者や Gatsby コアにとっては非常に
+ * 有用なノードのフィールド。`internal` オブジェクトに入れられるのは、以下に示すフィールドだけである。
+ * 独自のフィールドを使うと、種類を問わずバリデーションエラーになる。
+ * @param {string} node.internal.mediaType 省略可能なフィールド。ノードが
+ * 変換できる生のコンテンツを持っていることをトランスフォーマープラグインに伝える。
+ * 公式のメディアタイプ（情報源として mime-db
+ * (https://www.npmjs.com/package/mime-db) を使っている）か、データが
+ * 既存のどの分類にも当てはまらない場合は独自に作ったものを使う。トランスフォーマープラグインは、
+ * ノードを新しいノードに変換すべきかどうかをノードのメディアタイプで判断する。たとえば
+ * markdown のトランスフォーマーは、メディアタイプが
+ * `text/markdown` のものを探す。
+ * @param {string} node.internal.type ノードを作成するプラグインが選ぶ、
+ * グローバルに一意な任意の型。型は GraphQL の型を作るのに使われ、
+ * ユーザーはここで選んだ型をもとにノードをクエリするので、
+ * ノードの内容を表す名前にすべきである。ある型のノードを作成できるのは、
+ * 1 つのプラグインだけである。
+ * @param {string} node.internal.content 省略可能なフィールド。使われることは
+ * まれである。ソースプラグインが、変換方法の分からないデータ（たとえば
+ * API から取得した markdown の文字列）を取得したときに使う。ソースプラグインは、
+ * gatsby-transformer-remark のような専用のトランスフォーマープラグインに
+ * 変換を任せることができる。この `content` フィールドは生のコンテンツ
+ * （markdown の場合は markdown の文字列）を保持する。
  *
- * Data that's already structured should be added to the top-level of the node
- * object and _not_ added here. You should not `JSON.stringify` your node's
- * data here.
+ * すでに構造化されているデータは、ノードオブジェクトのトップレベルに
+ * 追加すべきであり、ここには追加 _しない_。ノードのデータをここで
+ * `JSON.stringify` してはならない。
  *
- * If the content is very large and can be lazy-loaded, e.g. a file on disk,
- * you can define a `loadNodeContent` function for this node and the node
- * content will be lazy loaded when it's needed.
- * @param {string} node.internal.contentDigest the digest for the content
- * of this node. Helps Gatsby avoid doing extra work on data that hasn't
- * changed.
- * @param {string} node.internal.description An optional field. Human
- * readable description of what this node represent / its source. It will
- * be displayed when type conflicts are found, making it easier to find
- * and correct type conflicts.
- * @param {string} node.internal.contentFilePath An optional field. A plugin
- * can add an absolute path to a content file (e.g. markdown file) here
- * while creating the node. Example: gatsby-plugin-mdx adds the absolute path
- * of the `File` node to the `Mdx` node under `internal.contentFilePath`.
- * @returns {Promise} The returned Promise resolves when all cascading
- * `onCreateNode` API calls triggered by `createNode` have finished.
+ * コンテンツが非常に大きく、遅延読み込みができる場合（たとえばディスク上のファイル）は、
+ * そのノードに `loadNodeContent` 関数を定義すれば、ノードの
+ * コンテンツは必要になったときに遅延読み込みされる。
+ * @param {string} node.internal.contentDigest このノードのコンテンツの
+ * ダイジェスト。変更されていないデータに対して Gatsby が余分な処理を
+ * しないようにするのに役立つ。
+ * @param {string} node.internal.description 省略可能なフィールド。この
+ * ノードが何を表すか、またはその出どころについての、人が読める説明。
+ * 型の衝突が見つかったときに表示され、衝突を見つけて直すのが
+ * 楽になる。
+ * @param {string} node.internal.contentFilePath 省略可能なフィールド。プラグインは、
+ * ノードを作成するときに、コンテンツファイル（たとえば markdown ファイル）への
+ * 絶対パスをここに追加できる。例: gatsby-plugin-mdx は、`File` ノードの
+ * 絶対パスを `Mdx` ノードの `internal.contentFilePath` に追加する。
+ * @returns {Promise} 返される Promise は、`createNode` によって連鎖的に起動された
+ * `onCreateNode` API の呼び出しがすべて終わったときに解決される。
  * @example
  * createNode({
  *   // Data for the node.
@@ -687,22 +687,22 @@ const createNode = (
     )
   }
 
-  // Ensure the new node has an internals object.
+  // 新しいノードが internal オブジェクトを持つようにする。
   if (!node.internal) {
     node.internal = {}
   }
 
-  // Ensure the new node has a children array.
+  // 新しいノードが children 配列を持つようにする。
   if (!node.array && !_.isArray(node.children)) {
     node.children = []
   }
 
-  // Ensure the new node has a parent field
+  // 新しいノードが parent フィールドを持つようにする
   if (!node.parent) {
     node.parent = null
   }
 
-  // Tell user not to set the owner name themself.
+  // owner の名前を自分で設定しないようにユーザーへ伝える。
   if (node.internal.owner) {
     report.error(JSON.stringify(node, null, 4))
     report.panic(
@@ -713,7 +713,7 @@ const createNode = (
   }
 
   const trackParams = {}
-  // Add the plugin name to the internal object.
+  // プラグイン名を internal オブジェクトに追加する。
   if (plugin) {
     node.internal.owner = plugin.name
     trackParams[`pluginName`] = `${plugin.name}@${plugin.version}`
@@ -749,7 +749,7 @@ const createNode = (
     return { type: `VALIDATION_ERROR`, error: true }
   }
 
-  // Ensure node isn't directly setting fields.
+  // ノードが fields を直接設定していないことを確認する。
   if (node.fields) {
     throw new Error(
       stripIndent`
@@ -781,7 +781,7 @@ const createNode = (
 
   let deleteActions
   let updateNodeAction
-  // Check if the node has already been processed.
+  // ノードがすでに処理済みであるかを確認する。
   if (oldNode && !hasNodeChanged(node.id, node.internal.contentDigest)) {
     updateNodeAction = {
       ...actionOptions,
@@ -791,8 +791,8 @@ const createNode = (
       typeName: node.internal.type,
     }
   } else {
-    // Remove any previously created descendant nodes as they're all due
-    // to be recreated.
+    // 以前に作成された子孫ノードは、すべて作り直されることになるので、
+    // 取り除く。
     if (oldNode) {
       const createDeleteAction = node => {
         return {
@@ -862,12 +862,12 @@ actions.createNode =
   }
 
 /**
- * "Touch" a node. Tells Gatsby a node still exists and shouldn't
- * be garbage collected. Primarily useful for source plugins fetching
- * nodes from a remote system that can return only nodes that have
- * updated. The source plugin then touches all the nodes that haven't
- * updated but still exist so Gatsby knows to keep them.
- * @param {Object} node A node object. See the "createNode" action for more information about the node object details.
+ * ノードに「タッチ」する。ノードがまだ存在しており、ガベージコレクションの
+ * 対象にすべきでないことを Gatsby に伝える。主に、更新されたノードだけを
+ * 返せるリモートシステムからノードを取得するソースプラグインで役に立つ。
+ * その場合、ソースプラグインは、更新されていないがまだ存在するすべての
+ * ノードにタッチして、それらを残すべきであることを Gatsby に知らせる。
+ * @param {Object} node ノードオブジェクト。ノードオブジェクトの詳細については "createNode" アクションを参照。
  * @example
  * touchNode(node)
  */
@@ -875,7 +875,7 @@ actions.touchNode = (node: any, plugin?: Plugin) => {
   const nodeId = node?.id
 
   if (!nodeId) {
-    // if we don't have a node id, we don't want to dispatch this action
+    // ノードの ID がなければ、このアクションは dispatch しない
     return []
   }
 
@@ -893,16 +893,16 @@ type CreateNodeInput = {
   value: any,
 }
 /**
- * Extend another node. The new node field is placed under the `fields`
- * key on the extended node object.
+ * 別のノードを拡張する。新しいノードフィールドは、拡張されたノード
+ * オブジェクトの `fields` キーの下に置かれる。
  *
- * Once a plugin has claimed a field name the field name can't be used by
- * other plugins.  Also since nodes are immutable, you can't mutate the node
- * directly. So to extend another node, use this.
+ * あるプラグインがフィールド名を確保すると、そのフィールド名は他の
+ * プラグインからは使えなくなる。また、ノードはイミュータブルなので、ノードを
+ * 直接変更することはできない。別のノードを拡張するには、これを使う。
  * @param {Object} $0
- * @param {Object} $0.node the target node object
- * @param {string} $0.name the name for the field
- * @param {any} $0.value the value for the field
+ * @param {Object} $0.node 対象のノードオブジェクト
+ * @param {string} $0.name フィールドの名前
+ * @param {any} $0.value フィールドの値
  * @example
  * createNodeField({
  *   node,
@@ -917,7 +917,7 @@ actions.createNodeField = (
   plugin: Plugin,
   actionOptions?: ActionOptions
 ) => {
-  // Ensure required fields are set.
+  // 必須のフィールドが設定されていることを確認する。
   if (!node.internal.fieldOwners) {
     node.internal.fieldOwners = {}
   }
@@ -925,12 +925,12 @@ actions.createNodeField = (
     node.fields = {}
   }
 
-  // Normalized name of the field that will be used in schema
+  // スキーマで使われる、正規化したフィールド名
   const schemaFieldName = _.includes(name, `___NODE`)
     ? name.split(`___`)[0]
     : name
 
-  // Check that this field isn't owned by another plugin.
+  // このフィールドが別のプラグインに所有されていないことを確認する。
   const fieldOwner = node.internal.fieldOwners[schemaFieldName]
   if (fieldOwner && fieldOwner !== plugin.name) {
     throw new Error(
@@ -945,7 +945,7 @@ actions.createNodeField = (
     )
   }
 
-  // Update node
+  // ノードを更新する
   node.fields[name] = value
   node.internal.fieldOwners[schemaFieldName] = plugin.name
   node = sanitizeNode(node)
@@ -960,14 +960,14 @@ actions.createNodeField = (
 }
 
 /**
- * Creates a link between a parent and child node. This is used when you
- * transform content from a node creating a new child node. You need to add
- * this new child node to the `children` array of the parent but since you
- * don't have direct access to the immutable parent node, use this action
- * instead.
+ * 親ノードと子ノードの間のリンクを作成する。ノードのコンテンツを変換して
+ * 新しい子ノードを作成するときに使う。新しい子ノードは親の `children` 配列に
+ * 追加する必要があるが、イミュータブルな親ノードには直接
+ * アクセスできないので、代わりにこのアクションを
+ * 使う。
  * @param {Object} $0
- * @param {Object} $0.parent the parent node object
- * @param {Object} $0.child the child node object
+ * @param {Object} $0.parent 親のノードオブジェクト
+ * @param {Object} $0.child 子のノードオブジェクト
  * @example
  * createParentChildLink({ parent: parentNode, child: childNode })
  */
@@ -987,13 +987,13 @@ actions.createParentChildLink = (
 }
 
 /**
- * Merge additional configuration into the current webpack config. A few
- * configurations options will be ignored if set, in order to try prevent accidental breakage.
- * Specifically, any change to `entry`, `output`, `target`, or `resolveLoaders` will be ignored.
+ * 追加の設定を現在の webpack の設定にマージする。意図せず壊してしまうのを防ぐために、
+ * 一部の設定オプションは、設定されていても無視される。
+ * 具体的には、`entry`、`output`、`target`、`resolveLoaders` への変更はすべて無視される。
  *
- * For full control over the webpack config, use `replaceWebpackConfig()`.
+ * webpack の設定を完全に制御するには、`replaceWebpackConfig()` を使う。
  *
- * @param {Object} config partial webpack config, to be merged into the current one
+ * @param {Object} config 現在の設定にマージする、webpack の設定の一部
  */
 actions.setWebpackConfig = (config: Object, plugin?: ?Plugin = null) => {
   if (config.node?.fs === `empty`) {
@@ -1016,13 +1016,13 @@ actions.setWebpackConfig = (config: Object, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Completely replace the webpack config for the current stage. This can be
- * dangerous and break Gatsby if certain configuration options are changed.
+ * 現在のステージの webpack の設定を完全に置き換える。特定の設定オプションを
+ * 変更すると Gatsby が壊れることがあり、危険を伴う。
  *
- * Generally only useful for cases where you need to handle config merging logic
- * yourself, in which case consider using `webpack-merge`.
+ * 通常は、設定のマージのロジックを自分で扱う必要がある場合にだけ
+ * 役に立つ。その場合は `webpack-merge` の利用を検討するとよい。
  *
- * @param {Object} config complete webpack config
+ * @param {Object} config webpack の設定の全体
  */
 actions.replaceWebpackConfig = (config: Object, plugin?: ?Plugin = null) => {
   if (config.node?.fs === `empty`) {
@@ -1045,9 +1045,9 @@ actions.replaceWebpackConfig = (config: Object, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Set top-level Babel options. Plugins and presets will be ignored. Use
- * setBabelPlugin and setBabelPreset for this.
- * @param {Object} config An options object in the shape of a normal babelrc JavaScript object
+ * トップレベルの Babel オプションを設定する。プラグインとプリセットは無視される。
+ * それらには setBabelPlugin と setBabelPreset を使う。
+ * @param {Object} config 通常の babelrc の JavaScript オブジェクトと同じ形のオプションオブジェクト
  * @example
  * setBabelOptions({
  *   options: {
@@ -1056,7 +1056,7 @@ actions.replaceWebpackConfig = (config: Object, plugin?: ?Plugin = null) => {
  * })
  */
 actions.setBabelOptions = (options: Object, plugin?: ?Plugin = null) => {
-  // Validate
+  // 検証する
   let name = `The plugin "${plugin.name}"`
   if (plugin.name === `default-site-plugin`) {
     name = `Your site's "gatsby-node.js"`
@@ -1085,10 +1085,10 @@ actions.setBabelOptions = (options: Object, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Add new plugins or merge options into existing Babel plugins.
- * @param {Object} config A config object describing the Babel plugin to be added.
- * @param {string} config.name The name of the Babel plugin
- * @param {Object} config.options Options to pass to the Babel plugin.
+ * 新しいプラグインを追加するか、既存の Babel プラグインにオプションをマージする。
+ * @param {Object} config 追加する Babel プラグインを表す設定オブジェクト。
+ * @param {string} config.name Babel プラグインの名前
+ * @param {Object} config.options Babel プラグインに渡すオプション。
  * @example
  * setBabelPlugin({
  *   name:  `@emotion/babel-plugin`,
@@ -1098,7 +1098,7 @@ actions.setBabelOptions = (options: Object, plugin?: ?Plugin = null) => {
  * })
  */
 actions.setBabelPlugin = (config: Object, plugin?: ?Plugin = null) => {
-  // Validate
+  // 検証する
   let name = `The plugin "${plugin.name}"`
   if (plugin.name === `default-site-plugin`) {
     name = `Your site's "gatsby-node.js"`
@@ -1121,10 +1121,10 @@ actions.setBabelPlugin = (config: Object, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Add new presets or merge options into existing Babel presets.
- * @param {Object} config A config object describing the Babel plugin to be added.
- * @param {string} config.name The name of the Babel preset.
- * @param {Object} config.options Options to pass to the Babel preset.
+ * 新しいプリセットを追加するか、既存の Babel プリセットにオプションをマージする。
+ * @param {Object} config 追加する Babel プラグインを表す設定オブジェクト。
+ * @param {string} config.name Babel プリセットの名前。
+ * @param {Object} config.options Babel プリセットに渡すオプション。
  * @example
  * setBabelPreset({
  *   name: `@babel/preset-react`,
@@ -1134,7 +1134,7 @@ actions.setBabelPlugin = (config: Object, plugin?: ?Plugin = null) => {
  * })
  */
 actions.setBabelPreset = (config: Object, plugin?: ?Plugin = null) => {
-  // Validate
+  // 検証する
   let name = `The plugin "${plugin.name}"`
   if (plugin.name === `default-site-plugin`) {
     name = `Your site's "gatsby-node.js"`
@@ -1157,16 +1157,16 @@ actions.setBabelPreset = (config: Object, plugin?: ?Plugin = null) => {
 }
 
 /**
- * DEPRECATED. Use createJobV2 instead.
+ * 非推奨。代わりに createJobV2 を使うこと。
  *
- * Create a "job". This is a long-running process that is generally
- * started as a side-effect to a GraphQL query.
- * [`gatsby-plugin-sharp`](/plugins/gatsby-plugin-sharp/) uses this for
- * example.
+ * 「ジョブ」を作成する。ジョブは長時間かかる処理で、通常は
+ * GraphQL クエリの副作用として開始される。
+ * たとえば [`gatsby-plugin-sharp`](/plugins/gatsby-plugin-sharp/) が
+ * これを使っている。
  *
- * Gatsby doesn't finish its process until all jobs are ended.
- * @param {Object} job A job object with at least an id set
- * @param {id} job.id The id of the job
+ * Gatsby は、すべてのジョブが終了するまでプロセスを終了しない。
+ * @param {Object} job 少なくとも id が設定されたジョブオブジェクト
+ * @param {id} job.id ジョブの ID
  * @deprecated Use "createJobV2" instead
  * @example
  * createJob({ id: `write file id: 123`, fileName: `something.jpeg` })
@@ -1187,18 +1187,18 @@ actions.createJob = (job: Job, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Create a "job". This is a long-running process that is generally
- * started as a side-effect to a GraphQL query.
- * [`gatsby-plugin-sharp`](/plugins/gatsby-plugin-sharp/) uses this for
- * example.
+ * 「ジョブ」を作成する。ジョブは長時間かかる処理で、通常は
+ * GraphQL クエリの副作用として開始される。
+ * たとえば [`gatsby-plugin-sharp`](/plugins/gatsby-plugin-sharp/) が
+ * これを使っている。
  *
- * Gatsby doesn't finish its process until all jobs are ended.
- * @param {Object} job A job object with name, inputPaths, outputDir and args
- * @param {string} job.name The name of the job you want to execute
- * @param {string[]} job.inputPaths The inputPaths that are needed to run
- * @param {string} job.outputDir The directory where all files are being saved to
- * @param {Object} job.args The arguments the job needs to execute
- * @returns {Promise<object>} Promise to see if the job is done executing
+ * Gatsby は、すべてのジョブが終了するまでプロセスを終了しない。
+ * @param {Object} job name、inputPaths、outputDir、args を持つジョブオブジェクト
+ * @param {string} job.name 実行したいジョブの名前
+ * @param {string[]} job.inputPaths 実行に必要な inputPaths
+ * @param {string} job.outputDir すべてのファイルの保存先になるディレクトリ
+ * @param {Object} job.args ジョブの実行に必要な引数
+ * @returns {Promise<object>} ジョブの実行が終わったかを確認するための Promise
  * @example
  * createJobV2({ name: `IMAGE_PROCESSING`, inputPaths: [`something.jpeg`], outputDir: `public/static`, args: { width: 100, height: 100 } })
  */
@@ -1221,13 +1221,13 @@ actions.addGatsbyImageSourceUrl = (sourceUrl: string) => {
 }
 
 /**
- * DEPRECATED. Use createJobV2 instead.
+ * 非推奨。代わりに createJobV2 を使うこと。
  *
- * Set (update) a "job". Sometimes on really long running jobs you want
- * to update the job as it continues.
+ * 「ジョブ」を設定（更新）する。非常に長時間かかるジョブでは、
+ * 途中経過に合わせてジョブを更新したいことがある。
  *
- * @param {Object} job A job object with at least an id set
- * @param {id} job.id The id of the job
+ * @param {Object} job 少なくとも id が設定されたジョブオブジェクト
+ * @param {id} job.id ジョブの ID
  * @deprecated Use "createJobV2" instead
  * @example
  * setJob({ id: `write file id: 123`, progress: 50 })
@@ -1248,13 +1248,13 @@ actions.setJob = (job: Job, plugin?: ?Plugin = null) => {
 }
 
 /**
- * DEPRECATED. Use createJobV2 instead.
+ * 非推奨。代わりに createJobV2 を使うこと。
  *
- * End a "job".
+ * 「ジョブ」を終了する。
  *
- * Gatsby doesn't finish its process until all jobs are ended.
- * @param {Object} job  A job object with at least an id set
- * @param {id} job.id The id of the job
+ * Gatsby は、すべてのジョブが終了するまでプロセスを終了しない。
+ * @param {Object} job  少なくとも id が設定されたジョブオブジェクト
+ * @param {id} job.id ジョブの ID
  * @deprecated Use "createJobV2" instead
  * @example
  * endJob({ id: `write file id: 123` })
@@ -1275,10 +1275,10 @@ actions.endJob = (job: Job, plugin?: ?Plugin = null) => {
 }
 
 /**
- * Set plugin status. A plugin can use this to save status keys e.g. the last
- * it fetched something. These values are persisted between runs of Gatsby.
+ * プラグインのステータスを設定する。プラグインはこれを使って、最後に何かを取得した
+ * 時刻などのステータスのキーを保存できる。これらの値は Gatsby の実行をまたいで永続化される。
  *
- * @param {Object} status  An object with arbitrary values set
+ * @param {Object} status  任意の値を設定したオブジェクト
  * @example
  * setPluginStatus({ lastFetched: Date.now() })
  */
@@ -1293,7 +1293,7 @@ actions.setPluginStatus = (
   }
 }
 
-// Check if path is absolute and add pathPrefix in front if it's not
+// パスが絶対パスであるかを確認し、そうでなければ先頭に pathPrefix を付ける
 const maybeAddPathPrefix = (path, pathPrefix) => {
   const parsed = url.parse(path)
   const isRelativeProtocol = path.startsWith(`//`)
@@ -1303,25 +1303,25 @@ const maybeAddPathPrefix = (path, pathPrefix) => {
 }
 
 /**
- * Create a redirect from one page to another.
+ * あるページから別のページへのリダイレクトを作成する。
  *
- * Redirects must be implemented by your deployment platform (e.g. Gatsby Cloud, Netlify, etc.). You can use an [adapter](/docs/how-to/previews-deploys-hosting/adapters/) or plugins for this. Alternatively, you can use [gatsby-plugin-meta-redirect](/plugins/gatsby-plugin-meta-redirect/) to generate meta redirect HTML files for redirecting on any static file host.
+ * リダイレクトは、デプロイ先のプラットフォーム（Gatsby Cloud、Netlify など）で実装されている必要がある。そのために [アダプター](/docs/how-to/previews-deploys-hosting/adapters/) やプラグインを使える。あるいは、[gatsby-plugin-meta-redirect](/plugins/gatsby-plugin-meta-redirect/) を使って、meta リダイレクトの HTML ファイルを生成すれば、任意の静的ファイルホスティングでリダイレクトできる。
  *
- * You can read the source code of [gatsby-adapter-netlify](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-adapter-netlify) to see how redirects are implemented on Netlify. Redirects also work out of the box on Gatsby Cloud.
+ * Netlify でリダイレクトがどのように実装されているかは、[gatsby-adapter-netlify](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-adapter-netlify) のソースコードで確認できる。Gatsby Cloud でも、リダイレクトは追加の設定なしで動く。
  *
- * Keep the redirects configuration in sync with trailing slash configuration from [Gatsby Config API](/docs/reference/config-files/gatsby-config/#trailingslash).
+ * リダイレクトの設定は、[Gatsby Config API](/docs/reference/config-files/gatsby-config/#trailingslash) の末尾のスラッシュの設定と一致させておくこと。
  *
- * @param {Object} redirect Redirect data
- * @param {string} redirect.fromPath Any valid URL. Must start with a forward slash
- * @param {boolean} redirect.isPermanent This is a permanent redirect; defaults to temporary
- * @param {string} redirect.toPath URL of a created page (see `createPage`)
- * @param {boolean} redirect.redirectInBrowser Redirects are generally for redirecting legacy URLs to their new configuration on the server. If you can't update your UI for some reason, set `redirectInBrowser` to true and Gatsby will handle redirecting in the client as well. You almost never need this so be sure your use case fits before enabling.
- * @param {boolean} redirect.force (Plugin-specific) Will trigger the redirect even if the `fromPath` matches a piece of content. This is not part of the Gatsby API, but implemented by (some) plugins that configure hosting provider redirects
- * @param {number} redirect.statusCode (Plugin-specific) Manually set the HTTP status code. This allows you to create a rewrite (status code 200) or custom error page (status code 404). Note that this will override the `isPermanent` option which also sets the status code. This is not part of the Gatsby API, but implemented by (some) plugins that configure hosting provider redirects
- * @param {boolean} redirect.ignoreCase (Plugin-specific) Ignore case when looking for redirects
- * @param {Object} redirect.conditions Specify a country or language based redirect
- * @param {(string|string[])} redirect.conditions.country A two-letter country code based on the regional indicator symbol
- * @param {(string|string[])} redirect.conditions.language A two-letter identifier defined by ISO 639-1
+ * @param {Object} redirect リダイレクトのデータ
+ * @param {string} redirect.fromPath 任意の有効な URL。スラッシュで始まる必要がある
+ * @param {boolean} redirect.isPermanent 恒久的なリダイレクトにする。デフォルトは一時的なリダイレクト
+ * @param {string} redirect.toPath 作成済みのページの URL（`createPage` を参照）
+ * @param {boolean} redirect.redirectInBrowser リダイレクトは通常、古い URL をサーバー側で新しい構成へ転送するためのものである。何らかの理由で UI を更新できない場合は、`redirectInBrowser` を true にすると、Gatsby がクライアント側でもリダイレクトを処理する。これが必要になることはほとんどないので、有効にする前に用途に合っているかを確認すること。
+ * @param {boolean} redirect.force （プラグイン固有）`fromPath` がコンテンツに一致する場合でもリダイレクトを発生させる。これは Gatsby の API の一部ではなく、ホスティングプロバイダーのリダイレクトを設定する（一部の）プラグインが実装している
+ * @param {number} redirect.statusCode （プラグイン固有）HTTP ステータスコードを手動で設定する。これにより、リライト（ステータスコード 200）や独自のエラーページ（ステータスコード 404）を作成できる。同じくステータスコードを設定する `isPermanent` オプションよりも優先されることに注意。これは Gatsby の API の一部ではなく、ホスティングプロバイダーのリダイレクトを設定する（一部の）プラグインが実装している
+ * @param {boolean} redirect.ignoreCase （プラグイン固有）リダイレクトを探すときに大文字と小文字を区別しない
+ * @param {Object} redirect.conditions 国または言語に基づくリダイレクトを指定する
+ * @param {(string|string[])} redirect.conditions.country regional indicator symbol に基づく 2 文字の国コード
+ * @param {(string|string[])} redirect.conditions.language ISO 639-1 で定義された 2 文字の識別子
  * @example
  * // Generally you create redirects while creating pages.
  * exports.createPages = ({ graphql, actions }) => {
@@ -1364,12 +1364,12 @@ actions.createRedirect = ({
 }
 
 /**
- * Create a dependency between a page and data.
+ * ページとデータの間の依存を作成する。
  *
  * @param {Object} $0
- * @param {string} $0.path the path to the page
- * @param {string} $0.nodeId A node ID
- * @param {string} $0.connection A connection type
+ * @param {string} $0.path ページへのパス
+ * @param {string} $0.nodeId ノードの ID
+ * @param {string} $0.connection connection の型
  * @private
  */
 actions.createPageDependency = (
@@ -1397,15 +1397,15 @@ actions.createPageDependency = (
 }
 
 /**
- * Record that a page was visited on the server..
+ * ページがサーバーで訪問されたことを記録する。
  *
  * @param {Object} $0
- * @param {string} $0.id the chunkName for the page component.
+ * @param {string} $0.id ページコンポーネントの chunkName。
  */
 actions.createServerVisitedPage = (chunkName: string) => {
   if (store.getState().visitedPages.get(`server`)?.has(chunkName)) {
-    // we already have given chunk tracked, let's not emit `CREATE_SERVER_VISITED_PAGE`
-    // action to not cause any additional work
+    // このチャンクはすでに追跡しているので、余分な処理を発生させないように
+    // `CREATE_SERVER_VISITED_PAGE` アクションは発行しない
     return []
   }
 
@@ -1416,13 +1416,13 @@ actions.createServerVisitedPage = (chunkName: string) => {
 }
 
 /**
- * Creates an individual node manifest.
- * This is used to tie the unique revision state within a data source at the current point in time to a page generated from the provided node when it's node manifest is processed.
+ * 個別のノードマニフェストを作成する。
+ * ノードマニフェストが処理されるときに、データソース内のその時点での一意なリビジョンの状態を、渡されたノードから生成されるページに結び付けるために使う。
  *
- * @param {Object} manifest Manifest data
- * @param {string} manifest.manifestId An id which ties the unique revision state of this manifest to the unique revision state of a data source.
- * @param {Object} manifest.node The Gatsby node to tie the manifestId to. See the "createNode" action for more information about the node object details.
- * @param {string} manifest.updatedAtUTC (optional) The time in which the node was last updated. If this parameter is not included, a manifest is created for every node that gets called. By default, node manifests are created for content updated in the last 30 days. To change this, set a `NODE_MANIFEST_MAX_DAYS_OLD` environment variable.
+ * @param {Object} manifest マニフェストのデータ
+ * @param {string} manifest.manifestId このマニフェストの一意なリビジョンの状態を、データソースの一意なリビジョンの状態に結び付ける ID。
+ * @param {Object} manifest.node manifestId を結び付ける Gatsby のノード。ノードオブジェクトの詳細については "createNode" アクションを参照。
+ * @param {string} manifest.updatedAtUTC （省略可能）ノードが最後に更新された時刻。この引数を省略すると、呼び出されたすべてのノードについてマニフェストが作成される。デフォルトでは、過去 30 日以内に更新されたコンテンツについてノードマニフェストが作成される。これを変更するには、環境変数 `NODE_MANIFEST_MAX_DAYS_OLD` を設定する。
  * @example
  * unstable_createNodeManifest({
  *   manifestId: `post-id-1--updated-53154315`,
@@ -1448,9 +1448,9 @@ actions.unstable_createNodeManifest = (
 }
 
 /**
- * Marks a source plugin as "stateful" which disables automatically deleting untouched nodes. Stateful source plugins manage deleting their own nodes without stale node checks in Gatsby.
- * Enabling this is a major performance improvement for source plugins that manage their own node deletion. It also lowers the total memory required by a source plugin.
- * When using this action, check if it's supported first with `hasFeature('stateful-source-nodes')`, `hasFeature` is exported from `gatsby-plugin-utils`.
+ * ソースプラグインを「ステートフル」として印を付け、タッチされなかったノードの自動削除を無効にする。ステートフルなソースプラグインは、Gatsby による古いノードの確認に頼らずに、自分のノードの削除を自分で管理する。
+ * ノードの削除を自分で管理するソースプラグインでは、これを有効にするとパフォーマンスが大きく改善する。ソースプラグインが必要とするメモリーの総量も減る。
+ * このアクションを使うときは、先に `hasFeature('stateful-source-nodes')` で対応しているかを確認すること。`hasFeature` は `gatsby-plugin-utils` から export されている。
  *
  * @example
  * import { hasFeature } from "gatsby-plugin-utils"
@@ -1473,11 +1473,11 @@ actions.enableStatefulSourceNodes = (plugin: Plugin) => {
 }
 
 /**
- * Stores request headers for a given domain to be later used when making requests for Image CDN (and potentially other features).
+ * 指定したドメインのリクエストヘッダーを保存し、後で Image CDN（や、場合によっては他の機能）のリクエストを行うときに使えるようにする。
  *
  * @param {Object} $0
- * @param {string} $0.domain The domain to store the headers for.
- * @param {Object} $0.headers The headers to store.
+ * @param {string} $0.domain ヘッダーを保存する対象のドメイン。
+ * @param {Object} $0.headers 保存するヘッダー。
  */
 actions.setRequestHeaders = ({ domain, headers }, plugin: Plugin) => {
   const headersIsObject =

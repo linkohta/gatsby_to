@@ -174,7 +174,7 @@ describe(`Deprecation warnings`, () => {
 async function buildSchema(typeDefs, nodes = []): Promise<void> {
   store.dispatch(actions.createTypes(typeDefs))
   nodes.forEach(nodeInput => {
-    // Satisfy node validation
+    // ノードのバリデーションを満たすため
     const node = {
       children: [],
       ...nodeInput,

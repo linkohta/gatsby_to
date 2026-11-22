@@ -25,8 +25,8 @@ export const createPageDependency = ({
 }): void => {
   const { queries } = store.getState()
 
-  // Check that the dependencies aren't already recorded so we
-  // can avoid creating lots of very noisy actions.
+  // やかましいアクションを大量に作らずに済むように、依存がまだ記録されて
+  // いないことを確認する。
   let nodeDependencyExists = false
   let connectionDependencyExists = false
   if (!nodeId) {
@@ -53,6 +53,6 @@ export const createPageDependency = ({
     return
   }
 
-  // It's new, let's dispatch it
+  // 新しいものなので dispatch する
   createPageDependencyBatcher.add({ path, nodeId, connection })
 }

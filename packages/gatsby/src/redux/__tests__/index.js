@@ -32,17 +32,17 @@ jest.mock(`fs-extra`, () => {
     ),
     readFileSync: jest.fn(file => mockWrittenContent.get(file)),
     moveSync: jest.fn((from, to) => {
-      // This will only work for folders if they are always the full prefix
-      // of the file... (that goes for both input dirs). That's the case here.
+      // フォルダーについては、それが常にファイルの完全なプレフィックスである場合にしか
+      // 動かない...（これは両方の入力ディレクトリに当てはまる）。ここではその条件を満たしている。
       if (mockWrittenContent.has(to)) {
         throw new Error(`File/folder exists`)
       }
 
-      // Move all files in this folder as well ... :/
+      // このフォルダーの中のファイルもすべて移動する ... :/
       mockWrittenContent.forEach((value, key) => {
         if (key.startsWith(from)) {
           // rename('foo/bar', 'a/b/c') => foo/bar/ding.js -> a/b/c/ding.js
-          // (.replace with string arg will only replace the first occurrence)
+          // （文字列を引数にした .replace は、最初に現れたものしか置き換えない）
           mockWrittenContent.set(
             key.replace(from, to),
             mockWrittenContent.get(key)
@@ -66,8 +66,8 @@ jest.mock(`fs-extra`, () => {
 jest.mock(`glob`, () => {
   return {
     sync: jest.fn(pattern => {
-      // Tricky.
-      // Expecting a path prefix, ending with star. Else this won't work :/
+      // ややこしい。
+      // スターで終わるパスのプレフィックスを期待している。そうでないと動かない :/
       if (pattern.slice(-1) !== `*`) {
         throw new Error(`Expected pattern ending with star`)
       }
@@ -99,8 +99,8 @@ jest.mock(`gatsby-core-utils`, () => {
 })
 
 function getFakeNodes() {
-  // Set nodes to something or the cache will fail because it asserts this
-  // Actual nodes content should match TS type; these are verified
+  // nodes に何かを設定する。キャッシュがこれをアサートしているので、設定しないと失敗する
+  // 実際の nodes の内容は TS の型と一致していなければならない。これらは検証される
   const map /* : Map<string, IReduxNode> */ = new Map()
   map.set(`pageA`, {
     id: `pageA`,
@@ -121,10 +121,10 @@ describe(`redux db`, () => {
   const initialComponentsState = _.cloneDeep(store.getState().components)
 
   function createPages(pages) {
-    // mock Date.now so Date.now() doesn't change in between tests
+    // テストの間で Date.now() が変わらないように、Date.now をモックする
     const RealDateNow = Date.now
     let DateNowCallCount = 0
-    // simulate passage of time by increasing call counter (instead of actual time value)
+    // （実際の時刻の値ではなく）呼び出し回数のカウンターを増やすことで、時間の経過をシミュレートする
     Date.now = jest.fn(() => ++DateNowCallCount)
 
     store.dispatch(
@@ -141,10 +141,10 @@ describe(`redux db`, () => {
 
   const defaultPage = {
     path: `/my-sweet-new-page/`,
-    // seems like jest serializer doesn't play nice with Maps on Windows
+    // Windows では、jest のシリアライザーが Map をうまく扱えないようだ
     component: pageTemplatePath,
-    // The context is passed as props to the component as well
-    // as into the component's GraphQL query.
+    // コンテキストは、props としてコンポーネントに渡されるほか、
+    // コンポーネントの GraphQL クエリにも渡される。
     context: {
       id: `123456`,
     },
@@ -173,17 +173,17 @@ describe(`redux db`, () => {
 
     expect(writeToCache).toBeCalled()
 
-    // reset state in memory
+    // メモリー上の状態をリセットする
     store.dispatch({
       type: `DELETE_CACHE`,
     })
-    // make sure store in memory is empty
+    // メモリー上のストアが空であることを確認する
     expect(store.getState().components).toEqual(initialComponentsState)
 
-    // read data that was previously cached
+    // 以前にキャッシュされたデータを読み込む
     const data = readState()
 
-    // make sure data was read and is not the same as our clean redux state
+    // データが読み込まれ、クリーンな redux の状態とは異なることを確認する
     expect(data.components).not.toEqual(initialComponentsState)
 
     expect(data).toMatchSnapshot()
@@ -214,9 +214,9 @@ describe(`redux db`, () => {
       v8Deserialize.mockRestore()
     })
 
-    // we set limit to 1.5 * 1024 * 1024 * 1024 per shard
-    // simulating size for page will allow us to see if we create expected amount of shards
-    // and that we stitch them back together correctly
+    // 上限はシャード 1 つあたり 1.5 * 1024 * 1024 * 1024 に設定している
+    // ページのサイズをシミュレートすることで、期待した数のシャードが作られることと、
+    // それらを正しくつなぎ合わせて元に戻せることを確認できる
     const pageShardsScenarios = [
       {
         numberOfPages: 50 * 1000,
@@ -260,13 +260,13 @@ describe(`redux db`, () => {
         _expectedPageContextSizeWarningLabelForTestName,
         expectedPageContextSizeWarning
       ) => {
-        // just some baseline checking to make sure test setup is correct - check both in-memory state and persisted state
-        // and make sure it's empty
+        // テストのセットアップが正しいことを確かめるための基本的な確認。メモリー上の状態と永続化された状態の両方を確認し、
+        // 空であることを確かめる
         const initialStateInMemory = store.getState()
         expect(initialStateInMemory.pages).toEqual(new Map())
 
-        // we expect to have no persisted state yet - this returns empty object
-        // and let redux to use initial states for all redux slices
+        // 永続化された状態はまだないはずである。これは空のオブジェクトを返し、
+        // redux がすべてのスライスで初期状態を使うようにする
         const initialPersistedState = readState()
         expect(initialPersistedState.pages).toBeUndefined()
         expect(initialPersistedState).toEqual({})
@@ -287,20 +287,20 @@ describe(`redux db`, () => {
         const currentStateInMemory = store.getState()
         expect(currentStateInMemory.pages.size).toEqual(numberOfPages)
 
-        // this is just to make sure that any implementation changes in readState
-        // won't affect this test - so we clone current state of things and will
-        // use that for assertions
+        // これは、readState の実装が変わってもこのテストに影響しないように
+        // するためのものである。現在の状態を複製しておき、それを
+        // アサーションに使う
         const clonedCurrentPages = new Map(currentStateInMemory.pages)
 
-        // we expect to have no persisted state yet and that current in-memory state doesn't affect it
+        // 永続化された状態はまだなく、現在のメモリー上の状態がそれに影響しないはずである
         const persistedStateBeforeSaving = readState()
         expect(persistedStateBeforeSaving.pages).toBeUndefined()
         expect(persistedStateBeforeSaving).toEqual({})
 
-        // simulate that pages have sizes set in scenario parameters
-        // it changes implementation to JSON.stringify because calling v8.serialize
-        // again cause max stack size errors :shrug: - this also requires adjusting
-        // deserialize implementation
+        // ページが、シナリオのパラメーターで指定されたサイズを持っているようにシミュレートする
+        // 実装を JSON.stringify に変えている。v8.serialize をもう一度呼ぶと
+        // スタックサイズの上限エラーになるためである :shrug:。これに合わせて
+        // deserialize の実装も調整する必要がある
         v8Serialize.mockImplementation(obj => {
           if (obj?.[1]?.context?.objectType === `page`) {
             return {
@@ -342,8 +342,8 @@ describe(`redux db`, () => {
         expect(shardsWritten.rest).toEqual(1)
         expect(shardsWritten.page).toEqual(expectedNumberOfPageShards)
 
-        // and finally - let's make sure that reading shards stitches it back together
-        // correctly
+        // 最後に、シャードを読み込むと正しくつなぎ合わされて元に戻ることを
+        // 確認する
         const persistedStateAfterSaving = readState()
 
         expect(persistedStateAfterSaving.pages).toEqual(clonedCurrentPages)
@@ -371,7 +371,7 @@ describe(`redux db`, () => {
       )
     )
 
-    // In strict mode nodes are stored in LMDB not redux state
+    // strict モードでは、ノードは redux の状態ではなく LMDB に保存される
     expect(store.getState().nodes.size).toEqual(0)
     expect(store.getState().pages.size).toEqual(0)
 
@@ -382,7 +382,7 @@ describe(`redux db`, () => {
 
     saveState()
 
-    // reset state in memory
+    // メモリー上の状態をリセットする
     store.dispatch({
       type: `DELETE_CACHE`,
     })
@@ -392,8 +392,8 @@ describe(`redux db`, () => {
 
     persistedState = readState()
 
-    // With lmdb store we always persist a single dummy node to bypass
-    // "Cache exists but contains no nodes..." warning
+    // lmdb ストアでは、"Cache exists but contains no nodes..." の警告を回避するために、
+    // 常にダミーのノードを 1 つ永続化する
     expect(persistedState.nodes?.size).toEqual(1)
     const nodes = Array.from(persistedState.nodes.values())
     expect(nodes[0]).toMatchObject({ id: `dummy-node-id` })
@@ -417,7 +417,7 @@ describe(`redux db`, () => {
 
     saveState()
 
-    // reset state in memory
+    // メモリー上の状態をリセットする
     store.dispatch({
       type: `DELETE_CACHE`,
     })
@@ -427,8 +427,8 @@ describe(`redux db`, () => {
 
     persistedState = readState()
 
-    // With lmdb store we always persist a single dummy node to bypass
-    // "Cache exists but contains no nodes..." warning
+    // lmdb ストアでは、"Cache exists but contains no nodes..." の警告を回避するために、
+    // 常にダミーのノードを 1 つ永続化する
     expect(persistedState.nodes?.size ?? 0).toEqual(1)
     expect(persistedState.pages?.size ?? 0).toEqual(1)
     expect(reporterInfo).not.toBeCalled()
@@ -445,7 +445,7 @@ describe(`redux db`, () => {
       savePartialStateToDisk([`pages`])
 
       let basename
-      // get first non page template mocked fs write
+      // ページテンプレート以外で最初の、モックされた fs の書き込みを取得する
       for (const savedFile of mockWrittenContent.keys()) {
         if (savedFile === pageTemplatePath) {
           continue
@@ -472,7 +472,7 @@ describe(`redux db`, () => {
       savePartialStateToDisk([`pages`], `custom-prefix`)
 
       let basename
-      // get first non page template mocked fs write
+      // ページテンプレート以外で最初の、モックされた fs の書き込みを取得する
       for (const savedFile of mockWrittenContent.keys()) {
         if (savedFile === pageTemplatePath) {
           continue

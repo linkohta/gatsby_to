@@ -9,7 +9,7 @@ function extractEnumValues(
     hasValue = true
     acc.push(value.value)
   } else if (value.kind === graphql.Kind.LIST) {
-    // list can be empty but it indicate that it is set at least
+    // リストは空でもよいが、少なくとも設定されていることを示す
     hasValue = true
     for (const listItem of value.values) {
       extractEnumValues(listItem, acc)
@@ -29,7 +29,7 @@ function isOldSortObject(props: unknown): props is IOldSortObject {
   }
 
   let hasFields = false
-  // skip if there any unexpected keys
+  // 予期しないキーがある場合はスキップする
   for (const [key, value] of Object.entries(props)) {
     if (key === `fields`) {
       if (value) {
@@ -75,7 +75,7 @@ function processGraphQLQuery(query: string | graphql.DocumentNode): {
   hasChanged: boolean
 } {
   try {
-    let hasChanged = false // this is sort of a hack, but print changes formatting and we only want to use it when we have to
+    let hasChanged = false // これは一種のハックだが、print は書式を変えてしまうので、必要なときにだけ使いたい
     const ast = typeof query === `string` ? graphql.parse(query) : query
 
     graphql.visit(ast, {
@@ -85,7 +85,7 @@ function processGraphQLQuery(query: string | graphql.DocumentNode): {
             return
           }
 
-          // old style sort: `allX(sort: { fields: <something>, order?: </something> })
+          // 古い形式の sort: `allX(sort: { fields: <something>, order?: </something> })
           const props: Record<string, Array<string> | undefined> = {}
           for (const field of node.value.fields) {
             props[field.name.value] = extractEnumValues(field.value)
@@ -95,7 +95,7 @@ function processGraphQLQuery(query: string | graphql.DocumentNode): {
             return
           }
 
-          // iterate over each pair of field and order and create new object style for each
+          // フィールドと order の組を順に処理し、それぞれについて新しいオブジェクト形式を作る
           const newObjects: Array<
             graphql.ObjectValueNode | graphql.EnumValueNode
           > = []

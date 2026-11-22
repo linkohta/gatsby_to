@@ -1,11 +1,11 @@
 /***
- * Jobs of this module
- * - Maintain the list of components in the Redux store. So monitor new components
- *   and add/remove components.
- * - Watch components for query changes and extract these and update the store.
- * - Ensure all page queries are run as part of bootstrap and report back when
- *   this is done
- * - Whenever a query changes, re-run all pages that rely on this query.
+ * このモジュールの役割
+ * - Redux ストアの中のコンポーネントの一覧を維持する。そのために新しいコンポーネントを
+ *   監視して、コンポーネントを追加または削除する。
+ * - コンポーネントのクエリの変更を監視し、クエリを抽出してストアを更新する。
+ * - bootstrap の一部としてすべてのページクエリが実行されるようにし、完了したら
+ *   それを報告する
+ * - クエリが変更されるたびに、そのクエリに依存するすべてのページを再実行する。
  ***/
 
 import chokidar, { FSWatcher } from "chokidar"
@@ -73,8 +73,8 @@ const handleComponentsWithRemovedQueries = (
   { staticQueryComponents }: IQuerySnapshot,
   queries: Map<string, IQuery>
 ): void => {
-  // If a component had static query and it doesn't have it
-  // anymore - update the store
+  // コンポーネントに静的クエリがあったが、今はもうない場合は、
+  // ストアを更新する
   staticQueryComponents.forEach(c => {
     if (c.query !== `` && !queries.has(c.componentPath)) {
       debug(`Static query was removed from ${c.componentPath}`)
@@ -91,17 +91,17 @@ const handleQuery = (
   query: IQuery,
   component: string
 ): boolean => {
-  // If this is a static query
-  // Add action / reducer + watch staticquery files
+  // これが静的クエリである場合
+  // アクションとレデューサーを追加し、staticquery のファイルを監視する
   if (query.isStaticQuery) {
     const oldQuery = staticQueryComponents.get(query.id)
     const isNewQuery = !oldQuery
 
-    // Compare query text because text is compiled query with any attached
-    // fragments and we want to rerun queries if fragments are edited.
-    // Compare hash because hash is used for identyfing query and
-    // passing data to component in development. Hash can change if user will
-    // format query text, but it doesn't mean that compiled text will change.
+    // クエリのテキストを比較する。テキストは、関連するフラグメントを含めてコンパイルされた
+    // クエリであり、フラグメントが編集されたときにもクエリを再実行したいためである。
+    // ハッシュも比較する。ハッシュは、開発時にクエリを識別してコンポーネントへデータを
+    // 渡すために使われるためである。ユーザーがクエリのテキストを整形するとハッシュは変わりうるが、
+    // それはコンパイルされたテキストが変わることを意味しない。
     if (
       isNewQuery ||
       oldQuery?.hash !== query.hash ||
@@ -162,10 +162,10 @@ const watch = async (rootDir: string): Promise<void> => {
 }
 
 const watchComponent = (componentPath: string): void => {
-  // We don't start watching until mid-way through the bootstrap so ignore
-  // new components being added until then. This doesn't affect anything as
-  // when extractQueries is called from bootstrap, we make sure that all
-  // components are being watched.
+  // 監視は bootstrap の途中まで始めないので、それまでに追加された新しい
+  // コンポーネントは無視する。これは何にも影響しない。bootstrap から
+  // extractQueries が呼ばれるときに、すべてのコンポーネントが監視されている
+  // ことを保証しているためである。
   if (
     process.env.NODE_ENV !== `production` &&
     !filesToWatch.has(componentPath)
@@ -178,18 +178,18 @@ const watchComponent = (componentPath: string): void => {
 }
 
 /**
- * Removes components templates that aren't used by any page from redux store.
+ * どのページからも使われていないコンポーネントテンプレートを redux ストアから取り除く。
  */
 const clearInactiveComponents = (): void => {
   const { components, pages, slices } = store.getState()
 
   const activeTemplates = new Set()
   pages.forEach(page => {
-    // Set will guarantee uniqueness of entries
+    // Set を使うことで、エントリーが重複しないことが保証される
     activeTemplates.add(slash(page.componentPath))
   })
   slices.forEach(slice => {
-    // Set will guarantee uniqueness of entries
+    // Set を使うことで、エントリーが重複しないことが保証される
     activeTemplates.add(slash(slice.componentPath))
   })
 
@@ -234,16 +234,16 @@ export const updateStateAndRunQueries = async (
 ): Promise<void> => {
   const snapshot = getQueriesSnapshot()
   const queries: Map<string, IQuery> = await queryCompiler({ parentSpan })
-  // If there's an error while extracting queries, the queryCompiler returns false
-  // or zero results.
-  // Yeah, should probably be an error but don't feel like threading the error
-  // all the way here.
+  // クエリの抽出中にエラーが起きると、queryCompiler は false か
+  // 0 件の結果を返す。
+  // 本来はおそらくエラーにすべきだが、エラーをここまで引き回す
+  // 気にはなれない。
   if (!queries || queries.size === 0) {
     return
   }
   handleComponentsWithRemovedQueries(snapshot, queries)
 
-  // Run action for each component
+  // それぞれのコンポーネントに対してアクションを実行する
   snapshot.components.forEach(c => {
     const { isStaticQuery = false, text = `` } =
       queries.get(c.componentPath) || {}
@@ -262,9 +262,9 @@ export const updateStateAndRunQueries = async (
 
     if (queryWillRun) {
       watchComponent(component)
-      // Check if this is a page component.
-      // If it is and this is our first run during bootstrap,
-      // show a warning about having a query in a non-page component.
+      // これがページコンポーネントであるかを確認する。
+      // そうであり、かつ bootstrap 中の最初の実行である場合は、
+      // ページでないコンポーネントにクエリがあることについての警告を表示する。
     } else if (
       isFirstRun &&
       !snapshot.componentsWithCleanFilePaths.has(
@@ -292,7 +292,7 @@ export const updateStateAndRunQueries = async (
 
   if (process.env.NODE_ENV === `development`) {
     /**
-     * only process node manifests here in develop. we want this to run every time queries are updated. for gatsby build we process node manifests in src/utils/page-data.ts after all queries are run and pages are created. If we process node manifests in this location for gatsby build we wont have all the information needed to create the manifests. If we don't process manifests in this location during gatsby develop manifests will only be written once and never again when more manifests are created.
+     * ここでノードマニフェストを処理するのは develop のときだけである。クエリが更新されるたびにこれを実行したい。gatsby build では、すべてのクエリが実行されてページが作成された後に、src/utils/page-data.ts でノードマニフェストを処理する。gatsby build のときにこの場所でノードマニフェストを処理すると、マニフェストの作成に必要な情報がそろっていない。gatsby develop のときにこの場所でマニフェストを処理しないと、マニフェストは一度しか書き出されず、その後にマニフェストが作られても二度と書き出されない。
      */
     await processNodeManifests()
   }
@@ -301,17 +301,17 @@ export const updateStateAndRunQueries = async (
 export const extractQueries = ({
   parentSpan,
 }: { parentSpan?: Span } = {}): Promise<void> => {
-  // Remove template components that point to not existing page templates.
-  // We need to do this, because components data is cached and there might
-  // be changes applied when development server isn't running. This is needed
-  // only in initial run, because during development state will be adjusted.
+  // 存在しないページテンプレートを指しているテンプレートコンポーネントを取り除く。
+  // これが必要なのは、コンポーネントのデータがキャッシュされており、開発サーバーが
+  // 動いていない間に変更が加えられているかもしれないためである。必要なのは
+  // 初回の実行だけである。開発中は状態が調整されていくためである。
   clearInactiveComponents()
 
   return updateStateAndRunQueries(true, { parentSpan }).then(() => {
-    // During development start watching files to recompile & run
-    // queries on the fly.
+    // 開発中は、ファイルの監視を始めて、クエリをその場で再コンパイルして
+    // 実行する。
 
-    // TODO: move this into a spawned service
+    // TODO: これを spawn したサービスへ移す
     if (process.env.NODE_ENV !== `production`) {
       watch(store.getState().program.directory)
     }

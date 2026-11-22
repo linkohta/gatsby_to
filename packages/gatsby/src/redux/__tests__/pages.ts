@@ -4,7 +4,7 @@ import { murmurhash } from "gatsby-core-utils/murmurhash"
 jest.mock(`fs-extra`, () => {
   return {
     readFile: jest.fn(() => `contents`),
-    readFileSync: jest.fn(() => `foo`), // createPage action reads the page template file trying to find `getServerData`
+    readFileSync: jest.fn(() => `foo`), // createPage アクションは、`getServerData` を探すためにページテンプレートのファイルを読み込む
   }
 })
 jest.mock(`gatsby-core-utils/murmurhash`)
@@ -173,7 +173,7 @@ describe(`Add pages`, () => {
       )
       .filter(a => a.type === `CREATE_PAGE`)[0]
 
-    // Change the component
+    // コンポーネントを変更する
     const action2 = actions
       .createPage(
         {

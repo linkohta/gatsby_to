@@ -4,7 +4,7 @@ import { CreateDevServerArgs } from "gatsby"
 import { thirdPartyProxyPath, partytownProxy } from "./proxy"
 
 /**
- * Copy Partytown library files to public.
+ * Partytown のライブラリファイルを public にコピーする。
  * @see {@link https://partytown.builder.io/copy-library-files}
  */
 exports.onPreBootstrap = async ({ store }): Promise<void> => {
@@ -13,7 +13,7 @@ exports.onPreBootstrap = async ({ store }): Promise<void> => {
 }
 
 /**
- * Implement reverse proxy so scripts can fetch in web workers without CORS errors.
+ * スクリプトが Web Worker の中で CORS エラーなしに fetch できるように、リバースプロキシを実装する。
  * @see {@link https://partytown.builder.io/proxying-requests}
  */
 exports.createPages = ({ actions, store }): void => {

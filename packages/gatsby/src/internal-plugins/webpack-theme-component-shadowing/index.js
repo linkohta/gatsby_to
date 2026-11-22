@@ -4,18 +4,17 @@ const fs = require(`fs`)
 const _ = require(`lodash`)
 const { splitComponentPath } = require(`gatsby-core-utils`)
 
-// A file can be shadowed by a file of the same extension, or a file of a
-// "compatible" file extension; two files extensions are compatible if they both
-// belongs to the same "category". For example, a .JS file (that is code), may
-// be shadowed by a .TS file or a .JSX file (both are code), but not by a .CSS
-// file (that is a stylesheet) or a .PNG file (that is an image). The following
-// list establish to which category a given file extension belongs. Note that if
-// a file is not present in this list, then it can only be shadowed by a file
-// of the same extension.
+// ファイルは、同じ拡張子のファイル、または「互換性のある」拡張子のファイルで
+// シャドーイングできる。2 つの拡張子は、同じ「カテゴリー」に属していれば
+// 互換性がある。たとえば .JS ファイル（コード）は、.TS ファイルや .JSX ファイル
+// （どちらもコード）でシャドーイングできるが、.CSS ファイル（スタイルシート）や
+// .PNG ファイル（画像）ではできない。次の一覧は、それぞれの拡張子がどのカテゴリーに
+// 属するかを定めている。なお、この一覧にないファイルは、同じ拡張子のファイルでしか
+// シャドーイングできない。
 
-// FIXME: Determine how this list can be extended by user/plugins
+// FIXME: ユーザーやプラグインがこの一覧を拡張できるようにする方法を決める
 const DEFAULT_FILE_EXTENSIONS_CATEGORIES = {
-  // Code formats
+  // コードの形式
   js: `code`,
   jsx: `code`,
   ts: `code`,
@@ -25,19 +24,19 @@ const DEFAULT_FILE_EXTENSIONS_CATEGORIES = {
   mts: `code`,
   coffee: `code`,
 
-  // JSON-like data formats
+  // JSON に似たデータ形式
   json: `json`,
   yaml: `json`,
   yml: `json`,
 
-  // Stylesheets formats
+  // スタイルシートの形式
   css: `stylesheet`,
   sass: `stylesheet`,
   scss: `stylesheet`,
   less: `stylesheet`,
   "css.js": `stylesheet`,
 
-  // Images formats
+  // 画像の形式
   jpeg: `image`,
   jpg: `image`,
   jfif: `image`,
@@ -47,16 +46,16 @@ const DEFAULT_FILE_EXTENSIONS_CATEGORIES = {
   avif: `image`,
   gif: `image`,
 
-  // Fonts
+  // フォント
   woff: `font`,
   woff2: `font`,
 }
 
 // TO-DO:
-//  - implement ability to add/remove shadowed modules from the webpack chain as file are being created/deleted
+//  - ファイルの作成や削除に合わせて、シャドーイングされたモジュールを webpack のチェーンに追加または削除できるようにする
 //    ( https://github.com/gatsbyjs/gatsby/issues/11456 ):
-//    - this will also need to add memo invalidation for page template shadowing:
-//      see memoized `shadowCreatePagePath` function used in `createPage` action creator.
+//    - そのためには、ページテンプレートのシャドーイングに対するメモの無効化も追加する必要がある:
+//      `createPage` アクションクリエイターで使われている、メモ化された `shadowCreatePagePath` 関数を参照。
 
 module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
   constructor({ projectRoot, themes, extensions, extensionsCategory }) {
@@ -89,15 +88,15 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
       }
     }
 
-    // Sort extensions in reverse length order, so that something such as
-    // ".css.js" get caught before ".js"
+    // ".css.js" のようなものが ".js" より先に拾われるように、
+    // 拡張子を長い順に並べ替える
     return additionalExtensions.sort(
       ({ key: a }, { key: b }) => a.length <= b.length
     )
   }
 
   apply(resolver) {
-    // This hook is executed very early and captures the original file name
+    // このフックは非常に早い段階で実行され、元のファイル名を記録する
     resolver
       .getHook(`resolve`)
       .tapAsync(
@@ -110,7 +109,7 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
         }
       )
 
-    // This is where the magic really happens
+    // ここが実際の処理の核心である
     resolver
       .getHook(`before-resolved`)
       .tapAsync(
@@ -123,22 +122,22 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
 
           if (
             /**
-             * if someone adds
+             * 誰かが
              * ```
              * modules: [path.resolve(__dirname, /src'), 'node_modules'],
              * ```
-             * to the webpack config, `issuer` is `null`, so we skip this check.
-             * note that it's probably a bad idea in general to set `modules`
-             * like this in a theme, but we also shouldn't artificially break
-             * people that do.
+             * を webpack の設定に追加すると、`issuer` は `null` になるので、この確認をスキップする。
+             * なお、テーマの中で `modules` をこのように設定するのは、一般的には
+             * おそらく良くない。しかし、そうしている人の環境をこちらの都合で
+             * 壊すべきでもない。
              */
             request.context.issuer &&
             /**
-             * An issuer is the file making the require request. It can
-             * be in a user's site or a theme. If the issuer is requesting
-             * a path in the shadow chain that it participates in, then we
-             * will let the request through as normal. Otherwise, we
-             * engage the shadowing algorithm.
+             * issuer は、require のリクエストを出しているファイルである。ユーザーの
+             * サイトの中にあることも、テーマの中にあることもある。issuer が、自分も
+             * 属しているシャドーチェーンの中のパスをリクエストしている場合は、
+             * リクエストを通常どおり通す。そうでない場合は、
+             * シャドーイングのアルゴリズムを適用する。
              */
             this.requestPathIsIssuerShadowPath({
               component,
@@ -154,7 +153,7 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
             request._gatsbyThemeShadowingOriginalRequestPath
           const originalRequestComponent = path.basename(originalRequestPath)
 
-          // This is the shadowing algorithm.
+          // ここからがシャドーイングのアルゴリズムである。
           const builtComponentPath = this.resolveComponentPath({
             theme,
             component,
@@ -176,7 +175,7 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
       )
   }
 
-  // check the user's project and the theme files
+  // ユーザーのプロジェクトとテーマのファイルを確認する
   resolveComponentPath({
     theme,
     component: originalComponent,
@@ -184,7 +183,7 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
   }) {
     const [component, content] = splitComponentPath(originalComponent)
 
-    // don't include matching theme in possible shadowing paths
+    // 一致したテーマ自身は、シャドーイングの候補のパスに含めない
     const themes = this.themes.filter(
       ({ themeName }) => themeName !== theme.themeName
     )
@@ -208,15 +207,15 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
 
       let dir
       try {
-        // we use fs/path instead of require.resolve to work with
-        // TypeScript and alternate syntaxes
+        // TypeScript やその他の構文でも動くように、require.resolve ではなく
+        // fs/path を使う
         dir = fs.readdirSync(path.dirname(possibleComponentPath))
       } catch (e) {
         continue
       }
       const existsDir = dir.map(filepath => path.basename(filepath))
 
-      // if no exact path, search for extension
+      // 完全に一致するパスがなければ、拡張子を探す
       const matchingShadowFile = acceptableShadowFileNames.find(shadowFile =>
         existsDir.includes(shadowFile)
       )
@@ -237,17 +236,17 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
   }
 
   getThemeAndComponent(filepath) {
-    // find out which theme's src/components dir we're requiring from
+    // どのテーマの src/components ディレクトリから require しているかを調べる
     const allMatchingThemes = this.themes.filter(({ themeDir }) =>
       filepath.startsWith(path.join(themeDir, `src`))
     )
 
-    // The same theme can be included twice in the themes list causing multiple
-    // matches. This case should only be counted as a single match for that theme.
+    // 同じテーマがテーマの一覧に 2 回含まれて、複数回一致することがある。
+    // その場合は、そのテーマについて 1 回の一致として数える。
     const matchingThemes = _.uniqBy(allMatchingThemes, `themeName`)
 
-    // 0 matching themes happens a lot for paths we don't want to handle
-    // > 1 matching theme means we have a path like
+    // 一致するテーマが 0 個になるのは、扱いたくないパスでよく起きる
+    // 一致するテーマが 2 個以上になるのは、次のようなパスの場合である
     //   `gatsby-theme-blog/src/components/gatsby-theme-something/src/components`
     if (matchingThemes.length > 1) {
       throw new Error(
@@ -263,13 +262,13 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
 
     const theme = matchingThemes[0]
 
-    // get the location of the component relative to its theme's src/
+    // テーマの src/ から見たコンポーネントの相対的な場所を取得する
     const [, component] = filepath.split(path.join(theme.themeDir, `src`))
 
     return [theme, component]
   }
 
-  // given a theme name, return all of the possible shadow locations
+  // テーマ名を受け取り、シャドーイングの候補になる場所をすべて返す
   getBaseShadowDirsForThemes(theme) {
     return Array.from(this.themes)
       .reverse()
@@ -287,13 +286,13 @@ module.exports = class GatsbyThemeComponentShadowingResolverPlugin {
       return false
     }
 
-    // get list of potential shadow locations
+    // シャドーイングの候補になる場所の一覧を取得する
     const shadowFiles = this.getBaseShadowDirsForThemes(theme.themeName)
       .concat(path.join(userSiteDir, `src`, theme.themeName))
       .map(dir => path.join(dir, component))
       .flatMap(comp => this.getAcceptableShadowFileNames(comp))
 
-    // if the issuer is requesting a path that is a potential shadow path of itself
+    // issuer が、自分自身のシャドーイングの候補になるパスをリクエストしている場合
     return shadowFiles.includes(issuerPath)
   }
 

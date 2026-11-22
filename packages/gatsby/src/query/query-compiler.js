@@ -1,8 +1,8 @@
 // @flow
 
-/** Query compiler extracts queries and fragments from all files, validates them
- * and then collocates them with fragments they require. This way fragments
- * have global scope and can be used in any other query or fragment.
+/** クエリコンパイラーは、すべてのファイルからクエリとフラグメントを抽出して検証し、
+ * それぞれが必要とするフラグメントと一緒にまとめる。これにより、フラグメントは
+ * グローバルスコープを持ち、他のどのクエリやフラグメントからでも使える。
  */
 
 const _ = require(`lodash`)
@@ -91,7 +91,7 @@ export default async function compile({ parentSpan } = {}): Promise<
     }
   } else {
     if (process.env.gatsby_executing_command === `develop`) {
-      // emitError with `null` as 2nd param to clear browser error overlay
+      // ブラウザーのエラーオーバーレイを消すために、第 2 引数を `null` にして emitError を呼ぶ
       websocketManager.emitError(overlayErrorID, null)
     }
   }
@@ -113,10 +113,10 @@ export const parseQueries = async ({
   parentSpan,
 }) => {
   const filesRegex = `*.?(m|c)+(t|j)s?(x)`
-  // Pattern that will be appended to searched directories.
-  // It will match any .js, .jsx, .ts, .tsx, .cjs, .cjsx,
-  // .cts, .ctsx, .mjs, .mjsx, .mts, and .mtsx files,
-  // that are not inside <searched_directory>/node_modules.
+  // 検索対象のディレクトリに付け加えるパターン。
+  // <searched_directory>/node_modules の中にない、
+  // .js、.jsx、.ts、.tsx、.cjs、.cjsx、.cts、.ctsx、.mjs、.mjsx、.mts、.mtsx の
+  // すべてのファイルに一致する。
   const pathRegex = `/{${filesRegex},!(node_modules)/**/${filesRegex}}`
 
   const modulesThatUseGatsby = await getGatsbyDependents()
@@ -139,17 +139,17 @@ export const parseQueries = async ({
 
   files = files.map(normalize)
 
-  // We should be able to remove the following and preliminary tests do suggest
-  // that they aren't needed anymore since we transpile node_modules now
-  // However, there could be some cases (where a page is outside of src for example)
-  // that warrant keeping this and removing later once we have more confidence (and tests)
+  // 以下は削除できるはずであり、今は node_modules をトランスパイルしているので
+  // もう不要であることを予備的なテストも示している
+  // ただし、これを残しておき、もっと確信（とテスト）が得られてから削除するのが妥当な
+  // ケース（たとえばページが src の外にある場合）があるかもしれない
 
-  // Ensure all page components added as they're not necessarily in the
-  // pages directory e.g. a plugin could add a page component. Plugins
-  // *should* copy their components (if they add a query) to .cache so that
-  // our babel plugin to remove the query on building is active.
-  // Otherwise the component will throw an error in the browser of
-  // "graphql is not defined".
+  // すべてのページコンポーネントが追加されているようにする。ページコンポーネントは
+  // pages ディレクトリにあるとは限らない（たとえばプラグインが追加することもある）。
+  // プラグインは、（クエリを追加する場合は）ビルド時にクエリを取り除く babel プラグインが
+  // 働くように、コンポーネントを .cache にコピーする *べきである*。
+  // そうしないと、コンポーネントはブラウザーで
+  // "graphql is not defined" というエラーを投げる。
   files = files.concat(
     Array.from(store.getState().components.keys(), c => normalize(c))
   )
@@ -253,7 +253,7 @@ const extractOperations = (schema, parsedQueries, addError, parentSpan) => {
           componentPath: filePath,
         })
       )
-      // Something is super wrong with this document, so we report it and skip
+      // このドキュメントは何かが根本的におかしいので、報告してスキップする
       continue
     }
 
@@ -268,12 +268,12 @@ const extractOperations = (schema, parsedQueries, addError, parentSpan) => {
           hash,
         })
       } else if (def.kind === Kind.FRAGMENT_DEFINITION) {
-        // Check if we already registered a fragment with this name
+        // この名前のフラグメントがすでに登録されているかを確認する
         printedAst = print(def)
         if (definitionsByName.has(name)) {
           const otherDef = definitionsByName.get(name)
-          // If it's not an accidental duplicate fragment, but is a different
-          // one - we report an error
+          // たまたま重複した同じフラグメントではなく、別のフラグメントである
+          // 場合は、エラーを報告する
           if (printedAst !== otherDef.printedAst) {
             addError(
               duplicateFragmentError({
@@ -287,8 +287,8 @@ const extractOperations = (schema, parsedQueries, addError, parentSpan) => {
                 rightDefinition: otherDef,
               })
             )
-            // We won't know which one to use, so it's better to fail both of
-            // them.
+            // どちらを使えばよいか分からないので、両方とも失敗させるほうが
+            // よい。
             definitionsByName.delete(name)
           }
           return
@@ -407,9 +407,9 @@ const processDefinitions = ({
     }
 
     const printedDocument = print(document)
-    // Check for duplicate page/static queries in the same component.
-    // (config query is not a duplicate of page/static query in the component)
-    // TODO: make sure there is at most one query type per component (e.g. one config + one page)
+    // 同じコンポーネントの中で、ページクエリや静的クエリが重複していないかを確認する。
+    // （config クエリは、コンポーネントの中のページクエリや静的クエリの重複とは見なさない）
+    // TODO: 1 つのコンポーネントにつき、クエリの種類ごとに最大 1 つ（たとえば config が 1 つとページが 1 つ）になるようにする
     if (processedQueries.has(filePath) && !originalDefinition.isConfigQuery) {
       const otherQuery = processedQueries.get(filePath)
 
@@ -443,7 +443,7 @@ const processDefinitions = ({
       isStaticQuery: originalDefinition.isStaticQuery,
       isConfigQuery: originalDefinition.isConfigQuery,
       templatePath,
-      // ensure hash should be a string and not a number
+      // hash が数値ではなく文字列になるようにする
       hash: String(originalDefinition.hash),
     }
 
@@ -466,9 +466,9 @@ const processDefinitions = ({
       )
     }
 
-    // Our current code only supports single graphql query per file (page or static query per file)
-    // So, not adding config query because it can overwrite existing page query
-    // TODO: allow multiple queries in single file, while preserving limitation of a single page query per file
+    // 現在のコードは、1 ファイルにつき 1 つの graphql クエリ（1 ファイルにつきページクエリか静的クエリのどちらか）しか対応していない
+    // そのため、config クエリは追加しない。既存のページクエリを上書きしてしまう可能性があるためである
+    // TODO: ページクエリは 1 ファイルに 1 つという制限を保ちつつ、1 つのファイルに複数のクエリを書けるようにする
     if (!query.isConfigQuery) {
       processedQueries.set(filePath, query)
     }
@@ -496,8 +496,8 @@ const determineUsedFragmentsForDefinition = (
         const fragmentDefinition = definitionsByName.get(name)
         if (fragmentDefinition) {
           if (traversalPath.includes(name)) {
-            // Already visited this fragment during current traversal.
-            //   Visiting it again will cause a stack overflow
+            // このフラグメントは、今回の走査ですでに訪れている。
+            //   もう一度訪れるとスタックオーバーフローを起こす
             return
           }
           traversalPath.push(name)

@@ -2,7 +2,7 @@ import { partytownSnippet } from "@builder.io/partytown/integration"
 import { ScriptProps } from "gatsby-script"
 import { getForwards } from "./get-forwards"
 
-// Adapted from https://github.com/BuilderIO/partytown/blob/main/src/react/snippet.tsx to only include CSR logic
+// https://github.com/BuilderIO/partytown/blob/main/src/react/snippet.tsx を基に、CSR のロジックだけを含むように改変したもの
 export function injectPartytownSnippet(
   collectedScripts: Array<ScriptProps>
 ): void {

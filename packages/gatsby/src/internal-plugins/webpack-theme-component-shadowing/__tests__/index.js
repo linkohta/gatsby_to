@@ -1,12 +1,12 @@
 import path from "path"
 import ShadowingPlugin from "../"
 
-// allow writing paths like path/to/thing, even on windows
+// Windows でも path/to/thing のようにパスを書けるようにする
 const xplatPath = uri => uri.split(`/`).join(path.sep)
 describe(`Component Shadowing`, () => {
   it.each([
     [
-      // simple request path to a theme's component
+      // テーマのコンポーネントへの単純なリクエストパス
       `/some/place/a-theme/src/components/a-component`,
       {
         themeDir: `/some/place/a-theme`,
@@ -15,8 +15,8 @@ describe(`Component Shadowing`, () => {
       `/components/a-component`,
     ],
     [
-      // request to a shadowed component in theme b
-      // component-path is expected to be `a-theme/components/a-component`
+      // theme b の中のシャドーイングされたコンポーネントへのリクエスト
+      // component-path は `a-theme/components/a-component` になるはずである
       `/some/place/theme-b/src/a-theme/components/a-component`,
       {
         themeDir: `/some/place/theme-b`,
@@ -56,9 +56,9 @@ describe(`Component Shadowing`, () => {
   it.each([
     [
       {
-        // issuer is in `theme-b`
+        // issuer は `theme-b` の中にある
         issuerPath: `/some/node_modules/theme-b/src/a-theme/components/a-component`,
-        // require'ing a file it is a "shadow child" of in a-theme
+        // a-theme の中で自分が「シャドーの子」になっているファイルを require している
         requestPath: `/some/node_modules/a-theme/src/components/a-component`,
         userSiteDir: `/some`,
       },
@@ -66,10 +66,10 @@ describe(`Component Shadowing`, () => {
     ],
     [
       {
-        // issuer is in `theme-b`
+        // issuer は `theme-b` の中にある
         issuerPath: `/some/node_modules/theme-b/src/a-theme/components/a-component`,
-        // require'ing a file it is NOT a "shadow child" of, also in theme-b
-        // the `component-path` here would be "components/a-component"
+        // 自分が「シャドーの子」になっていない、同じ theme-b の中のファイルを require している
+        // ここでの `component-path` は "components/a-component" になる
         requestPath: `/some/node_modules/theme-b/src/components/a-component`,
         userSiteDir: `/some`,
       },
@@ -77,9 +77,9 @@ describe(`Component Shadowing`, () => {
     ],
     [
       {
-        // issuer is in the user's site
+        // issuer はユーザーのサイトの中にある
         issuerPath: `/some/src/theme-b/components/a-component`,
-        // require'ing a file it is a "shadow child" of
+        // 自分が「シャドーの子」になっているファイルを require している
         requestPath: `/some/node_modules/theme-b/src/components/a-component`,
         userSiteDir: `/some`,
       },
@@ -87,9 +87,9 @@ describe(`Component Shadowing`, () => {
     ],
     [
       {
-        // issuer is in the user's site
+        // issuer はユーザーのサイトの中にある
         issuerPath: `/some/src/@orgname/theme-d/components/a-component`,
-        // require'ing a file it is a "shadow child" of
+        // 自分が「シャドーの子」になっているファイルを require している
         requestPath: `/some/node_modules/@orgname/theme-d/src/components/a-component`,
         userSiteDir: `/some`,
       },
@@ -116,9 +116,9 @@ describe(`Component Shadowing`, () => {
       )
       expect(
         plugin.requestPathIsIssuerShadowPath({
-          // issuer is in `theme-b`
+          // issuer は `theme-b` の中にある
           issuerPath: xplatPath(issuerPath),
-          // require'ing a file it is a "shadow child" of in a-theme
+          // a-theme の中で自分が「シャドーの子」になっているファイルを require している
           theme,
           component,
           userSiteDir: xplatPath(userSiteDir),

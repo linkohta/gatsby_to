@@ -23,10 +23,10 @@ const concurrency =
   Number(process.env.GATSBY_EXPERIMENTAL_QUERY_CONCURRENCY) || 4
 
 /**
- * Calculates the set of dirty query IDs (page.paths, or staticQuery.id's).
+ * ダーティなクエリ ID（page.path または staticQuery.id）の集合を計算する。
  *
- * Dirty state is tracked in `queries` reducer, here we simply filter
- * them from all tracked queries.
+ * ダーティな状態は `queries` レデューサーで追跡されている。ここでは、
+ * 追跡されているすべてのクエリからそれらを絞り込むだけである。
  */
 export function calcDirtyQueryIds(state: IGatsbyState): Array<string> {
   const { trackedQueries, trackedComponents, deletedQueries } = state.queries
@@ -39,7 +39,7 @@ export function calcDirtyQueryIds(state: IGatsbyState): Array<string> {
       }
     }
   }
-  // Note: trackedQueries contains both - page and static query ids
+  // 注: trackedQueries には、ページクエリと静的クエリの両方の ID が含まれる
   const dirtyQueryIds: Array<string> = []
   for (const [queryId, query] of trackedQueries) {
     if (deletedQueries.has(queryId)) {
@@ -55,7 +55,7 @@ export function calcDirtyQueryIds(state: IGatsbyState): Array<string> {
 export { calcDirtyQueryIds as calcInitialDirtyQueryIds }
 
 /**
- * Groups queryIds by whether they are static or page queries.
+ * queryId を、静的クエリかページクエリかで分類する。
  */
 export function groupQueryIds(queryIds: Array<string>): IGroupedQueryIds {
   const grouped = _.groupBy(queryIds, p => {
@@ -112,15 +112,15 @@ function createQueue<QueryIDType>({
         if (activity.tick) {
           activity.tick()
         }
-        // Note: we need setImmediate to ensure garbage collection has a chance
-        //  to get started during query running
+        // 注: クエリの実行中にガベージコレクションが始まる機会を確保するために、
+        //  setImmediate が必要である
         setImmediate(() => cb(null, { job, result }))
       })
       .catch(error => {
         cb(error)
       })
   }
-  // Note: fastq.promise version is much slower
+  // 注: fastq.promise 版はかなり遅い
   return fastq(worker, concurrency)
 }
 
@@ -202,7 +202,7 @@ function createSliceQueryJob(
   state: IGatsbyState,
   queryId: string
 ): IQueryJob | undefined {
-  const sliceName = queryId.substring(7) // remove "slice--" prefix
+  const sliceName = queryId.substring(7) // "slice--" プレフィックスを取り除く
 
   const sliceDef = state.slices.get(sliceName)
   if (!sliceDef) {
@@ -264,8 +264,8 @@ export async function processStaticQueries(
     graphqlTracing,
   })
 
-  // at this point, we're done grabbing page dependencies, so we need to
-  // flush out the batcher in case there are any left
+  // この時点でページの依存の取得は終わっているので、残りがある場合に備えて
+  // バッチャーをフラッシュする必要がある
   createPageDependencyBatcher.flush()
 
   return processedQueries
@@ -278,15 +278,15 @@ export async function processSliceQueries(
   const processedQueries = await processQueries<string>({
     queryIds,
     createJobFn: createSliceQueryJob,
-    onQueryDone: undefined, // maybe this will later need same HMR stuff as static query
+    onQueryDone: undefined, // これにも、後で静的クエリと同じ HMR の仕組みが必要になるかもしれない
     state,
     activity,
     graphqlRunner,
     graphqlTracing,
   })
 
-  // at this point, we're done grabbing page dependencies, so we need to
-  // flush out the batcher in case there are any left
+  // この時点でページの依存の取得は終わっているので、残りがある場合に備えて
+  // バッチャーをフラッシュする必要がある
   createPageDependencyBatcher.flush()
 
   return processedQueries
@@ -306,8 +306,8 @@ export async function processPageQueries(
     graphqlTracing,
   })
 
-  // at this point, we're done grabbing page dependencies, so we need to
-  // flush out the batcher in case there are any left
+  // この時点でページの依存の取得は終わっているので、残りがある場合に備えて
+  // バッチャーをフラッシュする必要がある
   createPageDependencyBatcher.flush()
 
   return processedQueries

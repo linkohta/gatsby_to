@@ -8,8 +8,8 @@ import { IGraphQLSpanTracer } from "../schema/type-definitions"
 import { pathToArray } from "./utils"
 
 /**
- * Tracks and knows how to get a parent span for a particular
- *  point in query resolver for a particular query and path
+ * 特定のクエリとパスについて、クエリリゾルバーの特定の時点での
+ *  親スパンを追跡し、その取得方法を知っている
  */
 export default class GraphQLSpanTracer implements IGraphQLSpanTracer {
   parentActivity: IPhantomReporter

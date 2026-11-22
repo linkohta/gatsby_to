@@ -70,10 +70,10 @@ exports.sourceNodes = ({
     })
   })
 
-  // Add site node.
+  // site ノードを追加する。
 
   const createGatsbyConfigNode = (config = {}) => {
-    // Delete plugins from the config as we add plugins above.
+    // プラグインは上で追加しているので、config から plugins を削除する。
     const configCopy = { ...config }
     delete configCopy.plugins
     const node = {
@@ -124,7 +124,7 @@ exports.sourceNodes = ({
     ) ?? systemPath.join(program.directory, `gatsby-config.js`)
   watchConfig(pathToGatsbyConfig, createGatsbyConfigNode)
 
-  // Create nodes for functions
+  // 関数のノードを作成する
   const { functions } = store.getState()
   const createFunctionNode = config => {
     createNode({
@@ -142,9 +142,9 @@ exports.sourceNodes = ({
     createFunctionNode(config)
   })
 
-  // Listen for updates to functions to update the nodes.
+  // 関数の更新を監視して、ノードを更新する。
   emitter.on(`SET_SITE_FUNCTIONS`, action => {
-    // Identify any now deleted functions and remove their nodes.
+    // 削除された関数を特定して、そのノードを削除する。
     const existingNodes = getNodesByType(`SiteFunction`)
     const newFunctionsSet = new Set()
     action.payload.forEach(config =>
@@ -165,12 +165,12 @@ function watchConfig(pathToGatsbyConfig, createGatsbyConfigNode) {
   chokidar.watch(pathToGatsbyConfig).on(`change`, () => {
     const oldCache = require.cache[require.resolve(pathToGatsbyConfig)]
     try {
-      // Delete require cache so we can reload the module.
+      // モジュールを再読み込みできるように、require キャッシュを削除する。
       delete require.cache[require.resolve(pathToGatsbyConfig)]
       const config = require(pathToGatsbyConfig)
       createGatsbyConfigNode(config)
     } catch (e) {
-      // Restore the old cache since requiring the new gatsby-config.js failed.
+      // 新しい gatsby-config.js の require に失敗したので、古いキャッシュを復元する。
       if (oldCache !== undefined) {
         require.cache[require.resolve(pathToGatsbyConfig)] = oldCache
       }
@@ -205,7 +205,7 @@ exports.createResolvers = ({ createResolvers }) => {
   createResolvers(resolvers)
 }
 
-// Listen for DELETE_PAGE and delete page nodes.
+// DELETE_PAGE を監視して、ページのノードを削除する。
 emitter.on(`DELETE_PAGE`, action => {
   const nodeId = createPageId(action.payload.path)
   const node = getNode(nodeId)
