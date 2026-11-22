@@ -40,7 +40,7 @@ const getWithAssetPrefix = (prefix = ``) => {
 
 const setup = ({ sourcePath = `/`, linkProps, pathPrefix = `` } = {}) => {
   const intersectionInstances = new WeakMap()
-  // mock intersectionObserver
+  // intersectionObserver をモックする
   global.IntersectionObserver = jest.fn(cb => {
     const instance = {
       observe: ref => {

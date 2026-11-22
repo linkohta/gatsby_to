@@ -9,7 +9,7 @@ export = async function getSharpInstance(): Promise<typeof import("sharp")> {
   } catch (err) {
     await rebuildSharp()
 
-    // Try importing again now we have rebuilt sharp
+    // sharp を再ビルドしたので、もう一度 import を試す
     return importSharp()
   }
 }
@@ -20,7 +20,7 @@ function importSharp(): typeof import("sharp") {
     const sharp = cleanRequire(`sharp`)
 
     sharp.simd(true)
-    // Concurrency is handled by gatsby
+    // 並行処理は gatsby が制御する
     sharp.concurrency(1)
 
     sharpInstance = sharp

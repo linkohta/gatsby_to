@@ -33,10 +33,10 @@ function addEsmImport(j, root) {
     existingImport.find(j.ImportSpecifier, { imported: { name: IMPORT_NAME } })
       .length
   )
-    return // already exists
+    return // すでに存在する
 
   if (!existingImport.length) {
-    // save comment at top (if any) and attach it to the new import statement
+    // 先頭のコメントがあれば保存し、新しい import 文に付ける
     const firstNode = getFirstNode(j, root)
     const { comments } = firstNode
 
@@ -113,7 +113,7 @@ function removeGatsbyLinkRequire(j, root) {
 function addRequire(j, root) {
   const existingImport = findGatsbyRequire(root, j)
 
-  if (existingImport.find(j.Identifier, { value: IMPORT_NAME }).length) return // already exists
+  if (existingImport.find(j.Identifier, { value: IMPORT_NAME }).length) return // すでに存在する
 
   if (!existingImport.length) {
     root

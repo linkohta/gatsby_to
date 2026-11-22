@@ -1,28 +1,28 @@
 import * as React from "react"
-import { NavigateOptions, LinkProps } from "@reach/router" // These come from `@types/reach__router`
+import { NavigateOptions, LinkProps } from "@reach/router" // これらは `@types/reach__router` に由来する
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface GatsbyLinkProps<TState> extends LinkProps<TState> {
-  /** A class to apply when this Link is active */
+  /** この Link がアクティブなときに適用するクラス */
   activeClassName?: string
-  /** Inline styles for when this Link is active */
+  /** この Link がアクティブなときのインラインスタイル */
   activeStyle?: object
   onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void
-  /** Class the link as highlighted if there is a partial match via a the `to` being prefixed to the current url */
+  /** `to` が現在の URL の前方に一致する部分一致の場合に、リンクをハイライト対象として扱う */
   partiallyActive?: boolean
-  /** Used to declare that this link replaces the current URL in history with the target */
+  /** このリンクが、履歴の中の現在の URL をリンク先で置き換えることを宣言するために使う */
   replace?: boolean
-  /** Used to pass state data to the linked page.
-   * The linked page will have a `location` prop containing a nested `state` object structure containing the passed data.
+  /** リンク先のページへ state のデータを渡すために使う。
+   * リンク先のページは `location` prop を持ち、その中のネストした `state` オブジェクトに渡したデータが入る。
    */
   state?: TState
-  /** The URL you want to link to */
+  /** リンク先の URL */
   to: string
 }
 
 /**
- * This component is intended _only_ for links to pages handled by Gatsby. For links to pages on other
- * domains or pages on the same domain not handled by the current Gatsby site, use the normal `<a>` element.
+ * このコンポーネントは、Gatsby が扱うページへのリンク _だけ_ を対象にしている。ほかのドメインのページや、
+ * 同じドメインでも現在の Gatsby サイトが扱わないページへのリンクには、通常の `<a>` 要素を使うこと。
  */
 export class Link<TState> extends React.Component<
   GatsbyLinkProps<TState>,
@@ -30,8 +30,8 @@ export class Link<TState> extends React.Component<
 > {}
 
 /**
- * Sometimes you need to navigate to pages programmatically, such as during form submissions. In these
- * cases, `Link` won’t work.
+ * フォームの送信時など、プログラムからページを移動する必要が生じることがある。そのような
+ * 場合、`Link` は使えない。
  */
 export const navigate: {
   (to: string, options?: NavigateOptions<{}>): void
@@ -39,9 +39,9 @@ export const navigate: {
 }
 
 /**
- * It is common to host sites in a sub-directory of a site. Gatsby lets you set the path prefix for your site.
- * After doing so, Gatsby's `<Link>` component will automatically handle constructing the correct URL in
- * development and production
+ * サイトをサブディレクトリでホストすることはよくある。Gatsby ではサイトのパスプレフィックスを設定できる。
+ * 設定すると、Gatsby の `<Link>` コンポーネントは開発時と本番の両方で、正しい URL を
+ * 自動的に組み立てる
  */
 export const withPrefix: (path: string) => string
 export const withAssetPrefix: (path: string) => string

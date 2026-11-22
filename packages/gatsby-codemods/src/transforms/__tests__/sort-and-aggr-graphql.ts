@@ -130,7 +130,7 @@ describe(transformName, () => {
       })
 
       it(`single field, list with multiple orders`, () => {
-        // those extra orders are no-op, just testing that we process this also
+        // これらの余分な order には意味がない。これも処理されることを確認しているだけである
         expect(
           run(
             `allMarkdownRemark(sort: { 

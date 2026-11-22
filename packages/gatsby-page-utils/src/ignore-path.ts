@@ -9,7 +9,7 @@ export function ignorePath(
   path: string,
   ignore?: IPathIgnoreOptions | string | Array<string> | null
 ): boolean {
-  // Don't do anything if no ignore patterns
+  // ignore のパターンがなければ何もしない
   if (!ignore) return false
   const settings: {
     patterns: string | ReadonlyArray<string>

@@ -213,7 +213,7 @@ describe(`createStaticAssetsPathHandler`, () => {
       await fileMovingDone()
 
       expect(vol.existsSync(`public/404.html`)).toEqual(true)
-      // 404 page is coped so it exists in both locations
+      // 404 ページはコピーされるので、両方の場所に存在する
       expect(vol.existsSync(`public/foo/404.html`)).toEqual(true)
     })
 
@@ -231,7 +231,7 @@ describe(`createStaticAssetsPathHandler`, () => {
       await fileMovingDone()
 
       expect(vol.existsSync(`public/500.html`)).toEqual(true)
-      // 500 page is coped so it exists in both locations
+      // 500 ページはコピーされるので、両方の場所に存在する
       expect(vol.existsSync(`public/foo/500.html`)).toEqual(true)
     })
   })

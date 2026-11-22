@@ -1,6 +1,6 @@
 import preval from "preval.macro"
 
-// TODO re:system-ui, keep an eye on https://github.com/primer/css/issues/838
+// TODO system-ui については https://github.com/primer/css/issues/838 を注視する
 const f = preval`
   const system = body = [
     "-apple-system",

@@ -39,7 +39,7 @@ export function generateImageArgs({
   if (cropFocus) {
     params.append(`fit`, `cover`)
     if (Array.isArray(cropFocus)) {
-      // For array of cropFocus values, append them as comma-separated string
+      // cropFocus の値が配列の場合は、カンマ区切りの文字列として追加する
       params.append(`position`, cropFocus.join(`,`))
     } else {
       params.append(`position`, cropFocus)

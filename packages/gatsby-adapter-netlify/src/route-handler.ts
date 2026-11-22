@@ -16,9 +16,9 @@ const NETLIFY_REDIRECT_KEYWORDS_ALLOWLIST = new Set([
 const NETLIFY_CONDITIONS_ALLOWLIST = new Set([`language`, `country`])
 
 const toNetlifyPath = (fromPath: string, toPath: string): Array<string> => {
-  // Modifies query parameter redirects, having no effect on other fromPath strings
+  // クエリパラメーターのリダイレクトを書き換える。ほかの fromPath の文字列には影響しない
   const netlifyFromPath = fromPath.replace(/[&?]/, ` `)
-  // Modifies wildcard & splat redirects, having no effect on other toPath strings
+  // ワイルドカードとスプラットのリダイレクトを書き換える。ほかの toPath の文字列には影響しない
   const netlifyToPath = toPath.replace(/\*/, `:splat`)
 
   return [netlifyFromPath, netlifyToPath]
@@ -126,7 +126,7 @@ export async function injectEntries(
     streamReplacer.on(`error`, reject)
   })
 
-  // remove previous file and move new file from tmp to final path
+  // 以前のファイルを削除し、新しいファイルを tmp から最終的なパスへ移動する
   await fs.remove(fileName)
   await fs.move(tmpFile, fileName)
 }
@@ -174,7 +174,7 @@ export function processRoutesManifest(
       const {
         status: routeStatus,
         toPath,
-        // TODO: add headers handling
+        // TODO: ヘッダーの処理を追加する
         headers,
         ...rest
       } = route
@@ -186,15 +186,15 @@ export function processRoutesManifest(
 
       const [netlifyFromPath, netlifyToPath] = toNetlifyPath(fromPath, toPath)
 
-      // The order of the first 3 parameters is significant.
-      // The order for rest params (key-value pairs) is arbitrary.
+      // 最初の 3 つのパラメーターは順序に意味がある。
+      // 残りのパラメーター（キーと値のペア）の順序は任意である。
       const pieces = [netlifyFromPath, netlifyToPath, status]
 
       for (const [key, value] of Object.entries(rest)) {
         if (NETLIFY_REDIRECT_KEYWORDS_ALLOWLIST.has(key)) {
           if (key === `conditions`) {
-            // "conditions" key from Gatsby contains only "language" and "country"
-            // which need special transformation to match Netlify _redirects
+            // Gatsby の "conditions" キーには "language" と "country" しか含まれず、
+            // Netlify の _redirects に合わせるには特別な変換が必要である
             // https://www.gatsbyjs.com/docs/reference/config-files/actions/#createRedirect
             if (value && typeof value === `object`) {
               for (const [conditionKey, conditionValueRaw] of Object.entries(
@@ -204,7 +204,7 @@ export function processRoutesManifest(
                   const conditionValue = Array.isArray(conditionValueRaw)
                     ? conditionValueRaw.join(`,`)
                     : conditionValueRaw
-                  // Gatsby gives us "country", we want "Country"
+                  // Gatsby が渡してくるのは "country" だが、必要なのは "Country" である
                   const conditionName =
                     conditionKey.charAt(0).toUpperCase() + conditionKey.slice(1)
 
@@ -232,7 +232,7 @@ export function processRoutesManifest(
       }
 
       if (!headerRoutes) {
-        // don't generate _headers from routesManifest if headerRoutes are provided
+        // headerRoutes が渡されている場合は、routesManifest から _headers を生成しない
         _headers += buildHeaderString(route.path, route.headers)
       }
     }

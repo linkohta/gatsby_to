@@ -7,7 +7,7 @@ import {
 } from "./theme"
 
 // gatsby-theme-ui-theme-gatsbyjs-org
-// extends gatsby-theme-ui-theme-default
+// gatsby-theme-ui-theme-default を拡張する
 
 const darkBackground = `#131217` // meh
 const darkBorder = colorsTokens.grey[90]
@@ -15,15 +15,15 @@ const shadowDarkBase = `19,18,23`
 const shadowDarkFlares = `0,0,0`
 
 // colors
-// provides a "dark" mode along the initial color mode "light"
+// 初期のカラーモード "light" に加えて "dark" モードを提供する
 const c = {
   ...colorsTokens,
-  // gatsbyjs.com specific stuff
+  // gatsbyjs.com 固有のもの
   banner: colorsTokens.purple[70],
-  // moved `text.placeholder` to `input.placeholder`
-  // ref. e.g. https://github.com/system-ui/theme-ui/blob/702c43e804046a94389e7a12a8bba4c4f436b14e/packages/presets/src/tailwind.js#L6
+  // `text.placeholder` を `input.placeholder` へ移動した
+  // 参考: https://github.com/system-ui/theme-ui/blob/702c43e804046a94389e7a12a8bba4c4f436b14e/packages/presets/src/tailwind.js#L6 など
   // transparent: `transparent`,
-  // expand `gatsby-design-tokens` defaults
+  // `gatsby-design-tokens` のデフォルトを拡張する
   ui: {
     background: colorsTokens.grey[5],
     hover: colorsTokens.purple[5],
@@ -54,7 +54,7 @@ const c = {
     iconFocus: colorsTokens.grey[60],
     placeholder: colorsTokens.text.placeholder,
   },
-  // new tokens
+  // 新しいトークン
   card: {
     background: colorsTokens.white,
     color: colorsTokens.grey[50],
@@ -198,7 +198,7 @@ const c = {
         iconFocus: colorsTokens.purple[50],
         placeholder: colorsTokens.whiteFade[50],
       },
-      // TODO figure out how to make shadows themeable
+      // TODO シャドウをテーマで切り替えられるようにする方法を検討する
       shadows: {
         dialog: `0px 4px 16px rgba(${shadowDarkBase}, 0.08), 0px 8px 24px rgba(${shadowDarkFlares}, 0.16)`,
         floating: `0px 2px 4px rgba(${shadowDarkBase}, 0.08), 0px 4px 8px rgba(${shadowDarkFlares}, 0.16)`,
@@ -336,8 +336,8 @@ export {
   transition,
 } from "./theme"
 
-// individual exports
-// colors extended with theme-ui required values
+// 個別の export
+// theme-ui が必要とする値で拡張した colors
 export { c as colors, s as sizes, zIndices }
 
 export const theme = newTheme

@@ -28,7 +28,7 @@ export function babelRecast(code: string, filePath: string): string {
     },
   })
 
-  const changedTracker = { hasChanged: false, filename: filePath } // recast adds extra semicolons that mess with diffs and we want to avoid them
+  const changedTracker = { hasChanged: false, filename: filePath } // recast は余分なセミコロンを追加して差分を乱すので、それを避けたい
 
   const options = {
     cloneInputAst: false,
@@ -62,7 +62,7 @@ function runParseSync(source: string, filePath: string): ParseResult | null {
     ],
     filename: filePath,
     parserOpts: {
-      tokens: true, // recast uses this
+      tokens: true, // recast がこれを使う
     },
   })
   if (!ast) {
@@ -179,7 +179,7 @@ function extractEnumValues(
     hasValue = true
     acc.push(value.value)
   } else if (value.kind === graphql.Kind.LIST) {
-    // list can be empty but it indicate that it is set at least
+    // 一覧は空のこともあるが、少なくとも設定されていることは分かる
     hasValue = true
     for (const listItem of value.values) {
       extractEnumValues(listItem, acc)
@@ -199,7 +199,7 @@ function isOldSortObject(props: unknown): props is IOldSortObject {
   }
 
   let hasFields = false
-  // skip if there any unexpected keys
+  // 想定外のキーがある場合はスキップする
   for (const [key, value] of Object.entries(props)) {
     if (key === `fields`) {
       if (value) {
@@ -245,7 +245,7 @@ export function processGraphQLQuery(query: string | graphql.DocumentNode): {
   hasChanged: boolean
 } {
   try {
-    let hasChanged = false // this is sort of a hack, but print changes formatting and we only want to use it when we have to
+    let hasChanged = false // ややハック的だが、print は書式を変えてしまうので、必要なときにだけ使いたい
     const ast = typeof query === `string` ? graphql.parse(query) : query
 
     graphql.visit(ast, {
@@ -255,7 +255,7 @@ export function processGraphQLQuery(query: string | graphql.DocumentNode): {
             return
           }
 
-          // old style sort: `allX(sort: { fields: <something>, order?: </something> })
+          // 旧形式の sort: `allX(sort: { fields: <something>, order?: </something> })
           const props: Record<string, Array<string> | undefined> = {}
           for (const field of node.value.fields) {
             props[field.name.value] = extractEnumValues(field.value)
@@ -265,7 +265,7 @@ export function processGraphQLQuery(query: string | graphql.DocumentNode): {
             return
           }
 
-          // iterate over each pair of field and order and create new object style for each
+          // field と order の組を順に処理し、それぞれについて新しいオブジェクト形式を作る
           const newObjects: Array<
             graphql.ObjectValueNode | graphql.EnumValueNode
           > = []

@@ -1,9 +1,9 @@
 const {
-  targets: listOfPolyfillsByTarget, // object with targets for each module
+  targets: listOfPolyfillsByTarget, // モジュールごとのターゲットを持つオブジェクト
 } = require(`core-js-compat`)({
-  // get all polyfills necessary for IE11, chrome > 63 or safari < 12.1
-  // This will give us a comprehensive list of all polyfills of legacy polyfills and modern polyfills.
-  // Core-js will give us output like:
+  // IE11、chrome > 63、safari < 12.1 に必要なポリフィルをすべて取得する
+  // これで、レガシー向けとモダン向けの全ポリフィルを網羅した一覧が得られる。
+  // core-js は次のような出力を返す:
   //   "es.symbol.match-all": {
   //     "chrome": "64",
   //     "ie": "11",
@@ -13,8 +13,8 @@ const {
   //     "ie": "11",
   //     "safari": "3.1"
   //   },
-  // With this matrix we can remove all modern polyfills like es.symbol.match-all from the exclude list so babel-preset-env
-  // can still polyfill them for our users.
+  // この対応表を使えば、es.symbol.match-all のようなモダン向けのポリフィルをすべて除外リストから外せるので、
+  // babel-preset-env がユーザーのために引き続きポリフィルを入れられる。
   targets: `IE 11, chrome > 63, safari <= 12.1`,
   filter: /^(es)\./,
 })
@@ -22,14 +22,14 @@ const {
 const listOfLegacyPolyfills = []
 Object.keys(listOfPolyfillsByTarget).forEach(polyfill => {
   const targets = listOfPolyfillsByTarget[polyfill]
-  // only add a list of polyfills that are necessary for IE, we don't want to exclude promise.finally...
+  // IE に必要なポリフィルの一覧だけを追加する。promise.finally などは除外したくない
   if (!targets.chrome) {
     listOfLegacyPolyfills.push(polyfill)
   }
 })
 
 module.exports = {
-  // Is imported inside the legacy polyfill file
+  // レガシー向けのポリフィルのファイルの中で import される
   LEGACY_POLYFILLS: [
     `features/array/copy-within`,
     `features/array/fill`,
@@ -78,19 +78,19 @@ module.exports = {
     `features/promise`,
     `features/dom-collections`,
   ],
-  // Will be used by preset-env to exclude already polyfilled features from the automatic polyfilling option
+  // preset-env が、すでにポリフィル済みの機能を自動ポリフィルの対象から除外するために使う
   CORE_JS_POLYFILL_EXCLUDE_LIST: [
     ...listOfLegacyPolyfills,
     `es.object.assign`,
 
-    // These are added by default as the check in babel-preset-env isn't thorough enough
-    // ex if .forEach is used it adds a bunch of iterator polyfills even if it has nothing to do with that
+    // babel-preset-env の判定が十分に厳密ではないので、これらはデフォルトで追加している
+    // たとえば .forEach を使っていると、まったく関係がなくてもイテレーターのポリフィルが大量に追加される
     `es.array.iterator`,
     `es.promise`,
     `es.symbol.description`,
     `web.*`,
 
-    // core-js@3.7.0 added extra polyfill for reduce & reduce-right because of bug - we don't care about that bug, we're already on chrome 87
+    // core-js@3.7.0 は、あるバグのために reduce と reduce-right のポリフィルを追加した。こちらはすでに chrome 87 を対象にしているので、そのバグは関係ない
     `es.array.reduce`,
     `es.array.reduce-right`,
   ],

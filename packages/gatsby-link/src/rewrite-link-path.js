@@ -1,5 +1,5 @@
 import { resolve } from "@gatsbyjs/reach-router"
-// Specific import to treeshake Node.js stuff
+// Node.js 向けのコードを tree shaking で除くため、個別に import する
 import { applyTrailingSlashOption } from "gatsby-page-utils/apply-trailing-slash-option"
 import { parsePath } from "./parse-path"
 import { isLocalLink } from "./is-local-link"
@@ -18,7 +18,7 @@ function applyTrailingSlashOptionOnPathnameOnly(path, option) {
 }
 
 function absolutify(path, current) {
-  // If it's already absolute, return as-is
+  // すでに絶対パスであれば、そのまま返す
   if (isAbsolutePath(path)) {
     return path
   }

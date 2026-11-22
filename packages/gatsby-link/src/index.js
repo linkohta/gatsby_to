@@ -18,19 +18,19 @@ const NavLinkPropTypes = {
   partiallyActive: PropTypes.bool,
 }
 
-// Set up IntersectionObserver
+// IntersectionObserver を設定する
 const createIntersectionObserver = (el, cb) => {
   const io = new window.IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (el === entry.target) {
-        // Check if element is within viewport, remove listener, destroy observer, and run link callback.
-        // MSEdge doesn't currently support isIntersecting, so also test for  an intersectionRatio > 0
+        // 要素がビューポート内にあるかを確認し、リスナーを削除し、オブザーバーを破棄して、リンクのコールバックを実行する。
+        // MSEdge は現在 isIntersecting に対応していないので、intersectionRatio > 0 も確認する
         cb(entry.isIntersecting || entry.intersectionRatio > 0)
       }
     })
   })
 
-  // Add element to the observer
+  // 要素をオブザーバーに追加する
   io.observe(el)
 
   return { instance: io, el }
@@ -47,7 +47,7 @@ function GatsbyLinkLocationWrapper(props) {
 class GatsbyLink extends React.Component {
   constructor(props) {
     super(props)
-    // Default to no support for IntersectionObserver
+    // デフォルトでは IntersectionObserver に対応していないものとして扱う
     let IOSupported = false
     if (typeof window !== `undefined` && window.IntersectionObserver) {
       IOSupported = true
@@ -63,7 +63,7 @@ class GatsbyLink extends React.Component {
   _prefetch() {
     let currentPath = window.location.pathname + window.location.search
 
-    // reach router should have the correct state
+    // reach router が正しい state を持っているはずである
     if (this.props._location && this.props._location.pathname) {
       currentPath = this.props._location.pathname + this.props._location.search
     }
@@ -73,8 +73,8 @@ class GatsbyLink extends React.Component {
 
     const newPathName = parsed.pathname + parsed.search
 
-    // Prefetch is used to speed up next navigations. When you use it on the current navigation,
-    // there could be a race-condition where Chrome uses the stale data instead of waiting for the network to complete
+    // プリフェッチは次のナビゲーションを速くするために使う。現在のナビゲーションに対して使うと、
+    // Chrome がネットワークの完了を待たずに古いデータを使ってしまう競合状態が起こり得る
     if (currentPath !== newPathName) {
       return ___loader.enqueue(newPathName)
     }
@@ -107,7 +107,7 @@ class GatsbyLink extends React.Component {
     }
 
     if (this.state.IOSupported && ref) {
-      // If IO supported and element reference found, setup Observer functionality
+      // IO に対応しており、要素の参照が見つかった場合は、オブザーバーの機能を設定する
       this.io = createIntersectionObserver(ref, inViewPort => {
         if (inViewPort) {
           this.abortPrefetch = this._prefetch()
@@ -180,10 +180,10 @@ class GatsbyLink extends React.Component {
           }
 
           if (
-            e.button === 0 && // ignore right clicks
-            !this.props.target && // let browser handle "target=_blank"
-            !e.defaultPrevented && // onClick prevented default
-            !e.metaKey && // ignore clicks with modifier keys...
+            e.button === 0 && // 右クリックは無視する
+            !this.props.target && // "target=_blank" はブラウザーに任せる
+            !e.defaultPrevented && // onClick がデフォルトの動作を止めた
+            !e.metaKey && // 修飾キーを伴うクリックは無視する...
             !e.altKey &&
             !e.ctrlKey &&
             !e.shiftKey
@@ -196,8 +196,8 @@ class GatsbyLink extends React.Component {
             if (typeof replace !== `boolean` && isCurrent) {
               shouldReplace = true
             }
-            // Make sure the necessary scripts and data are
-            // loaded before continuing.
+            // 続行する前に、必要なスクリプトとデータが
+            // 読み込まれていることを確認する。
             window.___navigate(prefixedTo, {
               state,
               replace: shouldReplace,

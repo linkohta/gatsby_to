@@ -66,7 +66,7 @@ export function babelRecast(code, filePath) {
     },
   })
 
-  const changedTracker = { hasChanged: false, filename: filePath } // recast adds extra semicolons that mess with diffs and we want to avoid them
+  const changedTracker = { hasChanged: false, filename: filePath } // recast は余分なセミコロンを追加して差分を乱すので、それを避けたい
 
   const options = {
     cloneInputAst: false,
@@ -97,7 +97,7 @@ function runParseSync(source, filePath) {
     ],
     filename: filePath,
     parserOpts: {
-      tokens: true, // recast uses this
+      tokens: true, // recast がこれを使う
     },
   })
   if (!ast) {
@@ -251,7 +251,7 @@ function processImportUsage(path, t, template, state) {
   }
   const expressionValue = fixedOrFluid?.[0]?.value?.expression
 
-  let newImageExpression = expressionValue // by default, pass what they pass
+  let newImageExpression = expressionValue // デフォルトでは、渡されたものをそのまま渡す
   if (
     t.isMemberExpression(expressionValue) &&
     propNames.includes(expressionValue?.property.name)
@@ -264,7 +264,7 @@ function processImportUsage(path, t, template, state) {
         .ast`${expressionValue?.object}.gatsbyImageData`
     }
 
-    newImageExpression.extra.parenthesized = false // the template adds parens and we don't want it to
+    newImageExpression.extra.parenthesized = false // テンプレートが括弧を追加するが、それは不要である
   } else if (
     t.isOptionalMemberExpression(expressionValue) &&
     propNames.includes(expressionValue?.property.name)
@@ -277,7 +277,7 @@ function processImportUsage(path, t, template, state) {
         .ast`${expressionValue?.object}?.gatsbyImageData`
     }
 
-    newImageExpression.extra.parenthesized = false // the template adds parens and we don't want it to
+    newImageExpression.extra.parenthesized = false // テンプレートが括弧を追加するが、それは不要である
   } else if (t.isObjectExpression(expressionValue)) {
     console.log(
       `It appears you're passing src or srcSet directly. This API is no longer exposed, please update ${state.opts.filename} manually.`
@@ -301,12 +301,12 @@ function processImportUsage(path, t, template, state) {
       true
     )
   )
-  path.skip() // prevent us from revisiting these nodes
+  path.skip() // これらのノードを再び訪れないようにする
 }
 
 function processArguments(queryArguments, fragment, layout, state) {
   if (!legacyFragments.includes(fragment.name.value)) {
-    let placeholderEnum = `BLURRED` // just in case these aren't the discrete cases we expect
+    let placeholderEnum = `BLURRED` // 想定している個別のケースに当てはまらない場合に備える
     if (legacyFragmentsNoPlaceholder.includes(fragment.name?.value)) {
       placeholderEnum = `NONE`
     } else if (legacyFragmentsSVGPlaceholder.includes(fragment.name?.value)) {
@@ -374,7 +374,7 @@ function processArguments(queryArguments, fragment, layout, state) {
 
 function processGraphQLQuery(query, state) {
   try {
-    let hasChanged = false // this is sort of a hack, but print changes formatting and we only want to use it when we have to
+    let hasChanged = false // ややハック的だが、print は書式を変えてしまうので、必要なときにだけ使いたい
     const ast = graphql.parse(query)
 
     graphql.visit(ast, {

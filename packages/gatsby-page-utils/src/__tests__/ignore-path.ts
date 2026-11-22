@@ -11,11 +11,11 @@ describe(`ignore-path`, () => {
     ]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },
-      // example page or directory without the prepended extension
+      // 拡張子の前に .example が付いていない example ページまたはディレクトリ
       { path: `example.js` },
       { path: `example/file.tsx` },
       { path: `dir/example.jsx` },
@@ -34,11 +34,11 @@ describe(`ignore-path`, () => {
     ]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },
-      // example page or directory without the preprended extension
+      // 拡張子の前に .example が付いていない example ページまたはディレクトリ
       { path: `example.js` },
       { path: `example/file.tsx` },
       { path: `dir/example.jsx` },
@@ -49,9 +49,9 @@ describe(`ignore-path`, () => {
 
   it(`filters out files matching ignore patterns`, () => {
     const patterns = [
-      // files named 'blog' or 'post' in top of pages directory
+      // pages ディレクトリの直下にある 'blog' または 'post' という名前のファイル
       `(blog|post).(js|ts|jsx|tsx)*`,
-      // any files with .example prepended to the js(x)/ts(x) extension
+      // js(x)/ts(x) の拡張子の前に .example が付いているすべてのファイル
       `**/*.example.(js|ts|jsx|tsx)`,
     ]
 
@@ -64,11 +64,11 @@ describe(`ignore-path`, () => {
     ]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },
-      // example page or directory without the preprended extension
+      // 拡張子の前に .example が付いていない example ページまたはディレクトリ
       { path: `example.js` },
       { path: `example/file.tsx` },
       { path: `dir/example.jsx` },
@@ -81,9 +81,9 @@ describe(`ignore-path`, () => {
 
   it(`filters out files matching ignore patterns w/ options.nocase`, () => {
     const patterns = [
-      // files named 'blog' or 'post' in top of pages directory
+      // pages ディレクトリの直下にある 'blog' または 'post' という名前のファイル
       `(blog|post).(js|ts|jsx|tsx)*`,
-      // any files with .example prepended to the js(x)/ts(x) extension
+      // js(x)/ts(x) の拡張子の前に .example が付いているすべてのファイル
       `**/*.example.(js|ts|jsx|tsx)`,
     ]
 
@@ -100,11 +100,11 @@ describe(`ignore-path`, () => {
     ]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },
-      // example page or directory without the preprended extension
+      // 拡張子の前に .example が付いていない example ページまたはディレクトリ
       { path: `example.js` },
       { path: `example/file.tsx` },
       { path: `dir/example.jsx` },
@@ -117,9 +117,9 @@ describe(`ignore-path`, () => {
 
   it(`filters out files matching ignore patterns as shorthand array`, () => {
     const patterns = [
-      // files named 'blog' or 'post' in top of pages directory
+      // pages ディレクトリの直下にある 'blog' または 'post' という名前のファイル
       `(blog|post).(js|ts|jsx|tsx)*`,
-      // any files with .example prepended to the js(x)/ts(x) extension
+      // js(x)/ts(x) の拡張子の前に .example が付いているすべてのファイル
       `**/*.example.(js|ts|jsx|tsx)`,
     ]
 
@@ -132,11 +132,11 @@ describe(`ignore-path`, () => {
     ]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },
-      // example page or directory without the preprended extension
+      // 拡張子の前に .example が付いていない example ページまたはディレクトリ
       { path: `example.js` },
       { path: `example/file.tsx` },
       { path: `dir/example.jsx` },
@@ -149,12 +149,12 @@ describe(`ignore-path`, () => {
 
   it(`filters out files matching ignore pattern as shorthand string`, () => {
     const pattern = `(blog|post).(js|ts|jsx|tsx)*`
-    // files named 'blog' or 'post' in top of pages directory
+    // pages ディレクトリの直下にある 'blog' または 'post' という名前のファイル
 
     const ignoreFiles = [{ path: `blog.js` }, { path: `post.tsx` }]
 
     const testFiles = ignoreFiles.concat([
-      // blog or post in sub directory, other pages in top directory
+      // blog または post はサブディレクトリに、ほかのページはトップディレクトリにある
       { path: `dir/blog.jsx` },
       { path: `dir/post.ts` },
       { path: `other.js` },

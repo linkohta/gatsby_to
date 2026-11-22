@@ -20,7 +20,7 @@ export async function handleAllowedRemoteUrlsNetlifyConfig({
 
     const missingAllowedUrlsInNetlifyToml: Array<string> = []
     for (const remoteFileAllowedUrl of remoteFileAllowedUrls) {
-      // test if url pattern already passes one of the regexes in netlify.toml
+      // URL パターンが、netlify.toml にある正規表現のいずれかにすでに一致するかを調べる
       const isAlreadyAllowed = allowedUrlsInNetlifyTomlRegexes.some(
         allowedRegex => allowedRegex.test(remoteFileAllowedUrl.urlPattern)
       )

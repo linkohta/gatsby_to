@@ -96,7 +96,7 @@ describe(`route-handler`, () => {
         const content = await getContent(gatsbyPluginNetlifyContent)
 
         expect(content.indexOf(newAdapterContent)).not.toBe(-1)
-        // it removes gatsby-plugin-netlify entries
+        // gatsby-plugin-netlify のエントリーを削除する
         expect(content.indexOf(GATSBY_PLUGIN_MARKER_START)).toBe(-1)
         expect(content.indexOf(gatsbyPluginNetlifyContent)).toBe(-1)
       })
@@ -105,7 +105,7 @@ describe(`route-handler`, () => {
         const content = await getContent(netlifyPluginGatsbyContent)
 
         expect(content.indexOf(newAdapterContent)).not.toBe(-1)
-        // it removes netlify-plugin-gatsby entries
+        // netlify-plugin-gatsby のエントリーを削除する
         expect(content.indexOf(NETLIFY_PLUGIN_MARKER_START)).toBe(-1)
         expect(content.indexOf(NETLIFY_PLUGIN_MARKER_END)).toBe(-1)
         expect(content.indexOf(netlifyPluginGatsbyContent)).toBe(-1)
@@ -125,19 +125,19 @@ describe(`route-handler`, () => {
 
         expect(content.indexOf(newAdapterContent)).not.toBe(-1)
 
-        // it preserve any custom entries
+        // カスタムのエントリーはすべて残す
         expect(content.indexOf(customContent1)).not.toBe(-1)
         expect(content.indexOf(customContent2)).not.toBe(-1)
         expect(content.indexOf(customContent3)).not.toBe(-1)
 
-        // it removes previous gatsby-adapter-netlify entries
+        // 以前の gatsby-adapter-netlify のエントリーを削除する
         expect(content.indexOf(previousAdapterContent)).toBe(-1)
 
-        // it removes gatsby-plugin-netlify entries
+        // gatsby-plugin-netlify のエントリーを削除する
         expect(content.indexOf(GATSBY_PLUGIN_MARKER_START)).toBe(-1)
         expect(content.indexOf(gatsbyPluginNetlifyContent)).toBe(-1)
 
-        // it removes netlify-plugin-gatsby entries
+        // netlify-plugin-gatsby のエントリーを削除する
         expect(content.indexOf(NETLIFY_PLUGIN_MARKER_START)).toBe(-1)
         expect(content.indexOf(NETLIFY_PLUGIN_MARKER_END)).toBe(-1)
         expect(content.indexOf(netlifyPluginGatsbyContent)).toBe(-1)
@@ -168,9 +168,9 @@ describe(`route-handler`, () => {
 
       const { redirects } = processRoutesManifest(manifest)
 
-      // `!` is appended to status to mark forced redirect
+      // 強制リダイレクトであることを示すため、ステータスに `!` が付く
       expect(redirects).toMatch(/^\/old-url\s+\/new-url\s+301!$/m)
-      // `!` is not appended to status to mark not forced redirect
+      // 強制リダイレクトではないので、ステータスに `!` は付かない
       expect(redirects).toMatch(/^\/old-url2\s+\/new-url2\s+308$/m)
     })
 

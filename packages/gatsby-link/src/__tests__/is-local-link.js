@@ -11,7 +11,7 @@ describe(`isLocalLink`, () => {
     expect(isLocalLink(undefined)).toBeUndefined()
     expect(isLocalLink(-1)).toBeUndefined()
   })
-  // TODO(v5): Unskip Tests
+  // TODO(v5): テストのスキップを解除する
   it.skip(`throws TypeError if input is undefined`, () => {
     expect(() => isLocalLink(undefined)).toThrowError(
       `Expected a \`string\`, got \`undefined\``

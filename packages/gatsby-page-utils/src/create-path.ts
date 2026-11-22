@@ -7,14 +7,14 @@ export function createPath(
   usePathBase: boolean = false
 ): string {
   const { dir, name, base } = parse(filePath)
-  // When a collection route also has client-only routes (e.g. {Product.name}/[...sku])
-  // The "name" would be .. and "ext" .sku -- that's why "base" needs to be used instead
-  // to get [...sku]. usePathBase is set to "true" in collection-route-builder and gatsbyPath
+  // コレクションルートにクライアント専用ルートも含まれる場合（例: {Product.name}/[...sku]）、
+  // "name" は .. に、"ext" は .sku になる。そのため、[...sku] を得るには代わりに "base" を
+  // 使う必要がある。usePathBase は collection-route-builder と gatsbyPath で "true" に設定される
   const parsedBase = base === `index` ? `` : base
   const parsedName = name === `index` ? `` : name
   const postfix = withTrailingSlash ? `/` : ``
 
-  // Convert slashes since the Regex operates on forward slashes
+  // 正規表現はスラッシュを前提にしているので、区切り文字をスラッシュに変換する
   return slash(
     posix.join(`/`, dir, usePathBase ? parsedBase : parsedName, postfix)
   )

@@ -47,7 +47,7 @@ export async function prepareFunction(
 
   await fs.ensureDir(internalFunctionsDir)
 
-  // This is a temporary hacky approach, eventually it should be just `fun.name`
+  // これは一時的で強引な方法であり、最終的には単に `fun.name` になるべきである
   const displayName = isODB
     ? `DSG`
     : fun.name === `SSR & DSG`
@@ -87,7 +87,7 @@ const http = require("http")
 const { Buffer } = require("buffer")
 const cookie = require("${getRelativePathToModule(`cookie`)}")
 ${
-  isODB // inlined @netlify/functions#builder working on Node@24 that doesn't use callback
+  isODB // コールバックを使わない Node@24 で動作する @netlify/functions#builder をインライン化したもの
     ? /* javascript */ `function builder(handler) {
       return async function(event, context) {
         if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD') {

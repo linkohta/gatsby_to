@@ -18,9 +18,9 @@ interface IMoveTask {
 export function normalizeDynamicRoutePath(routePath: string): string {
   return (
     routePath
-      // replace `:param` with `[param]`
+      // `:param` を `[param]` に置き換える
       .replace(/:([^:/\\]+)/gm, `[$1]`)
-      // replace `*param` with `[...param]` and `*` with `[...]`
+      // `*param` を `[...param]` に、`*` を `[...]` に置き換える
       .replace(/\*([^:/\\]*)/gm, `[...$1]`)
   )
 }
@@ -53,8 +53,8 @@ export function createStaticAssetsPathHandler(): {
       filePath.endsWith(`.html`) && !routePath.endsWith(`.html`)
 
     let isDynamic = false
-    // dynamic routes syntax use characters that are reserved in a lot of filesystems
-    // so if route is dynamic we should normalize filepath
+    // 動的ルートの構文は、多くのファイルシステムで予約されている文字を使う
+    // そのため、ルートが動的な場合はファイルパスを正規化する
     if (routePath.includes(`/:`) || routePath.includes(`/*`)) {
       routePath = normalizeDynamicRoutePath(routePath)
       isDynamic = true
@@ -68,8 +68,8 @@ export function createStaticAssetsPathHandler(): {
       moveQueue.push({
         from: filePath,
         to: finalFilePath,
-        // 404.html should stay in root of PUBLISH_DIR to be used as custom 404 page
-        // both 404.html and 500.html should stay in root of PUBLISH_DIR to be bundled correctly for SSR/DSG
+        // 404.html は、カスタム 404 ページとして使われるよう PUBLISH_DIR のルートに置いたままにする
+        // 404.html と 500.html はどちらも、SSR/DSG 用に正しくバンドルされるよう PUBLISH_DIR のルートに置いたままにする
         keepOriginalFile:
           filePath === `public/404.html` || filePath === `public/500.html`,
       })

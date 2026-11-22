@@ -15,33 +15,33 @@ import {
 } from "./index"
 
 // gatsby-theme-ui-theme-default
-// provides a theme-ui theme using gatsby-design-tokens
+// gatsby-design-tokens を使った theme-ui のテーマを提供する
 
 // colors
-// extend colors with theme-ui required keys
+// theme-ui が必要とするキーで colors を拡張する
 // https://theme-ui.com/theme-spec#color
 const c = {
   ...colorsTokens,
-  // Body foreground color
-  // overwrite what's currently in _colors_ from _gatsby-design-tokens_
-  // also see _heading_ key below
+  // 本文の前景色
+  // _gatsby-design-tokens_ の _colors_ に今ある値を上書きする
+  // 下の _heading_ キーも参照
   text: colorsTokens.grey[80], // colors.text.primary
-  // Body background color
+  // 本文の背景色
   background: colorsTokens.white,
-  // Primary brand color for links, buttons, etc.
+  // リンクやボタンなどに使う、ブランドのプライマリーカラー
   primary: colorsTokens.gatsby,
-  // A secondary brand color for alternative styling
+  // 別のスタイルに使う、ブランドのセカンダリーカラー
   secondary: colorsTokens.purple[40],
-  // A contrast color for emphasizing UI
+  // UI を強調するためのコントラストカラー
   accent: colorsTokens.orange[60],
-  // A faint color for backgrounds, borders, and accents that do not require high contrast with the background color
+  // 背景色との高いコントラストを必要としない背景、ボーダー、アクセントに使う淡い色
   muted: colorsTokens.grey[5],
-  // end Theme-UI required keys
+  // theme-ui が必要とするキーはここまで
 
-  // gatsby-design-tokens has the following in colors.text,
-  // which conflicts with theme-ui's default color _text_
-  // making text.header and text.secondary available as
-  // _heading_ and _textMuted_ resolves that
+  // gatsby-design-tokens の colors.text には次のものがあり、
+  // theme-ui のデフォルトの色 _text_ と衝突する
+  // text.header と text.secondary を _heading_ と _textMuted_ として
+  // 使えるようにすることで解決している
   heading: colorsTokens.text.header, // text.header
   textMuted: colorsTokens.text.secondary, // text.secondary
 }

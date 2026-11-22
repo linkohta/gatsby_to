@@ -38,8 +38,8 @@ window.location.search
     }
   })
 
-// When the query and variables string is edited, update the URL bar so
-// that it can be easily shared.
+// クエリと変数の文字列が編集されたら、簡単に共有できるよう
+// URL バーを更新する。
 function onEditQuery(newQuery) {
   parameters.query = newQuery
   updateURL()
@@ -182,9 +182,9 @@ const App = ({ initialExternalFragments }) => {
 const container = document.getElementById(`root`)
 const root = createRoot(container)
 
-// crude way to fetch fragments on boot time
-// it won't hot reload fragments (refresh required)
-// but good enough for initial integration
+// 起動時にフラグメントを取得する簡易的な方法
+// フラグメントはホットリロードされない（再読み込みが必要）が、
+// 最初の組み込みとしては十分である
 fetchFragments().then(initialExternalFragments => {
   root.render(<App initialExternalFragments={initialExternalFragments} />)
 })

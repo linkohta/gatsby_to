@@ -7,8 +7,8 @@ export const getGlobalBasePrefix = () =>
       : undefined
     : __BASE_PATH__
 
-// These global values are wrapped in typeof clauses to ensure the values exist.
-// This is especially problematic in unit testing of this component.
+// これらのグローバルな値は、値が存在することを確かめるために typeof の条件で包んでいる。
+// このコンポーネントのユニットテストでは、特に問題になる。
 export const getGlobalPathPrefix = () =>
   process.env.NODE_ENV !== `production`
     ? typeof __PATH_PREFIX__ !== `undefined`
