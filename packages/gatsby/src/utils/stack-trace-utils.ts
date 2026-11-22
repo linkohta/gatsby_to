@@ -15,9 +15,9 @@ const chalk = require(`chalk`)
 const { isNodeInternalModulePath } = require(`gatsby-core-utils`)
 
 const getDirName = (arg: unknown): string => {
-  // Caveat related to executing in engines:
-  // After webpack bundling we would get number here (webpack module id) and that would crash when doing
-  // path.dirname(number).
+  // エンジンの中で実行する場合の注意点:
+  // webpack でバンドルした後は、ここに数値（webpack のモジュール ID）が入り、
+  // path.dirname(number) を実行するとクラッシュする。
   if (typeof arg === `string`) {
     return path.dirname(arg)
   }

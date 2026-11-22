@@ -31,9 +31,9 @@ export function logTransitions<T = DefaultContext>(
     }
     // eslint-disable-next-line no-unused-expressions
     service.children?.forEach(child => {
-      // We want to ensure we don't attach a listener to the same
-      // actor. We don't need to worry about detaching the listener
-      // because xstate handles that for us when the actor is stopped.
+      // 同じアクターにリスナーを重複して付けないようにしたい。
+      // リスナーの取り外しを気にする必要はない。アクターが停止したときに
+      // xstate が処理してくれるためである。
 
       // @ts-ignore - TODO: Fix it
       if (isInterpreter(child) && !listeners.has(child)) {

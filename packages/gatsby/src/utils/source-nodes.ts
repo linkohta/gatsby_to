@@ -10,32 +10,32 @@ import type { GatsbyIterable } from "../datastore/common/iterable"
 const { deleteNode } = actions
 
 /**
- * Finds the name of all plugins which implement Gatsby APIs that
- * may create nodes, but which have not actually created any nodes.
+ * ノードを作成する可能性のある Gatsby の API を実装しているが、
+ * 実際にはノードを 1 つも作成していないプラグインの名前をすべて探す。
  */
 function discoverPluginNamesWithoutNodes(): Array<string> {
   const { typeOwners, flattenedPlugins } = store.getState()
 
-  // Find out which plugins own already created nodes
+  // 作成済みのノードをどのプラグインが所有しているかを調べる
   const pluginNamesThatCreatedNodes = new Set([
     `default-site-plugin`,
-    // each plugin that owns node types created a node at some point
+    // ノードの型を所有しているプラグインは、どこかの時点でノードを作成している
     ...Array.from(typeOwners.pluginsToTypes.keys()),
   ])
 
   return flattenedPlugins
     .filter(
       plugin =>
-        // "Can generate nodes"
+        // 「ノードを生成できる」
         plugin.nodeAPIs.includes(`sourceNodes`) &&
-        // "Has not generated nodes"
+        // 「ノードを生成していない」
         !pluginNamesThatCreatedNodes.has(plugin.name)
     )
     .map(plugin => plugin.name)
 }
 
 /**
- * Warn about plugins that should have created nodes but didn't.
+ * ノードを作成するはずなのに作成しなかったプラグインについて警告する。
  */
 function warnForPluginsWithoutNodes(): void {
   const pluginNamesWithNoNodes = discoverPluginNamesWithoutNodes()
@@ -48,7 +48,7 @@ function warnForPluginsWithoutNodes(): void {
 }
 
 /**
- * Return the set of nodes for which its root node has not been touched
+ * ルートノードがタッチされていないノードの集合を返す
  */
 function getStaleNodes(
   state: IGatsbyState,
@@ -82,7 +82,7 @@ function getStaleNodes(
 }
 
 /**
- * Find all stale nodes and delete them unless the node type has been opted out of stale node garbage collection.
+ * 古いノードをすべて探して削除する。ただし、古いノードのガベージコレクションの対象から外されたノードの型は除く。
  */
 async function deleteStaleNodes(
   previouslyExistingNodeTypeNames: Array<string>
@@ -101,7 +101,7 @@ async function deleteStaleNodes(
   for (const typeName of previouslyExistingNodeTypeNames) {
     const pluginName = typeOwners.typesToPlugins.get(typeName)
 
-    // no need to check this type if its owner has declared its a stateful source plugin
+    // 所有者がステートフルなソースプラグインであると宣言している場合は、この型を確認する必要はない
     if (pluginName && statefulSourcePlugins.has(pluginName)) {
       continue
     }
@@ -116,7 +116,7 @@ async function deleteStaleNodes(
       cleanupStaleNodesActivity.tick()
 
       if (++deleteCount % 5000) {
-        // dont block event loop
+        // イベントループをブロックしない
         await new Promise(res => {
           setImmediate(() => {
             res(null)
@@ -129,7 +129,7 @@ async function deleteStaleNodes(
   cleanupStaleNodesActivity.end()
 }
 
-// exported for unit tests purposes only to allow internal module state resets
+// モジュールの内部状態をリセットできるように、ユニットテストのためだけに export している
 export const is = {
   initialSourceNodesOfCurrentNodeProcess: true,
 }
@@ -150,7 +150,7 @@ export default async ({
     ? `initial-sourceNodes`
     : `sourceNodes #${sourcingCount}`
 
-  // this is persisted to cache between builds, so it will always have an up to date list of previously created types by plugin name
+  // これはビルドをまたいでキャッシュに永続化されるので、以前に作成された型の、プラグイン名ごとの最新の一覧を常に持っている
   const { typeOwners } = store.getState()
 
   const previouslyExistingNodeTypeNames: Array<string> = Array.from(
@@ -167,14 +167,14 @@ export default async ({
 
   await getDataStore().ready()
 
-  // We only warn for plugins w/o nodes and delete stale nodes on the first sourceNodes call of the current process.
+  // ノードのないプラグインについての警告と、古いノードの削除は、現在のプロセスで最初の sourceNodes の呼び出しのときにだけ行う。
   if (is.initialSourceNodesOfCurrentNodeProcess) {
     is.initialSourceNodesOfCurrentNodeProcess = false
 
     warnForPluginsWithoutNodes()
 
     if (
-      // if this is the very first source and no types existed before this sourceNodes run, there's no need to check for stale nodes. They wont be stale because they were just created. Only check for stale nodes in node types that never existed before.
+      // これがまったく最初の取得であり、今回の sourceNodes の実行より前に型が 1 つも存在しなかった場合は、古いノードを確認する必要はない。作成されたばかりなので、古いはずがないためである。古いノードを確認するのは、以前に一度も存在しなかったノードの型だけにする。
       previouslyExistingNodeTypeNames.length > 0
     ) {
       await deleteStaleNodes(previouslyExistingNodeTypeNames)

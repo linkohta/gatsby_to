@@ -1,14 +1,14 @@
 export default function (source: string): string {
-  // all it does is adding BaseContext to list of exports
+  // 行っているのは、export の一覧に BaseContext を追加することだけである
   return source.replace(/export\s+{([^}]+)}/m, (match, exportList) => {
     // return `export { ${exportList}, BaseContext }`
 
     if (/[,\s]BaseContext[,\s]/.test(exportList)) {
-      // If BaseContext is already in export list - do nothing.
-      // At the time of writing this, BaseContext is not exported,
-      // but this can change in future version of @reach/router
-      // and we don't want to export same thing multiple times
-      // as this would cause parsing errors:
+      // BaseContext がすでに export の一覧にある場合は、何もしない。
+      // これを書いている時点では BaseContext は export されていないが、
+      // @reach/router の将来のバージョンで変わる可能性がある。
+      // 同じものを複数回 export すると、次のパースエラーになるので
+      // 避けたい:
       // "Module parse failed: Duplicate export 'BaseContext'"
       return match
     } else {

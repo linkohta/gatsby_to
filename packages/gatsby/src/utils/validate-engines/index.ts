@@ -45,9 +45,9 @@ async function validateEngines(directory: string): Promise<void> {
     {
       numWorkers: 1,
       env: {
-        // Do not "inherit" this env var for validation,
-        // as otherwise validation will fail on any imports
-        // that OpenTracing config might make
+        // 検証では、この環境変数を「引き継がない」。
+        // そうしないと、OpenTracing の設定が行うかもしれない
+        // あらゆる import で検証が失敗するためである
         GATSBY_OPEN_TRACING_CONFIG_FILE: ``,
       },
       silent: true,

@@ -8,30 +8,30 @@ let logger: ZipkinHttpLogger
 let recorder: ZipkinBatchRecorder
 
 /**
- * Create and return an open-tracing compatible tracer. See
+ * open-tracing 互換の tracer を作成して返す。次を参照
  * https://github.com/opentracing/opentracing-javascript/blob/master/src/tracer.ts
  */
 export const create = (): ZipkinTracer => {
   logger = new HttpLogger({
-    // endpoint of local docker zipkin instance
+    // ローカルの docker の zipkin インスタンスのエンドポイント
     endpoint: `http://localhost:9411/api/v1/spans`,
   }) as ZipkinHttpLogger
 
   recorder = new zipkin.BatchRecorder({
     logger,
-    // timeout = 60 hours, must be longer than site's build time
+    // タイムアウト = 60 時間。サイトのビルド時間より長くなければならない
     timeout: 60 * 60 * 60 * 1000000,
   }) as ZipkinBatchRecorder
 
   const tracer = new ZipkinTracer({
     localServiceName: `gatsby`,
     serviceName: `gatsby`,
-    // Sample 1 out of 1 spans (100%). When tracing production
-    // services, it is normal to sample 1 out of 10 requests so that
-    // tracing information doesn't impact site performance. But Gatsby
-    // is a build tool and only has "1" request (the
-    // build). Therefore, we must set this to 100% so that spans
-    // aren't missing
+    // 1 個のスパンのうち 1 個をサンプリングする（100%）。本番の
+    // サービスをトレースする場合は、トレースの情報がサイトのパフォーマンスに
+    // 影響しないように、10 リクエストのうち 1 つをサンプリングするのが普通である。しかし
+    // Gatsby はビルドツールであり、リクエストは "1" つ（ビルド）しか
+    // ない。そのため、スパンが欠けないように、これを 100% に
+    // 設定しなければならない
     sampler: new zipkin.sampler.CountingSampler(1),
     traceId128Bit: true,
     recorder,
@@ -41,10 +41,10 @@ export const create = (): ZipkinTracer => {
   return tracer
 }
 
-// Workaround for issue in Zipkin HTTP Logger where Spans are not
-// cleared off their processing queue before the node.js process
-// exits. Code is mostly the same as the zipkin processQueue
-// implementation.
+// node.js のプロセスが終了する前に、スパンが処理キューから
+// 消去されないという Zipkin HTTP Logger の問題への回避策。
+// コードは、zipkin の processQueue の実装と
+// ほぼ同じである。
 const _processQueue = async (): Promise<void> => {
   if (logger.queue.length > 0) {
     const postBody = `[${logger.queue.join(`,`)}]`
@@ -73,18 +73,18 @@ const _processQueue = async (): Promise<void> => {
 }
 
 /**
- * Run any tracer cleanup required before the node.js process
- * exits. For Zipkin HTTP, we must manually process any spans still on
- * the queue
+ * node.js のプロセスが終了する前に必要な tracer の後始末を
+ * 実行する。Zipkin HTTP の場合は、キューに残っているスパンを
+ * 手動で処理しなければならない
  */
 export const stop = async (): Promise<void> => {
-  // First, write all partial spans to the http logger
+  // まず、未完了のスパンをすべて http ロガーに書き込む
   recorder.partialSpans.forEach((span, id) => {
     if (recorder._timedOut(span)) {
       recorder._writeSpan(id)
     }
   })
 
-  // Then tell http logger to process all spans in its queue
+  // 次に、キューの中のすべてのスパンを処理するよう http ロガーに伝える
   await _processQueue()
 }

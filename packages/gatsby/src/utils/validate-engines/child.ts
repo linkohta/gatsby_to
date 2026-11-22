@@ -28,17 +28,17 @@ class EngineValidationError extends Error {
 }
 
 export async function validate(directory: string): Promise<void> {
-  // intercept module loading and validate no unexpected imports are happening
+  // モジュールの読み込みに割り込み、予期しない import が起きていないことを検証する
   // @ts-ignore TS doesn't like accessing `_load`
   mod._load = (request: string, parent: mod, isMain: boolean): any => {
-    // Allow all node builtins
+    // node の組み込みモジュールはすべて許可する
     if (mod.builtinModules.includes(request)) {
       return originalModuleLoad(request, parent, isMain)
     }
 
-    // Allow imports to modules in engines directory.
-    // For example: importing ".cache/page-ssr/routes/render-page" from
-    // page-ssr engine should be allowed as it is part of engine.
+    // engines ディレクトリの中のモジュールの import を許可する。
+    // たとえば、page-ssr エンジンからの ".cache/page-ssr/routes/render-page" の import は、
+    // エンジンの一部なので許可すべきである。
     const allowedPrefixes = [
       path.join(`.cache`, `query-engine`),
       path.join(`.cache`, `page-ssr`),
@@ -52,21 +52,21 @@ export async function validate(directory: string): Promise<void> {
       }
     }
 
-    // We throw on anything that is not allowed
-    // Runtime might have try/catch for it and continue to work
-    // (for example`msgpackr` have fallback if native `msgpack-extract` can't be loaded)
-    // and we don't fail validation in those cases because error we throw will be handled.
-    // We do want to fail validation if there is no fallback
+    // 許可されていないものには、すべて例外を投げる
+    // ランタイムがそれを try/catch して動作を続けることもある
+    // （たとえば`msgpackr` は、ネイティブの `msgpack-extract` を読み込めない場合のフォールバックを持っている）
+    // そのような場合は、投げたエラーが処理されるので、検証を失敗させない。
+    // フォールバックがない場合は、検証を失敗させたい
     throw new EngineValidationError({ request, relativeToRoot, parent })
   }
 
-  // workaround for gatsby-worker issue:
-  // gatsby-worker gets bundled in engines and it will auto-init "child" module
-  // if GATSBY_WORKER_MODULE_PATH env var is set. To prevent this we just unset
-  // env var so it's falsy.
+  // gatsby-worker の問題への回避策:
+  // gatsby-worker はエンジンにバンドルされ、環境変数 GATSBY_WORKER_MODULE_PATH が
+  // 設定されていると "child" モジュールを自動的に初期化する。これを防ぐために、
+  // 環境変数の設定を解除して falsy にする。
   process.env.GATSBY_WORKER_MODULE_PATH = ``
 
-  // import engines, initiate them, if there is any error thrown it will be handled in parent process
+  // エンジンを import して初期化する。エラーが投げられた場合は、親プロセスで処理される
   const { GraphQLEngine } = require(path.join(
     directory,
     `.cache`,

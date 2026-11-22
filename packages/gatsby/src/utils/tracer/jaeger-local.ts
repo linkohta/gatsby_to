@@ -3,13 +3,13 @@ import { initTracer, JaegerTracer, TracingConfig } from "jaeger-client"
 let tracer: JaegerTracer
 
 function create(): JaegerTracer {
-  // See schema
+  // スキーマは次を参照
   // https://github.com/jaegertracing/jaeger-client-node/blob/master/src/configuration.js#L37
   const config: TracingConfig = {
     serviceName: `gatsby`,
     reporter: {
-      // Provide the traces endpoint; this forces the client to
-      // connect directly to the Collector and send spans over HTTP
+      // トレースのエンドポイントを指定する。これにより、クライアントは
+      // Collector に直接接続し、スパンを HTTP で送る
       collectorEndpoint: `http://localhost:14268/api/traces`,
     },
     sampler: {

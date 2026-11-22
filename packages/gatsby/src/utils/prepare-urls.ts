@@ -37,30 +37,30 @@ export function prepareUrls(
     prettyHost = `localhost`
 
     try {
-      // This can only return an IPv4 address
+      // これは IPv4 アドレスしか返せない
       lanUrlForConfig = address.ip()
       if (lanUrlForConfig) {
-        // Check if the address is a private ip
+        // アドレスがプライベート IP であるかを確認する
         // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
         if (
           /^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(
             lanUrlForConfig
           )
         ) {
-          // Address is private, format it for later use
+          // アドレスはプライベートなので、後で使えるように整形する
           lanUrlForTerminal = prettyPrintUrl(lanUrlForConfig)
         } else {
-          // Address is not private, so we will discard it
+          // アドレスはプライベートではないので、破棄する
           lanUrlForConfig = undefined
         }
       }
     } catch (_e) {
-      // ignored
+      // 無視する
     }
   }
-  // TODO collect errors (GraphQL + Webpack) in Redux so we
-  // can clear terminal and print them out on every compile.
-  // Borrow pretty printing code from webpack plugin.
+  // TODO エラー（GraphQL と Webpack）を Redux に集めて、コンパイルのたびに
+  // ターミナルを消去して出力できるようにする。
+  // 整形して出力するコードは webpack のプラグインから借用する。
   const localUrlForTerminal = prettyPrintUrl(prettyHost)
   const localUrlForBrowser = formatUrl(prettyHost)
   return {

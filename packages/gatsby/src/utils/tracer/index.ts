@@ -10,13 +10,13 @@ interface ITracerProvider {
 let tracerProvider: ITracerProvider | undefined
 
 /**
- * tracerFile should be a js file that exports two functions.
+ * tracerFile は、2 つの関数を export する js ファイルであること。
  *
- * `create` - Create and return an open-tracing compatible tracer. See
+ * `create` - open-tracing 互換の tracer を作成して返す。次を参照
  * https://github.com/opentracing/opentracing-javascript/blob/master/src/tracer.ts
  *
- * `stop` - Run any tracer cleanup required before the node.js process
- * exits
+ * `stop` - node.js のプロセスが終了する前に必要な tracer の後始末を
+ * 実行する
  */
 export const initTracer = async (tracerFile: string): Promise<Tracer> => {
   let tracer: Tracer

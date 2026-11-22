@@ -74,7 +74,7 @@ type MiniCSSExtractLoaderModuleOptions =
       namedExport?: boolean
     }
 /**
- * Utils that produce webpack `loader` objects
+ * webpack の `loader` オブジェクトを生成するユーティリティ
  */
 interface ILoaderUtils {
   yaml: LoaderResolver
@@ -116,11 +116,11 @@ interface IModuleThatUseGatsby {
 type CssLoaderModuleOption = boolean | Record<string, any> | string
 
 /**
- * Utils that produce webpack rule objects
+ * webpack のルールオブジェクトを生成するユーティリティ
  */
 interface IRuleUtils {
   /**
-   * Handles JavaScript compilation via babel
+   * babel による JavaScript のコンパイルを扱う
    */
   js: RuleFactory<{ modulesThatUseGatsby?: Array<IModuleThatUseGatsby> }>
   dependencies: RuleFactory<{
@@ -158,7 +158,7 @@ type PluginUtils = BuiltinPlugins & {
 }
 
 /**
- * webpack atoms namespace
+ * webpack の atoms 名前空間
  */
 interface IWebpackUtils {
   loaders: ILoaderUtils
@@ -171,7 +171,7 @@ interface IWebpackUtils {
 const vendorRegex = /(node_modules|bower_components)/
 
 /**
- * A factory method that produces an atoms namespace
+ * atoms 名前空間を生成するファクトリーメソッド
  */
 export const createWebpackUtils = (
   stage: Stage,
@@ -213,9 +213,9 @@ export const createWebpackUtils = (
   }
 
   if (stage === `build-html` || stage === `develop-html`) {
-    // build-html and develop-html outputs to `.cache/page-ssr/routes/` (ROUTES_DIRECTORY)
-    // so this config is setting it to output assets to `public` (outputPath)
-    // while preserving "url" (publicPath)
+    // build-html と develop-html は `.cache/page-ssr/routes/`（ROUTES_DIRECTORY）に出力する
+    // そのため、この設定では、"url"（publicPath）を保ったまま、
+    // アセットを `public`（outputPath）に出力するようにしている
     fileLoaderCommonOptions.outputPath = path.relative(
       ROUTES_DIRECTORY,
       `public`
@@ -261,7 +261,7 @@ export const createWebpackUtils = (
       }
     },
 
-    // TODO(v5): Re-Apply https://github.com/gatsbyjs/gatsby/pull/33979 with breaking change in inline loader syntax
+    // TODO(v5): インラインのローダー構文の破壊的変更とあわせて、https://github.com/gatsbyjs/gatsby/pull/33979 を再適用する
     miniCssExtract: (
       options: {
         modules?: MiniCSSExtractLoaderModuleOptions
@@ -310,9 +310,9 @@ export const createWebpackUtils = (
       return {
         loader: require.resolve(`css-loader`),
         options: {
-          // Absolute urls (https or //) are not send to this function. Only resolvable paths absolute or relative ones.
+          // 絶対 URL（https または //）は、この関数には渡されない。渡されるのは、絶対または相対の、解決できるパスだけである。
           url: function (url: string): boolean {
-            // When an url starts with /
+            // url が / で始まる場合
             if (url.startsWith(`/`)) {
               return false
             }
@@ -426,13 +426,13 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Rules
+   * ルール
    */
   const rules = {} as IRuleUtils
 
   /**
-   * JavaScript loader via babel, includes userland code
-   * and packages that depend on `gatsby`
+   * babel による JavaScript のローダー。ユーザー側のコードと、
+   * `gatsby` に依存するパッケージを含む
    */
   {
     const js = ({
@@ -444,28 +444,28 @@ export const createWebpackUtils = (
       return {
         test: /\.(js|mjs|jsx|ts|tsx)$/,
         include: (modulePath: string): boolean => {
-          // when it's not coming from node_modules we treat it as a source file.
+          // node_modules から来たものでなければ、ソースファイルとして扱う。
           if (!vendorRegex.test(modulePath)) {
             return true
           }
 
-          // If the module uses Gatsby as a dependency
-          // we want to treat it as src so we can extract queries
+          // モジュールが Gatsby を依存として使っている場合は、
+          // クエリを抽出できるように src として扱いたい
           return modulesThatUseGatsby.some(module =>
             modulePath.includes(module.path)
           )
         },
         type: `javascript/auto`,
         use: ({ resourceQuery, issuer }): Array<RuleSetUseItem> => [
-          // If a JS import comes from async-requires, assume it is for a page component.
-          // Using `issuer` allows us to avoid mutating async-requires for this case.
+          // JS の import が async-requires から来ている場合は、ページコンポーネント用であると仮定する。
+          // `issuer` を使うことで、このケースのために async-requires を変更せずに済む。
           //
-          // If other imports are added to async-requires in the future, another option is to
-          // append a query param to page components in the store and check against `resourceQuery` here.
+          // 将来 async-requires に他の import が追加された場合は、ストアの中のページコンポーネントに
+          // クエリパラメーターを付け、ここで `resourceQuery` と照合するという方法もある。
           //
-          // This would require we adjust `doesModuleMatchResourcePath` in `static-query-mapper`
-          // to check against the module's `resourceResolveData.path` instead of resource to avoid
-          // mismatches because of the added query param. Other adjustments may also be needed.
+          // その場合、追加したクエリパラメーターによる不一致を避けるために、`static-query-mapper` の
+          // `doesModuleMatchResourcePath` を、resource ではなくモジュールの `resourceResolveData.path` と
+          // 照合するように調整する必要がある。他の調整も必要になるかもしれない。
           loaders.js({
             ...options,
             configFile: true,
@@ -480,9 +480,9 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Node_modules JavaScript loader via babel
-   * Excludes core-js & babel-runtime to speedup babel transpilation
-   * Excludes modules that use Gatsby since the `rules.js` already transpiles those
+   * babel による node_modules の JavaScript のローダー
+   * babel のトランスパイルを速くするために、core-js と babel-runtime を除外する
+   * Gatsby を使うモジュールは、`rules.js` がすでにトランスパイルしているので除外する
    */
   {
     const dependencies = ({
@@ -502,10 +502,10 @@ export const createWebpackUtils = (
             },
           ],
         ],
-        // If an error happens in a package, it's possible to be
-        // because it was compiled. Thus, we don't want the browser
-        // debugger to show the original code. Instead, the code
-        // being evaluated would be much more helpful.
+        // パッケージの中でエラーが起きた場合、コンパイルされたことが
+        // 原因である可能性がある。そのため、ブラウザーのデバッガーに
+        // 元のコードを表示させたくない。代わりに、実際に評価されている
+        // コードのほうがずっと役に立つ。
         sourceMaps: false,
 
         cacheIdentifier: JSON.stringify({
@@ -514,8 +514,8 @@ export const createWebpackUtils = (
         }),
       }
 
-      // TODO REMOVE IN V3
-      // a list of vendors we know we shouldn't polyfill (we should have set core-js to entry but we didn't so we have to do this)
+      // TODO V3 で削除する
+      // ポリフィルすべきでないと分かっているベンダーの一覧（core-js を entry に設定すべきだったが、そうしなかったので、こうする必要がある）
       const VENDORS_TO_NOT_POLYFILL = [
         `@babel[\\\\/]runtime`,
         `@mikaelkristiansson[\\\\/]domready`,
@@ -549,12 +549,12 @@ export const createWebpackUtils = (
       return {
         test: /\.(js|mjs)$/,
         exclude: (modulePath: string): boolean => {
-          // If dep is user land code, exclude
+          // 依存がユーザー側のコードであれば除外する
           if (!vendorRegex.test(modulePath)) {
             return true
           }
 
-          // If dep uses Gatsby, exclude
+          // 依存が Gatsby を使っていれば除外する
           if (
             modulesThatUseGatsby.some(module =>
               modulePath.includes(module.path)
@@ -581,7 +581,7 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Font loader
+   * フォントのローダー
    */
   rules.fonts = (): RuleSetRule => {
     return {
@@ -591,8 +591,8 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Loads image assets, inlines images via a data URI if they are below
-   * the size threshold
+   * 画像のアセットを読み込む。サイズのしきい値を下回る場合は、
+   * data URI でインライン化する
    */
   rules.images = (): RuleSetRule => {
     return {
@@ -602,8 +602,8 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Loads audio and video and inlines them via a data URI if they are below
-   * the size threshold
+   * 音声と動画を読み込む。サイズのしきい値を下回る場合は、
+   * data URI でインライン化する
    */
   rules.media = (): RuleSetRule => {
     return {
@@ -613,7 +613,7 @@ export const createWebpackUtils = (
   }
 
   /**
-   * Loads assets without inlining
+   * インライン化せずにアセットを読み込む
    */
   rules.miscAssets = (): RuleSetRule => {
     return {
@@ -623,7 +623,7 @@ export const createWebpackUtils = (
   }
 
   /**
-   * CSS style loader.
+   * CSS の style ローダー。
    */
   {
     const css: IRuleUtils["css"] = (options = {}): RuleSetRule => {
@@ -641,7 +641,7 @@ export const createWebpackUtils = (
     }
 
     /**
-     * CSS style loader, _excludes_ node_modules.
+     * CSS の style ローダー。node_modules は _除外する_。
      */
     css.internal = makeInternalOnly(css)
     css.external = makeExternalOnly(css)
@@ -658,7 +658,7 @@ export const createWebpackUtils = (
   }
 
   /**
-   * PostCSS loader.
+   * PostCSS のローダー。
    */
   {
     const postcss: ContextualRuleFactory = (options): RuleSetRule => {
@@ -669,17 +669,17 @@ export const createWebpackUtils = (
     }
 
     /**
-     * PostCSS loader, _excludes_ node_modules.
+     * PostCSS のローダー。node_modules は _除外する_。
      */
     postcss.internal = makeInternalOnly(postcss)
     postcss.external = makeExternalOnly(postcss)
     rules.postcss = postcss
   }
   /**
-   * cast rules to IRuleUtils
+   * rules を IRuleUtils にキャストする
    */
   /**
-   * Plugins
+   * プラグイン
    */
   const plugins = { ...builtinPlugins } as PluginUtils
 
@@ -720,26 +720,26 @@ export const createWebpackUtils = (
             svgo: {
               full: true,
               plugins: [
-                // potentially destructive plugins removed - see https://github.com/gatsbyjs/gatsby/issues/15629
-                // use correct config format and remove plugins requiring specific params - see https://github.com/gatsbyjs/gatsby/issues/31619
-                // List of default plugins and their defaults: https://github.com/svg/svgo#built-in-plugins
-                // Last update 2021-08-17
+                // 破壊的になりうるプラグインは取り除いた - https://github.com/gatsbyjs/gatsby/issues/15629 を参照
+                // 正しい設定形式を使い、特定の引数が必要なプラグインを取り除く - https://github.com/gatsbyjs/gatsby/issues/31619 を参照
+                // デフォルトのプラグインとそのデフォルト値の一覧: https://github.com/svg/svgo#built-in-plugins
+                // 最終更新 2021-08-17
                 `cleanupAttrs`,
                 `cleanupEnableBackground`,
                 `cleanupIDs`,
-                `cleanupListOfValues`, // Default: disabled
+                `cleanupListOfValues`, // デフォルト: 無効
                 `cleanupNumericValues`,
                 `collapseGroups`,
                 `convertColors`,
                 `convertPathData`,
-                `convertStyleToAttrs`, // Default: disabled
+                `convertStyleToAttrs`, // デフォルト: 無効
                 `convertTransform`,
                 `inlineStyles`,
                 `mergePaths`,
                 `minifyStyles`,
                 `moveElemsAttrsToGroup`,
                 `moveGroupAttrsToElems`,
-                `prefixIds`, // Default: disabled
+                `prefixIds`, // デフォルト: 無効
                 `removeComments`,
                 `removeDesc`,
                 `removeDoctype`,
@@ -750,17 +750,17 @@ export const createWebpackUtils = (
                 `removeHiddenElems`,
                 `removeMetadata`,
                 `removeNonInheritableGroupAttrs`,
-                `removeRasterImages`, // Default: disabled
-                `removeScriptElement`, // Default: disabled
-                `removeStyleElement`, // Default: disabled
+                `removeRasterImages`, // デフォルト: 無効
+                `removeScriptElement`, // デフォルト: 無効
+                `removeStyleElement`, // デフォルト: 無効
                 `removeTitle`,
                 `removeUnknownsAndDefaults`,
                 `removeUnusedNS`,
                 `removeUselessDefs`,
                 `removeUselessStrokeAndFill`,
                 `removeXMLProcInst`,
-                `reusePaths`, // Default: disabled
-                `sortAttrs`, // Default: disabled
+                `reusePaths`, // デフォルト: 無効
+                `sortAttrs`, // デフォルト: 無効
               ],
             },
           },
@@ -776,13 +776,13 @@ export const createWebpackUtils = (
   plugins.fastRefresh = ({ modulesThatUseGatsby }): WebpackPluginInstance => {
     const regExpToHack = /node_modules/
     regExpToHack.test = (modulePath: string): boolean => {
-      // when it's not coming from node_modules we treat it as a source file.
+      // node_modules から来たものでなければ、ソースファイルとして扱う。
       if (!vendorRegex.test(modulePath)) {
         return false
       }
 
-      // If the module uses Gatsby as a dependency
-      // we want to treat it as src because of shadowing
+      // モジュールが Gatsby を依存として使っている場合は、
+      // シャドーイングのために src として扱いたい
       return !modulesThatUseGatsby.some(module =>
         modulePath.includes(module.path)
       )
@@ -793,9 +793,9 @@ export const createWebpackUtils = (
         sockIntegration: `whm`,
         module: path.join(__dirname, `fast-refresh-module`),
       },
-      // this is a bit hacky - exclude expect string or regexp or array of those
-      // so this is tricking ReactRefreshWebpackPlugin with providing regexp with
-      // overwritten .test method
+      // これは少しハック的である。exclude は、文字列、正規表現、またはそれらの配列を期待する
+      // そこで、.test メソッドを上書きした正規表現を渡して、
+      // ReactRefreshWebpackPlugin をだましている
       exclude: regExpToHack,
     })
   }
@@ -811,7 +811,7 @@ export const createWebpackUtils = (
   plugins.extractStats = (): GatsbyWebpackStatsExtractor =>
     new GatsbyWebpackStatsExtractor(publicPath)
 
-  // TODO: remove this in v5
+  // TODO: v5 で削除する
   plugins.eslintGraphqlSchemaReload = (): null => null
 
   plugins.virtualModules = (): GatsbyWebpackVirtualModules =>

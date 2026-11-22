@@ -8,7 +8,7 @@ const plugin =
   ): ((...args: any) => WebpackPluginInstance) =>
   (...args: any): WebpackPluginInstance => {
     if (deprecationReason) {
-      // TODO add proper deprecation function to reporter
+      // TODO reporter に適切な非推奨の通知用の関数を追加する
       console.warn(`[deprecated]: ${deprecationReason}`)
     }
 

@@ -72,7 +72,7 @@ const transformWebpackError = (
     }
   }
 
-  // try to get location out of stacktrace
+  // スタックトレースから位置を取り出すことを試みる
   if (!location) {
     const matches = castedWebpackError.message.match(/\((\d+):(\d+)\)/)
     if (matches && matches[1] && matches[2]) {
@@ -89,12 +89,12 @@ const transformWebpackError = (
   const context: ITransformedWebpackError["context"] = {
     stage,
     stageLabel: stageCodeToReadableLabel[stage],
-    // TODO use formatWebpackMessages like in warnings
+    // TODO 警告の場合と同じように formatWebpackMessages を使う
     sourceMessage:
       castedWebpackError.error?.message ?? castedWebpackError.message,
   }
 
-  // When a module cannot be found we can short circuit
+  // モジュールが見つからない場合は、早めに処理を打ち切れる
   if (castedWebpackError.name === `ModuleNotFoundError`) {
     const matches =
       castedWebpackError.error?.message.match(
@@ -105,8 +105,8 @@ const transformWebpackError = (
     context.packageName = matches?.[1]
     context.sourceMessage = matches?.[0]
 
-    // get Breaking change message out of error
-    // it shows extra information for things that changed with webpack
+    // エラーから Breaking change のメッセージを取り出す
+    // webpack で変更された点についての追加情報が表示される
     const BreakingChangeRegex = /BREAKING CHANGE[\D\n\d]+$/
     if (BreakingChangeRegex.test(castedWebpackError.message)) {
       const breakingMatch =
@@ -123,16 +123,16 @@ const transformWebpackError = (
       castedWebpackError.file,
     location,
     context,
-    // We use original error to display stack trace for the most part.
-    // In case of webpack error stack will include internals of webpack
-    // or one of loaders (for example babel-loader) and doesn't provide
-    // much value to user, so it's purposely omitted.
+    // スタックトレースの表示には、ほとんどの場合、元のエラーを使う。
+    // webpack のエラーの場合、スタックには webpack やローダー（たとえば
+    // babel-loader）の内部が含まれ、ユーザーにとってあまり価値がないので、
+    // 意図的に省いている。
 
     // error: webpackError?.error || webpackError,
   }
 }
 
-// With the introduction of Head API, the modulePath can have a resourceQuery so this function can be used to remove it
+// Head API の導入により、modulePath が resourceQuery を持つことがあるので、この関数を使ってそれを取り除ける
 const removeResourceQuery = (
   moduleName: string | undefined
 ): string | undefined => {

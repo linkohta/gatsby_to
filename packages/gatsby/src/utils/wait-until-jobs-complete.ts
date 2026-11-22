@@ -26,7 +26,7 @@ export async function waitJobsByRequest(requestId: string): Promise<void> {
   const jobs = store.getState().jobsV2
   const jobDigests = new Set([
     ...(jobs.jobsByRequest.get(requestId) ?? []),
-    ...(jobs.jobsByRequest.get(``) ?? []), // wait for jobs without requestId just in case
+    ...(jobs.jobsByRequest.get(``) ?? []), // 念のため、requestId を持たないジョブを待つ
   ])
   await Promise.all([waitJobsV1(), waitJobsV2(jobDigests)])
 }

@@ -64,12 +64,12 @@ async function stitchSlices(
       end: match.index + match[0].length,
       ...(match.groups.startOrEndElementOpenening
         ? {
-            syntax: `element`, // can discard this field
+            syntax: `element`, // このフィールドは破棄できる
             id: match.groups.idElement,
             type: ensureExpectedType(match.groups.startOrEndElementOpenening),
           }
         : {
-            syntax: `comment`, // can discard this field
+            syntax: `comment`, // このフィールドは破棄できる
             id: match.groups.idComment,
             type: ensureExpectedType(match.groups.startOrEndComment),
           }),
@@ -77,8 +77,8 @@ async function stitchSlices(
 
     if (meta.type === `start`) {
       if (previousStart) {
-        // if we are already in a slice, we will replace everything until the outer slice end
-        // so we just ignore those
+        // すでにスライスの中にいる場合は、外側のスライスの終わりまでをすべて置き換えるので、
+        // それらは無視するだけでよい
         continue
       }
       const newCursor = meta.end
@@ -95,8 +95,8 @@ async function stitchSlices(
         )
       }
       if (previousStart.id !== meta.id) {
-        // it's possible to have nested slices - we want to handle just the most outer slice
-        // as stitching it in will recursively handle nested slices as well
+        // スライスはネストすることがある。処理したいのは最も外側のスライスだけである。
+        // それをつなぎ合わせるときに、ネストしたスライスも再帰的に処理されるためである
         continue
       }
 
@@ -116,7 +116,7 @@ async function stitchSlices(
     )
   }
 
-  // get rest of the html
+  // html の残りを取得する
   processedHTML += htmlString.substring(cursor)
 
   return processedHTML

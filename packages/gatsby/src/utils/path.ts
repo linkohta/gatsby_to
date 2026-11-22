@@ -33,7 +33,7 @@ export const getCommonDir = (path1: string, path2: string): string => {
   return posixJoinWithLeadingSlash(path1Segments)
 }
 
-// MacOS (APFS) and Windows (NTFS) filename length limit = 255 chars, Others = 255 bytes
+// MacOS（APFS）と Windows（NTFS）のファイル名の長さの上限は 255 文字、その他は 255 バイト
 const MAX_PATH_SEGMENT_CHARS = 255
 const MAX_PATH_SEGMENT_BYTES = 255
 const SLICING_INDEX = 50
@@ -44,8 +44,8 @@ const isWindows = process.platform === `win32`
 
 const isNameTooLong = (segment: string): boolean =>
   isMacOs || isWindows
-    ? segment.length > MAX_PATH_SEGMENT_CHARS // MacOS (APFS) and Windows (NTFS) filename length limit (255 chars)
-    : Buffer.from(segment).length > MAX_PATH_SEGMENT_BYTES // Other (255 bytes)
+    ? segment.length > MAX_PATH_SEGMENT_CHARS // MacOS（APFS）と Windows（NTFS）のファイル名の長さの上限（255 文字）
+    : Buffer.from(segment).length > MAX_PATH_SEGMENT_BYTES // その他（255 バイト）
 
 export const tooLongSegmentsInPath = (path: string): Array<string> => {
   const invalidFilenames: Array<string> = []
