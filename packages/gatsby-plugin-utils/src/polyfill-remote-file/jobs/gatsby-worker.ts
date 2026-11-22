@@ -19,7 +19,7 @@ const queue = Queue<null, IImageServiceProps, string>(
       return void cb(e)
     }
   },
-  // When inside query workers, we only want to use the current core
+  // クエリワーカーの中では、現在のコアだけを使いたい
   process.env.GATSBY_WORKER_POOL_WORKER ? 1 : Math.max(1, cpuCoreCount() - 1)
 )
 

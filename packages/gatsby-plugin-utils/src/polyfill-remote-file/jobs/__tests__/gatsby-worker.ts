@@ -25,7 +25,7 @@ describe(`gatsby-worker`, () => {
   afterAll(() => server.close())
 
   describe(`IMAGE_CDN`, () => {
-    // TODO msw is failing on weird error during CI but not locally
+    // TODO msw が CI では不可解なエラーで失敗するが、ローカルでは失敗しない
     it.skip(`should download and transform an image`, async () => {
       const outputDir = path.join(__dirname, `.cache`)
       await IMAGE_CDN({

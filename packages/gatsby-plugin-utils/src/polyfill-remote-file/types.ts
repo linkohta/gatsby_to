@@ -111,15 +111,15 @@ type CdnSourceImage = {
 export type ImageCdnSourceImage = CdnSourceImage
 
 /**
- * The function is used to optimize image delivery by generating URLs that leverage CDN capabilities
- * @param {ImageCdnSourceImage} source - An object representing the source image, including properties like
- * URL, filename, and MIME type.
- * @param {ImageCdnTransformArgs} imageArgs - An object containing arguments for image transformation, such as
- * format, quality, and crop focus.
- * @param {string} pathPrefix - This parameter allows for an optional path prefix in the generated relative URL,
- * primarily influencing the location of the image transformation endpoint, particularly if not in the domain root.
- * @returns {string} A string representing the generated URL for the image on the CDN. Ideally it is relative url
- * (starting with `/`, resulting in usage of same domain as site itself), but it can also be absolute URL.
+ * この関数は、CDN の機能を活用する URL を生成して、画像の配信を最適化するために使う
+ * @param {ImageCdnSourceImage} source - 元画像を表すオブジェクト。URL、ファイル名、
+ * MIME タイプなどのプロパティを持つ。
+ * @param {ImageCdnTransformArgs} imageArgs - 画像変換の引数を持つオブジェクト。フォーマット、
+ * 品質、クロップの基準位置など。
+ * @param {string} pathPrefix - 生成する相対 URL に付ける任意のパスプレフィックス。
+ * 主に画像変換のエンドポイントの場所に影響し、特にドメインのルートにない場合に関係する。
+ * @returns {string} CDN 上の画像を指す、生成された URL の文字列。相対 URL が望ましいが
+ * （`/` で始まり、サイト自身と同じドメインが使われる）、絶対 URL でもよい。
  */
 export type ImageCdnUrlGeneratorFn = (
   source: ImageCdnSourceImage,
@@ -130,13 +130,13 @@ export type ImageCdnUrlGeneratorFn = (
 export type FileCdnSourceImage = CdnSourceImage
 
 /**
- * The function is used to optimize image delivery by generating URLs that leverage CDN capabilities
- * @param {FileCdnSourceImage} source - An object representing the source file, including properties like
- * URL, filename, and MIME type.
- * @param {string} pathPrefix - A string representing the path prefix to be prepended to the
- * generated URL.
- * @returns {string} A string representing the generated URL for the file on the CDN. Ideally it is relative url
- * (starting with `/`, resulting in usage of same domain as site itself), but it can also be absolute URL.
+ * この関数は、CDN の機能を活用する URL を生成して、画像の配信を最適化するために使う
+ * @param {FileCdnSourceImage} source - 元ファイルを表すオブジェクト。URL、ファイル名、
+ * MIME タイプなどのプロパティを持つ。
+ * @param {string} pathPrefix - 生成する URL の前に付けるパスプレフィックスを表す
+ * 文字列。
+ * @returns {string} CDN 上のファイルを指す、生成された URL の文字列。相対 URL が望ましいが
+ * （`/` で始まり、サイト自身と同じドメインが使われる）、絶対 URL でもよい。
  */
 export type FileCdnUrlGeneratorFn = (
   source: FileCdnSourceImage,

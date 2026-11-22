@@ -54,7 +54,7 @@ function addRemoteFilePolyfillInterface<
     store: Store
   }
 ): T {
-  // When the image-cdn is part of Gatsby we will only add the RemoteFile interface if necessary
+  // image-cdn が Gatsby に含まれている場合は、必要なときにだけ RemoteFile インターフェースを追加する
   if (hasFeature(`image-cdn`)) {
     // @ts-ignore - wrong typing by typecomposer
     if (!type.config.interfaces.includes(`RemoteFile`)) {
@@ -66,7 +66,7 @@ function addRemoteFilePolyfillInterface<
   }
 
   if (!enums) {
-    // We only want to create the enums and interface once
+    // enum とインターフェースは 1 回だけ作成したい
     const composer = new SchemaComposer()
     enums = getRemoteFileEnums(composer.createEnumTC.bind(composer))
 

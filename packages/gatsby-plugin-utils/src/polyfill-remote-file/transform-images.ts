@@ -13,11 +13,11 @@ export interface IResizeArgs {
   quality: number
 }
 
-// Lots of work to get the sharp instance
+// sharp のインスタンスを取得するための手間のかかる処理
 type Pipeline = ReturnType<Awaited<ReturnType<typeof getSharpInstance>>>
 
-// queue is used inside transformImage to batch multiple transforms together
-// more info inside the transformImage function
+// queue は、transformImage の中で複数の変換をまとめて処理するために使う
+// 詳しくは transformImage 関数の中を参照
 const queue = new Map<
   string,
   { transforms: Array<IResizeArgs>; promise: Promise<string> }
@@ -59,8 +59,8 @@ export async function transformImage({
   const outputPath = path.join(outputDir, filename)
   await mkdirp(path.dirname(outputPath))
 
-  // if the queue already contains the url, we're going to add it to queue so, we can batch the transforms together.
-  // We use setImmediate to not block the event loop so the queue can fill up.
+  // キューにすでにその URL がある場合は、キューに追加して変換をまとめて処理できるようにする。
+  // イベントループをブロックせずにキューがたまるよう、setImmediate を使う。
   if (queue.has(url)) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const queued = queue.get(url)!

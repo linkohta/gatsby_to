@@ -5,7 +5,7 @@ export function getCache(): GatsbyCache {
   if (global._polyfillRemoteFileCache) {
     return global._polyfillRemoteFileCache
   }
-  // We need to use import-from to remove circular dependency
+  // 循環依存をなくすため、import-from を使う必要がある
   const { getCache: getGatsbyCache } = importFrom(
     global.__GATSBY?.root ?? process.cwd(),
     `gatsby/dist/utils/get-cache`

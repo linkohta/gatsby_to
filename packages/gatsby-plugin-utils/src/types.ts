@@ -1,9 +1,9 @@
 /**
- * ⚠️ DO NOT EDIT ⚠️
- * These types are duplicated from packages/gatsby/src/bootstrap/load-plugins/types.ts
- * If you edit this file, make sure to edit that file too!!!
- * They are duplicate to avoid a circular dependency between gatsby-plugin-utils <=> gatsby <=> gatsby-plugin-utils
- * See gatsbyjs/gatsby#27578
+ * ⚠️ 編集しないこと ⚠️
+ * これらの型は packages/gatsby/src/bootstrap/load-plugins/types.ts から複製したものである
+ * このファイルを編集する場合は、必ずそちらのファイルも編集すること
+ * 複製しているのは、gatsby-plugin-utils <=> gatsby <=> gatsby-plugin-utils の循環依存を避けるためである
+ * gatsbyjs/gatsby#27578 を参照
  */
 
 export interface IRawSiteConfig {
@@ -14,24 +14,24 @@ export interface ISiteConfig extends IRawSiteConfig {
   plugins?: Array<IPluginRefObject>
 }
 
-// There are two top-level "Plugin" concepts:
-// 1. IPluginInfo, for processed plugins, and
-// 2. PluginRef, for plugin configs
+// トップレベルの "Plugin" の概念は 2 つある:
+// 1. 処理済みのプラグインを表す IPluginInfo
+// 2. プラグインの設定を表す PluginRef
 
 export interface IPluginInfo {
-  /** Unique ID describing a plugin */
+  /** プラグインを表す一意な ID */
   id: string
 
-  /** The absolute path to the plugin */
+  /** プラグインの絶対パス */
   resolve: string
 
-  /** The plugin name */
+  /** プラグイン名 */
   name: string
 
-  /** The plugin version (can be content hash) */
+  /** プラグインのバージョン（コンテンツハッシュの場合もある） */
   version: string
 
-  /** Options passed to the plugin */
+  /** プラグインに渡されたオプション */
   pluginOptions?: IPluginInfoOptions
 
   module?: any
