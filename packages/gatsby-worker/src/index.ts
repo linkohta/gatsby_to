@@ -16,11 +16,11 @@ import {
 } from "./types"
 
 interface IWorkerOptions {
-  // number of workers to spawn, defaults to 1
+  // 起動するワーカーの数。デフォルトは 1
   numWorkers?: number
-  // environmental variables specific to the worker(s)
+  // ワーカー専用の環境変数
   env?: Record<string, string>
-  // whether or not output should be ignored
+  // 出力を無視するかどうか
   silent?: boolean
 }
 
@@ -30,8 +30,8 @@ type WrapReturnOfAFunctionInAPromise<
   ...a: Parameters<FunctionThatDoesNotReturnAPromise>
 ) => Promise<ReturnType<FunctionThatDoesNotReturnAPromise>>
 
-// gatsby-worker will make sync function async, so to keep proper types we need to adjust types so all functions
-// on worker pool are async
+// gatsby-worker は同期関数を非同期にするので、正しい型を保つには、ワーカープール上の
+// すべての関数が非同期になるよう型を調整する必要がある
 type EnsureFunctionReturnsAPromise<MaybeFunction> = MaybeFunction extends (
   ...args: Array<any>
 ) => Promise<any>
@@ -101,12 +101,12 @@ export interface IPublicWorkerInfo {
 }
 
 /**
- * Worker pool is a class that allow you to queue function execution across multiple
- * child processes, in order to parallelize work. It accepts absolute path to worker module
- * and will expose exported function of that module as properties on WorkerPool instance.
+ * ワーカープールは、処理を並列化するために、複数の子プロセスにまたがって関数の実行を
+ * キューに入れられるクラスである。ワーカーモジュールの絶対パスを受け取り、
+ * そのモジュールが export する関数を WorkerPool インスタンスのプロパティとして公開する。
  *
- * Worker pool allows queueing execution of a function on all workers (via `.all` property)
- * as well as distributing execution across workers (via `.single` property)
+ * ワーカープールでは、すべてのワーカーで関数を実行するようキューに入れること（`.all` プロパティ）も、
+ * 実行をワーカーに分散させること（`.single` プロパティ）もできる
  */
 export class WorkerPool<
   WorkerModuleExports = Record<string, unknown>,
@@ -114,7 +114,7 @@ export class WorkerPool<
   MessagesFromChild = MessagesFromParent
 > {
   /**
-   * Schedule task execution on all workers. Useful for setting up workers
+   * すべてのワーカーでタスクの実行を予約する。ワーカーの初期設定に役立つ
    */
   all: {
     [FunctionName in keyof WorkerModuleExports]: WrapReturnInArray<
@@ -123,7 +123,7 @@ export class WorkerPool<
   }
 
   /**
-   * Schedule task execution on single worker. Useful to distribute tasks between multiple workers.
+   * 1 つのワーカーでタスクの実行を予約する。複数のワーカーにタスクを分散させるのに役立つ。
    */
   single: {
     [FunctionName in keyof WorkerModuleExports]: EnsureFunctionReturnsAPromise<
@@ -143,7 +143,7 @@ export class WorkerPool<
     const all: Partial<WorkerPool<WorkerModuleExports>["all"]> = {}
 
     {
-      // we don't need to retain these
+      // これらは保持しておく必要がない
       const module = require(workerPath)
       const exportNames = Object.keys(module) as Array<
         keyof WorkerModuleExports
@@ -151,10 +151,10 @@ export class WorkerPool<
 
       for (const exportName of exportNames) {
         if (typeof module[exportName] !== `function`) {
-          // We only expose functions. Exposing other types
-          // would require additional handling which doesn't seem
-          // worth supporting given that consumers can just access
-          // those via require/import instead of WorkerPool interface.
+          // 関数だけを公開する。ほかの型を公開するには
+          // 追加の処理が必要になるが、利用側は WorkerPool の
+          // インターフェースではなく require/import で取得すれば済むので、
+          // 対応する価値はなさそうである。
           continue
         }
 
@@ -193,7 +193,7 @@ export class WorkerPool<
           GATSBY_WORKER_MODULE_PATH: this.workerPath,
           GATSBY_WORKER_IN_FLIGHT_DUMP_LOCATION: workerInFlightsDumpLocation,
         },
-        // Suppress --debug / --inspect flags while preserving others (like --harmony).
+        // --debug / --inspect フラグを取り除き、それ以外（--harmony など）は残す。
         execArgv: process.execArgv.filter(v => !/^--(debug|inspect)/.test(v)),
         silent: options && options.silent,
       })
@@ -229,25 +229,25 @@ export class WorkerPool<
 
       const workerProcessMessageHandler = (msg: ChildMessageUnion): void => {
         if (!Array.isArray(msg)) {
-          // all gatsby-worker messages should be an array
-          // if it's not an array we skip it
+          // gatsby-worker のメッセージはすべて配列のはずである
+          // 配列でなければスキップする
           return
         } else if (msg[1] <= workerInfo.lastMessage) {
-          // this message was already handled, so skipping it
-          // this is specifically for special casing worker exits
-          // where we serialize "in-flight" IPC messages to fs
-          // and "replay" them here to ensure no messages are lost
-          // Trickiness is that while we write out in flight IPC messages
-          // to fs, those messages might actually still go through as regular
-          // ipc messages so we have to ensure we don't handle same message twice
+          // このメッセージは処理済みなのでスキップする
+          // これは、ワーカーの終了を特別扱いするためのものである
+          // 終了時には「送信中」の IPC メッセージを fs にシリアライズし、
+          // ここで「再生」することで、メッセージが失われないようにしている
+          // 難しいのは、送信中の IPC メッセージを fs に書き出しているあいだにも、
+          // そのメッセージが通常の ipc メッセージとして届くことがある点である。
+          // そのため、同じメッセージを 2 回処理しないようにする必要がある
           return
         } else if (msg[1] !== workerInfo.lastMessage + 1) {
-          // TODO: figure out IPC message order guarantees (or lack of them) - for now
-          // condition above relies on IPC messages being received in same order
-          // as they were sent via `process.send` in child process
-          // generally we expect messages we receive to be next one (lastMessage + 1)
-          // IF order is not guaranteed, then different strategy for de-duping messages
-          // is needed.
+          // TODO: IPC メッセージの順序が保証されるのか（されないのか）を調べる。今のところ
+          // 上の条件は、IPC メッセージが、子プロセスで `process.send` によって送られたのと
+          // 同じ順序で届くことを前提にしている
+          // 通常、受け取るメッセージは次のもの（lastMessage + 1）であると想定している
+          // 順序が保証されないのであれば、メッセージの重複排除には別の方法が
+          // 必要になる。
           throw new Error(
             `[gatsby-worker] Out of order message. Expected ${
               workerInfo.lastMessage + 1
@@ -321,18 +321,18 @@ export class WorkerPool<
           try {
             await fs.remove(workerInFlightsDumpLocation)
           } catch {
-            // this is just cleanup, failing to delete this file
-            // won't cause
+            // これは単なる後始末であり、このファイルの削除に失敗しても
+            // 支障はない
           }
         }
 
         if (workerInfo.currentTask) {
-          // worker exited without finishing a task
+          // ワーカーがタスクを終えないまま終了した
           workerInfo.currentTask.reject(
             new Error(`Worker exited before finishing task`)
           )
         }
-        // remove worker from list of workers
+        // ワーカーの一覧からワーカーを取り除く
         this.workers.splice(this.workers.indexOf(workerInfo), 1)
         workerExitResolve({ code, signal })
       })
@@ -343,17 +343,17 @@ export class WorkerPool<
   }
 
   /**
-   * Kills worker processes and rejects and ongoing or pending tasks.
-   * @returns Array of promises for each worker that will resolve once worker did exit.
+   * ワーカープロセスを終了させ、実行中または保留中のタスクを reject する。
+   * @returns 各ワーカーに対応する Promise の配列。ワーカーが終了すると解決される。
    */
   end(): Array<Promise<number | null>> {
     const results = this.workers.map(async workerInfo => {
-      // tell worker to end gracefully
+      // ワーカーに正常終了するよう伝える
       const endMessage: ParentMessageUnion = [END, ++this.counter]
 
       workerInfo.send(endMessage)
 
-      // force exit if worker doesn't exit gracefully quickly
+      // ワーカーがすぐに正常終了しない場合は、強制終了する
       const forceExitTimeout = setTimeout(() => {
         workerInfo.kill(`SIGKILL`)
       }, 1000)
@@ -366,7 +366,7 @@ export class WorkerPool<
     })
 
     Promise.all(results).then(() => {
-      // make sure we fail queued tasks as well
+      // キューに入っているタスクも確実に失敗させる
       for (const taskNode of this.taskQueue) {
         taskNode.value.reject(new Error(`Worker exited before finishing task`))
       }
@@ -378,7 +378,7 @@ export class WorkerPool<
   }
 
   /**
-   * Kills all running worker processes and spawns a new pool of processes
+   * 実行中のワーカープロセスをすべて終了させ、新しいプロセスのプールを起動する
    */
   async restart(): Promise<void> {
     await Promise.all(this.end())
@@ -394,7 +394,7 @@ export class WorkerPool<
   private checkForWork<T extends keyof WorkerModuleExports>(
     workerInfo: IWorkerInfo<T>
   ): void {
-    // check if there is task in queue
+    // キューにタスクがあるかを確認する
     for (const taskNode of this.taskQueue) {
       const task = taskNode.value
       if (!task.assignedToWorker || task.assignedToWorker === workerInfo) {
@@ -405,7 +405,7 @@ export class WorkerPool<
       }
     }
 
-    // no task found, so just marking worker as idle
+    // タスクが見つからなかったので、ワーカーをアイドル状態にする
     this.idleWorkers.add(workerInfo)
   }
 
@@ -413,7 +413,7 @@ export class WorkerPool<
     taskInfo: TaskInfo<T>,
     workerInfo: IWorkerInfo<T>
   ): Promise<void> {
-    // block worker
+    // ワーカーをブロックする
     workerInfo.currentTask = taskInfo
     this.idleWorkers.delete(workerInfo)
 
