@@ -9,7 +9,7 @@ const cleanDocletValue = str => {
 const isLiteral = str => /^('|"|true|false|\d+)/.test(str.trim())
 
 /**
- * Remove doclets from string
+ * 文字列から doclets を取り除く
  */
 export const cleanDoclets = desc => {
   desc = desc || ``
@@ -18,11 +18,11 @@ export const cleanDoclets = desc => {
 }
 
 /**
- * Given a string, this function returns an object with doclet names as keys
- * and their "content" as values.
+ * 文字列を受け取り、doclet の名前をキー、その「内容」を値とする
+ * オブジェクトを返す。
  *
- * Adapted from https://github.com/reactjs/react-docgen/blob/ee8a5359c478b33a6954f4546637312764798d6b/src/utils/docblock.js#L62
- * Updated to strip \r from the end of doclets
+ * https://github.com/reactjs/react-docgen/blob/ee8a5359c478b33a6954f4546637312764798d6b/src/utils/docblock.js#L62 をもとにしている
+ * doclets の末尾の \r を取り除くよう変更した
  */
 const getDoclets = str => {
   const doclets = []
@@ -38,7 +38,7 @@ const getDoclets = str => {
 }
 
 /**
- * parse out description doclets to an object and remove the comment
+ * description の doclets をオブジェクトへパースし、コメントを取り除く
  *
  * @param  {ComponentMetadata|PropMetadata} obj
  */
@@ -77,18 +77,18 @@ function parseType(type) {
 }
 
 /**
- * Reads the JSDoc "doclets" and applies certain ones to the prop type data
- * This allows us to "fix" parsing errors, or unparsable data with JSDoc
- * style comments
+ * JSDoc の "doclets" を読み取り、その一部を prop の型データに適用する
+ * これにより、パースエラーやパースできないデータを、JSDoc 形式の
+ * コメントで「修正」できる
  *
- * @param  {Object} props     Object Hash of the prop metadata
+ * @param  {Object} props     prop のメタデータのオブジェクトハッシュ
  * @param  {String} propName
  */
 export const applyPropDoclets = prop => {
   prop.doclets.forEach(({ tag, value }) => {
-    // the @type doclet to provide a prop type
-    // Also allows enums (oneOf) if string literals are provided
-    // ex: @type {("optionA"|"optionB")}
+    // prop の型を指定するための @type doclet
+    // 文字列リテラルが指定されていれば、enum（oneOf）にもできる
+    // 例: @type {("optionA"|"optionB")}
     if (tag === `type`) {
       value = cleanDocletValue(value)
 
@@ -112,21 +112,21 @@ export const applyPropDoclets = prop => {
       return
     }
 
-    // Use @required to mark a prop as required
-    // useful for custom propTypes where there isn't a `.isRequired` addon
+    // prop を必須としてマークするには @required を使う
+    // `.isRequired` を付けられないカスタムの propTypes で役立つ
     if (tag === `required` && value) {
       prop.required = true
       return
     }
 
-    // Use @defaultValue to provide a prop's default value
+    // prop のデフォルト値を指定するには @defaultValue を使う
     if ((tag === `default` || tag === `defaultValue`) && value != null) {
       prop.defaultValue = { value, computed: false }
       return
     }
   })
 
-  // lookup for tsTypes or flowTypes
+  // tsTypes または flowTypes を参照する
   if (prop.type === undefined) {
     prop.type = parseType(prop.tsType) || parseType(prop.flowType)
   }

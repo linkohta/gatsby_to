@@ -16,7 +16,7 @@ describe(`Process nodes correctly`, () => {
     name: `test`,
   }
 
-  // Make some fake functions its expecting.
+  // 期待されるダミーの関数をいくつか用意する。
   const loadNodeContent = node => Promise.resolve(node.content)
 
   it(`correctly creates nodes from JSON which is an array of objects`, async () => {

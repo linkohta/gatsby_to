@@ -12,12 +12,12 @@ describe(`Process TOML nodes correctly`, () => {
     name: `test`,
   }
 
-  // Provide fake functions
+  // ダミーの関数を用意する
   const loadNodeContent = node => Promise.resolve(node.content)
 
   it(`Correctly creates nodes from TOML test file`, async () => {
-    // Unfortunately due to TOML limitations no JSON -> TOML converters exist,
-    // which means that we are stuck with JS template literals.
+    // 残念ながら、TOML の制約のために JSON -> TOML のコンバーターは存在しない。
+    // そのため、JS のテンプレートリテラルを使うしかない。
     node.content = `
     [the]
     test_string = "You'll hate me after this - #"
@@ -59,7 +59,7 @@ describe(`Process TOML nodes correctly`, () => {
     })
   })
 
-  // Since TOML transformer doesn't generate sub-objects from arrays,
-  // but directly uses the object, 'id' uniqueness tests between sub-objects
-  // are omitted.
+  // TOML トランスフォーマーは配列からサブオブジェクトを生成せず、
+  // オブジェクトをそのまま使うので、サブオブジェクト間の 'id' の一意性のテストは
+  // 省略している。
 })

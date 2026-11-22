@@ -5,7 +5,7 @@ const traverse = require(`@babel/traverse`).default
 const fileExtsToProcess = [`js`, `jsx`, `ts`, `tsx`]
 
 function shouldOnCreateNode({ node }) {
-  // This only processes JavaScript and TypeScript files.
+  // JavaScript と TypeScript のファイルだけを処理する。
   return fileExtsToProcess.includes(node.extension)
 }
 
@@ -51,8 +51,8 @@ async function onCreateNode({
       let value
 
       if (node.type === `TemplateLiteral`) {
-        // Experimental basic support for template literals:
-        // Extract and join any text content; ignore interpolations
+        // テンプレートリテラルへの実験的で基本的な対応:
+        // テキストの内容を取り出して連結し、補間は無視する
         value = node.quasis.map(quasi => quasi.value.cooked).join(``)
       } else if (node.type === `ObjectExpression`) {
         value = {}
@@ -98,8 +98,8 @@ async function onCreateNode({
       },
     })
   } catch (e) {
-    // stick the error on the query so the user can
-    // react to an error as they see fit
+    // ユーザーが適切と考える方法でエラーに対処できるよう、
+    // エラーをクエリに付ける
     error = {
       err: true,
       code: e.code,
@@ -107,7 +107,7 @@ async function onCreateNode({
       stack: e.stack,
     }
   } finally {
-    // only create node if frontmatter is not empty
+    // frontmatter が空でない場合にだけノードを作成する
     if (!_.isEmpty(frontmatter)) {
       exportsData = {
         ...frontmatter,

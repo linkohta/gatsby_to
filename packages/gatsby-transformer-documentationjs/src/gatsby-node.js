@@ -134,7 +134,7 @@ exports.createResolvers = ({ createResolvers }) => {
   createResolvers({
     DocumentationJs: {
       type: {
-        // resolve `typeDef___NODE` recursively
+        // `typeDef___NODE` を再帰的に解決する
         resolve: (source, _, context) => {
           if (!source.type) {
             return null
@@ -198,8 +198,8 @@ function shouldOnCreateNode({ node }) {
 exports.shouldOnCreateNode = shouldOnCreateNode
 
 /**
- * Implement the onCreateNode API to create documentation.js nodes
- * @param {Object} super this is a super param
+ * onCreateNode API を実装して、documentation.js のノードを作成する
+ * @param {Object} super これは super パラメーターである
  */
 exports.onCreateNode = async ({ node, actions, ...helpers }) => {
   const { createNodeId, createContentDigest } = helpers
@@ -211,8 +211,8 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
       shallow: true,
     })
   } catch (e) {
-    // Ignore as there'll probably be other tooling already checking for errors
-    // and an error here kills Gatsby.
+    // 無視する。おそらく他のツールがすでにエラーを確認しており、
+    // ここでエラーにすると Gatsby が止まってしまうためである。
   }
 
   if (documentationJson && documentationJson.length > 0) {
@@ -265,23 +265,23 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
     }
 
     /**
-     * Prepare Gatsby node from JsDoc object.
-     *  - set description and deprecated fields as markdown
-     *  - recursively process params, properties, returns
-     *  - link types to type definitions
-     *  - unwrap optional types to top level optional field
-     * @param {Object} docsJson JsDoc object. See https://documentation.js.org/html-example/index.json for example of JsDoc objects shape.
+     * JsDoc オブジェクトから Gatsby のノードを準備する。
+     *  - description と deprecated のフィールドを markdown として設定する
+     *  - params、properties、returns を再帰的に処理する
+     *  - 型を型定義に関連付ける
+     *  - 省略可能な型をアンラップして、トップレベルの optional フィールドにする
+     * @param {Object} docsJson JsDoc オブジェクト。JsDoc オブジェクトの形の例は https://documentation.js.org/html-example/index.json を参照。
      * @param {Object} args
-     * @param {Number} [args.commentNumber] Index of JsDoc in root of module
-     * @param {Number} args.level Nesting level
-     * @param {string} args.parent Id of parent node
+     * @param {Number} [args.commentNumber] モジュールのルートでの JsDoc のインデックス
+     * @param {Number} args.level 入れ子のレベル
+     * @param {string} args.parent 親ノードの id
      */
     const prepareNodeForDocs = (
       docsJson,
       { commentNumber = null, level = 0, parent = node.id } = {}
     ) => {
       if (handledDocs.has(docsJson)) {
-        // this was already handled
+        // これはすでに処理済みである
         return handledDocs.get(docsJson)
       }
 
@@ -324,9 +324,9 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
 
       picked.optional = false
       if (docsJson.loc) {
-        // loc is instance of SourceLocation class, and Gatsby doesn't support
-        // class instances at this moment when inferring schema. Serializing
-        // and deserializing converts class instance to plain object.
+        // loc は SourceLocation クラスのインスタンスだが、Gatsby は現時点で、スキーマの推論時に
+        // クラスのインスタンスに対応していない。シリアライズしてから
+        // デシリアライズすることで、クラスのインスタンスをプレーンなオブジェクトに変換する。
         picked.docsLocation = JSON.parse(JSON.stringify(docsJson.loc))
       }
       if (docsJson.context && docsJson.context.loc) {
@@ -377,8 +377,8 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
         if (docsJson[fieldName] && docsJson[fieldName].length > 0) {
           picked[`${fieldName}___NODE`] = docsJson[fieldName].map(
             (docObj, fieldIndex) => {
-              // When documenting destructured parameters, the name
-              // is parent.child where we just want the child.
+              // 分割代入された引数をドキュメント化する場合、name は
+              // parent.child になるが、必要なのは child だけである。
               if (docObj.name && docObj.name.split(`.`).length > 1) {
                 docObj.name = docObj.name.split(`.`).slice(-1).join(`.`)
               }
@@ -408,8 +408,8 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
           instance: [],
           static: [],
         }
-        each member type has array of jsdocs in same shape as top level jsdocs
-        so we use same transformation as top level ones
+        メンバーの種類ごとに、トップレベルの jsdoc と同じ形の jsdoc の配列がある
+        そのため、トップレベルのものと同じ変換を使う
         */
         picked.members = _.reduce(
           docsJson.members,
@@ -432,7 +432,7 @@ exports.onCreateNode = async ({ node, actions, ...helpers }) => {
 
       if (docsJson.examples) {
         picked.examples = docsJson.examples.map(example => {
-          // Extract value from <caption/> element
+          // <caption/> 要素から値を取り出す
           const caption =
             example?.caption?.children[0]?.children[0].value || null
           return {

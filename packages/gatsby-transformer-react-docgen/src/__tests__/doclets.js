@@ -62,7 +62,7 @@ describe(`transformer-react-doc-gen: Doclets`, () => {
       })
     })
 
-    // Doclets differenz from ts type
+    // ts の型と異なる doclets
     describe(`doclets: [{ tag: "type", value: "{number}" }]`, () => {
       const doclets = [{ tag: `type`, value: `{number}` }]
       describe(`tsType: { name: string }`, () => {

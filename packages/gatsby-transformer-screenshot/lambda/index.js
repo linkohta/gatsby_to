@@ -23,7 +23,7 @@ exports.handler = async (event, context) => {
 
   console.log(`SCREENSHOT`, screenshot)
 
-  // is it cached already?
+  // すでにキャッシュされているか？
   const maybeFile = await screenshot.getFile()
   if (maybeFile) {
     console.log(`Cache hit. Returning screenshot from cache`)
@@ -52,7 +52,7 @@ exports.handler = async (event, context) => {
 
     console.log(`Taking screenshot`)
     await page.goto(screenshot.url, { waitUntil: [`networkidle2`] })
-    await page.waitFor(1000) // wait for full-size images to fade in
+    await page.waitFor(1000) // フルサイズの画像がフェードインするのを待つ
     image = await page.screenshot({ fullPage: screenshot.fullPage })
     await page.close()
     await browser.close()

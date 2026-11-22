@@ -18,7 +18,7 @@ describe(`Process nodes correctly`, () => {
     name: `test`,
   }
 
-  // Make some fake functions its expecting.
+  // 期待されるダミーの関数をいくつか用意する。
   const loadNodeContent = node => Promise.resolve(node.content)
 
   it(`correctly creates nodes from JSON which is an array of objects`, async () => {
@@ -169,7 +169,7 @@ describe(`Process nodes correctly`, () => {
   it(`correctly handles the typeName option with the provided typeNameFromDir function`, async () => {
     node.name = `theTypeWontBeThis`
     node.content = `letter,number\na,65\nb,42\nc,23`
-    node.dir = `${os.tmpdir()}/foo/` // The type will be FooCsv
+    node.dir = `${os.tmpdir()}/foo/` // 型は FooCsv になる
     node.internal.type = `File`
 
     const createNode = jest.fn()

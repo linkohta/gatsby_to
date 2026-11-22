@@ -40,15 +40,15 @@ exports.onPreBootstrap = (
 
   let anyQueued = false
 
-  // Check for updated screenshots and placeholder flag
-  // and prevent Gatsby from garbage collecting remote file nodes
+  // 更新されたスクリーンショットとプレースホルダーのフラグを確認し、
+  // Gatsby がリモートファイルのノードをガベージコレクションしないようにする
   screenshotNodes.forEach(n => {
     if (
       (n.expires && new Date() >= new Date(n.expires)) ||
       USE_PLACEHOLDER_IMAGE !== n.usingPlaceholder
     ) {
       anyQueued = true
-      // Screenshot expired, re-run Lambda
+      // スクリーンショットの期限が切れているので、Lambda を再実行する
       screenshotQueue.push({
         url: n.url,
         parent: n.parent,
@@ -61,8 +61,8 @@ exports.onPreBootstrap = (
         pluginOptions,
       })
     } else {
-      // Screenshot hasn't yet expired, touch the image node
-      // to prevent garbage collection
+      // スクリーンショットの期限がまだ切れていないので、ガベージコレクションを
+      // 防ぐために画像ノードを touch する
       touchNode(getNode(n.screenshotFile___NODE))
     }
   })
@@ -80,8 +80,8 @@ exports.onPreBootstrap = (
 
 function shouldOnCreateNode({ node }, pluginOptions) {
   /*
-   * Check if node is of a type we care about, and has a url field
-   * (originally only checked sites.yml, hence including by default)
+   * ノードが対象の型であり、url フィールドを持っているかを確認する
+   * （もともとは sites.yml だけを確認していたので、デフォルトで含めている）
    */
   const validNodeTypes = [`SitesYaml`].concat(pluginOptions.nodeTypes || [])
   return validNodeTypes.includes(node.internal.type) && node.url

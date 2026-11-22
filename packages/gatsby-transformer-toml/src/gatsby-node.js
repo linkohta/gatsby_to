@@ -2,9 +2,9 @@ const toml = require(`toml`)
 const _ = require(`lodash`)
 
 function shouldOnCreateNode({ node }) {
-  // Filter out non-toml content
-  // Currently TOML files are considered null in 'mime-db'
-  // Hence the extension test instead of mediaType test
+  // toml 以外の内容を取り除く
+  // 現在、TOML ファイルは 'mime-db' で null と見なされる
+  // そのため、mediaType ではなく拡張子で判定している
   return node.extension === `toml`
 }
 
@@ -17,14 +17,14 @@ async function onCreateNode({
 }) {
   const { createNode, createParentChildLink } = actions
 
-  // Load TOML contents
+  // TOML の内容を読み込む
   const content = await loadNodeContent(node)
-  // Parse
+  // パースする
   const parsedContent = toml.parse(content)
 
-  // This version suffers from:
-  // 1) More TOML files -> more types
-  // 2) Different files with the same name creating conflicts
+  // このバージョンには次の問題がある:
+  // 1) TOML ファイルが増えるほど型が増える
+  // 2) 同じ名前の異なるファイルが衝突する
   const contentDigest = createContentDigest(parsedContent)
 
   const newNode = {
@@ -37,7 +37,7 @@ async function onCreateNode({
     internal: {
       contentDigest,
 
-      // Use the relative filepath as "type"
+      // 相対ファイルパスを "type" として使う
       type: _.upperFirst(_.camelCase(node.relativePath)),
     },
   }

@@ -3,9 +3,9 @@ const path = require(`path`)
 const HJSON = require(`hjson`)
 
 function shouldOnCreateNode({ node }) {
-  // We only care about HJSON content.
-  // NOTE the mime package does not recognize HJSON yet
-  // See RFC https://hjson.org/rfc.html#rfc.section.1.3
+  // HJSON の内容だけを対象にする。
+  // NOTE: mime パッケージはまだ HJSON を認識しない
+  // RFC https://hjson.org/rfc.html#rfc.section.1.3 を参照
   return (
     node.internal.mediaType === `text/hjson` ||
     node.internal.mediaType === `application/hjson`

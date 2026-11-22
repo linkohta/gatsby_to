@@ -21,16 +21,16 @@ async function onCreateNode(
 ) {
   const { createNode, createParentChildLink } = actions
 
-  // Destructure out our custom options
+  // 独自のオプションを分割代入で取り出す
   const { typeName, nodePerFile, ...options } = pluginOptions || {}
 
-  // Load file contents
+  // ファイルの内容を読み込む
   const content = await loadNodeContent(node)
 
-  // Parse
+  // パースする
   const parsedContent = await convertToJson(content, options)
 
-  // Generate the type
+  // 型を生成する
   function getType({ node, object }) {
     if (pluginOptions && _.isFunction(typeName)) {
       return pluginOptions.typeName({ node, object })
@@ -41,7 +41,7 @@ async function onCreateNode(
     }
   }
 
-  // Generate the new node
+  // 新しいノードを生成する
   async function transformObject(obj, i) {
     const csvNode = {
       ...obj,
@@ -52,8 +52,8 @@ async function onCreateNode(
       parent: node.id,
       internal: {
         contentDigest: createContentDigest(obj),
-        // TODO make choosing the "type" a lot smarter. This assumes
-        // the parent node is a file.
+        // TODO: "type" の選び方をもっと賢くする。ここでは
+        // 親ノードがファイルであると仮定している。
         // PascalCase
         type: getType({ node, object: parsedContent }),
       },

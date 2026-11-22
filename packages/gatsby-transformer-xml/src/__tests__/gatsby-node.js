@@ -14,7 +14,7 @@ describe(`Process XML nodes correctly`, () => {
     },
   }
 
-  // Make some fake functions its expecting.
+  // 期待されるダミーの関数をいくつか用意する。
   node.content = `
       <?xml version="1.0"?>
       <catalog>

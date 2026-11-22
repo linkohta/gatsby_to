@@ -18,7 +18,7 @@ const defaultHandlers = [
 let fileCount = 0
 
 /**
- * Wrap handlers to pass in additional arguments such as the File node
+ * File ノードなどの追加の引数を渡せるよう、ハンドラーを包む
  */
 function makeHandlers(node, handlers) {
   handlers = (handlers || []).map(
@@ -49,7 +49,7 @@ export default function parseMetadata(content, node, options) {
     )
   } catch (err) {
     if (err.message === ERROR_MISSING_DEFINITION) return []
-    // reset the stack to here since it's not helpful to see all the react-docgen guts
+    // react-docgen の内部をすべて見せても役に立たないので、スタックをここにリセットする
     // const parseErr = new Error(err.message)
     if (err.loc) {
       err.codeFrame = codeFrameColumns(

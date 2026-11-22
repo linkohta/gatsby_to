@@ -2,7 +2,7 @@ const parseXml = require(`xml-parser`)
 const _ = require(`lodash`)
 
 function shouldOnCreateNode({ node }) {
-  // We only care about XML content.
+  // XML の内容だけを対象にする。
   return [`application/xml`, `text/xml`].includes(node.internal.mediaType)
 }
 
