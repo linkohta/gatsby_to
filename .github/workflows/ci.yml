@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+# 同じブランチで新しい実行が始まったら、古い実行を取り消す
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GATSBY_CPU_COUNT: 2
+  COMPILER_OPTIONS: GATSBY_MAJOR=5
+  NODE_NO_WARNINGS: 1
+  BROWSERSLIST_IGNORE_OLD_DATA: true
+  # グローバルにインストールされた libvips は使わない
+  # https://sharp.pixelplumbing.com/install/#custom-libvips
+  SHARP_IGNORE_GLOBAL_LIBVIPS: 1
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      # lint に必要なのはルートの依存だけなので、インストールを速くするために
+      # workspaces を `babel-preset-gatsby-package` だけに絞る。
+      # `.eslintrc.js` が `.babelrc.js` 経由でこのプリセットを読み込むため、これだけは残す。
+      - name: Limit workspaces to what lint needs
+        run: |
+          sed -i ':a;N;$!ba;s/,\n\s*"workspaces":\s\[[^]]*]/,"workspaces":\["packages\/babel-preset-gatsby-package"\]/g' package.json
+      - name: Install root dependencies
+        run: yarn
+      - run: yarn lint:code
+      - run: yarn lint:other
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+      - name: Install dependencies
+        run: yarn
+      - name: Check for dirty lockfile
+        run: ./scripts/check-lockfile.sh
+      - name: Build all packages
+        run: yarn bootstrap
+      - run: yarn typecheck
+
+  unit-tests:
+    name: Unit tests (${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: yarn
+      - name: Install dependencies
+        run: yarn
+      - name: Build all packages
+        run: yarn bootstrap
+      - name: Run tests
+        run: yarn jest --ci --maxWorkers=2 --shard=${{ matrix.shard }}/4
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
