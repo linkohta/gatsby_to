@@ -62,18 +62,20 @@ describe(`init-starter`, () => {
           `A site`
         )
       } catch (e) {
-        expect(execa).toBeCalledWith(`git`, [
+        expect(execa).toHaveBeenCalledWith(`git`, [
           `clone`,
           `gatsby-starter-hello-world`,
           `--recursive`,
           `--depth=1`,
           `--quiet`,
         ])
-        expect(reporter.panic).toBeCalledWith(`Not possible to clone the repo`)
-        expect(reporter.success).not.toBeCalledWith(
+        expect(reporter.panic).toHaveBeenCalledWith(
+          `Not possible to clone the repo`
+        )
+        expect(reporter.success).not.toHaveBeenCalledWith(
           `Created site from template`
         )
-        expect(fs.remove).toBeCalledWith(`/somewhere-here`)
+        expect(fs.remove).toHaveBeenCalledWith(`/somewhere-here`)
       }
     })
 
@@ -91,16 +93,18 @@ describe(`init-starter`, () => {
         `A site`
       )
 
-      expect(execa).toBeCalledWith(`git`, [
+      expect(execa).toHaveBeenCalledWith(`git`, [
         `clone`,
         `gatsby-starter-hello-world`,
         `--recursive`,
         `--depth=1`,
         `--quiet`,
       ])
-      expect(reporter.panic).not.toBeCalled()
-      expect(reporter.success).toBeCalledWith(`Created site from template`)
-      expect(fs.remove).toBeCalledWith(`/somewhere-here`)
+      expect(reporter.panic).not.toHaveBeenCalled()
+      expect(reporter.success).toHaveBeenCalledWith(
+        `Created site from template`
+      )
+      expect(fs.remove).toHaveBeenCalledWith(`/somewhere-here`)
     })
   })
 
@@ -120,10 +124,10 @@ describe(`init-starter`, () => {
         `A site`
       )
 
-      expect(fs.remove).toBeCalledWith(`package-lock.json`)
-      expect(reporter.success).toBeCalledWith(`Installed plugins`)
-      expect(reporter.panic).not.toBeCalled()
-      expect(execa).toBeCalledWith(`yarnpkg`, [`--silent`], {
+      expect(fs.remove).toHaveBeenCalledWith(`package-lock.json`)
+      expect(reporter.success).toHaveBeenCalledWith(`Installed plugins`)
+      expect(reporter.panic).not.toHaveBeenCalled()
+      expect(execa).toHaveBeenCalledWith(`yarnpkg`, [`--silent`], {
         stderr: `inherit`,
       })
     })
@@ -143,11 +147,11 @@ describe(`init-starter`, () => {
         `A site`
       )
 
-      expect(fs.remove).toBeCalledWith(`yarn.lock`)
-      expect(reporter.success).toBeCalledWith(`Installed Gatsby`)
-      expect(reporter.success).toBeCalledWith(`Installed plugins`)
-      expect(reporter.panic).not.toBeCalled()
-      expect(execa).toBeCalledWith(
+      expect(fs.remove).toHaveBeenCalledWith(`yarn.lock`)
+      expect(reporter.success).toHaveBeenCalledWith(`Installed Gatsby`)
+      expect(reporter.success).toHaveBeenCalledWith(`Installed plugins`)
+      expect(reporter.panic).not.toHaveBeenCalled()
+      expect(execa).toHaveBeenCalledWith(
         `npm`,
         [
           `install`,
@@ -160,7 +164,7 @@ describe(`init-starter`, () => {
         ],
         { stderr: `inherit` }
       )
-      expect(execa).toBeCalledWith(
+      expect(execa).toHaveBeenCalledWith(
         `npm`,
         [
           `install`,
@@ -194,7 +198,7 @@ describe(`init-starter`, () => {
         `A site`
       )
 
-      expect(reporter.info).toBeCalledWith(
+      expect(reporter.info).toHaveBeenCalledWith(
         `Woops! You have chosen "yarn" as your package manager, but it doesn't seem be installed on your machine. You can install it from https://yarnpkg.com/getting-started/install or change your preferred package manager with the command "gatsby options set pm npm". As a fallback, we will run the next steps with npm.`
       )
     })

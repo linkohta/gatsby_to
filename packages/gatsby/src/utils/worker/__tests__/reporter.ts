@@ -55,7 +55,7 @@ describe(`log actions from workers are dispatched in main process`, () => {
 
         try {
           await worker.single.log(`foo`, method)
-          expect(spies.createLog).toBeCalledWith(
+          expect(spies.createLog).toHaveBeenCalledWith(
             expect.objectContaining({
               level,
               text: `foo`,
@@ -76,7 +76,7 @@ describe(`log actions from workers are dispatched in main process`, () => {
       try {
         await worker.single.activityTimer(`foo`)
 
-        expect(spies.startActivity).toBeCalledWith(
+        expect(spies.startActivity).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             text: `foo`,
@@ -84,14 +84,14 @@ describe(`log actions from workers are dispatched in main process`, () => {
           })
         )
 
-        expect(spies.setActivityStatusText).toBeCalledWith(
+        expect(spies.setActivityStatusText).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             statusText: `test`,
           })
         )
 
-        expect(spies.endActivity).toBeCalledWith(
+        expect(spies.endActivity).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             status: `SUCCESS`,
@@ -109,7 +109,7 @@ describe(`log actions from workers are dispatched in main process`, () => {
       try {
         await worker.single.progress(`foo`)
 
-        expect(spies.startActivity).toBeCalledWith(
+        expect(spies.startActivity).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             text: `foo`,
@@ -119,35 +119,35 @@ describe(`log actions from workers are dispatched in main process`, () => {
           })
         )
 
-        expect(spies.activityTick).toBeCalledWith(
+        expect(spies.activityTick).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             increment: 25,
           })
         )
 
-        expect(spies.activityTick).toBeCalledWith(
+        expect(spies.activityTick).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             increment: 75,
           })
         )
 
-        expect(spies.setActivityTotal).toBeCalledWith(
+        expect(spies.setActivityTotal).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             total: 100,
           })
         )
 
-        expect(spies.setActivityStatusText).toBeCalledWith(
+        expect(spies.setActivityStatusText).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             statusText: `test`,
           })
         )
 
-        expect(spies.endActivity).toBeCalledWith(
+        expect(spies.endActivity).toHaveBeenCalledWith(
           expect.objectContaining({
             id: `foo`,
             status: `SUCCESS`,

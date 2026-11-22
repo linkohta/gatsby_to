@@ -113,7 +113,7 @@ describe(`gatsby-plugin-sitemap Node API`, () => {
 
     expect(destinationDir).toEqual(path.join(`public`, `custom-folder`))
     expect(sourceData).toMatchSnapshot()
-    expect(graphql).toBeCalledWith(customQuery)
+    expect(graphql).toHaveBeenCalledWith(customQuery)
   })
 
   it(`should include path prefix when creating creating index sitemap`, async () => {

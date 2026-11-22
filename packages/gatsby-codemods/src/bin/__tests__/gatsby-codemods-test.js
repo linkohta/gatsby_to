@@ -29,7 +29,7 @@ describe("transform", () => {
     console.log = jest.fn()
     runTransform(`gatsby-plugin-image`, `src`)
 
-    expect(console.log).toBeCalledWith(
+    expect(console.log).toHaveBeenCalledWith(
       `Executing command: jscodeshift --ignore-pattern=**/node_modules/** --ignore-pattern=**/.cache/** --ignore-pattern=**/public/** --extensions=jsx,js,ts,tsx --transform ${path.join(
         transformerDirectory,
         "gatsby-plugin-image.js"
@@ -43,7 +43,7 @@ describe("transform", () => {
     process.argv = [`node`, `dir`]
     run()
 
-    expect(console.log).toBeCalledWith(
+    expect(console.log).toHaveBeenCalledWith(
       `Be sure to pass in the name of the codemod you're attempting to run.`
     )
   })
@@ -54,7 +54,7 @@ describe("transform", () => {
     process.argv = [`node`, `dir`, `gatsby-plugin-image`]
     run()
 
-    expect(console.log).toBeCalledWith(
+    expect(console.log).toHaveBeenCalledWith(
       `You have not provided a target directory to run the codemod against, will default to root.`
     )
   })
@@ -65,7 +65,7 @@ describe("transform", () => {
     process.argv = [`node`, `dir`, `does-not-exist`]
     run()
 
-    expect(console.log).toBeCalledWith(
+    expect(console.log).toHaveBeenCalledWith(
       `You have passed in invalid codemod name: does-not-exist. Please pass in one of the following: gatsby-plugin-image, global-graphql-calls, import-link, navigate-calls, rename-bound-action-creators, sort-and-aggr-graphql.`
     )
   })

@@ -39,8 +39,8 @@ describe(`parseArgs`, () => {
   it(`should warn if unknown flags are used`, () => {
     const unknownFlag = `-unknown`
     const { flags, dirName } = parseArgs([dirNameArg, unknownFlag])
-    expect(reporter.warn).toBeCalledTimes(1)
-    expect(reporter.warn).toBeCalledWith(
+    expect(reporter.warn).toHaveBeenCalledTimes(1)
+    expect(reporter.warn).toHaveBeenCalledWith(
       expect.stringContaining(
         `Found unknown argument "${unknownFlag}", ignoring. Known arguments are: -y, -ts`
       )

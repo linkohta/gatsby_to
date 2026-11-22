@@ -140,7 +140,7 @@ describe(`Queryable Node interfaces with interface inheritance`, () => {
       `)
     )
     await buildSchema()
-    expect(report.panic).toBeCalledWith(
+    expect(report.panic).toHaveBeenCalledWith(
       `Types implementing queryable interfaces must also implement the \`Node\` interface. ` +
         `Check the type definition of \`Wrong\`, \`WrongAgain\`.`
     )
@@ -350,8 +350,8 @@ describe(`Queryable Node interfaces with interface inheritance`, () => {
       `)
     )
     await build({})
-    expect(report.panic).toBeCalledTimes(1)
-    expect(report.panic).toBeCalledWith(
+    expect(report.panic).toHaveBeenCalledTimes(1)
+    expect(report.panic).toHaveBeenCalledWith(
       `Interfaces with the \`nodeInterface\` extension must have a field ` +
         `\`id\` of type \`ID!\`. Check the type definition of \`WrongInterface\`.`
     )

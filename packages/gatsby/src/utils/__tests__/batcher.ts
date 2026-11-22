@@ -49,7 +49,7 @@ describe(`Batcher`, () => {
 
       expect(singleCall).toHaveBeenCalledTimes(threshold)
       for (let i = 0; i < threshold; i++) {
-        expect(singleCall).toBeCalledWith(`string`, i)
+        expect(singleCall).toHaveBeenCalledWith(`string`, i)
       }
     })
 
@@ -66,7 +66,7 @@ describe(`Batcher`, () => {
       }
 
       expect(bulkCall).toHaveBeenCalledTimes(1)
-      expect(bulkCall).toBeCalledWith(expectedCall)
+      expect(bulkCall).toHaveBeenCalledWith(expectedCall)
     })
   })
 

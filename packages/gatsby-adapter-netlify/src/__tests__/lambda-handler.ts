@@ -31,7 +31,7 @@ test(`produced handler is correct`, async () => {
   // require のパスにバックスラッシュ（Windows のパス）が含まれていてはならない
   expect(handlerCode).not.toMatch(/require\(["'][^"']*\\[^"']*["']\)/)
 
-  expect(writeJsonSpy).toBeCalledWith(
+  expect(writeJsonSpy).toHaveBeenCalledWith(
     expect.any(String),
     expect.objectContaining({
       config: expect.objectContaining({

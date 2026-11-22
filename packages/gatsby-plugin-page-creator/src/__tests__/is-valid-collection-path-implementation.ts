@@ -88,7 +88,7 @@ describe(`isValidCollectionPathImplementation`, () => {
       reporter
     )
     expect(isValid).toBe(false)
-    expect(reporter.panicOnBuild).toBeCalledWith({
+    expect(reporter.panicOnBuild).toHaveBeenCalledWith({
       context: {
         sourceMessage: `Collection page builder encountered an error parsing the filepath. To use collection paths the schema to follow is {Model.field__subfield}. The problematic part is: ${part}.`,
       },
@@ -121,7 +121,7 @@ describe(`isValidCollectionPathImplementation`, () => {
       reporter
     )
     expect(isValid).toBe(false)
-    expect(reporter.panicOnBuild).toBeCalledWith({
+    expect(reporter.panicOnBuild).toHaveBeenCalledWith({
       context: {
         sourceMessage: `Collection page builder encountered an error parsing the filepath. To use collection paths the schema to follow is {Model.field__subfield}. The problematic part is: ${part}.`,
       },

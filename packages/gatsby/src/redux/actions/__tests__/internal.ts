@@ -59,7 +59,7 @@ describe(`setSiteConfig`, () => {
       plugins: [],
     })
 
-    expect(reporter.panic).toBeCalledWith({
+    expect(reporter.panic).toHaveBeenCalledWith({
       id: `10122`,
       context: {
         sourceMessage: `"someRandomThing" is not allowed`,
@@ -99,7 +99,7 @@ describe(`setSiteConfig`, () => {
       plugin: [],
     })
 
-    expect(reporter.panic).toBeCalledWith({
+    expect(reporter.panic).toHaveBeenCalledWith({
       id: `10122`,
       context: {
         sourceMessage: `"plugin" is not allowed. Did you mean "plugins"?`,

@@ -66,7 +66,7 @@ it(`warns by default if both variants exist and defaults to the gatsby-config.js
     rootDir: mockDir,
     filePath: configFilePath,
   })
-  expect(reporterWarnMock).toBeCalledWith(
+  expect(reporterWarnMock).toHaveBeenCalledWith(
     `The file '${relativeFilePath}' has both .js and .mjs variants, please use one or the other. Using .js by default.`
   )
   expect(resolvedConfigFilePath).toBe(`${configFilePath}.js`)
@@ -79,7 +79,7 @@ it(`does NOT warn if both variants exist and warnings are disabled`, async () =>
     filePath: configFilePath,
     warn: false,
   })
-  expect(reporterWarnMock).not.toBeCalled()
+  expect(reporterWarnMock).not.toHaveBeenCalled()
   expect(resolvedConfigFilePath).toBe(`${configFilePath}.js`)
 })
 

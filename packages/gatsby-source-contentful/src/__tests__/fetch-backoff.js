@@ -85,7 +85,7 @@ describe(`fetch-backoff`, () => {
       .reply(200, { items: [] })
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).not.toBeCalled()
+    expect(reporter.panic).not.toHaveBeenCalled()
     expect(reporter.warn.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
@@ -123,8 +123,8 @@ describe(`fetch-backoff`, () => {
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).not.toBeCalled()
-    expect(reporter.warn).not.toBeCalled()
+    expect(reporter.panic).not.toHaveBeenCalled()
+    expect(reporter.warn).not.toHaveBeenCalled()
     expect(scope.isDone()).toBeTruthy()
   })
 })

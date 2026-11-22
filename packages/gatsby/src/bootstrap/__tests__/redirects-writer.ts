@@ -43,7 +43,7 @@ describe(`redirect-writer`, () => {
 
     await writeRedirects()
 
-    expect(writeFileMock).toBeCalledTimes(1)
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
 
     const clientSideRedirects = JSON.parse(writeFileMock.mock.calls[0][1])
 
@@ -54,7 +54,7 @@ describe(`redirect-writer`, () => {
       expect.objectContaining({ fromPath: `/server/` })
     )
 
-    expect(reporterWarnMock).not.toBeCalled()
+    expect(reporterWarnMock).not.toHaveBeenCalled()
   })
 
   it(`show warning when there is both redirect and page with same path`, async () => {
@@ -92,7 +92,7 @@ describe(`redirect-writer`, () => {
 
     await writeRedirects()
 
-    expect(writeFileMock).toBeCalledTimes(1)
+    expect(writeFileMock).toHaveBeenCalledTimes(1)
 
     const clientSideRedirects = JSON.parse(writeFileMock.mock.calls[0][1])
 
@@ -104,7 +104,7 @@ describe(`redirect-writer`, () => {
       expect.objectContaining({ fromPath: `/server-overlap/` })
     )
 
-    expect(reporterWarnMock).toBeCalledTimes(1)
+    expect(reporterWarnMock).toHaveBeenCalledTimes(1)
 
     const warningMessage = reporterWarnMock.mock.calls[0][0]
     expect(warningMessage).toMatchInlineSnapshot(`

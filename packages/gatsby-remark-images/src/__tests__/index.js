@@ -468,7 +468,7 @@ test(`it doesn't use tracedSVG placeholder (deprecated and fallback to base64)`,
   expect(node.type).toBe(`html`)
   expect(node.value).toMatchSnapshot()
   expect(node.value).not.toMatch(`<html>`)
-  expect(mockTraceSVG).toBeCalledTimes(0)
+  expect(mockTraceSVG).toHaveBeenCalledTimes(0)
 })
 
 describe(`showCaptions`, () => {

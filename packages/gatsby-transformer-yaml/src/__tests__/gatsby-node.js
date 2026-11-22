@@ -45,7 +45,7 @@ const expectCreatedNodesMatchingSnapshot = count => {
 }
 
 const expectCreatedNodeTypeName = nodeTypeName => {
-  expect(createNode).toBeCalledWith(
+  expect(createNode).toHaveBeenCalledWith(
     expect.objectContaining({
       internal: expect.objectContaining({
         type: nodeTypeName,

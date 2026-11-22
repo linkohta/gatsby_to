@@ -225,7 +225,7 @@ describe(`gatsby-source-drupal`, () => {
     ].map(fileUrl => new URL(fileUrl, baseUrl).href)
 
     urls.forEach(url => {
-      expect(createRemoteFileNode).toBeCalledWith(
+      expect(createRemoteFileNode).toHaveBeenCalledWith(
         expect.objectContaining({
           url,
           auth: {},
@@ -289,14 +289,14 @@ describe(`gatsby-source-drupal`, () => {
 
   it(`Skips File Downloads on initial build`, async () => {
     const skipFileDownloads = true
-    expect(createRemoteFileNode).toBeCalledTimes(10)
+    expect(createRemoteFileNode).toHaveBeenCalledTimes(10)
     await sourceNodes(args, { baseUrl, skipFileDownloads })
-    expect(createRemoteFileNode).toBeCalledTimes(10)
+    expect(createRemoteFileNode).toHaveBeenCalledTimes(10)
   })
 
   it(`Skips File Downloads on webhook update`, async () => {
     const skipFileDownloads = true
-    expect(createRemoteFileNode).toBeCalledTimes(10)
+    expect(createRemoteFileNode).toHaveBeenCalledTimes(10)
     const nodeToUpdate = require(`./fixtures/webhook-file-update.json`).data
 
     await handleWebhookUpdate(
@@ -310,7 +310,7 @@ describe(`gatsby-source-drupal`, () => {
       }
     )
 
-    expect(createRemoteFileNode).toBeCalledTimes(10)
+    expect(createRemoteFileNode).toHaveBeenCalledTimes(10)
   })
 
   describe(`Update webhook`, () => {
@@ -478,7 +478,7 @@ describe(`gatsby-source-drupal`, () => {
     }
 
     expect(callSkipCount).toBe(1)
-    expect(got).toBeCalledTimes(8)
+    expect(got).toHaveBeenCalledTimes(8)
 
     expect(Object.keys(nodes).length).not.toEqual(0)
     expect(nodes[createNodeId(`und.file-1`)]).toBeDefined()

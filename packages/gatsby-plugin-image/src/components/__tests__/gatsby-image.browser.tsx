@@ -99,7 +99,7 @@ describe(`GatsbyImage browser`, () => {
 
     await waitFor(() => container.querySelector(`[data-placeholder-image=""]`))
 
-    expect(console.warn).toBeCalledWith(
+    expect(console.warn).toHaveBeenCalledWith(
       `[gatsby-plugin-image] You're missing out on some cool performance features. Please add "gatsby-plugin-image" to your gatsby-config.js`
     )
   })
@@ -114,7 +114,7 @@ describe(`GatsbyImage browser`, () => {
 
     await waitFor(() => container.querySelector(`[data-placeholder-image=""]`))
 
-    expect(console.warn).toBeCalledWith(
+    expect(console.warn).toHaveBeenCalledWith(
       `[gatsby-plugin-image] Missing image prop`
     )
     expect(container.firstChild).toBeNull()
@@ -183,7 +183,7 @@ describe(`GatsbyImage browser`, () => {
 
     img?.dispatchEvent(new Event(`load`))
 
-    expect(onStartLoadSpy).toBeCalledWith({ wasCached: true })
-    expect(onLoadSpy).toBeCalled()
+    expect(onStartLoadSpy).toHaveBeenCalledWith({ wasCached: true })
+    expect(onLoadSpy).toHaveBeenCalled()
   })
 })

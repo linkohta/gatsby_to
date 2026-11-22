@@ -69,7 +69,7 @@ describe(`gets ssl certs`, () => {
   describe(`automatic SSL certificate`, () => {
     it(`sets up dev cert`, () => {
       getSslCert({ name: `mock-cert`, directory: `` })
-      expect(getDevCert).toBeCalledWith(`mock-cert`, {
+      expect(getDevCert).toHaveBeenCalledWith(`mock-cert`, {
         getCaPath: true,
         skipCertutilInstall: false,
         ui: {

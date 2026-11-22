@@ -16,19 +16,19 @@ describe(`patchConsole`, () => {
       it(`handles an empty call`, () => {
         console[method]()
 
-        expect(reporter[method]).toBeCalledWith(``)
+        expect(reporter[method]).toHaveBeenCalledWith(``)
       })
 
       it(`handles multiple arguments`, () => {
         console[method](`foo`, `bar`, `baz`)
 
-        expect(reporter[method]).toBeCalledWith(`foo bar baz`)
+        expect(reporter[method]).toHaveBeenCalledWith(`foo bar baz`)
       })
 
       it(`handles formatting`, () => {
         console[method](`%s %d`, `bar`, true)
 
-        expect(reporter[method]).toBeCalledWith(`bar 1`)
+        expect(reporter[method]).toHaveBeenCalledWith(`bar 1`)
       })
 
       it(`handles normal values`, () => {
@@ -53,7 +53,7 @@ describe(`patchConsole`, () => {
         let a
         console[method](a)
 
-        expect(reporter[method]).toBeCalledWith(``)
+        expect(reporter[method]).toHaveBeenCalledWith(``)
       })
     })
   })

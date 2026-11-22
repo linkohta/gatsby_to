@@ -427,7 +427,7 @@ describe(`gatsby-worker`, () => {
         }
 
         workerPool.sendMessage({ type: `PONG` }, 9001)
-      }).toThrowError(`There is no worker with "9001" id.`)
+      }).toThrow(`There is no worker with "9001" id.`)
     })
 
     it(`messages are not lost if worker exits soon after sending a message`, async () => {

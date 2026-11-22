@@ -208,7 +208,7 @@ describe(`Create and update nodes`, (): void => {
         }
       )
     }
-    expect(callActionCreator).toThrowError(
+    expect(callActionCreator).toThrow(
       `A plugin tried to update a node field that it doesn't own`
     )
   })
@@ -248,7 +248,7 @@ describe(`Create and update nodes`, (): void => {
       )(dispatch)
     }
 
-    expect(callActionCreator).toThrowError(
+    expect(callActionCreator).toThrow(
       `The plugin "pluginB" created a node of a type owned by another plugin.`
     )
   })
@@ -275,7 +275,7 @@ describe(`Create and update nodes`, (): void => {
       )(dispatch)
     }
 
-    expect(callActionCreator).toThrowError(
+    expect(callActionCreator).toThrow(
       `Plugins creating nodes can not set data on the reserved field "fields"
       as this is reserved for plugins which wish to extend your nodes.`
     )

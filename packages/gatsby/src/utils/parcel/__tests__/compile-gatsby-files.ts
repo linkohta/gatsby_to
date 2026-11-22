@@ -242,7 +242,7 @@ describe(`misnamed gatsby-node files`, () => {
     await remove(`${dir.misnamedJS}/.cache`)
     await compileGatsbyFiles(dir.misnamedJS)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10128`,
       context: {
         configName: `gatsby-node`,
@@ -256,7 +256,7 @@ describe(`misnamed gatsby-node files`, () => {
     await remove(`${dir.misnamedTS}/.cache`)
     await compileGatsbyFiles(dir.misnamedTS)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10128`,
       context: {
         configName: `gatsby-node`,

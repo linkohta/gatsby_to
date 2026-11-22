@@ -25,7 +25,7 @@ describe(`gatsby-source-medium`, () => {
         { actions, createNodeId, createContentDigest },
         { username: `foo`, limit: 5 }
       )
-      expect(actions.createNode).toBeCalled()
+      expect(actions.createNode).toHaveBeenCalled()
       expect(actions.createNode.mock.calls).toMatchSnapshot()
     })
 
@@ -36,7 +36,7 @@ describe(`gatsby-source-medium`, () => {
         { actions, createNodeId, createContentDigest },
         { username, limit }
       )
-      expect(axios.get).toBeCalledWith(
+      expect(axios.get).toHaveBeenCalledWith(
         `https://medium.com/${username}/?format=json&limit=${limit}`
       )
     })

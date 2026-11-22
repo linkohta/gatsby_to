@@ -169,8 +169,8 @@ describe(`processNodeManifests() warnings`, () => {
 
     await processNodeManifests()
 
-    expect(reporter.error).not.toBeCalled()
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.error).not.toHaveBeenCalled()
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(
         `unstable_createNodeManifest produced warnings [${foundPageByToLogIds.none}]`
       )
@@ -196,8 +196,8 @@ describe(`processNodeManifests() warnings`, () => {
 
     await processNodeManifests()
 
-    expect(reporter.error).not.toBeCalled()
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.error).not.toHaveBeenCalled()
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(
         `unstable_createNodeManifest produced warnings [${
           foundPageByToLogIds[`context.id`]
@@ -225,11 +225,11 @@ describe(`processNodeManifests() warnings`, () => {
 
     await processNodeManifests()
 
-    expect(reporter.error).not.toBeCalled()
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.error).not.toHaveBeenCalled()
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(foundPageByToLogIds.none)
     )
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(foundPageByToLogIds[`context.id`])
     )
   })
@@ -257,8 +257,8 @@ describe(`processNodeManifests() warnings`, () => {
 
       await processNodeManifests()
 
-      expect(reporter.error).toBeCalled()
-      expect(reporter.error).toBeCalledWith(
+      expect(reporter.error).toHaveBeenCalled()
+      expect(reporter.error).toHaveBeenCalledWith(
         expect.objectContaining({ id: foundPageByToLogIds.none })
       )
     })
@@ -282,8 +282,8 @@ describe(`processNodeManifests() warnings`, () => {
 
       await processNodeManifests()
 
-      expect(reporter.error).toBeCalled()
-      expect(reporter.error).toBeCalledWith(
+      expect(reporter.error).toHaveBeenCalled()
+      expect(reporter.error).toHaveBeenCalledWith(
         expect.objectContaining({
           id: foundPageByToLogIds[`context.id`],
         })
@@ -294,8 +294,8 @@ describe(`processNodeManifests() warnings`, () => {
 
       await processNodeManifests()
 
-      expect(reporter.error).toBeCalled()
-      expect(reporter.error).toBeCalledWith(
+      expect(reporter.error).toHaveBeenCalled()
+      expect(reporter.error).toHaveBeenCalledWith(
         expect.objectContaining({
           id: foundPageByToLogIds[`context.id`],
         })
@@ -332,8 +332,8 @@ describe(`processNodeManifests() warnings`, () => {
 
       await processNodeManifests()
 
-      expect(reporter.error).toBeCalled()
-      expect(reporter.error).toBeCalledWith(
+      expect(reporter.error).toHaveBeenCalled()
+      expect(reporter.error).toHaveBeenCalledWith(
         expect.objectContaining({
           id: foundPageByToLogIds.queryTracking,
         })
@@ -352,7 +352,7 @@ describe(`processNodeManifests() warnings`, () => {
         verbose: process.env.gatsby_log_level === `verbose`,
       })
 
-      expect(reporter.error).not.toBeCalled()
+      expect(reporter.error).not.toHaveBeenCalled()
       expect(logId).toEqual(foundPageByToLogIds[`filesystem-route-api`])
     })
   })
@@ -364,11 +364,11 @@ describe(`processNodeManifests`, () => {
 
     await processNodeManifests()
 
-    expect(fs.writeJSON).not.toBeCalled()
-    expect(reporter.info).not.toBeCalled()
-    expect(reporter.warn).not.toBeCalled()
-    expect(reporter.error).not.toBeCalled()
-    expect(store.dispatch).not.toBeCalled()
+    expect(fs.writeJSON).not.toHaveBeenCalled()
+    expect(reporter.info).not.toHaveBeenCalled()
+    expect(reporter.warn).not.toHaveBeenCalled()
+    expect(reporter.error).not.toHaveBeenCalled()
+    expect(store.dispatch).not.toHaveBeenCalled()
   })
 
   const testProcessNodeManifestsWithUpdatedAt = async (): Promise<void> => {
@@ -484,29 +484,31 @@ describe(`processNodeManifests`, () => {
     await processNodeManifests()
 
     if (process.env.gatsby_log_level === `verbose`) {
-      expect(reporter.error).toBeCalled()
-      expect(reporter.error).toBeCalledWith({
+      expect(reporter.error).toHaveBeenCalled()
+      expect(reporter.error).toHaveBeenCalledWith({
         context: { nodeId: `4`, pluginName: `test` },
         id: `11804`,
       })
     } else {
-      expect(reporter.error).not.toBeCalled()
-      expect(reporter.info).toBeCalledWith(expect.stringContaining(`11804`))
+      expect(reporter.error).not.toHaveBeenCalled()
+      expect(reporter.info).toHaveBeenCalledWith(
+        expect.stringContaining(`11804`)
+      )
     }
 
-    expect(reporter.info).toBeCalled()
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.info).toHaveBeenCalled()
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(
         `Wrote out ${nodes.length} node page manifest files`
       )
     )
-    expect(reporter.info).toBeCalledWith(
+    expect(reporter.info).toHaveBeenCalledWith(
       expect.stringContaining(`1 manifest couldn't be processed`)
     )
-    expect(store.dispatch).toBeCalled()
+    expect(store.dispatch).toHaveBeenCalled()
 
-    expect(fs.ensureDir).toBeCalledTimes(nodes.length)
-    expect(fs.writeJSON).toBeCalledTimes(nodes.length)
+    expect(fs.ensureDir).toHaveBeenCalledTimes(nodes.length)
+    expect(fs.writeJSON).toHaveBeenCalledTimes(nodes.length)
 
     pendingManifests.forEach((manifest, index) => {
       // このマニフェストに対応するノードが存在しない場合は、マニフェストが

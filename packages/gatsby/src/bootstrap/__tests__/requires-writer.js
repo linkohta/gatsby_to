@@ -76,7 +76,7 @@ describe(`requires-writer`, () => {
         components: new Map(),
       })
 
-      expect(spy).toBeCalledWith(
+      expect(spy).toHaveBeenCalledWith(
         joinPath(`/dir`, `.cache`, `match-paths.json.${now}`),
         JSON.stringify([{ path: `/path1`, matchPath: `matchPath1` }], null, 4)
       )

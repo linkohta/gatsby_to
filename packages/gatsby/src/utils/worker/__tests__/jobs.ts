@@ -198,7 +198,7 @@ describe(`worker (jobs)`, () => {
 
   describe(`messages (worker<->parent communication)`, () => {
     it(`worker pool receives messages about created jobs from workers`, () => {
-      expect(receivedMessageSpy).toBeCalledWith(
+      expect(receivedMessageSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: `JOB_CREATED`,
           payload: expect.objectContaining({
@@ -213,7 +213,7 @@ describe(`worker (jobs)`, () => {
     })
 
     it(`worker pool reports job completion back to workers`, () => {
-      expect(sendMessageSpy).toBeCalledWith(
+      expect(sendMessageSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: `JOB_COMPLETED`,
           payload: expect.objectContaining({
@@ -228,7 +228,7 @@ describe(`worker (jobs)`, () => {
     })
 
     it(`worker pool reports job failure back to workers`, () => {
-      expect(sendMessageSpy).toBeCalledWith(
+      expect(sendMessageSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           type: `JOB_FAILED`,
           payload: {

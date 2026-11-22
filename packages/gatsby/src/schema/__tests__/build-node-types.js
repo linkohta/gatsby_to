@@ -315,6 +315,6 @@ describe(`build-node-types`, () => {
   })
 
   it(`should not report conflicts on plugin fields`, () => {
-    expect(typeConflictReporter.addConflict).not.toBeCalled()
+    expect(typeConflictReporter.addConflict).not.toHaveBeenCalled()
   })
 })

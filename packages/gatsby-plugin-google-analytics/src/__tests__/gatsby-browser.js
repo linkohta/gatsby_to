@@ -119,8 +119,8 @@ describe(`gatsby-plugin-google-analytics`, () => {
 
           jest.runAllTimers()
 
-          expect(window.ga).toBeCalledTimes(3)
-          expect(window.ga).toBeCalledWith(
+          expect(window.ga).toHaveBeenCalledTimes(3)
+          expect(window.ga).toHaveBeenCalledWith(
             `send`,
             `event`,
             expect.objectContaining({
@@ -130,7 +130,7 @@ describe(`gatsby-plugin-google-analytics`, () => {
               eventValue: 300,
             })
           )
-          expect(window.ga).toBeCalledWith(
+          expect(window.ga).toHaveBeenCalledWith(
             `send`,
             `event`,
             expect.objectContaining({
@@ -140,7 +140,7 @@ describe(`gatsby-plugin-google-analytics`, () => {
               eventValue: 150,
             })
           )
-          expect(window.ga).toBeCalledWith(
+          expect(window.ga).toHaveBeenCalledWith(
             `send`,
             `event`,
             expect.objectContaining({
@@ -161,9 +161,9 @@ describe(`gatsby-plugin-google-analytics`, () => {
 
           jest.runAllTimers()
 
-          expect(getLCP).not.toBeCalled()
-          expect(getFID).not.toBeCalled()
-          expect(getCLS).not.toBeCalled()
+          expect(getLCP).not.toHaveBeenCalled()
+          expect(getFID).not.toHaveBeenCalled()
+          expect(getCLS).not.toHaveBeenCalled()
         })
       })
     })

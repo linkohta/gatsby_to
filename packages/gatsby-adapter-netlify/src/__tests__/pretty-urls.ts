@@ -72,8 +72,8 @@ describe(`createStaticAssetsPathHandler`, () => {
 
     await fileMovingDone()
 
-    expect(moveSpy).not.toBeCalled()
-    expect(copySpy).not.toBeCalled()
+    expect(moveSpy).not.toHaveBeenCalled()
+    expect(copySpy).not.toHaveBeenCalled()
   })
 
   describe(`moves or copies file if filepath is incorrect for given route`, () => {

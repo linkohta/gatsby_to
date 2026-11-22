@@ -37,7 +37,7 @@ describe(`GatsbyImage server`, () => {
     const { container } = render(<GatsbyImageAny />)
 
     // 実装の詳細を検証しているが、UX のためなので許容できるトレードオフである
-    expect(console.warn).toBeCalledWith(
+    expect(console.warn).toHaveBeenCalledWith(
       `[gatsby-plugin-image] Missing image prop`
     )
     expect(container.firstChild).toBeNull()

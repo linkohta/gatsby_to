@@ -54,7 +54,7 @@ it(`does not validate async external validation rules when validateExternalRules
       }
     )
 
-  expect(invalid).not.toThrowError()
+  expect(invalid).not.toThrow()
 })
 
 it(`throws an warning on unknown values`, async () => {

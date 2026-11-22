@@ -127,8 +127,8 @@ afterAll(() => {
 
 it(`calls contentful.createClient with expected params`, async () => {
   await fetchContent({ pluginConfig, reporter, syncToken: null })
-  expect(reporter.panic).not.toBeCalled()
-  expect(createClient).toBeCalledWith(
+  expect(reporter.panic).not.toHaveBeenCalled()
+  expect(createClient).toHaveBeenCalledWith(
     expect.objectContaining({
       accessToken: `6f35edf0db39085e9b9c19bd92943e4519c77e72c852d961968665f1324bfc94`,
       environment: `env`,
@@ -149,8 +149,8 @@ it(`calls contentful.createClient with expected params and default fallbacks`, a
     syncToken: null,
   })
 
-  expect(reporter.panic).not.toBeCalled()
-  expect(createClient).toBeCalledWith(
+  expect(reporter.panic).not.toHaveBeenCalled()
+  expect(createClient).toHaveBeenCalledWith(
     expect.objectContaining({
       accessToken: `6f35edf0db39085e9b9c19bd92943e4519c77e72c852d961968665f1324bfc94`,
       environment: `master`,
@@ -169,7 +169,7 @@ it(`calls contentful.getContentTypes with default page limit`, async () => {
     reporter,
   })
 
-  expect(reporter.panic).not.toBeCalled()
+  expect(reporter.panic).not.toHaveBeenCalled()
   expect(mockClient.getContentTypes).toHaveBeenCalledWith({
     limit: 1000,
     order: `sys.createdAt`,
@@ -187,7 +187,7 @@ it(`calls contentful.getContentTypes with custom plugin option page limit`, asyn
     reporter,
   })
 
-  expect(reporter.panic).not.toBeCalled()
+  expect(reporter.panic).not.toHaveBeenCalled()
   expect(mockClient.getContentTypes).toHaveBeenCalledWith({
     limit: 50,
     order: `sys.createdAt`,
@@ -207,8 +207,8 @@ describe(`Tags feature`, () => {
       syncToken: null,
     })
 
-    expect(reporter.panic).not.toBeCalled()
-    expect(mockClient.getTags).not.toBeCalled()
+    expect(reporter.panic).not.toHaveBeenCalled()
+    expect(mockClient.getTags).not.toHaveBeenCalled()
   })
   it(`calls contentful.getTags when enabled`, async () => {
     await fetchContent({
@@ -222,7 +222,7 @@ describe(`Tags feature`, () => {
       syncToken: null,
     })
 
-    expect(reporter.panic).not.toBeCalled()
+    expect(reporter.panic).not.toHaveBeenCalled()
     expect(mockClient.getTags).toHaveBeenCalledWith({
       limit: 50,
       order: `sys.createdAt`,
@@ -239,7 +239,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -249,7 +249,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -259,7 +259,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(formatPluginOptionsForCLI).toBeCalledWith(
+    expect(formatPluginOptionsForCLI).toHaveBeenCalledWith(
       expect.objectContaining({
         ...options,
       }),
@@ -277,7 +277,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(`You seem to be offline`),
@@ -285,7 +285,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -295,7 +295,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(formatPluginOptionsForCLI).toBeCalledWith(
+    expect(formatPluginOptionsForCLI).toHaveBeenCalledWith(
       expect.objectContaining({
         ...options,
       }),
@@ -319,7 +319,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       syncToken: null,
     })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(`Endpoint not found`),
@@ -327,7 +327,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -337,7 +337,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(formatPluginOptionsForCLI).toBeCalledWith(
+    expect(formatPluginOptionsForCLI).toHaveBeenCalledWith(
       expect.objectContaining({
         ...masterOptions,
       }),
@@ -358,7 +358,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -368,7 +368,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -378,7 +378,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(formatPluginOptionsForCLI).toBeCalledWith(
+    expect(formatPluginOptionsForCLI).toHaveBeenCalledWith(
       expect.objectContaining({
         ...options,
       }),
@@ -399,7 +399,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(`Authorization error.`),
@@ -407,7 +407,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: expect.stringContaining(
@@ -417,7 +417,7 @@ describe(`Displays troubleshooting tips and detailed plugin options on contentfu
       })
     )
 
-    expect(formatPluginOptionsForCLI).toBeCalledWith(
+    expect(formatPluginOptionsForCLI).toHaveBeenCalledWith(
       expect.objectContaining({
         ...options,
       }),
