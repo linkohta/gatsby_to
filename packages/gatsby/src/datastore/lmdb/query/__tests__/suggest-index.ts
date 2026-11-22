@@ -49,7 +49,7 @@ describe(`suggestIndex`, () => {
     ])(
       `includes fields in index by predicate specificity: %#`,
       (filter, expectedFields) => {
-        // expected specificity: eq, in, gte, lte, gt, lt
+        // 期待する具体性の順: eq, in, gte, lte, gt, lt
         const expected = expectedFields.map(f => [f, 1])
         expect(suggestIndex({ filter, sort })).toEqual(expected)
       }
@@ -65,7 +65,7 @@ describe(`suggestIndex`, () => {
         f: { eq: 6 },
         g: { eq: 7 },
       }
-      // expected specificity: eq, in, gte, lte, gt, lt
+      // 期待する具体性の順: eq, in, gte, lte, gt, lt
       expect(suggestIndex({ filter, sort })).toEqual([
         [`a`, 1],
         [`b`, 1],
@@ -125,7 +125,7 @@ describe(`suggestIndex`, () => {
     })
 
     it(`only sorts in one direction`, () => {
-      // This is a limitation of our implementation :/
+      // これは実装上の制約である :/
       const sort: Sort = {
         fields: [`a`, `b`, `c`],
         order: [`desc`, `DESC`, `asc`],
@@ -201,9 +201,9 @@ describe(`suggestIndex`, () => {
         const filter = { a: { eq: `foo` }, b: { eq: `bar` }, c: { eq: `baz` } }
         const sort = { fields: [`c`, `b`], order: [] }
 
-        // TODO: consider sorting "eq" fields in the order they appear in "sort"
-        //  The assumption here is that the same sort order may be used somewhere else,
-        //  so maybe this index can be re-used more often
+        // TODO: "eq" のフィールドを "sort" に現れる順でソートすることを検討する
+        //  同じソート順が他の場所でも使われるかもしれないという想定である。
+        //  そうであれば、このインデックスをより頻繁に再利用できるかもしれない
 
         expect(suggestIndex({ filter, sort })).toEqual([
           [`a`, 1],

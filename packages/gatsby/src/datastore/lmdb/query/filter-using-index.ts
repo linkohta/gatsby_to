@@ -18,7 +18,7 @@ import {
 import { cartesianProduct, matchesFilter } from "./common"
 import { inspect } from "util"
 
-// JS values encoded by ordered-binary never start with 0 or 255 byte
+// ordered-binary でエンコードされた JS の値が、0 や 255 のバイトで始まることはない
 export const BinaryInfinityNegative = Buffer.from([0])
 export const BinaryInfinityPositive = String.fromCharCode(255).repeat(4)
 
@@ -90,7 +90,7 @@ export function filterUsingIndex(args: IFilterArgs): IFilterResult {
       : performFullScan(context)
 
   if (context.usedQueries.size !== args.dbQueries.length) {
-    // Try to additionally filter out results using data stored in index
+    // インデックスに保存されたデータを使って、結果をさらに絞り込むことを試みる
     entries = narrowResultsIfPossible(context, entries)
   }
   if (isMultiKeyIndex(context) && needsDeduplication(context)) {
@@ -132,7 +132,7 @@ export function countUsingIndexOnly(args: IFilterArgs): number {
   for (let { start, end } of ranges) {
     start = [keyPrefix, ...start]
     end = [keyPrefix, ...end]
-    // Assuming ranges are not overlapping
+    // 範囲は重なっていないと仮定する
     const range: ILmdbStoreRangeOptions = { start, end, snapshot: false }
     count += indexes.getKeysCount(range)
   }
@@ -156,7 +156,7 @@ function needsDeduplication(context: IFilterContext): boolean {
   if (!isMultiKeyIndex(context)) {
     return false
   }
-  // Deduplication is not needed if all multiKeyFields have applied `eq` filters
+  // すべての multiKeyFields に `eq` フィルターが適用されている場合、重複の除去は不要である
   const fieldsWithAppliedEq = new Set<string>()
   context.usedQueries.forEach(q => {
     const filter = getFilterStatement(q)
@@ -181,27 +181,27 @@ function performRangeScan(
   let { limit, skip: offset = 0 } = context
 
   if (context.dbQueries.length !== context.usedQueries.size) {
-    // Since this query is not fully satisfied by the index, we can't use limit/skip
+    // このクエリはインデックスだけでは完全に満たせないので、limit/skip は使えない
     limit = undefined
     offset = 0
   }
   if (ranges.length > 1) {
-    // e.g. { in: [1, 2] }
-    // Cannot use offset: we will run several range queries and it's not clear which one to offset
-    // TODO: assuming ranges are sorted and not overlapping it should be possible to use offsets in this case
-    //   by running first range query, counting results while lazily iterating and
-    //   running the next range query when the previous iterator is done (and count is known)
-    //   with offset = offset - previousRangeCount, limit = limit - previousRangeCount
+    // 例: { in: [1, 2] }
+    // offset は使えない: 複数の範囲クエリを実行するので、どれに offset を適用するかが明確でない
+    // TODO: 範囲がソート済みで重なっていないと仮定すれば、この場合でも offset を使えるはずである
+    //   最初の範囲クエリを実行し、遅延的に走査しながら結果を数え、
+    //   前のイテレーターが終わったら（件数が分かったら）次の範囲クエリを
+    //   offset = offset - previousRangeCount、limit = limit - previousRangeCount で実行すればよい
     limit = typeof limit !== `undefined` ? offset + limit : undefined
     offset = 0
   }
   if (limit && isMultiKeyIndex(context) && needsDeduplication(context)) {
-    // Cannot use limit:
-    // MultiKey index may contain duplicates - we can only set a safe upper bound
+    // limit は使えない:
+    // MultiKey インデックスは重複を含むことがあるので、安全な上限を設定することしかできない
     limit *= stats.maxKeysPerItem
   }
 
-  // Assuming ranges are sorted and not overlapping, we can yield results sequentially
+  // 範囲がソート済みで重なっていないと仮定すれば、結果を順に yield できる
   const lmdbRanges: Array<ILmdbStoreRangeOptions> = []
   for (let { start, end } of ranges) {
     start = [keyPrefix, ...start]
@@ -218,9 +218,9 @@ function performRangeScan(
 }
 
 function performFullScan(context: IFilterContext): GatsbyIterable<IIndexEntry> {
-  // *Caveat*: our old query implementation was putting undefined and null values at the end
-  //   of the list when ordered ascending. But lmdb-store keeps them at the top.
-  //   So in LMDB case, need to concat two ranges to conform to our old format:
+  // *注意点*: 以前のクエリ実装では、昇順のときに undefined と null の値を
+  //   一覧の末尾に置いていた。しかし lmdb-store はそれらを先頭に保持する。
+  //   そのため LMDB の場合は、以前の形式に合わせるために 2 つの範囲を連結する必要がある:
   //     concat(undefinedToEnd, topToUndefined)
   const {
     reverse,
@@ -235,7 +235,7 @@ function performFullScan(context: IFilterContext): GatsbyIterable<IIndexEntry> {
 
   const undefinedToEnd = range
 
-  // Concat null/undefined values
+  // null と undefined の値を連結する
   end = start
   start = [keyPrefix, null]
   range = !reverse
@@ -266,22 +266,22 @@ function* traverseRanges(
 }
 
 /**
- * Takes results after the index scan and tries to filter them additionally with unused parts of the query.
+ * インデックススキャン後の結果を受け取り、クエリの未使用の部分でさらに絞り込むことを試みる。
  *
- * This is O(N) but the advantage is that it uses data available in the index.
- * So it effectively bypasses the `getNode()` call for such filters (with all associated deserialization complexity).
+ * これは O(N) だが、インデックスにあるデータを使えるという利点がある。
+ * そのため、こうしたフィルターでは `getNode()` の呼び出し（およびそれに伴うデシリアライズの複雑さ）を実質的に省ける。
  *
- * Example:
- *   Imagine the index is: { foo: 1, bar: 1 }
+ * 例:
+ *   インデックスが { foo: 1, bar: 1 } であるとする
  *
- * Now we run the query:
+ * ここで次のクエリを実行する:
  *   sort: [`foo`]
  *   filter: { bar: { eq: `test` }}
  *
- * Initial filtering pass will have to perform a full index scan (because `bar` is the last field in the index).
+ * 最初のフィルター処理では、インデックス全体のスキャンが必要になる（`bar` がインデックスの最後のフィールドのため）。
  *
- * But we still have values of `bar` stored in the index itself,
- * so can filter by this value without loading the full node contents.
+ * しかし、`bar` の値はインデックス自体に保存されているので、
+ * ノードの内容全体を読み込まなくても、この値で絞り込める。
  */
 function narrowResultsIfPossible(
   context: IFilterContext,
@@ -291,8 +291,8 @@ function narrowResultsIfPossible(
 
   const indexFields = new Map<string, number>()
   indexMetadata.keyFields.forEach(([fieldName], positionInKey) => {
-    // Every index key is [indexId, field1, field2, ...] and `indexMetadata.keyFields` contains [field1, field2, ...]
-    // As `indexId` is in the first column the fields need to be offset by +1 for correct addressing
+    // すべてのインデックスキーは [indexId, field1, field2, ...] であり、`indexMetadata.keyFields` は [field1, field2, ...] を含む
+    // `indexId` が最初の列にあるので、正しく参照するにはフィールドを +1 ずらす必要がある
     indexFields.set(fieldName, positionInKey + 1)
   })
 
@@ -304,17 +304,17 @@ function narrowResultsIfPossible(
     const positionInKey = indexFields.get(fieldName)
 
     if (typeof positionInKey === `undefined`) {
-      // No data for this field in index
+      // インデックスにこのフィールドのデータがない
       continue
     }
     if (usedQueries.has(query)) {
-      // Filter is already applied
+      // フィルターはすでに適用されている
       continue
     }
     if (isMultiKeyIndex(context) && isNegatedQuery(query)) {
-      // NE/NIN not supported with MultiKey indexes:
-      //   MultiKey indexes include duplicates; negated queries will only filter some of those
-      //   but may still incorrectly include others in final results
+      // NE/NIN は MultiKey インデックスでは使えない:
+      //   MultiKey インデックスは重複を含む。否定のクエリはその一部しか除外しないので、
+      //   最終結果に他のものが誤って含まれることがある
       continue
     }
     const filter = getFilterStatement(query)
@@ -332,7 +332,7 @@ function narrowResultsIfPossible(
               : key[fieldPositionInIndex]
 
           if (!matchesFilter(filter, value)) {
-            // Mimic AND semantics
+            // AND の意味論を模倣する
             return false
           }
         }
@@ -341,8 +341,8 @@ function narrowResultsIfPossible(
 }
 
 /**
- * Returns query clauses that can potentially use index.
- * Returned list is sorted by query specificity
+ * インデックスを使える可能性のあるクエリ句を返す。
+ * 返される一覧は、クエリの具体性の順にソートされている
  */
 function getSupportedQueries(
   context: IFilterContext,
@@ -362,13 +362,13 @@ function getSupportedQueries(
     isSupported.has(getFilterStatement(query).comparator)
   )
   if (isMultiKeyIndex(context)) {
-    // Note:
-    // NE and NIN are not supported by multi-key indexes. Why?
-    //   Imagine a node { id: 1, field: [`foo`, `bar`] }
-    //   Then the filter { field: { ne: `foo` } } should completely remove this node from results.
-    //   But multikey index contains separate entries for `foo` and `bar` values.
-    //   Final range will exclude entry "foo" but it will still include entry for "bar" hence
-    //   will incorrectly include our node in results.
+    // 注:
+    // NE と NIN はマルチキーインデックスでは使えない。その理由:
+    //   ノード { id: 1, field: [`foo`, `bar`] } があるとする
+    //   このとき、フィルター { field: { ne: `foo` } } はこのノードを結果から完全に除外すべきである。
+    //   しかし、マルチキーインデックスは `foo` と `bar` の値について別々のエントリーを持つ。
+    //   最終的な範囲は "foo" のエントリーを除外するが、"bar" のエントリーは含んだままなので、
+    //   このノードが誤って結果に含まれてしまう。
     supportedQueries = supportedQueries.filter(query => !isNegatedQuery(query))
   }
   return sortBySpecificity(supportedQueries)
@@ -402,7 +402,7 @@ export function getIndexRanges(context: IFilterContext): Array<IIndexRange> {
   for (const indexFieldInfo of new Map(keyFields)) {
     const query = getMostSpecificQuery(supportedQueries, indexFieldInfo)
     if (!query) {
-      // Use index prefix, not all index fields
+      // インデックスのすべてのフィールドではなく、接頭辞を使う
       break
     }
     const result = resolveIndexFieldRanges(context, query, indexFieldInfo)
@@ -410,25 +410,25 @@ export function getIndexRanges(context: IFilterContext): Array<IIndexRange> {
     rangeEndings.push(result.rangeEndings)
 
     if (!isEqualityQuery(query)) {
-      // Compound index { a: 1, b: 1, c: 1 } supports only one non-eq (range) operator. E.g.:
-      //  Supported: { a: { eq: `foo` }, b: { eq: 8 }, c: { gt: 5 } }
-      //  Not supported: { a: { eq: `foo` }, b: { gt: 5 }, c: { eq: 5 } }
-      //  (or to be precise, can do a range scan only for { a: { eq: `foo` }, b: { gt: 5 } })
+      // 複合インデックス { a: 1, b: 1, c: 1 } は、eq 以外の（範囲の）演算子を 1 つしか使えない。例:
+      //  使える: { a: { eq: `foo` }, b: { eq: 8 }, c: { gt: 5 } }
+      //  使えない: { a: { eq: `foo` }, b: { gt: 5 }, c: { eq: 5 } }
+      //  （正確には、範囲スキャンができるのは { a: { eq: `foo` }, b: { gt: 5 } } に対してだけである）
       break
     }
   }
   if (!rangeStarts.length) {
     return []
   }
-  // Only the last segment encloses the whole range.
-  // For example, given an index { a: 1, b: 1 } and a filter { a: { eq: `foo` }, b: { eq: `bar` } },
-  // It should produce this range:
+  // 最後のセグメントだけが範囲全体を囲む。
+  // たとえば、インデックス { a: 1, b: 1 } とフィルター { a: { eq: `foo` }, b: { eq: `bar` } } がある場合、
+  // 次の範囲を生成すべきである:
   // {
   //   start: [`foo`, `bar`],
   //   end: [`foo`, [`bar`, BinaryInfinityPositive]]
   // }
   //
-  // Not this:
+  // 次のようにはしない:
   // {
   //   start: [`foo`, `bar`],
   //   end: [[`foo`, BinaryInfinityPositive], [`bar`, BinaryInfinityPositive]]
@@ -437,7 +437,7 @@ export function getIndexRanges(context: IFilterContext): Array<IIndexRange> {
     rangeEndings[i] = rangeStarts[i]
   }
 
-  // Example:
+  // 例:
   //   rangeStarts: [
   //     [field1Start1, field1Start2],
   //     [field2Start1],
@@ -446,7 +446,7 @@ export function getIndexRanges(context: IFilterContext): Array<IIndexRange> {
   //     [field1End1, field1End2],
   //     [field2End1],
   //   ]
-  // Need:
+  // 必要なもの:
   //   rangeStartsProduct: [
   //     [field1Start1, field2Start1],
   //     [field1Start2, field2Start1],
@@ -465,7 +465,7 @@ export function getIndexRanges(context: IFilterContext): Array<IIndexRange> {
       end: rangeEndingsProduct[i],
     })
   }
-  // TODO: sort and intersect ranges. Also, we may want this at some point:
+  // TODO: 範囲をソートして積を取る。また、いずれ次のものが必要になるかもしれない:
   //   https://docs.mongodb.com/manual/core/multikey-index-bounds/
   return ranges
 }
@@ -482,7 +482,7 @@ function getMostSpecificQuery(
   [indexField]: [fieldName: string, sortDirection: number]
 ): DbQuery | undefined {
   const fieldQueries = getFieldQueries(queries, indexField)
-  // Assuming queries are sorted by specificity, the best bet is to pick the first query
+  // クエリが具体性の順にソートされていると仮定すれば、最初のクエリを選ぶのが最善である
   return fieldQueries[0]
 }
 
@@ -494,8 +494,8 @@ function resolveIndexFieldRanges(
   rangeStarts: RangeBoundary
   rangeEndings: RangeBoundary
 } {
-  // Tracking starts and ends separately instead of doing Array<[start, end]>
-  //  to simplify cartesian product creation later
+  // 後でデカルト積を作りやすくするため、Array<[start, end]> とせずに
+  //  開始と終了を別々に追跡する
   const rangeStarts: RangeBoundary = []
   const rangeEndings: RangeBoundary = []
 
@@ -514,7 +514,7 @@ function resolveIndexFieldRanges(
         ? [...filter.value]
         : [filter.value]
 
-      // Sort ranges by index sort direction
+      // インデックスのソート方向で範囲をソートする
       arr.sort((a: any, b: any): number => {
         if (a === b) return 0
         if (sortDirection === 1) return a > b ? 1 : -1
@@ -528,7 +528,7 @@ function resolveIndexFieldRanges(
         rangeStarts.push(value)
         rangeEndings.push(getValueEdgeAfter(value))
       }
-      // Special case: { eq: null } or { in: [null, `any`]} must also include values for undefined!
+      // 特別なケース: { eq: null } や { in: [null, `any`]} は、undefined の値も含めなければならない！
       if (hasNull) {
         rangeStarts.push(undefinedSymbol)
         rangeEndings.push(getValueEdgeAfter(undefinedSymbol))
@@ -544,14 +544,14 @@ function resolveIndexFieldRanges(
       const end =
         filter.comparator === DbComparator.LT ? value : getValueEdgeAfter(value)
 
-      // Try to find matching GTE/GT filter
+      // 一致する GTE/GT フィルターを探す
       const start =
         resolveRangeEdge(context, field, DbComparator.GTE) ??
         resolveRangeEdge(context, field, DbComparator.GT, ValueEdges.AFTER)
 
-      // Do not include null or undefined in results unless null was requested explicitly
+      // null が明示的に要求されていない限り、null や undefined を結果に含めない
       //
-      // Index ordering:
+      // インデックスの順序:
       //  BinaryInfinityNegative
       //  null
       //  Symbol(`undef`)
@@ -580,7 +580,7 @@ function resolveIndexFieldRanges(
           ? value
           : getValueEdgeAfter(value)
 
-      // Try to find matching LT/LTE
+      // 一致する LT/LTE を探す
       const end =
         resolveRangeEdge(context, field, DbComparator.LTE, ValueEdges.AFTER) ??
         resolveRangeEdge(context, field, DbComparator.LT)
@@ -598,7 +598,7 @@ function resolveIndexFieldRanges(
         ? [...filter.value]
         : [filter.value]
 
-      // Sort ranges by index sort direction
+      // インデックスのソート方向で範囲をソートする
       arr.sort((a: any, b: any): number => {
         if (a === b) return 0
         if (sortDirection === 1) return a > b ? 1 : -1
@@ -613,7 +613,7 @@ function resolveIndexFieldRanges(
       }
       for (const item of new Set(arr)) {
         const value = toIndexFieldValue(item, filter)
-        if (value === null) continue // already handled via hasNull case above
+        if (value === null) continue // 上の hasNull のケースですでに処理済み
         rangeEndings.push(value)
         rangeStarts.push(getValueEdgeAfter(value))
       }
@@ -660,19 +660,19 @@ function resolveRangeEdge(
 }
 
 /**
- * Returns the edge after the given value, suitable for lmdb range queries.
+ * 指定した値の直後の境界を返す。lmdb の範囲クエリに適している。
  *
- * Example:
- * Get all items from index starting with ["foo"] prefix up to the next existing prefix:
+ * 例:
+ * ["foo"] の接頭辞で始まり、次に存在する接頭辞までのすべての項目をインデックスから取得する:
  *
  * ```js
  *   db.getRange({ start: ["foo"], end: [getValueEdgeAfter("foo")] })
  * ```
  *
- * This method relies on ordered-binary format used by lmdb-store to persist keys
- * and assumes keys are composite and represented as arrays.
+ * このメソッドは、lmdb-store がキーの永続化に使う ordered-binary 形式に依存しており、
+ * キーが複合キーで、配列として表現されていることを前提にしている。
  *
- * Implementation detail: ordered-binary treats `null` as multipart separator within binary sequence
+ * 実装の詳細: ordered-binary は `null` を、バイナリ列の中のマルチパートの区切りとして扱う
  */
 function getValueEdgeAfter(value: IndexFieldValue): RangeEdgeAfter {
   return [value, BinaryInfinityPositive]

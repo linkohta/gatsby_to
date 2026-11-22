@@ -17,18 +17,18 @@ import mod from "module"
 const isProductionEnv = process.env.gatsby_executing_command !== `develop`
 
 interface IGlobPattern {
-  /** The plugin that owns this namespace **/
+  /** この名前空間を所有するプラグイン **/
   pluginName: string
-  /** The root path to the functions **/
+  /** 関数のルートパス **/
   rootPath: string
-  /** The glob pattern **/
+  /** glob パターン **/
   globPattern: string
-  /** The glob ignore pattern */
+  /** glob の除外パターン */
   ignorePattern: Array<string>
 }
 
-// During development, we lazily compile functions only when they're requested.
-// Here we keep track of which functions have been requested so are "active"
+// 開発中は、関数がリクエストされたときにだけ遅延的にコンパイルする。
+// ここでは、どの関数がリクエスト済みで「アクティブ」であるかを追跡する
 const activeDevelopmentFunctions = new Set<IGatsbyFunction>()
 let activeEntries = {}
 
@@ -36,24 +36,24 @@ async function ensureFunctionIsCompiled(
   functionObj: IGatsbyFunction,
   compiledFunctionsDir: string
 ): Promise<any> {
-  // stat the compiled function. If it's there, then return.
+  // コンパイル済みの関数を stat する。存在すれば return する。
   let compiledFileExists = false
   try {
     compiledFileExists = !!(await fs.stat(functionObj.absoluteCompiledFilePath))
   } catch (e) {
-    // ignore
+    // 無視する
   }
   if (compiledFileExists) {
     return
   } else {
-    // Otherwise, restart webpack by touching the file and watch for the file to be
-    // compiled.
+    // そうでなければ、ファイルを touch して webpack を再起動し、ファイルが
+    // コンパイルされるのを監視する。
     const time = new Date()
     fs.utimesSync(functionObj.originalAbsoluteFilePath, time, time)
     await new Promise(resolve => {
       const watcher = chokidar
-        // Watch the root of the compiled function directory in .cache as chokidar
-        // can't watch files in directories that don't yet exist.
+        // .cache 内のコンパイル済み関数のディレクトリのルートを監視する。chokidar は
+        // まだ存在しないディレクトリ内のファイルを監視できないためである。
         .watch(compiledFunctionsDir)
         .on(`add`, async _path => {
           if (_path === functionObj.absoluteCompiledFilePath) {
@@ -66,7 +66,7 @@ async function ensureFunctionIsCompiled(
   }
 }
 
-// Create glob type w/ glob, plugin name, root path
+// glob、プラグイン名、ルートパスを持つ glob の型を作成する
 const createGlobArray = (siteDirectoryPath, plugins): Array<IGlobPattern> => {
   const globs: Array<IGlobPattern> = []
 
@@ -77,13 +77,13 @@ const createGlobArray = (siteDirectoryPath, plugins): Array<IGlobPattern> => {
     const nestedFolder = pluginName ? `/${pluginName}/**/` : `/**/`
 
     return [
-      `${root}/src/api${nestedFolder}__tests__/**/*.+(js|ts)`, // Jest tests
+      `${root}/src/api${nestedFolder}__tests__/**/*.+(js|ts)`, // Jest のテスト
       `${root}/src/api${nestedFolder}+(*.)+(spec|test).+(js|ts)`,
-      `${root}/src/api${nestedFolder}+(*.)+(d).ts`, // .d.ts files
+      `${root}/src/api${nestedFolder}+(*.)+(d).ts`, // .d.ts ファイル
     ]
   }
 
-  // Add the default site src/api directory.
+  // サイトのデフォルトの src/api ディレクトリを追加する。
   globs.push({
     globPattern: `${siteDirectoryPath}/src/api/**/*.{js,ts}`,
     ignorePattern: globIgnorePatterns(siteDirectoryPath),
@@ -91,16 +91,16 @@ const createGlobArray = (siteDirectoryPath, plugins): Array<IGlobPattern> => {
     pluginName: `default-site-plugin`,
   })
 
-  // Add each plugin
+  // 各プラグインを追加する
   plugins.forEach(plugin => {
-    // Ignore the "default" site plugin (aka the src tree) as we're
-    // already watching that.
+    // サイトの「デフォルト」プラグイン（つまり src ツリー）は、すでに
+    // 監視しているので無視する。
     if (plugin.name === `default-site-plugin`) {
       return
     }
-    // Ignore any plugins we include by default. In the very unlikely case
-    // we want to ship default functions, we'll special case add them. In the
-    // meantime, we'll avoid extra FS IO.
+    // デフォルトで含めているプラグインは無視する。デフォルトの関数を
+    // 同梱したくなることはまずないが、その場合は特別扱いで追加する。
+    // それまでは、余分な FS の IO を避ける。
     if (plugin.resolve.includes(`internal-plugin`)) {
       return
     }
@@ -120,7 +120,7 @@ const createGlobArray = (siteDirectoryPath, plugins): Array<IGlobPattern> => {
     globs.push(glob)
   })
 
-  // Only return unique paths
+  // 一意なパスだけを返す
   return _.union(globs)
 }
 
@@ -156,8 +156,8 @@ const createWebpackConfig = async ({
   )
 
   const seenFunctionIds = new Set<string>()
-  // Glob and return object with relative/absolute paths + which plugin
-  // they belong to.
+  // glob を実行し、相対パスと絶対パス、およびそれらがどのプラグインに
+  // 属するかを持つオブジェクトを返す。
   const allFunctions = await Promise.all(
     globs.map(async (glob): Promise<Array<IGatsbyFunction>> => {
       const knownFunctions: Array<IGatsbyFunction> = []
@@ -169,7 +169,7 @@ const createWebpackConfig = async ({
         const originalRelativeFilePath = path.relative(glob.rootPath, file)
 
         const { dir, name } = path.parse(originalRelativeFilePath)
-        // Ignore the original extension as all compiled functions now end with js.
+        // コンパイル済みの関数はすべて js で終わるので、元の拡張子は無視する。
         const compiledFunctionName = path.join(dir, name + `.js`)
         const compiledPath = path.join(
           compiledFunctionsDir,
@@ -177,7 +177,7 @@ const createWebpackConfig = async ({
         )
         const finalName = urlResolve(dir, name === `index` ? `` : name)
 
-        // functionId should have only alphanumeric characters and dashes
+        // functionId は英数字とダッシュだけで構成されるべきである
         const functionIdBase = _.kebabCase(compiledFunctionName).replace(
           /[^a-zA-Z0-9-]/g,
           `-`
@@ -209,14 +209,14 @@ const createWebpackConfig = async ({
     })
   )
 
-  // Combine functions by the route name so that functions in the default
-  // functions directory can override the plugin's implementations.
+  // 関数をルート名でまとめ、デフォルトの functions ディレクトリの関数が
+  // プラグインの実装を上書きできるようにする。
   // @ts-ignore - Seems like a TS bug: https://github.com/microsoft/TypeScript/issues/28010#issuecomment-713484584
   const knownFunctions = _.unionBy(...allFunctions, func => func.functionRoute)
 
   store.dispatch(internalActions.setFunctions(knownFunctions))
 
-  // Write out manifest for use by `gatsby serve` and plugins
+  // `gatsby serve` とプラグインが使うマニフェストを書き出す
   fs.writeFileSync(
     path.join(compiledFunctionsDir, `manifest.json`),
     JSON.stringify(knownFunctions, null, 4)
@@ -227,13 +227,13 @@ const createWebpackConfig = async ({
     program,
   } = store.getState()
 
-  // Load environment variables from process.env.* and .env.* files.
-  // Logic is shared with webpack.config.js
+  // process.env.* と .env.* ファイルから環境変数を読み込む。
+  // ロジックは webpack.config.js と共有している
 
-  // node env should be DEVELOPMENT | PRODUCTION as these are commonly used in node land
+  // node env は DEVELOPMENT | PRODUCTION であるべきである。Node の世界ではこれらが一般的に使われている
   const nodeEnv = process.env.NODE_ENV || `development`
-  // config env is dependent on the env that it's run, this can be anything from staging-production
-  // this allows you to set use different .env environments or conditions in gatsby files
+  // config env は実行される環境に依存し、staging から production まで何にでもなりうる
+  // これにより、異なる .env 環境を使ったり、gatsby のファイル内で条件を設定したりできる
   const configEnv = process.env.GATSBY_ACTIVE_ENV || nodeEnv
   const envFile = path.join(siteDirectoryPath, `./.env.${configEnv}`)
   let parsed = {}
@@ -258,7 +258,7 @@ const createWebpackConfig = async ({
     return acc
   }, {} as Record<string, string>)
 
-  // Don't allow overwriting of NODE_ENV, PUBLIC_DIR as to not break gatsby things
+  // gatsby の動作を壊さないよう、NODE_ENV と PUBLIC_DIR の上書きは許可しない
   envObject.NODE_ENV = JSON.stringify(nodeEnv)
   envObject.PUBLIC_DIR = JSON.stringify(`${siteDirectoryPath}/public`)
 
@@ -286,7 +286,7 @@ const createWebpackConfig = async ({
     : activeDevelopmentFunctions
 
   functionsList.forEach(functionObj => {
-    // Get path without the extension (as it could be ts or js)
+    // 拡張子を除いたパスを取得する（ts のことも js のこともあるため）
     const parsedFile = path.parse(functionObj.originalRelativeFilePath)
     const compiledNameWithoutExtension = path.join(
       parsedFile.dir,
@@ -294,8 +294,8 @@ const createWebpackConfig = async ({
     )
 
     let entryToTheFunction = functionObj.originalAbsoluteFilePath
-    // we wrap user defined function with our preamble that handles matchPath as well as body parsing
-    // see api-function-webpack-loader.ts for more info
+    // ユーザー定義の関数を、matchPath と body の解析を処理する前処理でラップする
+    // 詳細は api-function-webpack-loader.ts を参照
     entryToTheFunction += `?matchPath=` + (functionObj.matchPath ?? ``)
     entries[compiledNameWithoutExtension] = entryToTheFunction
   })
@@ -319,17 +319,17 @@ const createWebpackConfig = async ({
     },
     target: `node`,
 
-    // Minification is expensive and not as helpful for serverless functions.
+    // ミニファイはコストが高く、サーバーレス関数ではそれほど役に立たない。
     optimization: {
       minimize: false,
     },
 
-    // Resolve files ending with .ts and the default extensions of .js, .json, .wasm
+    // .ts で終わるファイルと、デフォルトの拡張子である .js、.json、.wasm を解決する
     resolve: {
       extensions: [`.ts`, `...`],
     },
 
-    // Have webpack save its cache to the .cache/webpack directory
+    // webpack にキャッシュを .cache/webpack ディレクトリへ保存させる
     cache: {
       type: `filesystem`,
       name: stage,
@@ -345,8 +345,8 @@ const createWebpackConfig = async ({
     // watch: !isProductionEnv,
     module: {
       rules: [
-        // Webpack expects extensions when importing ESM modules as that's what the spec describes.
-        // Not all libraries have adapted so we don't enforce its behaviour
+        // webpack は、仕様に記述されているとおり、ESM モジュールを import するときに拡張子を期待する。
+        // すべてのライブラリが対応しているわけではないので、この挙動は強制しない
         // @see https://github.com/webpack/webpack/issues/11467
         {
           test: /\.[tj]sx?$/,
@@ -447,8 +447,8 @@ export async function onPreBootstrap({
   await fs.emptyDir(compiledFunctionsDir)
 
   try {
-    // We do this ungainly thing as we need to make accessible
-    // the resolve/reject functions to our shared callback function
+    // 不格好だが、共有のコールバック関数から resolve/reject の関数に
+    // アクセスできるようにする必要があるので、こうしている
     // eslint-disable-next-line
     await new Promise<any>(async (resolve, reject) => {
       const config = await createWebpackConfig({
@@ -470,8 +470,8 @@ export async function onPreBootstrap({
         if (err) return reject(err)
         const errors = stats?.compilation.errors || []
 
-        // If there's errors, reject in production and print to the console
-        // in development.
+        // エラーがある場合、本番では reject し、開発ではコンソールに
+        // 出力する。
         if (isProductionEnv) {
           if (errors.length > 0) return reject(errors)
         } else {
@@ -484,7 +484,7 @@ export async function onPreBootstrap({
           reporter.error(formatted.errors)
         }
 
-        // Log success in dev
+        // 開発では成功をログに出力する
         if (!isProductionEnv) {
           if (isFirstBuild) {
             isFirstBuild = false
@@ -499,7 +499,7 @@ export async function onPreBootstrap({
       if (isProductionEnv) {
         webpack(config).run(callback)
       } else {
-        // When in watch mode, you call things differently
+        // watch モードでは、呼び出し方が異なる
         let compiler = webpack(config).watch({}, callback)
 
         const globs = createGlobArray(
@@ -507,7 +507,7 @@ export async function onPreBootstrap({
           store.getState().flattenedPlugins
         )
 
-        // Watch for env files to change and restart the webpack watcher.
+        // env ファイルの変更を監視し、webpack のウォッチャーを再起動する。
         chokidar
           .watch(
             [
@@ -517,8 +517,8 @@ export async function onPreBootstrap({
             { ignoreInitial: true }
           )
           .on(`all`, async (event, path) => {
-            // Ignore change events from the API directory for functions we're
-            // already watching.
+            // すでに監視している関数については、API ディレクトリからの
+            // 変更イベントを無視する。
             if (
               event === `change` &&
               Object.values(activeEntries).includes(path) &&
@@ -531,7 +531,7 @@ export async function onPreBootstrap({
               `Restarting function watcher due to change to "${path}"`
             )
 
-            // Otherwise, restart the watcher
+            // そうでなければ、ウォッチャーを再起動する
             compiler.close(async () => {
               const config = await createWebpackConfig({
                 siteDirectoryPath,

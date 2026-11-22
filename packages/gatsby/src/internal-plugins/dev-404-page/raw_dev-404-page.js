@@ -243,7 +243,7 @@ export default function API (req, res) {
 
 export default Dev404Page
 
-// ESLint is complaining about the backslash in regex
+// ESLint が正規表現内のバックスラッシュについて警告する
 /* eslint-disable */
 export const pagesQuery = graphql`
   query PagesQuery {

@@ -9,18 +9,18 @@ export function isDesc(
 }
 
 /**
- * Given dotted field selector (e.g. `foo.bar`) returns a plain list of values matching this selector.
- * It is possible that the path maps to several values when one of the intermediate values is an array.
+ * ドット区切りのフィールドセレクター（例: `foo.bar`）を受け取り、このセレクターに一致する値の単純な一覧を返す。
+ * 途中の値のいずれかが配列の場合、パスが複数の値に対応することがある。
  *
- * Example node:
+ * ノードの例:
  * {
  *   foo: [{ bar: `bar1`}, { bar: `bar2` }]
  * }
  *
- * In this case resolveFieldValue([`foo`, `bar`], node) returns [`bar1`, `bar2`]
+ * この場合、resolveFieldValue([`foo`, `bar`], node) は [`bar1`, `bar2`] を返す
  *
- * When `resolvedNodeFields` argument is passed the function first looks for values in this object
- * and only looks in the node if the value is not found in `resolvedNodeFields`
+ * `resolvedNodeFields` 引数が渡された場合、関数はまずこのオブジェクトから値を探し、
+ * `resolvedNodeFields` に値が見つからないときにだけノードの中を探す
  */
 export function resolveFieldValue(
   dottedFieldPath: string | Array<string>,
@@ -86,12 +86,12 @@ const typeOrder = {
   string: 4,
 }
 
-// Note: this is a copy of this function from lmdb-store:
+// 注: これは lmdb-store の次の関数のコピーである:
 // https://github.com/DoctorEvidence/lmdb-store/blob/e1e53d6d2012ec22071a8fb7fa3b47f8886b22d2/index.js#L1259-L1300
-// We need it here to avoid imports from "lmdb-store" while it is not a direct dependency
-// FIXME: replace with an import in v4
+// "lmdb-store" が直接の依存ではない間、そこからの import を避けるためにここに置いている
+// FIXME: v4 で import に置き換える
 export function compareKey(a: unknown, b: unknown): number {
-  // compare with type consistency that matches ordered-binary
+  // ordered-binary と一致する型の一貫性で比較する
   if (typeof a == `object`) {
     if (!a) {
       return b == null ? 0 : -1

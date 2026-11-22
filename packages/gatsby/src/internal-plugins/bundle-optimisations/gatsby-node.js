@@ -1,7 +1,7 @@
 const path = require(`path`)
 
 exports.onCreateBabelConfig = ({ actions }) => {
-  // rewrites import { get }from 'lodash' into import get from 'lodash/get';
+  // import { get }from 'lodash' を import get from 'lodash/get'; に書き換える
   actions.setBabelPlugin({
     name: `@sigmacomputing/babel-plugin-lodash`,
   })
@@ -17,12 +17,12 @@ exports.onCreateWebpackConfig = function onCreateWebpackConfig({
   const whatwgFetchStub = path.join(__dirname, `polyfills/whatwg-fetch.js`)
 
   const alias = {
-    // These files are already polyfilled so these should return in a no-op
-    // Stub Package: object.assign & object-assign
+    // これらのファイルにはすでにポリフィルが適用されているので、何もしないものを返すべきである
+    // スタブにするパッケージ: object.assign と object-assign
     "object.assign": objectAssignStub,
     "object-assign$": objectAssignStub,
     "@babel/runtime/helpers/extends.js$": objectAssignStub,
-    // Stub package: fetch
+    // スタブにするパッケージ: fetch
     unfetch$: fetchStub,
     "unfetch/polyfill$": noOp,
     "isomorphic-unfetch$": fetchStub,

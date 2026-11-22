@@ -14,9 +14,9 @@ const undefinedNextEdge = [undefinedSymbol, BinaryInfinityPositive]
 
 describe(`getIndexRanges`, () => {
   describe(`Ranges on a single field`, () => {
-    // Each row is:
+    // 各行は次のとおり:
     // [filter, expected ranges, expected used predicates]
-    // if expected used predicates not set - expecting the first from filter
+    // expected used predicates が設定されていない場合は、filter の最初のものを期待する
     test.each([
       [{ $eq: 1 }, [{ start: [1], end: [[1, BinaryInfinityPositive]] }]],
       [{ $eq: -1 }, [{ start: [-1], end: [[-1, BinaryInfinityPositive]] }]],
@@ -28,8 +28,8 @@ describe(`getIndexRanges`, () => {
         ],
       ],
       [
-        // Order of values for $in predicate is irrelevant
-        // (it must be sorted the same way as the corresponding index field)
+        // $in 述語の値の順序は問わない
+        // （対応するインデックスフィールドと同じ方法でソートされなければならない）
         { $in: [2, 1] },
         [
           { start: [1], end: [[1, BinaryInfinityPositive]] },
@@ -78,7 +78,7 @@ describe(`getIndexRanges`, () => {
       ],
       [{ $gte: 6, $lt: 10 }, [{ start: [6], end: [10] }], [`$gte`, `$lt`]],
       [
-        // Returns empty result in lmdb
+        // lmdb では空の結果を返す
         { $lt: 5, $gt: 5 },
         [
           {
@@ -113,7 +113,7 @@ describe(`getIndexRanges`, () => {
         ],
       ],
       [
-        // Must produce the same set of ranges as $nin: [1, 2]
+        // $nin: [1, 2] と同じ範囲の集合を生成しなければならない
         { $nin: [2, 1] },
         [
           { start: [BinaryInfinityNegative], end: [1] },
@@ -127,8 +127,8 @@ describe(`getIndexRanges`, () => {
           },
         ],
       ],
-      // Nulls hackery
-      // $eq: null in gatsby must also include undefined!
+      // null に関する小細工
+      // gatsby での $eq: null は undefined も含めなければならない！
       [
         { $eq: null },
         [
@@ -156,7 +156,7 @@ describe(`getIndexRanges`, () => {
         ],
       ],
       [
-        // Essentially no-op
+        // 実質的に何もしない
         { $gt: null },
         [
           {
@@ -192,7 +192,7 @@ describe(`getIndexRanges`, () => {
           },
         ],
       ],
-      // Mixed predicates (picks the most specific one and applies others separately)
+      // 述語が混在する場合（最も具体的なものを選び、他は別々に適用する）
       [
         { $eq: 1, $lte: 10, $gte: 6 },
         [
@@ -267,9 +267,9 @@ describe(`getIndexRanges`, () => {
   })
 
   describe(`Ranges on two fields`, () => {
-    // Each row is:
+    // 各行は次のとおり:
     // [filters, expected ranges, expected used predicates]
-    // if expected used predicates not set - expecting the first from each field filter
+    // expected used predicates が設定されていない場合は、各フィールドの filter の最初のものを期待する
     test.each([
       [
         { foo: { $eq: 1 }, bar: { $eq: `bar` } },
