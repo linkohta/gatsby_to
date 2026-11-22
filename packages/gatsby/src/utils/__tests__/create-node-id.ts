@@ -3,7 +3,7 @@ import { createNodeId } from "../create-node-id"
 describe(`createNodeId`, (): void => {
   describe(`uuid`, () => {
     it(`should return a string`, () => {
-      // Key is just something random that's not only ascii
+      // キーは、ascii だけではない適当な値である
       const id2 = createNodeId(`myboea"`, `ghost ns`)
 
       expect(typeof id2).toBe(`string`)
@@ -15,7 +15,7 @@ describe(`createNodeId`, (): void => {
 
       expect(id1 !== id2).toBe(true)
 
-      // For completion sake
+      // 網羅するため
       expect(id1).toMatchInlineSnapshot(
         `"1ddac06a-6a4d-5921-a898-e9473e7ff0b1"`
       )
@@ -30,7 +30,7 @@ describe(`createNodeId`, (): void => {
 
       expect(id1 !== id2).toBe(true)
 
-      // For completion sake
+      // 網羅するため
       expect(id1).toMatchInlineSnapshot(
         `"03ca507d-c732-5412-95d2-eaf114f42f69"`
       )
@@ -42,10 +42,10 @@ describe(`createNodeId`, (): void => {
     it(`return same id for same input`, () => {
       const KEY = `resolved "https://registry.yarnpkg.com/cuint/-/cuint-0.2.2.tgz#408086d409550c2631155619e9fa7bc"`
       const NS = `gatsby-special-plugin`
-      // Key is just something random that's not only ascii
+      // キーは、ascii だけではない適当な値である
       const id = createNodeId(KEY, NS)
 
-      // Only input should affect it so repetitive calls should not change the output
+      // 影響するのは入力だけのはずなので、繰り返し呼び出しても出力は変わらないはずである
       expect(id).toMatchInlineSnapshot(`"6614d1bf-8c8c-5cfc-b782-2c019d7a7c95"`)
 
       for (let i = 0; i < 10; ++i) {

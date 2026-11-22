@@ -1,15 +1,15 @@
 /**
- * This argument is empty. This is for consistency so `pluginOptions` is always second argument.
+ * この引数は空である。`pluginOptions` が常に第 2 引数になるように、一貫性のために置いている。
  * @typedef {undefined} emptyArg
  */
 
 /**
- * Object containing options defined in `gatsby-config.js`
+ * `gatsby-config.js` で定義されたオプションを含むオブジェクト
  * @typedef {object} pluginOptions
  */
 
 /**
- * Called when the Gatsby browser runtime first starts.
+ * Gatsby のブラウザーランタイムが最初に起動したときに呼ばれる。
  * @param {emptyArg} _
  * @param {pluginOptions} pluginOptions
  * @example
@@ -21,7 +21,7 @@
 export const onClientEntry = true
 
 /**
- * Called when the initial (but not subsequent) render of Gatsby App is done on the client.
+ * クライアントで Gatsby App の最初の（2 回目以降ではない）レンダリングが終わったときに呼ばれる。
  * @param {emptyArg} _
  * @param {pluginOptions} pluginOptions
  * @example
@@ -32,10 +32,10 @@ export const onClientEntry = true
 export const onInitialClientRender = true
 
 /**
- * Called when changing location is started.
+ * location の変更が始まったときに呼ばれる。
  * @param {object} $0
- * @param {object} $0.location A location object
- * @param {object|null} $0.prevLocation The previous location object
+ * @param {object} $0.location location オブジェクト
+ * @param {object|null} $0.prevLocation 直前の location オブジェクト
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.onPreRouteUpdate = ({ location, prevLocation }) => {
@@ -46,10 +46,10 @@ export const onInitialClientRender = true
 export const onPreRouteUpdate = true
 
 /**
- * Called when changing location is longer than 1 second.
+ * location の変更に 1 秒より長くかかっているときに呼ばれる。
  * @param {object} $0
- * @param {object} $0.location A location object
- * @param {object} $0.action The "action" that caused the route change
+ * @param {object} $0.location location オブジェクト
+ * @param {object} $0.action ルートの変更を引き起こした "action"
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.onRouteUpdateDelayed = () => {
@@ -59,10 +59,10 @@ export const onPreRouteUpdate = true
 export const onRouteUpdateDelayed = true
 
 /**
- * Called when the user changes routes, including on the initial load of the app
+ * ユーザーがルートを変更したときに呼ばれる。アプリの最初の読み込み時も含む
  * @param {object} $0
- * @param {object} $0.location A location object
- * @param {object|null} $0.prevLocation The previous location object
+ * @param {object} $0.location location オブジェクト
+ * @param {object|null} $0.prevLocation 直前の location オブジェクト
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.onRouteUpdate = ({ location, prevLocation }) => {
@@ -73,21 +73,21 @@ export const onRouteUpdateDelayed = true
 export const onRouteUpdate = true
 
 /**
- * Allows a plugin to influence scrolling behavior on navigation.
- * Default behavior is persisting last known scrolling positions and scrolling back to them on navigation.
- * Plugins can also override this and return an Array of coordinates or an element name to scroll to.
+ * プラグインが、ナビゲーション時のスクロールの動作を変えられるようにする。
+ * デフォルトの動作は、最後のスクロール位置を保持し、ナビゲーション時にその位置までスクロールして戻すことである。
+ * プラグインはこれを上書きして、スクロール先の座標の配列または要素の名前を返すこともできる。
  * @param {object} $0
- * @param {object} $0.prevRouterProps The previous state of the router before the route change.
- * @param {object} $0.routerProps The current state of the router.
- * @param {string} $0.pathname The new pathname (for backwards compatibility with v1).
- * @param {function} $0.getSavedScrollPosition Takes a location and returns the
- * coordinates of the last scroll position for that location, or `null` depending on
- * whether a scroll happened or not. Gatsby saves scroll positions for each route
- * in `SessionStorage`, so they are available after page reload.
- * @returns {(boolean|string|Array)} Should return either an [x, y] Array of
- * coordinates to scroll to, a string of the `id` or `name` of an element to
- * scroll to, `false` to not update the scroll position, or `true` for the
- * default behavior.
+ * @param {object} $0.prevRouterProps ルートが変わる前の、ルーターの直前の状態。
+ * @param {object} $0.routerProps ルーターの現在の状態。
+ * @param {string} $0.pathname 新しい pathname（v1 との後方互換性のため）。
+ * @param {function} $0.getSavedScrollPosition location を受け取り、その location の
+ * 最後のスクロール位置の座標を返す。スクロールが行われていなければ `null` を
+ * 返す。Gatsby はルートごとのスクロール位置を `SessionStorage` に
+ * 保存するので、ページの再読み込み後も利用できる。
+ * @returns {(boolean|string|Array)} スクロール先の座標の [x, y] 配列、
+ * スクロール先の要素の `id` または `name` の文字列、
+ * スクロール位置を更新しない場合の `false`、デフォルトの動作にする場合の `true` の
+ * いずれかを返すこと。
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.shouldUpdateScroll = ({
@@ -105,30 +105,30 @@ export const onRouteUpdate = true
 export const shouldUpdateScroll = true
 
 /**
- * Allow a plugin to register a Service Worker. Should be a function that returns true.
+ * プラグインが Service Worker を登録できるようにする。true を返す関数にすること。
  * @param {emptyArg} _
  * @param {pluginOptions} pluginOptions
- * @returns {boolean} Should Gatsby register `/sw.js` service worker
+ * @returns {boolean} Gatsby が `/sw.js` の Service Worker を登録すべきか
  * @example
  * exports.registerServiceWorker = () => true
  */
 export const registerServiceWorker = true
 
 /**
- * Can be used to wrap each page element.
+ * それぞれのページ要素をラップするために使える。
  *
- * This is useful for setting wrapper components around pages that won't get
- * unmounted on page changes. For setting context providers, use [wrapRootElement](#wrapRootElement).
+ * ページが切り替わってもアンマウントされないラッパーコンポーネントを、ページの外側に
+ * 設定するのに役立つ。コンテキストプロバイダーを設定するには、[wrapRootElement](#wrapRootElement) を使う。
  *
- * _Note:_
- * There is an equivalent hook in Gatsby's [SSR API](/docs/ssr-apis/#wrapPageElement).
- * It is recommended to use both APIs together.
- * For example usage, check out [Using i18n](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-i18n).
+ * _注:_
+ * Gatsby の [SSR API](/docs/ssr-apis/#wrapPageElement) に同等のフックがある。
+ * 両方の API を一緒に使うことを推奨する。
+ * 使用例については、[Using i18n](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-i18n) を参照。
  * @param {object} $0
- * @param {ReactNode} $0.element The "Page" React Element built by Gatsby.
- * @param {object} $0.props Props object used by page.
+ * @param {ReactNode} $0.element Gatsby が作成した "Page" の React 要素。
+ * @param {object} $0.props ページが使う props オブジェクト。
  * @param {pluginOptions} pluginOptions
- * @returns {ReactNode} Wrapped element
+ * @returns {ReactNode} ラップした要素
  * @example
  * const React = require("react")
  * const Layout = require("./src/components/layout").default
@@ -142,19 +142,19 @@ export const registerServiceWorker = true
 export const wrapPageElement = true
 
 /**
- * Can be used to the wrap the root element.
+ * ルート要素をラップするために使える。
  *
- * This is useful to set up any context providers that will wrap your application.
- * For setting persistent UI elements around pages use [wrapPageElement](#wrapPageElement).
+ * アプリケーションをラップするコンテキストプロバイダーを設定するのに役立つ。
+ * ページの外側に常に表示する UI 要素を設定するには、[wrapPageElement](#wrapPageElement) を使う。
  *
- * _Note:_
- * There is an equivalent hook in Gatsby's [SSR API](/docs/ssr-apis/#wrapRootElement).
- * It is recommended to use both APIs together.
- * For example usage, check out [Using redux](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-redux).
+ * _注:_
+ * Gatsby の [SSR API](/docs/ssr-apis/#wrapRootElement) に同等のフックがある。
+ * 両方の API を一緒に使うことを推奨する。
+ * 使用例については、[Using redux](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-redux) を参照。
  * @param {object} $0
- * @param {ReactNode} $0.element The "Root" React Element built by Gatsby.
+ * @param {ReactNode} $0.element Gatsby が作成した "Root" の React 要素。
  * @param {pluginOptions} pluginOptions
- * @returns {ReactNode} Wrapped element
+ * @returns {ReactNode} ラップした要素
  * @example
  * const React = require("react")
  * const { Provider } = require("react-redux")
@@ -173,44 +173,44 @@ export const wrapPageElement = true
 export const wrapRootElement = true
 
 /**
- * Called when prefetching for a pathname is triggered. Allows
- * for plugins with custom prefetching logic.
+ * ある pathname のプリフェッチが開始されたときに呼ばれる。独自の
+ * プリフェッチのロジックを持つプラグインのためのものである。
  * @param {object} $0
- * @param {string} $0.pathname The pathname whose resources should now be prefetched
- * @param {function} $0.loadPage Function for fetching resources related to pathname
+ * @param {string} $0.pathname これからリソースをプリフェッチする pathname
+ * @param {function} $0.loadPage pathname に関連するリソースを取得する関数
  * @param {pluginOptions} pluginOptions
  */
 export const onPrefetchPathname = true
 
 /**
- * Called when prefetching for a pathname is successful. Allows
- * for plugins with custom prefetching logic.
+ * ある pathname のプリフェッチが成功したときに呼ばれる。独自の
+ * プリフェッチのロジックを持つプラグインのためのものである。
  * @param {object} $0
- * @param {string} $0.pathname The pathname whose resources have now been prefetched
+ * @param {string} $0.pathname リソースのプリフェッチが完了した pathname
  * @param {pluginOptions} pluginOptions
  */
 export const onPostPrefetchPathname = true
 
 /**
- * Plugins can take over prefetching logic. If they do, they should call this
- * to disable the now duplicate core prefetching logic.
+ * プラグインは、プリフェッチのロジックを引き受けることができる。その場合は、これを呼んで、
+ * 重複することになるコアのプリフェッチのロジックを無効にすること。
  * @param {emptyArg} _
  * @param {pluginOptions} pluginOptions
- * @returns {boolean} Should disable core prefetching
+ * @returns {boolean} コアのプリフェッチを無効にすべきか
  * @example
  * exports.disableCorePrefetching = () => true
  */
 export const disableCorePrefetching = true
 
 /**
- * Allow a plugin to replace the `ReactDOM.createRoot`/`render` function calls with a custom renderer.
+ * プラグインが、`ReactDOM.createRoot`/`render` の関数呼び出しを独自のレンダラーに置き換えられるようにする。
  * @param {emptyArg} _
  * @param {pluginOptions} pluginOptions
- * @returns {Function} This method should return a function with same signature as `ReactDOM.createRoot`/`render`
+ * @returns {Function} このメソッドは、`ReactDOM.createRoot`/`render` と同じシグネチャの関数を返すこと
  *
- * _Note:_
- * Refer to React's documentation on [`ReactDOM.createRoot`/`render`](https://reactjs.org/docs/react-dom-client.html#createroot) for more information.
- * Note that `ReactDOM.createRoot`/`render` is only available in React 18 or greater, prior versions should use [`ReactDOM.render`](https://reactjs.org/docs/react-dom.html#render).
+ * _注:_
+ * 詳しくは、React のドキュメントの [`ReactDOM.createRoot`/`render`](https://reactjs.org/docs/react-dom-client.html#createroot) を参照。
+ * `ReactDOM.createRoot`/`render` が使えるのは React 18 以降だけであり、それより前のバージョンでは [`ReactDOM.render`](https://reactjs.org/docs/react-dom.html#render) を使う必要があることに注意。
  * @example
  * exports.replaceHydrateFunction = () => {
  *   return (element, container) => {
@@ -222,52 +222,52 @@ export const disableCorePrefetching = true
 export const replaceHydrateFunction = true
 
 /**
- * Inform plugins when a service worker has been installed.
+ * Service Worker がインストールされたことをプラグインに知らせる。
  * @param {object} $0
- * @param {object} $0.serviceWorker The service worker instance.
+ * @param {object} $0.serviceWorker Service Worker のインスタンス。
  * @param {pluginOptions} pluginOptions
  */
 export const onServiceWorkerInstalled = true
 
 /**
- * Inform plugins of when a service worker has an update available.
+ * Service Worker に利用可能な更新があることをプラグインに知らせる。
  * @param {object} $0
- * @param {object} $0.serviceWorker The service worker instance.
+ * @param {object} $0.serviceWorker Service Worker のインスタンス。
  * @param {pluginOptions} pluginOptions
  */
 export const onServiceWorkerUpdateFound = true
 
 /**
- * Inform plugins when a service worker has been updated in the background
- * and the page is ready to reload to apply changes.
+ * Service Worker がバックグラウンドで更新され、変更を適用するために
+ * ページを再読み込みする準備ができたことをプラグインに知らせる。
  * @param {object} $0
- * @param {object} $0.serviceWorker The service worker instance.
+ * @param {object} $0.serviceWorker Service Worker のインスタンス。
  * @param {pluginOptions} pluginOptions
  */
 export const onServiceWorkerUpdateReady = true
 
 /**
- * Inform plugins when a service worker has become active.
+ * Service Worker がアクティブになったことをプラグインに知らせる。
  * @param {object} $0
- * @param {object} $0.serviceWorker The service worker instance.
+ * @param {object} $0.serviceWorker Service Worker のインスタンス。
  * @param {pluginOptions} pluginOptions
  */
 export const onServiceWorkerActive = true
 
 /**
- * Inform plugins when a service worker is redundant.
+ * Service Worker が不要（redundant）になったことをプラグインに知らせる。
  * @param {object} $0
- * @param {object} $0.serviceWorker The service worker instance.
+ * @param {object} $0.serviceWorker Service Worker のインスタンス。
  * @param {pluginOptions} pluginOptions
  */
 export const onServiceWorkerRedundant = true
 
 /**
- * Called when React catches an error during rendering, in a lifecycle method, or in the constructor of the whole tree.
- * This corresponds to React 19's `onCaughtError` root option.
+ * React が、レンダリング中、ライフサイクルメソッドの中、またはツリー全体のコンストラクターの中でエラーを捕捉したときに呼ばれる。
+ * これは React 19 のルートオプション `onCaughtError` に対応する。
  * @param {object} $0
- * @param {Error} $0.error The error that was caught.
- * @param {object} $0.errorInfo Additional error information containing componentStack.
+ * @param {Error} $0.error 捕捉されたエラー。
+ * @param {object} $0.errorInfo componentStack を含む、エラーの追加情報。
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.onCaughtError = ({ error, errorInfo }) => {
@@ -278,11 +278,11 @@ export const onServiceWorkerRedundant = true
 export const onCaughtError = true
 
 /**
- * Called when React receives an error that was thrown by an asynchronous event (e.g., setTimeout, requestIdleCallback, etc).
- * This corresponds to React 19's `onUncaughtError` root option.
+ * React が、非同期のイベント（setTimeout、requestIdleCallback など）で投げられたエラーを受け取ったときに呼ばれる。
+ * これは React 19 のルートオプション `onUncaughtError` に対応する。
  * @param {object} $0
- * @param {Error} $0.error The error that was thrown.
- * @param {object} $0.errorInfo Additional error information containing componentStack.
+ * @param {Error} $0.error 投げられたエラー。
+ * @param {object} $0.errorInfo componentStack を含む、エラーの追加情報。
  * @param {pluginOptions} pluginOptions
  * @example
  * exports.onUncaughtError = ({ error, errorInfo }) => {

@@ -17,14 +17,14 @@ export async function loadConfig({
   processFlags?: boolean
   program?: IProgram
 }): Promise<IGatsbyConfig> {
-  // Try opening the site's gatsby-config.js file.
+  // サイトの gatsby-config.js ファイルを開いてみる。
   const { configModule, configFilePath } = await getConfigFile(
     siteDirectory,
     `gatsby-config`
   )
   let config = preferDefault(configModule)
 
-  // The root config cannot be exported as a function, only theme configs
+  // ルートの設定は関数として export できない。できるのはテーマの設定だけである
   if (typeof config === `function`) {
     reporter.panic({
       id: `10126`,
@@ -36,7 +36,7 @@ export async function loadConfig({
   }
 
   if (processFlags) {
-    // Setup flags
+    // フラグを設定する
     const {
       enabledConfigFlags,
       unknownFlagMessage,
@@ -50,12 +50,12 @@ export async function loadConfig({
     if (unfitFlagMessage !== ``) {
       reporter.warn(unfitFlagMessage)
     }
-    //  set process.env for each flag
+    //  フラグごとに process.env を設定する
     enabledConfigFlags.forEach(flag => {
       process.env[flag.env] = `true`
     })
 
-    // Print out message.
+    // メッセージを出力する。
     if (message !== ``) {
       reporter.info(message)
     }
@@ -63,7 +63,7 @@ export async function loadConfig({
     process.env.GATSBY_SLICES = `true`
   }
 
-  // theme gatsby configs can be functions or objects
+  // テーマの gatsby-config は、関数でもオブジェクトでもよい
   if (config) {
     const plugins = await loadThemes(config, {
       configFilePath,

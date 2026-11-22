@@ -51,7 +51,7 @@ import type { Express } from "express"
 import { addImageRoutes } from "gatsby-plugin-utils/polyfill-remote-file"
 import { isFileInsideCompilations } from "./webpack/utils/is-file-inside-compilations"
 
-type ActivityTracker = any // TODO: Replace this with proper type once reporter is typed
+type ActivityTracker = any // TODO: reporter に型が付いたら、これを適切な型に置き換える
 
 export type WebpackWatching = NonNullable<Watching>
 
@@ -81,12 +81,12 @@ export async function startServer(
   })
   webpackActivity.start()
 
-  // loading indicator
-  // write virtual module always to not fail webpack compilation, but only add express route handlers when
-  // query on demand is enabled and loading indicator is not disabled
+  // ローディングインジケーター
+  // webpack のコンパイルを失敗させないように、仮想モジュールは常に書き出す。ただし、express のルートハンドラーを追加するのは、
+  // query on demand が有効で、ローディングインジケーターが無効にされていない場合だけである
   writeVirtualLoadingIndicatorModule()
 
-  // Remove the following when merging GATSBY_EXPERIMENTAL_DEV_SSR
+  // GATSBY_EXPERIMENTAL_DEV_SSR をマージするときに、以下を削除する
   const directoryPath = withBasePath(directory)
   const { buildRenderer, doBuildPages } = require(`../commands/build-html`)
   const createIndexHtml = async (activity: ActivityTracker): Promise<void> => {
@@ -103,7 +103,7 @@ export async function startServer(
         workerPool,
         Stage.DevelopHTML
       )
-      // close the compiler
+      // コンパイラーを閉じる
       await close()
     } catch (err) {
       if (err.name !== `WebpackError`) {
@@ -149,7 +149,7 @@ export async function startServer(
   const compiler = webpack(devConfig)
 
   /**
-   * Set up the express app.
+   * express の app をセットアップする。
    **/
   app.use(compression())
   app.use(
@@ -163,7 +163,7 @@ export async function startServer(
   app.use(cors())
 
   /**
-   * Pattern matching all endpoints with graphql or graphiql with 1 or more leading underscores
+   * 先頭に 1 つ以上のアンダースコアが付いた、graphql または graphiql のすべてのエンドポイントに一致するパターン
    */
   const graphqlEndpoint = `/_+graphi?ql`
 
@@ -218,9 +218,9 @@ export async function startServer(
   )
 
   /**
-   * Refresh external data sources.
-   * This behavior is disabled by default, but the ENABLE_GATSBY_REFRESH_ENDPOINT env var enables it
-   * If no GATSBY_REFRESH_TOKEN env var is available, then no Authorization header is required
+   * 外部のデータソースを更新する。
+   * この動作はデフォルトでは無効だが、環境変数 ENABLE_GATSBY_REFRESH_ENDPOINT で有効にできる
+   * 環境変数 GATSBY_REFRESH_TOKEN がなければ、Authorization ヘッダーは不要である
    **/
   const REFRESH_ENDPOINT = `/__refresh`
   const refresh = async (
@@ -309,7 +309,7 @@ export async function startServer(
           }
 
           let pageData: IPageDataWithQueryResult
-          // TODO move to query-engine
+          // TODO query-engine へ移す
           if (process.env.GATSBY_QUERY_ON_DEMAND) {
             pageData = await getPageDataExperimental(page.path)
           } else {
@@ -350,15 +350,15 @@ export async function startServer(
                 },
                 error,
               })
-              // Use page-data.json file instead of emitting via websockets as this makes it easier
-              // to only display the relevant error + clearing of the error
-              // The query-result-store reacts to this
+              // websocket で送る代わりに page-data.json ファイルを使う。そのほうが、関係するエラーだけを
+              // 表示することと、エラーを消すことが簡単になるためである
+              // query-result-store がこれに反応する
               pageData.getServerDataError = structuredError
             }
             pageData.path = page.matchPath ? `/${potentialPagePath}` : page.path
           } else {
-            // When user removes getServerData function, Gatsby browser runtime still has cached version of page-data.
-            // Send `null` to always reset cached serverData:
+            // ユーザーが getServerData 関数を削除しても、Gatsby のブラウザーランタイムにはキャッシュされた page-data が残っている。
+            // キャッシュされた serverData を常にリセットするために、`null` を送る:
             pageData.result.serverData = null
           }
 
@@ -436,7 +436,7 @@ export async function startServer(
             sourceEndColumn = parseInt(req.query.endColumnNumber as string, 10)
           }
         } catch {
-          // failed to get line/column, we should still try to show the code frame
+          // 行と列の取得に失敗したが、それでもコードフレームの表示を試みるべきである
         }
       }
       sourcePosition = {
@@ -471,8 +471,8 @@ export async function startServer(
         return
       }
 
-      // We need the internal webpack file that is used in the bundle, not the module source.
-      // It doesn't have the correct sourceMap.
+      // 必要なのは、モジュールのソースではなく、バンドルで使われている webpack の内部ファイルである。
+      // モジュールのソースには正しい sourceMap がない。
       const webpackSource = compilation?.codeGenerationResults
         ?.get(fileModule)
         ?.sources.get(`javascript`)
@@ -578,7 +578,7 @@ export async function startServer(
     })
   })
 
-  // Expose access to app for advanced use cases
+  // 高度な用途のために、app へのアクセスを公開する
   const { developMiddleware } = store.getState().config
 
   if (developMiddleware) {
@@ -589,19 +589,19 @@ export async function startServer(
 
   app.use(configureTrailingSlash(() => store.getState(), trailingSlash))
 
-  // Disable directory indexing i.e. serving index.html from a directory.
-  // This can lead to serving stale html files during development.
+  // ディレクトリのインデックス、つまりディレクトリから index.html を配信することを無効にする。
+  // 開発中に古い html ファイルを配信してしまう原因になりうるためである。
   //
-  // We serve by default an empty index.html that sets up the dev environment.
+  // デフォルトでは、開発環境をセットアップする空の index.html を配信する。
   app.use(developStatic(`public`, { index: false }))
 
-  // Set up API proxy.
+  // API のプロキシをセットアップする。
   if (proxy) {
     proxy.forEach(({ prefix, url }) => {
       app.use(`${prefix}/*`, (req, res) => {
         const proxiedUrl = url + req.originalUrl
         const {
-          // remove `host` from copied headers
+          // コピーしたヘッダーから `host` を取り除く
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           headers: { host, ...headers },
           method,
@@ -635,15 +635,15 @@ export async function startServer(
 
   await apiRunnerNode(`onCreateDevServer`, { app, deferNodeMutation: true })
 
-  // In case nothing before handled hot-update - send 404.
-  // This fixes "Unexpected token < in JSON at position 0" runtime
-  // errors after restarting development server and
-  // cause automatic hard refresh in the browser.
+  // ここまでで hot-update が処理されなかった場合は、404 を送る。
+  // これにより、開発サーバーの再起動後に起きる
+  // "Unexpected token < in JSON at position 0" の実行時エラーが直り、
+  // ブラウザーで自動的にハードリフレッシュが行われる。
   app.use(/.*\.hot-update\.json$/i, (_, res) => {
     res.status(404).end()
   })
 
-  // Render an HTML page and serve it.
+  // HTML ページをレンダリングして配信する。
   if (process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
     app.get(`*`, async (req, res, next) => {
       const pathObj = findPageByPath(store.getState(), decodeURI(req.path))
@@ -682,14 +682,14 @@ export async function startServer(
         }
         res.status(statusCode).send(renderResponse)
       } catch (error) {
-        // The page errored but couldn't read the page component.
-        // This is a race condition when a page is deleted but its requested
-        // immediately after before anything can recompile.
+        // ページがエラーになったが、ページコンポーネントを読み込めなかった。
+        // これは、ページが削除された直後、何も再コンパイルされないうちに
+        // そのページがリクエストされた場合の競合状態である。
         if (error === `404 page`) {
           return next()
         }
 
-        // renderDevHTML throws an error with these information
+        // renderDevHTML は、これらの情報を持つエラーを投げる
         const lineNumber = error?.line as number
         const columnNumber = error?.column as number
         const filePath = error?.filename as string
@@ -739,7 +739,7 @@ export async function startServer(
         }
 
         try {
-          // Generate a shell for client-only content -- for the error overlay
+          // エラーオーバーレイのために、クライアント専用のコンテンツ用のシェルを生成する
           const { html: clientOnlyShell } = await renderDevHTML({
             path: pathObj.path,
             page: pathObj,
@@ -788,17 +788,17 @@ export async function startServer(
   }
 
   app.use(async (req, res) => {
-    // in this catch-all block we don't support POST so we should 404
+    // このキャッチオールのブロックでは POST に対応していないので、404 にすべきである
     if (req.method === `POST`) {
       res.status(404).end()
       return
     }
 
     const fullUrl = req.protocol + `://` + req.get(`host`) + req.originalUrl
-    // This isn't used in development.
+    // これは開発では使われない。
     if (fullUrl.endsWith(`app-data.json`)) {
       res.json({ webpackCompilationHash: `123` })
-      // If this gets here, it's a non-existent file so just send back 404.
+      // ここに来た場合は存在しないファイルなので、404 を返すだけにする。
     } else if (fullUrl.endsWith(`.json`)) {
       res.json({}).status(404)
     } else {
@@ -809,7 +809,7 @@ export async function startServer(
           const allowTimedFallback = !req.headers[`x-gatsby-wait-for-dev-ssr`]
           const { html: renderResponse } = await renderDevHTML({
             path: `/dev-404-page/`,
-            // Let renderDevHTML figure it out.
+            // renderDevHTML に判断を任せる。
             page: undefined,
             store,
             htmlComponentRendererPath: pageRenderer,
@@ -838,7 +838,7 @@ export async function startServer(
         const potentialPagePath = reverseFixedPagePath(decodeURI(req.path))
         const page = findPageByPath(store.getState(), potentialPagePath, false)
 
-        // When we can't find a page we send 404
+        // ページが見つからない場合は 404 を送る
         if (!page) {
           res.status(404)
         }
@@ -853,7 +853,7 @@ export async function startServer(
   })
 
   /**
-   * Set up the HTTP server and socket.io.
+   * HTTP サーバーと socket.io をセットアップする。
    **/
   const server = program.ssl
     ? new https.Server(program.ssl, app)
@@ -863,7 +863,7 @@ export async function startServer(
 
   if (!process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
     const chokidar = require(`chokidar`)
-    // Register watcher that rebuilds index.html every time html.js changes.
+    // html.js が変更されるたびに index.html を再ビルドするウォッチャーを登録する。
     const watchGlobs = [`src/html.js`, `plugins/**/gatsby-ssr.js`].map(path =>
       slash(directoryPath(path))
     )

@@ -285,8 +285,8 @@ describe(`filtering on linked nodes`, () => {
     }
 
     expect(result.data.eq.edges).toEqual([`bar`, `baz`].map(itemToEdge))
-    // In case of LMDB results are also sorted by the filter field,
-    // so first - all parents with children having "hair: blonde", next - all with "hair: brown"
+    // LMDB の場合、結果はフィルターのフィールドでもソートされる。
+    // そのため、最初に "hair: blonde" の子を持つすべての親が、次に "hair: brown" のすべてが並ぶ
     const expectedIn = process.env.GATSBY_EXPERIMENTAL_LMDB_INDEXES
       ? [`bar`, `foo`, `baz`]
       : [`bar`, `baz`, `foo`]
@@ -303,10 +303,10 @@ describe(`filtering on linked nodes`, () => {
   })
 
   it.skip(`doesn't mutate node object`, async () => {
-    // We now infer the InputObjectType from the ObjectType, not from exampleValue
+    // 現在は、InputObjectType を exampleValue からではなく ObjectType から推論している
   })
 
   it.skip(`skips fields with missing nodes`, async () => {
-    // We now infer the InputObjectType from the ObjectType, not from exampleValue
+    // 現在は、InputObjectType を exampleValue からではなく ObjectType から推論している
   })
 })

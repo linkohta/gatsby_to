@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /*
-## Incrementally track the structure of nodes with metadata
+## メタデータを使ってノードの構造をインクリメンタルに追跡する
 
-This metadata can be later utilized for schema inference
-(via building `exampleValue` or directly)
+このメタデータは、後で（`exampleValue` の構築を通じて、または直接）
+スキーマの推論に利用できる
 
-### Usage example:
+### 使用例:
 
 ```javascript
   const node1 = { id: '1', foo: 25, bar: 'str' }
@@ -44,17 +44,17 @@ This metadata can be later utilized for schema inference
   // outputs: { foo: 25, bar: 'str' }
 ```
 
-`addNode`, `deleteNode`, `getExampleObject` are O(N) where N is the number
-of fields in the node object (including nested fields)
+`addNode`、`deleteNode`、`getExampleObject` は O(N) である。N はノードオブジェクトの
+フィールドの数（ネストしたフィールドを含む）
 
-### Caveats
+### 注意点
 
-* Conflict tracking for arrays is tricky, i.e.: { a: [5, "foo"] } and { a: [5] }, { a: ["foo"] }
-  are represented identically in metadata. To workaround it we additionally track first NodeId:
+* 配列の衝突の追跡は難しい。たとえば { a: [5, "foo"] } と、{ a: [5] }, { a: ["foo"] } は、
+  メタデータでは同じように表される。これを回避するために、最初の NodeId も追跡する:
   { a: { array: { item: { int: { total: 1, first: `1` }, string: { total: 1, first: `1` } }}
   { a: { array: { item: { int: { total: 1, first: `1` }, string: { total: 1, first: `2` } }}
-  This way we can produce more useful conflict reports
-  (still rare edge cases possible when reporting may be confusing, i.e. when node is deleted)
+  これにより、より役に立つ衝突のレポートを出せる
+  （それでも、ノードが削除された場合など、レポートが分かりにくくなるまれなエッジケースはありうる）
 */
 
 import { isEqual } from "lodash"
@@ -129,7 +129,7 @@ export interface ITypeMetadata {
 type Operation = "add" | "del"
 
 const getType = (value: unknown, key: string): ValueType | "null" => {
-  // Staying as close as possible to GraphQL types
+  // できるだけ GraphQL の型に近づけている
   switch (typeof value) {
     case `number`:
       return is32BitInteger(value) ? `int` : `float`
@@ -153,7 +153,7 @@ const getType = (value: unknown, key: string): ValueType | "null" => {
       if (!Object.keys(value).length) return `null`
       return `object`
     default:
-      // bigint, symbol, function, unknown (host objects in IE were typeof "unknown", for example)
+      // bigint、symbol、function、unknown（たとえば IE のホストオブジェクトは typeof が "unknown" だった）
       return `null`
   }
 }
@@ -227,9 +227,9 @@ const updateValueDescriptorRelNodes = (
   listOfNodeIds.forEach(nodeId => {
     nodes[nodeId] = (nodes[nodeId] || 0) + delta
 
-    // Treat any new related node addition or removal as a structural change
-    // FIXME: this will produce false positives as this node can be
-    //  of the same type as another node already in the map (but we don't know it here)
+    // 関連する新しいノードの追加や削除は、すべて構造の変更として扱う
+    // FIXME: これは誤検知を生む。このノードは、すでにマップにある別のノードと
+    //  同じ型かもしれないためである（ただし、ここではそれが分からない）
     if (nodes[nodeId] === 0 || (operation === `add` && nodes[nodeId] === 1)) {
       metadata.dirty = true
     }
@@ -258,8 +258,8 @@ const updateValueDescriptor = (
   metadata: ITypeMetadata,
   path: Array<Record<string, unknown>>
 ): void => {
-  // The object may be traversed multiple times from root.
-  // Each time it does it should not revisit the same node twice
+  // オブジェクトは、ルートから複数回走査されることがある。
+  // そのたびに、同じノードを 2 回訪れないようにすべきである
   if (path.includes(value as Record<string, unknown>)) {
     return
   }
@@ -279,14 +279,14 @@ const updateValueDescriptor = (
   }
   typeInfo.total += delta
 
-  // Keeping track of structural changes
-  // (when value of a new type is added or an existing type has no more values assigned)
+  // 構造の変更を追跡する
+  // （新しい型の値が追加されたとき、または既存の型に値が 1 つも割り当てられなくなったとき）
   if (typeInfo.total === 0 || (operation === `add` && typeInfo.total === 1)) {
     metadata.dirty = true
   }
 
-  // Keeping track of the first node for this type. Only used for better conflict reporting.
-  // (see Caveats section in the header comments)
+  // この型の最初のノードを追跡する。衝突のレポートを分かりやすくするためだけに使う。
+  // （冒頭のコメントの 「注意点」の節を参照）
   if (operation === `add`) {
     if (!typeInfo.first) {
       typeInfo.first = nodeId
@@ -392,8 +392,8 @@ const descriptorsAreEqual = (
           descriptor?.relatedNode?.nodes,
           otherDescriptor?.relatedNode?.nodes
         )
-        // Must be present in both descriptors or absent in both
-        // in order to be considered equal
+        // 等しいと見なすには、両方の記述子に存在するか、
+        // 両方に存在しないかでなければならない
         return nodeIds.every(
           id =>
             Boolean(descriptor?.relatedNode?.nodes[id]) ===
@@ -416,7 +416,7 @@ const descriptorsAreEqual = (
     }
   }
 
-  // Equal when all possible types are equal (including conflicts)
+  // 取りうるすべての型が等しい場合（衝突を含む）に、等しいとする
   return isEqual(types, otherTypes) && types.every(childDescriptorsAreEqual)
 }
 
@@ -496,7 +496,7 @@ const isEmpty = ({ fieldMap }): boolean =>
     field => possibleTypes(fieldMap[field]).length === 0
   )
 
-// Even empty type may still have nodes
+// 空の型であっても、ノードを持っていることがある
 const hasNodes = (typeMetadata: ITypeMetadata): boolean =>
   (typeMetadata.total ?? 0) > 0
 

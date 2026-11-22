@@ -20,12 +20,12 @@ export type {
 
 interface IBaseRoute {
   /**
-   * Request path that should be matched for this route.
-   * It can be:
-   *  - static: `/about/`
-   *  - dynamic:
-   *    - parameterized: `/blog/:slug/`
-   *    - catch-all / wildcard: `/app/*`
+   * このルートで照合するリクエストのパス。
+   * 次のいずれかである:
+   *  - 静的: `/about/`
+   *  - 動的:
+   *    - パラメーター付き: `/blog/:slug/`
+   *    - キャッチオール / ワイルドカード: `/app/*`
    */
   path: string
 }
@@ -33,11 +33,11 @@ interface IBaseRoute {
 export interface IStaticRoute extends IBaseRoute {
   type: `static`
   /**
-   * Location of the file that should be served for this route.
+   * このルートで配信するファイルの場所。
    */
   filePath: string
   /**
-   * HTTP headers that should be set for this route.
+   * このルートで設定する HTTP ヘッダー。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/headers/
    */
   headers: IHeader["headers"]
@@ -46,33 +46,33 @@ export interface IStaticRoute extends IBaseRoute {
 export interface IFunctionRoute extends IBaseRoute {
   type: `function`
   /**
-   * Unique identifier of this function. Corresponds to the `functionId` inside the `functionsManifest`.
-   * Some functions will be shared for multiple routes, e.g. SSR or DSG functions.
+   * この関数の一意な識別子。`functionsManifest` の中の `functionId` に対応する。
+   * 一部の関数は、複数のルートで共有される。たとえば SSR や DSG の関数。
    */
   functionId: string
   /**
-   * If `cache` is true, response of function should be cached for current deployment and served on subsequent requests for this route.
+   * `cache` が true の場合、関数のレスポンスは現在のデプロイの間キャッシュし、このルートへの以降のリクエストで配信すべきである。
    */
   cache?: true
 }
 
 /**
- * Redirects are being created through the `createRedirect` action.
+ * リダイレクトは `createRedirect` アクションによって作成される。
  * @see https://www.gatsbyjs.com/docs/reference/config-files/actions/#createRedirect
  */
 export interface IRedirectRoute extends IBaseRoute {
   type: `redirect`
   /**
-   * The redirect should happen from `path` to `toPath`.
+   * リダイレクトは `path` から `toPath` へ行う。
    */
   toPath: string
   /**
-   * HTTP status code that should be used for this redirect.
+   * このリダイレクトで使う HTTP ステータスコード。
    */
   status: HttpStatusCode
   ignoreCase?: boolean
   /**
-   * HTTP headers that should be used for this redirect.
+   * このリダイレクトで使う HTTP ヘッダー。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/headers/
    */
   headers: IHeader["headers"]
@@ -90,19 +90,19 @@ export interface IHeaderRoute extends IBaseRoute {
 export type HeaderRoutes = Array<IHeaderRoute>
 export interface IFunctionDefinition {
   /**
-   * Unique identifier of this function. Corresponds to the `functionId` inside the `routesManifest`.
+   * この関数の一意な識別子。`routesManifest` の中の `functionId` に対応する。
    */
   functionId: string
   /**
-   * Unique name of this function. Use this as a display name for the function.
+   * この関数の一意な名前。関数の表示名として使う。
    */
   name: string
   /**
-   * Path to function entrypoint that will be used to create function
+   * 関数の作成に使う、関数のエントリーポイントへのパス
    */
   pathToEntryPoint: string
   /**
-   * List of all required files that this function needs to run
+   * この関数の実行に必要なすべてのファイルの一覧
    */
   requiredFiles: Array<string>
 }
@@ -111,7 +111,7 @@ export type FunctionsManifest = Array<IFunctionDefinition>
 
 interface IDefaultContext {
   /**
-   * Reporter instance that can be used to log messages to terminal
+   * ターミナルへメッセージを出力するために使える reporter のインスタンス
    * @see https://www.gatsbyjs.com/docs/reference/config-files/node-api-helpers/#reporter
    */
   reporter: typeof reporter
@@ -119,11 +119,11 @@ interface IDefaultContext {
 
 export type RemoteFileAllowedUrls = Array<{
   /**
-   * Allowed url in URLPattern format. In particular it uses wildcard `*` and param `:param` syntax.
+   * URLPattern 形式で表した、許可する URL。具体的には、ワイルドカードの `*` とパラメーターの `:param` の構文を使う。
    */
   urlPattern: string
   /**
-   *Allowed url in regex source format
+   *正規表現のソース形式で表した、許可する URL
    */
   regexSource: string
 }>
@@ -141,8 +141,8 @@ export interface IAdaptContext extends IDefaultContext {
    */
   trailingSlash: TrailingSlash
   /**
-   * List of allowed remote file URLs represented in URLPattern and Regex formats.
-   * Allowed urls are provided by user or plugins using `addRemoteFileAllowedUrl` action.
+   * 許可するリモートファイルの URL の一覧。URLPattern と正規表現の形式で表される。
+   * 許可する URL は、ユーザーまたはプラグインが `addRemoteFileAllowedUrl` アクションを使って指定する。
    * @see https://www.gatsbyjs.com/docs/reference/config-files/actions/#addRemoteFileAllowedUrl
    */
   remoteFileAllowedUrls: RemoteFileAllowedUrls
@@ -154,63 +154,63 @@ export interface ICacheContext extends IDefaultContext {
 
 export interface IAdapterConfig {
   /**
-   * URL representing the unique URL for an individual deploy
+   * 個々のデプロイに固有の URL
    */
   deployURL?: string
   /**
-   * If `true`, Gatsby will not include the LMDB datastore in the serverless functions used for SSR/DSG.
-   * Instead, it will try to download the datastore from the given `deployURL`.
+   * `true` の場合、Gatsby は SSR/DSG に使うサーバーレス関数に LMDB データストアを含めない。
+   * 代わりに、指定された `deployURL` からデータストアのダウンロードを試みる。
    */
   excludeDatastoreFromEngineFunction?: boolean
   /**
-   * Adapters can optionally describe which features they support to prevent potentially faulty deployments
+   * アダプターは、問題のあるデプロイを防ぐために、対応している機能を必要に応じて宣言できる
    */
   supports?: {
     /**
-     * If `false`, Gatsby will fail the build if user tries to use pathPrefix.
+     * `false` の場合、ユーザーが pathPrefix を使おうとすると、Gatsby はビルドを失敗させる。
      */
     pathPrefix?: boolean
     /**
-     * Provide array of supported traling slash options
+     * 対応している末尾のスラッシュのオプションを配列で指定する
      * @example [`always`]
      */
     trailingSlash?: Array<TrailingSlash>
   }
   /**
-   * List of plugins that should be disabled when using this adapter. Purpose of this is to disable
-   * any potential plugins that serve similar role as adapter that would cause conflicts when both
-   * plugin and adapter is used at the same time.
+   * このアダプターを使うときに無効にすべきプラグインの一覧。その目的は、アダプターと似た役割を
+   * 果たし、プラグインとアダプターを同時に使うと衝突を起こしうるプラグインを
+   * 無効にすることである。
    */
   pluginsToDisable?: Array<string>
   /**
-   * Path to a CommonJS module that implements an image CDN URL generation function. The function
-   * is used to optimize image delivery by generating URLs that leverage CDN capabilities. This module
-   * should have a default export function that conforms to the {@link ImageCdnUrlGeneratorFn} type:
+   * Image CDN の URL を生成する関数を実装した CommonJS モジュールへのパス。この関数は、
+   * CDN の機能を活用する URL を生成することで、画像の配信を最適化するために使われる。このモジュールは、
+   * {@link ImageCdnUrlGeneratorFn} 型に適合する関数をデフォルト export していなければならない:
    *
-   * Adapters should provide an absolute path to this module.
-   * See 'packages/gatsby-adapter-netlify/src/image-cdn-url-generator.ts' as an implementation
-   * example for the Netlify adapter.
+   * アダプターは、このモジュールへの絶対パスを指定すること。
+   * Netlify アダプターでの実装例として、
+   * 'packages/gatsby-adapter-netlify/src/image-cdn-url-generator.ts' を参照。
    */
   imageCDNUrlGeneratorModulePath?: string
   /**
-   * Path to a CommonJS module that implements an file CDN URL generation function. This module
-   * should have a default export function that conforms to the {@link FileCdnUrlGeneratorFn} type:
+   * File CDN の URL を生成する関数を実装した CommonJS モジュールへのパス。このモジュールは、
+   * {@link FileCdnUrlGeneratorFn} 型に適合する関数をデフォルト export していなければならない:
    *
-   * Adapters should provide an absolute path to this module.
-   * See 'packages/gatsby-adapter-netlify/src/file-cdn-url-generator.ts' as an implementation
-   * example for the Netlify adapter.
+   * アダプターは、このモジュールへの絶対パスを指定すること。
+   * Netlify アダプターでの実装例として、
+   * 'packages/gatsby-adapter-netlify/src/file-cdn-url-generator.ts' を参照。
    */
   fileCDNUrlGeneratorModulePath?: string
   /**
-   * The platform bundled functions will execute on. Usually should be `linux`.
-   * This will be used if user didn't specify `GATSBY_FUNCTIONS_PLATFORM` environment variable
-   * or used `-functions-platform` CLI toggle. If none is defined current platform (process.platform) will be used.
+   * バンドルされた関数が実行されるプラットフォーム。通常は `linux` にする。
+   * これは、ユーザーが環境変数 `GATSBY_FUNCTIONS_PLATFORM` も CLI の
+   * `-functions-platform` も指定しなかった場合に使われる。どれも定義されていなければ、現在のプラットフォーム（process.platform）が使われる。
    */
   functionsPlatform?: string
   /**
-   * The architecture bundled functions will execute on. Usually should be `x64`.
-   * This will be used if user didn't specify `GATSBY_FUNCTIONS_ARCH` environment variable
-   * or used `-functions-arch` CLI toggle. If none is defined current arch (process.arch) will be used.
+   * バンドルされた関数が実行されるアーキテクチャ。通常は `x64` にする。
+   * これは、ユーザーが環境変数 `GATSBY_FUNCTIONS_ARCH` も CLI の
+   * `-functions-arch` も指定しなかった場合に使われる。どれも定義されていなければ、現在のアーキテクチャ（process.arch）が使われる。
    */
   functionsArch?: string
 }
@@ -218,8 +218,8 @@ export interface IAdapterConfig {
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 
 /**
- * This is the internal version of "IAdapterConfig" to enforce that certain keys must be present.
- * Authors of adapters will only see "IAdapterConfig".
+ * これは "IAdapterConfig" の内部用のバージョンであり、特定のキーが必ず存在することを強制する。
+ * アダプターの作者に見えるのは "IAdapterConfig" だけである。
  */
 export type IAdapterFinalConfig = WithRequired<
   IAdapterConfig,
@@ -228,39 +228,39 @@ export type IAdapterFinalConfig = WithRequired<
 
 export interface IAdapter {
   /**
-   * Unique name of the adapter. Used to identify adapter in manifest.
+   * アダプターの一意な名前。マニフェストの中でアダプターを識別するために使う。
    */
   name: string
   cache?: {
     /**
-     * Hook to restore `directories` from previous builds. This is executed very early on in the build process. If `false` is returned Gatsby will skip its cache restoration.
+     * 以前のビルドの `directories` を復元するためのフック。ビルドの処理のかなり早い段階で実行される。`false` を返すと、Gatsby はキャッシュの復元をスキップする。
      */
     restore: (
       context: ICacheContext
     ) => Promise<boolean | void> | boolean | void
     /**
-     * Hook to store `directories` for the current build. Executed as one of the last steps in the build process.
+     * 現在のビルドの `directories` を保存するためのフック。ビルドの処理の最後のほうのステップとして実行される。
      */
     store: (context: ICacheContext) => Promise<void> | void
   }
   /**
-   * Hook to take Gatsby’s output and preparing it for deployment on the adapter’s platform. Executed as one of the last steps in the build process.
+   * Gatsby の出力を受け取り、アダプターのプラットフォームへのデプロイに向けて準備するためのフック。ビルドの処理の最後のほうのステップとして実行される。
    *
-   * The `adapt` hook should do the following things:
-   * - Apply HTTP headers to assets
-   * - Apply redirects and rewrites. The adapter should can also create its own redirects/rewrites if necessary (e.g. mapping serverless functions to internal URLs).
-   * - Wrap serverless functions coming from Gatsby with platform-specific code (if necessary). Gatsby will produce [Express-like](https://expressjs.com/) handlers.
-   * - Apply trailing slash behavior and path prefix to URLs
-   * - Possibly upload assets to CDN
+   * `adapt` フックは次のことを行うべきである:
+   * - アセットに HTTP ヘッダーを適用する
+   * - リダイレクトとリライトを適用する。アダプターは、必要に応じて独自のリダイレクトやリライトを作成することもできる（たとえば、サーバーレス関数を内部の URL に対応付ける）。
+   * - Gatsby から渡されるサーバーレス関数を、（必要に応じて）プラットフォーム固有のコードでラップする。Gatsby は [Express 風の](https://expressjs.com/) ハンドラーを生成する。
+   * - URL に末尾のスラッシュの動作とパスのプレフィックスを適用する
+   * - 場合によっては、アセットを CDN にアップロードする
    *
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/creating-an-adapter/
    */
   adapt: (context: IAdaptContext) => Promise<void> | void
   /**
-   * Hook to pass information from the adapter to Gatsby. You must return an object with a predefined shape.
-   * Gatsby uses this information to adjust its build process. The information can be e.g. things that are only known once the project is deployed.
+   * アダプターから Gatsby へ情報を渡すためのフック。あらかじめ決められた形のオブジェクトを返さなければならない。
+   * Gatsby はこの情報を使ってビルドの処理を調整する。たとえば、プロジェクトがデプロイされて初めて分かる情報などを渡せる。
    *
-   * This hook can enable advanced feature of adapters and it is not required to implement it.
+   * このフックはアダプターの高度な機能を有効にするものであり、実装は必須ではない。
    *
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/creating-an-adapter/
    */
@@ -270,7 +270,7 @@ export interface IAdapter {
 }
 
 /**
- * Adapter initialization function that returns an instance of the adapter.
+ * アダプターのインスタンスを返す、アダプターの初期化関数。
  * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/creating-an-adapter/
  */
 export type AdapterInit<T = Record<string, unknown>> = (
@@ -284,38 +284,38 @@ export interface IAdapterManager {
   config: () => Promise<IAdapterFinalConfig>
 }
 /**
- * Types for gatsby/adapters.js
+ * gatsby/adapters.js 用の型
  * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/zero-configuration-deployments/
  */
 export interface IAdapterManifestEntry {
   /**
-   * Name of the adapter
+   * アダプターの名前
    */
   name: string
   /**
-   * Test function to determine if adapter should be used
+   * アダプターを使うべきかを判定するテスト関数
    */
   test: () => boolean
   /**
-   * npm module name of the adapter
+   * アダプターの npm モジュール名
    */
   module: string
   /**
-   * List of version pairs that are supported by the adapter.
-   * This allows to have multiple versions of the adapter for different versions of Gatsby.
-   * This is useful for when APIs change or bugs are fixed that require different implementations.
+   * アダプターが対応しているバージョンの組の一覧。
+   * これにより、Gatsby のバージョンごとに異なるバージョンのアダプターを用意できる。
+   * API が変更されたり、バグ修正のために別の実装が必要になったりした場合に役立つ。
    */
   versions: Array<{
     /**
-     * Version of the `gatsby` package. This is a semver range.
+     * `gatsby` パッケージのバージョン。semver の範囲で指定する。
      */
     gatsbyVersion: string
     /**
-     * Version of the adapter. This is a semver range.
+     * アダプターのバージョン。semver の範囲で指定する。
      */
     moduleVersion: string
     /**
-     * Can override the module defined in the parent manifest entry - useful for when the adapter is renamed.
+     * 親のマニフェストのエントリーで定義されたモジュールを上書きできる。アダプターの名前が変わった場合に役立つ。
      */
     module?: string
   }>

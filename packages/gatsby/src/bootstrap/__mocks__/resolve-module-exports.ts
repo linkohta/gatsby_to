@@ -5,17 +5,17 @@ let mockResults = {}
 export const resolveModuleExports = (
   input: unknown
 ): Array<string> | undefined => {
-  // return a mocked result
+  // モックの結果を返す
   if (typeof input === `string`) {
     return mockResults[input]
   }
 
-  // return default result
+  // デフォルトの結果を返す
   if (typeof input !== `object`) {
     return []
   }
 
-  // set mock results
+  // モックの結果を設定する
   mockResults = Object.assign({}, input)
   return undefined
 }

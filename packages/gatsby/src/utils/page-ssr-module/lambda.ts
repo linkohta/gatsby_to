@@ -12,38 +12,38 @@ import type { ISSRData, EnginePage } from "./entry"
 import { link, rewritableMethods as linkRewritableMethods } from "linkfs"
 
 const cdnDatastorePath = `%CDN_DATASTORE_PATH%`
-// this is fallback origin, we will prefer to extract it from first request instead
-// as in some cases one reported by adapter might not be correct
+// これはフォールバックの origin である。代わりに最初のリクエストから取り出すほうを優先する。
+// アダプターが報告したものが正しくない場合があるためである
 const cdnDatastoreOrigin = `%CDN_DATASTORE_ORIGIN%`
 const PATH_PREFIX = `%PATH_PREFIX%`
 const imageCdnUrlGeneratorModuleRelativePath = `%IMAGE_CDN_URL_GENERATOR_MODULE_RELATIVE_PATH%`
 const fileCdnUrlGeneratorModuleRelativePath = `%FILE_CDN_URL_GENERATOR_MODULE_RELATIVE_PATH%`
 
-// this file should be in `.cache/page-ssr-module/lambda.js`
-// so getting `.cache` location should be one directory above
-// directory of this file
+// このファイルは `.cache/page-ssr-module/lambda.js` にあるはずなので、
+// `.cache` の場所は、このファイルのディレクトリの
+// 1 つ上のディレクトリになる
 const cacheDir = path.join(__dirname, `..`)
 
-// gatsby relies on process.cwd() a lot, so this ensures that CWD is set correctly
-// in relation to bundled files for lambda. In some scenarios those files are not in
-// expected relative locations to CWD, so here we are forcing setting CWD so the
-// relative paths are correct
+// gatsby は process.cwd() に大きく依存しているので、lambda 用にバンドルされたファイルに対して
+// CWD が正しく設定されているようにする。状況によっては、それらのファイルが
+// CWD から見て期待される相対位置にないことがあるので、ここで CWD を強制的に設定して、
+// 相対パスが正しくなるようにしている
 process.chdir(path.join(cacheDir, `..`))
 
 function setupFsWrapper(): string {
-  // setup global._fsWrapper
+  // global._fsWrapper をセットアップする
   try {
     fs.accessSync(__filename, fs.constants.W_OK)
     return path.join(cacheDir, `data`, `datastore`)
   } catch (e) {
-    // we are in a read-only filesystem, so we need to use a temp dir
+    // 読み取り専用のファイルシステムの中にいるので、一時ディレクトリを使う必要がある
 
     const TEMP_DIR = path.join(tmpdir(), `gatsby`)
     const TEMP_CACHE_DIR = path.join(TEMP_DIR, `.cache`)
 
     global.__GATSBY.root = TEMP_DIR
 
-    // we need to rewrite fs
+    // fs を書き換える必要がある
     const rewrites = [
       [path.join(cacheDir, `caches`), path.join(TEMP_CACHE_DIR, `caches`)],
       [
@@ -59,7 +59,7 @@ function setupFsWrapper(): string {
       rewrites,
     })
 
-    // copied from https://github.com/streamich/linkfs/blob/master/src/index.ts#L126-L142
+    // https://github.com/streamich/linkfs/blob/master/src/index.ts#L126-L142 からコピーしたもの
     function mapPathUsingRewrites(fsPath: fs.PathLike): string {
       let filename = path.resolve(String(fsPath))
       for (const [from, to] of rewrites) {
@@ -92,13 +92,13 @@ function setupFsWrapper(): string {
           args[0] = mapPathUsingRewrites(args[0])
           args[1] = mapPathUsingRewrites(args[1])
           // @ts-ignore - can't decide which signature this is, but we just preserve the original
-          // signature here and mostly care about first 2 arguments being PathLike
+          // ここでのシグネチャについては、主に最初の 2 つの引数が PathLike であることだけに関心がある
           return original.apply(fsToRewrite, args)
         }
       }
     }
 
-    // linkfs doesn't handle following methods, so we need to add them manually
+    // linkfs は次のメソッドを扱わないので、手動で追加する必要がある
     linkRewritableMethods.push(`createWriteStream`, `createReadStream`, `rm`)
 
     function createLinkedFS<
@@ -106,30 +106,30 @@ function setupFsWrapper(): string {
     >(fsToRewrite: T): T {
       const linkedFS = link(fsToRewrite, rewrites) as T
 
-      // linkfs doesn't handle `to` argument in `rename` and `renameSync` methods
+      // linkfs は、`rename` メソッドと `renameSync` メソッドの `to` 引数を扱わない
       applyRename(fsToRewrite, linkedFS, `rename`)
       applyRename(fsToRewrite, linkedFS, `renameSync`)
 
       return linkedFS
     }
 
-    // Alias the cache dir paths to the temp dir
+    // キャッシュディレクトリのパスを一時ディレクトリへのエイリアスにする
     const lfs = createLinkedFS(fs)
 
-    // The following code is needed because linkfs doesn't pass across
-    // the `native` prop, which graceful-fs needs. However, we need to
-    // skip deprecated access-mode constants (F_OK, R_OK, W_OK, X_OK, etc.),
-    // because linkfs always creates these properties by doing lfs[prop] = fs[prop],
-    // even when fs[prop] is undefined (that is, it doesn't filter undefined
-    // properties). With fs-extra, the deprecated fs.F_OK, fs.R_OK, etc.
-    // aliases are missing because it rebuilds its API using object spread,
-    // which only copies enumerable properties, while Node marks these aliases
-    // as non-enumerable. As a result, lfs.F_OK (and others) become enumerable
-    // own properties with an undefined value, so the for...in loop visits them and
-    // Object.hasOwnProperty.call(fs[prop], `native`) throws. Skipping these keys
-    // (or basically anything that is not a function) is safe because .native is
-    // only added by graceful-fs to patched filesystem functions
-    // (e.g. fs.readdir.native), never to these numeric constants.
+    // 次のコードが必要なのは、graceful-fs が必要とする `native` prop を、
+    // linkfs が引き継がないためである。ただし、非推奨のアクセスモードの定数
+    // （F_OK、R_OK、W_OK、X_OK など）はスキップする必要がある。
+    // linkfs は、fs[prop] が undefined であっても、常に lfs[prop] = fs[prop] として
+    // これらのプロパティを作成するためである（つまり、undefined のプロパティを
+    // 取り除かない）。fs-extra では、非推奨の fs.F_OK、fs.R_OK などの
+    // エイリアスが存在しない。fs-extra はオブジェクトのスプレッドで API を作り直しており、
+    // スプレッドは列挙可能なプロパティしかコピーしないが、Node はこれらのエイリアスを
+    // 列挙不可にしているためである。その結果、lfs.F_OK などは、値が undefined の列挙可能な
+    // 自身のプロパティになるので、for...in ループがそれらを訪れ、
+    // Object.hasOwnProperty.call(fs[prop], `native`) が例外を投げる。これらのキー
+    // （基本的には関数でないものすべて）をスキップしても安全である。.native は、
+    // graceful-fs がパッチを当てたファイルシステムの関数（たとえば fs.readdir.native）に
+    // だけ追加するものであり、これらの数値の定数に追加されることはないためである。
 
     for (const key in lfs) {
       if (
@@ -140,9 +140,9 @@ function setupFsWrapper(): string {
       }
     }
 
-    // 'promises' is not initially linked within the 'linkfs'
-    // package, and is needed by underlying Gatsby code (the
-    // @graphql-tools/code-file-loader)
+    // 'promises' は、'linkfs' パッケージの中では最初からはリンクされておらず、
+    // Gatsby の内部のコード（@graphql-tools/code-file-loader）が
+    // 必要とする
     lfs.promises = createLinkedFS(fs.promises)
 
     const originalWritesStream = fs.WriteStream
@@ -199,7 +199,7 @@ function setupFsWrapper(): string {
 
     const dbPath = path.join(TEMP_CACHE_DIR, `data`, `datastore`)
 
-    // Gatsby uses this instead of fs if present
+    // これがあれば、Gatsby は fs の代わりにこれを使う
     // eslint-disable-next-line no-underscore-dangle
     // @ts-ignore __promisify__ stuff
     global._fsWrapper = lfs
@@ -242,8 +242,8 @@ if (fileCdnUrlGeneratorModuleRelativePath) {
 
 const dbPath = setupFsWrapper()
 
-// using require instead of import here for now because of type hell + import path doesn't exist in current context
-// as this file will be copied elsewhere
+// 今のところ、ここでは import ではなく require を使う。型の扱いが非常に面倒であり、また、このファイルは
+// 別の場所へコピーされるので、現在のコンテキストには import のパスが存在しないためである
 
 type GraphQLEngineType =
   import("../../schema/graphql-engine/entry").GraphQLEngine
@@ -275,7 +275,7 @@ function shouldDownloadDatastoreFromCDN(): boolean {
 
 async function downloadDatastoreFromCDN(origin: string): Promise<void> {
   const cdnDatastore = `${origin}/${cdnDatastorePath}`
-  // if this variable is set we need to download the datastore from the CDN
+  // この変数が設定されている場合は、CDN からデータストアをダウンロードする必要がある
   const downloadPath = dbPath + `/data.mdb`
   console.log(
     `Downloading datastore from CDN (${cdnDatastore} -> ${downloadPath})`
@@ -375,16 +375,16 @@ function memoizedInitializeGraphqlEngine(
   origin: string
 ): Promise<GraphQLEngineType> {
   if (!originToGraphqlEnginePromise.has(origin)) {
-    // register origin, but for now don't init anything
+    // origin を登録するが、今のところは何も初期化しない
     originToGraphqlEnginePromise.set(origin, null)
   }
 
   if (!memoizedGraphqlEnginePromise) {
-    // pick first non-errored entry
+    // エラーになっていない最初のエントリーを選ぶ
     memoizedGraphqlEnginePromise =
       tryToInitializeGraphqlEngineFromCollectedOrigins().catch(e => {
-        // at this point we don't have any origin that work, but maybe we will get one in future
-        // so unset memoizedGraphqlEnginePromise as it would be not allowing any more attempts once it settled
+        // この時点では動く origin が 1 つもないが、将来は得られるかもしれない
+        // そのため memoizedGraphqlEnginePromise の設定を解除する。確定してしまうと、それ以上の試行ができなくなるためである
         memoizedGraphqlEnginePromise = null
         throw e
       })
@@ -394,7 +394,7 @@ function memoizedInitializeGraphqlEngine(
 
 memoizedInitializeGraphqlEngine(cdnDatastoreOrigin).catch(
   () =>
-    // we don't want to crash the process if we can't get the engine without a request
+    // リクエストなしでエンジンを取得できなくても、プロセスをクラッシュさせたくはない
     null
 )
 
@@ -416,7 +416,7 @@ function getPathInfo(requestPath: string):
     }
   }
 
-  // if not matched
+  // 一致しなかった場合
   return {
     isPageData: false,
     pagePath: requestPath,

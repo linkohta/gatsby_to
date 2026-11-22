@@ -15,14 +15,14 @@ const handleFlags = (
   unfitFlagMessage: string
   message: string
 } => {
-  // Prepare config flags.
-  // Filter out any flags that are set to false.
+  // config のフラグを準備する。
+  // false に設定されているフラグを取り除く。
   const availableFlags = new Map<string, IFlag>()
   flags.forEach(flag => {
     availableFlags.set(flag.name, flag)
   })
 
-  // Find unknown flags someone has in their config to warn them about.
+  // 警告するために、config にある不明なフラグを探す。
   const unknownConfigFlags: Array<{ flag: string; didYouMean: string }> = []
   const unfitConfigFlags: Array<{ flag: string; requires: string }> = []
   for (const flagName in configFlags) {
@@ -65,19 +65,19 @@ const handleFlags = (
     .filter(name => configFlags[name] && availableFlags.has(name))
     .map(flagName => availableFlags.get(flagName)!)
 
-  // Test flags to see if it wants opted in.
+  // フラグをテストして、オプトインすべきかを調べる。
   const optedInFlags = new Map<string, IFlag>()
   const applicableFlags = new Map<string, IFlag>()
   const lockedInFlags = new Map<string, IFlag>()
   const lockedInFlagsThatAreInConfig = new Map<string, IFlag>()
   availableFlags.forEach(flag => {
     if (flag.command !== `all` && flag.command !== executingCommand) {
-      // if flag is not for all commands and current command doesn't match command flag is for - skip
+      // フラグがすべてのコマンド向けではなく、現在のコマンドがフラグの対象のコマンドと一致しない場合はスキップする
       return
     }
 
     if (flag.noCI && isCI()) {
-      // If we're in CI and flag is not available for CI - skip
+      // CI で実行中であり、フラグが CI では使えない場合はスキップする
       return
     }
 
@@ -92,8 +92,8 @@ const handleFlags = (
         lockedInFlagsThatAreInConfig.set(flag.name, flag)
       }
     } else if (!flagIsSetInConfig && fitness === `OPT_IN`) {
-      // if user didn't explicitly set a flag (either true or false)
-      // and it qualifies for auto opt-in - add it to optedInFlags
+      // ユーザーがフラグを明示的に（true にも false にも）設定しておらず、
+      // 自動オプトインの対象である場合は、optedInFlags に追加する
       enabledConfigFlags.push(flag)
       optedInFlags.set(flag.name, flag)
     }
@@ -118,19 +118,19 @@ const handleFlags = (
         .join(`\n`)
   }
 
-  // Filter enabledConfigFlags against various tests
+  // enabledConfigFlags をさまざまなテストで絞り込む
   enabledConfigFlags = enabledConfigFlags.filter(flag => {
     if (flag.command !== `all` && flag.command !== executingCommand) {
-      // if flag is not for all commands and current command doesn't match command flag is for - skip
+      // フラグがすべてのコマンド向けではなく、現在のコマンドがフラグの対象のコマンドと一致しない場合はスキップする
       return false
     }
 
     if (flag.noCI && isCI()) {
-      // If we're in CI and flag is not available for CI - skip
+      // CI で実行中であり、フラグが CI では使えない場合はスキップする
       return false
     }
 
-    // finally check if flag passes fitness check
+    // 最後に、フラグが適合性の確認を通過するかを確認する
     return flag.testFitness(flag)
   })
 
@@ -151,15 +151,15 @@ const handleFlags = (
       })
     }
   }
-  // Add to enabledConfigFlags any includedFlags
+  // includedFlags をすべて enabledConfigFlags に追加する
   enabledConfigFlags.forEach(flag => {
     addIncluded(flag)
   })
 
   enabledConfigFlags = _.uniq(enabledConfigFlags)
 
-  // TODO remove flags that longer exist.
-  //  w/ message of thanks
+  // TODO もう存在しないフラグを取り除く。
+  //  感謝のメッセージを添える
 
   const generateFlagLine = (flag): string => {
     let message = ``
@@ -176,7 +176,7 @@ const handleFlags = (
   }
 
   let message = ``
-  //  Create message about what flags are active.
+  //  どのフラグが有効かについてのメッセージを作成する。
   if (enabledConfigFlags.length > 0) {
     if (
       enabledConfigFlags.length - optedInFlags.size - lockedInFlags.size >
@@ -221,7 +221,7 @@ The following flags were automatically enabled on your site:`
     }
 
     if (message.length > 0) {
-      // if we will print anything about flags, let's try to suggest other available ones
+      // フラグについて何かを出力する場合は、他に使えるフラグの提案も試みる
       const otherFlagSuggestionLines: Array<string> = []
       const enabledFlagsSet = new Set()
       enabledConfigFlags.forEach(f => enabledFlagsSet.add(f.name))
@@ -230,8 +230,8 @@ The following flags were automatically enabled on your site:`
           !enabledFlagsSet.has(flag.name) &&
           typeof configFlags[flag.name] === `undefined`
         ) {
-          // we want to suggest flag when it's not enabled and user specifically didn't use it in config
-          // we don't want to suggest flag user specifically wanted to disable
+          // フラグを提案したいのは、有効になっておらず、かつユーザーが config で明示的に使っていない場合である
+          // ユーザーが明示的に無効にしたフラグは提案したくない
           otherFlagSuggestionLines.push(generateFlagLine(flag))
         }
       })

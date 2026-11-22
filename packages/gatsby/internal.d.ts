@@ -1,4 +1,4 @@
 /**
- * This is an internal API. It does not follow semver. Use at your own risk.
+ * これは内部 API である。semver には従わない。自己責任で使うこと。
  */
 export * from "./dist/internal"

@@ -66,7 +66,7 @@ describe(`redirect-writer`, () => {
     )
     store.dispatch(
       actions.createRedirect({
-        fromPath: `/client-overlap`, // intentionally missing trailing slash - this checks if /client-overlap/ page is discovered
+        fromPath: `/client-overlap`, // 末尾のスラッシュは意図的に付けていない。/client-overlap/ ページが検出されるかを確認する
         toPath: `/client-overlap/redirect/`,
         redirectInBrowser: true,
       })
@@ -74,7 +74,7 @@ describe(`redirect-writer`, () => {
     store.dispatch(
       actions.createPage(
         {
-          path: `/server-overlap`, // intentionally missing trailing slash - this checks if redirect for /server-overlap/ is discovered
+          path: `/server-overlap`, // 末尾のスラッシュは意図的に付けていない。/server-overlap/ へのリダイレクトが検出されるかを確認する
           component: `/whatever/index.js`,
         },
         { id: `test`, name: `test` }

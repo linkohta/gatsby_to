@@ -169,11 +169,11 @@ test.each([
         `fixtures/test-sites/workspace-shadowing`
       ),
       setup: () => {
-        // Yarn/Lerna workspaces are implemented by creating symlinks from node_modules/<modulename>
-        // to the actual location of the package (for example packages/<modulename>). In this test,
-        // we need a fixture that complies with such structure. However, restoration of symlinks in
-        // git repositories is unreliable on Windows. We therefore programmatically create the
-        // expeced structure here.
+        // Yarn/Lerna の workspaces は、node_modules/<modulename> からパッケージの実際の場所
+        // （たとえば packages/<modulename>）へのシンボリックリンクを作ることで実現されている。このテストでは、
+        // その構造に沿ったフィクスチャが必要になる。しかし、Git リポジトリでのシンボリックリンクの復元は
+        // Windows では当てにならない。そのため、期待する構造をここでプログラムから
+        // 作成する。
 
         if (fs.existsSync(`node_modules`)) {
           fs.rmdirSync(`node_modules`, { recursive: true })
@@ -197,7 +197,7 @@ test.each([
       `./src/theme-a/file-a.tsx`, // index.js => theme-a/file-a ==shadow=> src/theme-a/file-a.tsx
       `./src/theme-a/file-b.js`, // index.js => theme-a/file-b ==shadow=> src/theme-a/file-b.js
       `./src/theme-a/file-c.js`, // index.js => theme-a/file-c ==shadow=> src/theme-a/file-c.js
-      `../theme-a/src/file-c.ts`, // src/theme-a/file-c.js => theme-a/src/file-c.js (no shadow)
+      `../theme-a/src/file-c.ts`, // src/theme-a/file-c.js => theme-a/src/file-c.js（シャドーイングなし）
       `../theme-a/src/file-d.ts`, // src/theme-a/file-c.js => theme-a/src/file-d.js
     ],
   ],
@@ -285,9 +285,9 @@ test.each([
 ])(
   `Shadowing e2e: %s`,
   (testName, config, { context, setup, cleanup }, shadowPath, done) => {
-    // shadowing wants process.cwd() to be the root of the site.
-    // so change it from this dir to each of the example projects
-    // when running them
+    // シャドーイングは process.cwd() がサイトのルートであることを前提にしている。
+    // そのため、実行するときに、このディレクトリからそれぞれのサンプルプロジェクトへ
+    // 切り替える
     const oldCwd = process.cwd()
     const newCwd = context
     process.chdir(newCwd)
@@ -296,7 +296,7 @@ test.each([
 
     webpack(config, (err, stats) => {
       try {
-        // start error handling
+        // エラー処理の開始
         if (err) {
           done(err.stack || err)
           return
@@ -311,7 +311,7 @@ test.each([
         if (stats.hasWarnings()) {
           done(info.warnings)
         }
-        // end error handling
+        // エラー処理の終了
 
         const statsJSON = stats.toJson({
           assets: false,

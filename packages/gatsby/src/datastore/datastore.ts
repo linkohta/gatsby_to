@@ -11,9 +11,9 @@ export function getDataStore(): IDataStore {
   return dataStore
 }
 
-// It is possible that the store is not initialized yet when calling `DELETE_CACHE`.
-//  The code below ensures we wipe cache from the proper store
-//  (mostly relevant for tests)
+// `DELETE_CACHE` を呼ぶ時点で、store がまだ初期化されていないことがある。
+//  以下のコードは、正しい store からキャッシュを消去することを保証する
+//  （主にテストに関係する）
 emitter.on(`DELETE_CACHE`, () => {
   getDataStore()
 })

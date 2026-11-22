@@ -177,7 +177,7 @@ describe(`Resolver context`, () => {
                   },
                 },
                 resolve(source, args, context, info) {
-                  // Custom context value under namespace
+                  // 名前空間の下にある独自のコンテキストの値
                   return context.transformerHello.hello(args.planet)
                 },
               },

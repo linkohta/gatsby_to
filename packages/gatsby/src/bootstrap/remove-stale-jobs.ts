@@ -14,15 +14,15 @@ export const removeStaleJobs = (
     IRemoveStaleJobV2Action | ICreateJobV2FromInternalAction
   > = []
 
-  // If any of our finished jobs are stale we remove them to keep our cache small
+  // 完了済みのジョブのうち古くなったものは、キャッシュを小さく保つために削除する
   jobs.complete.forEach((job, contentDigest) => {
     if (isJobStale(job)) {
       actions.push(internalActions.removeStaleJob(contentDigest))
     }
   })
 
-  // If any of our pending jobs do not have an existing inputPath or the inputPath changed
-  // we remove it from the queue as they would fail anyway
+  // 保留中のジョブのうち、inputPath が存在しないもの、または inputPath が変わったものは、
+  // いずれにせよ失敗するのでキューから取り除く
   jobs.incomplete.forEach(({ job }): void => {
     if (isJobStale(job)) {
       actions.push(internalActions.removeStaleJob(job.contentDigest))

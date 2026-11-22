@@ -1,4 +1,4 @@
-// Initial file from https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d
+// 最初のファイルは https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d から取得した
 /* eslint-disable @babel/no-invalid-this, no-useless-catch */
 /* !
 The MIT License (MIT)
@@ -32,22 +32,22 @@ const wrapCallback = require(`./wrap-callback`)
 
 import reporter from "gatsby-cli/lib/reporter"
 
-// Cache read/writes are async. This locking attempts to prevent race conditions.
-// It's not ideal and locks timeout after 10s. It's mostly a port from when this
-// mechanism was using fs-based locks. Doing it in-memory reduces IO pressure and
-// we currently don't support two concurrent builds at the same time anyways.
+// キャッシュの読み書きは非同期である。このロックは競合状態を防ぐためのものである。
+// 理想的な実装ではなく、ロックは 10 秒でタイムアウトする。この仕組みが fs ベースの
+// ロックを使っていたころの実装を、ほぼそのまま移植したものである。メモリ上で行うことで IO の負荷が減る。
+// また、現状では 2 つのビルドの同時実行には対応していない。
 const globalGatsbyCacheLock = new Map()
 
-let showLockTimeoutWarning = true // Only show this once
+let showLockTimeoutWarning = true // これは 1 回だけ表示する
 
 /**
- * construction of the disk storage
- * @param {object} [args] options of disk store
- * @param {string} [args.path] path for cached files
- * @param {number} [args.ttl] time to life in seconds
- * @param {boolean} [args.zip] zip content to save diskspace
- * @todo {number} [args.maxsize] max size in bytes on disk
- * @param {boolean} [args.subdirs] create subdirectories
+ * ディスクストアを構築する
+ * @param {object} [args] ディスクストアのオプション
+ * @param {string} [args.path] キャッシュファイルのパス
+ * @param {number} [args.ttl] 有効期間（秒）
+ * @param {boolean} [args.zip] ディスク容量を節約するために内容を zip 圧縮する
+ * @todo {number} [args.maxsize] ディスク上の最大サイズ（バイト）
+ * @param {boolean} [args.subdirs] サブディレクトリを作成する
  * @returns {DiskStore}
  */
 exports.create = function (args): typeof DiskStore {
@@ -58,16 +58,16 @@ function DiskStore(this: any, options): void {
   options = options || {}
 
   this.options = {
-    path: options.path || `./cache` /* path for cached files  */,
+    path: options.path || `./cache` /* キャッシュファイルのパス  */,
     ttl:
       options.ttl >= 0
         ? +options.ttl
-        : 60 * 60 /* time before expiring in seconds */,
-    maxsize: options.maxsize || Infinity /* max size in bytes on disk */,
+        : 60 * 60 /* 期限切れになるまでの時間（秒） */,
+    maxsize: options.maxsize || Infinity /* ディスク上の最大サイズ（バイト） */,
     subdirs: options.subdirs || false,
     zip: options.zip || false,
     lockFile: {
-      // check lock at 0ms 50ms 100ms ... 400ms 1400ms 1450ms... up to 10 seconds, after that just assume the lock is staled
+      // 0ms、50ms、100ms ... 400ms、1400ms、1450ms... と最大 10 秒までロックを確認し、それを過ぎたらロックは古くなったものとみなす
       wait: 400,
       pollPeriod: 50,
       stale: 10 * 1000,
@@ -76,18 +76,18 @@ function DiskStore(this: any, options): void {
     },
   }
 
-  // check storage directory for existence (or create it)
+  // ストレージのディレクトリが存在するかを確認する（なければ作成する）
   if (!fs.existsSync(this.options.path)) {
     fs.mkdirSync(this.options.path)
   }
 }
 
 /**
- * save an entry in store
+ * ストアにエントリーを保存する
  * @param {string} key
  * @param {*} val
  * @param {object} [options]
- * @param {number} options.ttl time to life in seconds
+ * @param {number} options.ttl 有効期間（秒）
  * @param {function} [cb]
  * @returns {Promise}
  */
@@ -108,7 +108,7 @@ DiskStore.prototype.set = wrapCallback(async function (
   }
 
   if (this.options.subdirs) {
-    // check if subdir exists or create it
+    // サブディレクトリが存在するかを確認し、なければ作成する
     const dir = path.dirname(filePath)
     await promisify(fs.access)(dir, fs.constants.W_OK).catch(function () {
       return promisify(fs.mkdir)(dir).catch(err => {
@@ -128,7 +128,7 @@ DiskStore.prototype.set = wrapCallback(async function (
 })
 
 /**
- * get an entry from store
+ * ストアからエントリーを取得する
  * @param {string} key
  * @param {function} [cb]
  * @returns {Promise}
@@ -144,7 +144,7 @@ DiskStore.prototype.get = wrapCallback(async function (this: any, key) {
         if (err.code === `ENOENT`) {
           throw err
         }
-        // maybe the file is currently written to, lets lock it and read again
+        // ファイルが書き込み中かもしれないので、ロックしてから読み直す
         try {
           await this._lock(filePath)
           return await jsonFileStore.read(filePath, this.options)
@@ -155,17 +155,17 @@ DiskStore.prototype.get = wrapCallback(async function (this: any, key) {
         }
       })
     if (data.expireTime <= Date.now()) {
-      // cache expired
-      this.del(key).catch(() => 0 /* ignore */)
+      // キャッシュの期限切れ
+      this.del(key).catch(() => 0 /* 無視する */)
       return undefined
     }
     if (data.key !== key) {
-      // hash collision
+      // ハッシュの衝突
       return undefined
     }
     return data.val
   } catch (err) {
-    // file does not exist lets return a cache miss
+    // ファイルが存在しないので、キャッシュミスを返す
     if (err.code === `ENOENT`) {
       return undefined
     } else {
@@ -175,13 +175,13 @@ DiskStore.prototype.get = wrapCallback(async function (this: any, key) {
 })
 
 /**
- * delete entry from cache
+ * キャッシュからエントリーを削除する
  */
 DiskStore.prototype.del = wrapCallback(async function (this: any, key) {
   const filePath = this._getFilePathByKey(key)
   try {
     if (this.options.subdirs) {
-      // check if the folder exists to fail faster
+      // 早く失敗させるために、フォルダーが存在するかを確認する
       const dir = path.dirname(filePath)
       await promisify(fs.access)(dir, fs.constants.W_OK)
     }
@@ -189,7 +189,7 @@ DiskStore.prototype.del = wrapCallback(async function (this: any, key) {
     await this._lock(filePath)
     await jsonFileStore.delete(filePath, this.options)
   } catch (err) {
-    // ignore deleting non existing keys
+    // 存在しないキーの削除は無視する
     if (err.code !== `ENOENT`) {
       throw err
     }
@@ -199,7 +199,7 @@ DiskStore.prototype.del = wrapCallback(async function (this: any, key) {
 })
 
 /**
- * cleanup cache on disk -> delete all files from the cache
+ * ディスク上のキャッシュを片付ける -> キャッシュからすべてのファイルを削除する
  */
 DiskStore.prototype.reset = wrapCallback(async function (
   this: any
@@ -224,14 +224,14 @@ DiskStore.prototype.reset = wrapCallback(async function (
       stats.isFile() &&
       /[/\\]diskstore-[0-9a-fA-F/\\]+(\.json|-\d\.bin)/.test(fileOrDir)
     ) {
-      // delete the file if it is a diskstore file
+      // ディスクストアのファイルであれば削除する
       await unlink(fileOrDir)
     }
   }
 })
 
 /**
- * locks a file so other forks that want to use the same file have to wait
+ * ファイルをロックし、同じファイルを使いたい他のフォークが待つようにする
  * @param {string} filePath
  * @returns {Promise}
  * @private
@@ -259,7 +259,7 @@ function innerLock(resolve, reject, filePath): void {
         innerLock(resolve, reject, filePath)
       }, 50)
     } else {
-      // set sync
+      // 同期的に設定する
       globalGatsbyCacheLock.set(filePath, Date.now())
       resolve()
     }
@@ -269,7 +269,7 @@ function innerLock(resolve, reject, filePath): void {
 }
 
 /**
- * unlocks a file path
+ * ファイルパスのロックを解除する
  * @type {Function}
  * @param {string} filePath
  * @returns {void}
@@ -280,7 +280,7 @@ DiskStore.prototype._unlock = function _unlock(filePath): void {
 }
 
 /**
- * returns the location where the value should be stored
+ * 値を保存すべき場所を返す
  * @param {string} key
  * @returns {string}
  * @private
@@ -291,7 +291,7 @@ DiskStore.prototype._getFilePathByKey = function (key): string {
     .update(key + ``)
     .digest(`hex`)
   if (this.options.subdirs) {
-    // create subdirs with the first 3 chars of the hash
+    // ハッシュの先頭 3 文字でサブディレクトリを作成する
     return path.join(
       this.options.path,
       `diskstore-` + hash.slice(0, 3),

@@ -65,7 +65,7 @@ ${chalk.bgBlue.bold(notice.experimentIdentifier)} (${notice.umbrellaLink}), ${
 
 export const showExperimentNotices = (): void => {
   if (noticesToShow.length > 0) {
-    // Store that we're showing the invite.
+    // 案内を表示していることを保存する。
     noticesToShow.forEach(notice =>
       getConfigStore().set(
         configStoreKey(notice.experimentIdentifier),

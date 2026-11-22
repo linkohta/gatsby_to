@@ -44,7 +44,7 @@ export interface IBuildArgs extends IProgram {
   openTracingConfigFile: string
   functionsPlatform?: string
   functionsArch?: string
-  // TODO remove in v4
+  // TODO v4 で削除する
   keepPageRenderer: boolean
 }
 
@@ -59,8 +59,8 @@ let SSRBundleReceivedInvalidEvent = true
 let SSRBundleWillInvalidate = false
 
 export function devSSRWillInvalidate(): void {
-  // we only get one `invalid` callback, so if we already
-  // set this to true, we can't really await next `invalid` event
+  // `invalid` のコールバックは 1 回しか受け取れないので、すでにこれを true に
+  // 設定している場合は、次の `invalid` イベントを待つことができない
   if (!SSRBundleReceivedInvalidEvent) {
     SSRBundleWillInvalidate = true
   }
@@ -105,7 +105,7 @@ export const getDevSSRWebpack = (): {
             }
           }
           emitter.on(`DEV_SSR_COMPILATION_DONE`, finish)
-          // we reset it before we start compilation to be able to catch any invalid events
+          // invalid イベントを捕捉できるよう、コンパイルを開始する前にリセットする
           SSRBundleReceivedInvalidEvent = false
           if (activeRecompilations === 0) {
             watcher.resume()
@@ -113,7 +113,7 @@ export const getDevSSRWebpack = (): {
           activeRecompilations++
 
           if (allowTimedFallback) {
-            // Timeout after 1.5s.
+            // 1.5 秒後にタイムアウトする。
             timeout = setTimeout(() => {
               if (!isResolved) {
                 isResolved = true
@@ -152,11 +152,11 @@ const runWebpack = (
     if (isDevSSREnabledAndViable) {
       const compiler = webpack(compilerConfig)
 
-      // because of this line we can't use our watch helper
-      // These things should use emitter
+      // この行があるので watch ヘルパーを使えない
+      // これらは emitter を使うべきである
       compiler.hooks.invalid.tap(`ssr file invalidation`, () => {
         SSRBundleReceivedInvalidEvent = true
-        SSRBundleWillInvalidate = false // we were waiting for this event, we are no longer waiting for it
+        SSRBundleWillInvalidate = false // このイベントを待っていたが、もう待っていない
       })
 
       let isFirstCompile = true
@@ -165,7 +165,7 @@ const runWebpack = (
           ignored: /node_modules/,
         },
         (err, stats) => {
-          // this runs multiple times
+          // これは複数回実行される
           emitter.emit(`DEV_SSR_COMPILATION_DONE`)
           if (isFirstCompile) {
             watcher.suspend()
@@ -180,7 +180,7 @@ const runWebpack = (
             const {
               restartWorker,
             } = require(`../utils/dev-ssr/render-dev-html`)
-            // Make sure we use the latest version during development
+            // 開発中は必ず最新のバージョンを使うようにする
             if (oldHash !== `` && newHash !== oldHash) {
               restartWorker(`${directory}/${ROUTES_DIRECTORY}render-page.js`)
             }
@@ -225,7 +225,7 @@ const doBuildRenderer = async (
     setFilesFromDevelopHtmlCompilation(stats.compilation)
   }
 
-  // render-page.js is hard coded in webpack.config
+  // render-page.js は webpack.config にハードコードされている
   return {
     rendererPath: `${directory}/${ROUTES_DIRECTORY}render-page.js`,
     stats,
@@ -245,7 +245,7 @@ const doBuildPartialHydrationRenderer = async (
     )
   }
 
-  // render-page.js is hard coded in webpack.config
+  // render-page.js は webpack.config にハードコードされている
   return {
     rendererPath: `${directory}/${ROUTES_DIRECTORY}render-page.js`,
     stats,
@@ -290,7 +290,7 @@ export const buildPartialHydrationRenderer = async (
     }
   }
 
-  // TODO add caching
+  // TODO キャッシュを追加する
   config.cache = false
 
   config.output.path = path.join(
@@ -299,27 +299,27 @@ export const buildPartialHydrationRenderer = async (
     `partial-hydration`
   )
 
-  // require.resolve might fail the build if the package is not installed
-  // Instead of failing it'll be ignored
+  // パッケージがインストールされていないと、require.resolve がビルドを失敗させることがある
+  // 失敗させる代わりに無視する
   try {
-    // TODO collect javascript aliases to match the partial hydration bundle
+    // TODO Partial Hydration のバンドルに合わせて JavaScript のエイリアスを収集する
     config.resolve.alias[`gatsby-plugin-image`] = require.resolve(
       `gatsby-plugin-image/dist/gatsby-image.browser.modern`
     )
   } catch (e) {
-    // do nothing
+    // 何もしない
   }
 
   return doBuildPartialHydrationRenderer(program.directory, config, stage)
 }
 
-// TODO remove after v4 release and update cloud internals
+// TODO v4 のリリース後に削除し、クラウドの内部実装を更新する
 export const deleteRenderer = async (rendererPath: string): Promise<void> => {
   try {
     await fs.remove(rendererPath)
     await fs.remove(`${rendererPath}.map`)
   } catch (e) {
-    // This function will fail on Windows with no further consequences.
+    // この関数は Windows では失敗するが、それ以上の影響はない。
   }
 }
 export interface IRenderHtmlResult {
@@ -346,8 +346,8 @@ const renderHTMLQueue = async (
   pages: Array<string>,
   stage: Stage = Stage.BuildHTML
 ): Promise<void> => {
-  // We need to only pass env vars that are set programmatically in gatsby-cli
-  // to child process. Other vars will be picked up from environment.
+  // 子プロセスには、gatsby-cli でプログラムから設定された環境変数だけを
+  // 渡す必要がある。他の変数は環境から取得される。
   const envVars: Array<[string, string | undefined]> = [
     [`NODE_ENV`, process.env.NODE_ENV],
     [`gatsby_executing_command`, process.env.gatsby_executing_command],
@@ -491,8 +491,8 @@ const renderPartialHydrationQueue = async (
   pages: Array<string>,
   program: IProgram
 ): Promise<void> => {
-  // We need to only pass env vars that are set programmatically in gatsby-cli
-  // to child process. Other vars will be picked up from environment.
+  // 子プロセスには、gatsby-cli でプログラムから設定された環境変数だけを
+  // 渡す必要がある。他の変数は環境から取得される。
   const envVars: Array<[string, string | undefined]> = [
     [`NODE_ENV`, process.env.NODE_ENV],
     [`gatsby_executing_command`, process.env.gatsby_executing_command],
@@ -505,7 +505,7 @@ const renderPartialHydrationQueue = async (
   const { config } = store.getState()
   const { assetPrefix, pathPrefix } = config
 
-  // Let the error bubble up
+  // エラーを上位へ伝播させる
   await Promise.all(
     segments.map(async pageSegment => {
       await workerPool.single.renderPartialHydrationProd({
@@ -531,8 +531,8 @@ class BuildHTMLError extends Error {
   constructor(error: Error) {
     super(error.message)
 
-    // We must use getOwnProperty because keys like `stack` are not enumerable,
-    // but we want to copy over the entire error
+    // `stack` のようなキーは列挙可能ではないので、getOwnProperty を使う必要がある。
+    // エラー全体をコピーしたいためである
     Object.getOwnPropertyNames(error).forEach(key => {
       this[key] = error[key]
     })
@@ -563,8 +563,8 @@ export const doBuildPages = async (
         error.context.path
       }": ${JSON.stringify(modifiedPageDataForErrorMessage, null, 2)}`
 
-      // This is our only error during preview so customize it a bit + add the
-      // pretty build error.
+      // プレビュー中のエラーはこれだけなので、少しカスタマイズし、
+      // 整形したビルドエラーを追加する。
       if (isPreview) {
         reporter.error({
           id: `95314`,
@@ -576,14 +576,14 @@ export const doBuildPages = async (
       }
     }
 
-    // Don't crash the builder when we're in preview-mode.
+    // プレビューモードではビルダーをクラッシュさせない。
     if (!isPreview) {
       throw buildError
     }
   }
 }
 
-// TODO remove in v4 - this could be a "public" api
+// TODO v4 で削除する - これは「公開」API になりうる
 export const buildHTML = async ({
   program,
   stage,
@@ -698,7 +698,7 @@ export async function buildHTMLPagesAndDeleteStaleArtifacts({
           program
         )
       } catch (error) {
-        // Generic error with page path and useful stack trace, accurate code frame can be a future improvement
+        // ページパスと役に立つスタックトレースを持つ汎用のエラー。正確なコードフレームは今後の改善の余地がある
         buildHTMLActivityProgress.panic({
           id: `80000`,
           context: error.context,
@@ -714,7 +714,7 @@ export async function buildHTMLPagesAndDeleteStaleArtifacts({
     try {
       await deleteRenderer(rendererPath)
     } catch (err) {
-      // pass through
+      // そのまま通す
     }
   }
 
@@ -756,7 +756,7 @@ export async function buildSlices({
 }): Promise<void> {
   const state = store.getState()
 
-  // for now we always render everything, everytime
+  // 今のところ、毎回すべてをレンダリングする
   const slicesProps: Array<ISlicePropsEntry> = []
   for (const [
     sliceId,
@@ -822,7 +822,7 @@ export async function buildSlices({
       buildHTMLActivityProgress.end()
     }
 
-    // for now separate action for cleaning dirty flag and removing stale entries
+    // 今のところ、dirty フラグのクリアと古いエントリーの削除は別のアクションにしている
     store.dispatch({
       type: `SLICES_PROPS_RENDERED`,
       payload: slicesProps,

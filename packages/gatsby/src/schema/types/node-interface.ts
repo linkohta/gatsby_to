@@ -13,9 +13,9 @@ export const NodeInterfaceFields = [`id`, `parent`, `children`, `internal`]
 const getOrCreateNodeInterface = <TSource, TArgs>(
   schemaComposer: SchemaComposer<IGatsbyResolverContext<TSource, TArgs>>
 ): InterfaceTypeComposer => {
-  // TODO: why is `mediaType` on Internal? Applies only to File!?
-  // `fieldOwners` is an object
-  // Should we drop ignoreType?
+  // TODO: なぜ `mediaType` が Internal にあるのか？ File にしか当てはまらないのでは？
+  // `fieldOwners` はオブジェクトである
+  // ignoreType は削除すべきか？
   const internalTC = schemaComposer.getOrCreateOTC(`Internal`, tc => {
     tc.addFields({
       content: `String`,
@@ -28,7 +28,7 @@ const getOrCreateNodeInterface = <TSource, TArgs>(
       type: `String!`,
       contentFilePath: `String`,
     })
-    // TODO: Can be removed with graphql-compose 5.11
+    // TODO: graphql-compose 5.11 で削除できる
     tc.getInputTypeComposer()
   })
 

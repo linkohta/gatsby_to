@@ -7,9 +7,9 @@ const originalStatusPageByStatus = {}
 const originalStatusPageByPath = {}
 
 emitter.on(`CREATE_PAGE`, action => {
-  // Copy /404/ to /404.html and /500/ to /500.html. Many static site hosts expect
-  // site 404 pages to be named this. In addition, with Rendering Engines there might
-  // be runtime errors which would fallback to "/500.html" page.
+  // /404/ を /404.html に、/500/ を /500.html にコピーする。多くの静的サイトホスティングは、
+  // サイトの 404 ページがこの名前であることを期待している。さらに、Rendering Engines では
+  // 実行時エラーが起きることがあり、その場合は "/500.html" ページにフォールバックする。
   // https://www.gatsbyjs.com/docs/how-to/adding-common-features/add-404-page/
   const result = /^\/?(404|500)\/?$/.exec(action.payload.path)
   if (result && result.length > 1) {

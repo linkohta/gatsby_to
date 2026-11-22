@@ -39,11 +39,11 @@ export function htmlReducer(
   switch (action.type) {
     case `DELETE_CACHE`: {
       if (action.cacheIsCorrupt) {
-        // `public` doesn't exist so we can start fresh
+        // `public` が存在しないので、まっさらな状態から始められる
         return initialState()
       } else {
-        // we can't just clear the cache here - we want to keep track of pages, so we mark them all as "deleted"
-        // if they are recreated "isDeleted" flag will be removed
+        // ここで単純にキャッシュを消すことはできない。ページを追跡し続けたいので、すべてに "deleted" の印を付ける
+        // ページが作り直されれば、"isDeleted" フラグは取り除かれる
         state.browserCompilationHash = ``
         state.ssrCompilationHash = ``
         state.templateCompilationHashes = {}
@@ -51,10 +51,10 @@ export function htmlReducer(
         state.unsafeBuiltinWasUsedInSSR = false
         state.trackedHtmlFiles.forEach(htmlFile => {
           htmlFile.isDeleted = true
-          // there was a change somewhere, so just in case we mark those files are dirty as well
+          // どこかに変更があったので、念のためそれらのファイルにもダーティの印を付ける
           htmlFile.dirty |= FLAG_DIRTY_CLEARED_CACHE
         })
-        // slice html don't need to be deleted, they are just cleared
+        // スライスの html は削除する必要がなく、消去するだけでよい
         state.slicesProps = {
           bySliceId: new Map(),
           byPagePath: new Map(),
@@ -66,8 +66,8 @@ export function htmlReducer(
     }
 
     case `CREATE_PAGE`: {
-      // CREATE_PAGE can be called even if page already exist, so we only want to do anything
-      // if we don't track given page yet or if page is marked as deleted
+      // CREATE_PAGE はページがすでに存在していても呼ばれることがあるので、そのページをまだ
+      // 追跡していない場合か、ページに削除済みの印が付いている場合にだけ処理をする
       const { path } = action.payload
 
       let htmlFile = state.trackedHtmlFiles.get(path)
@@ -79,8 +79,8 @@ export function htmlReducer(
         }
         state.trackedHtmlFiles.set(path, htmlFile)
       } else if (htmlFile.isDeleted) {
-        // page was recreated so we remove `isDeleted` flag
-        // TBD if dirtiness need to change
+        // ページが作り直されたので、`isDeleted` フラグを取り除く
+        // ダーティの状態を変える必要があるかは未定
         htmlFile.isDeleted = false
       }
 
@@ -104,26 +104,26 @@ export function htmlReducer(
       const htmlFile = state.trackedHtmlFiles.get(path)
 
       if (!htmlFile) {
-        // invariant
+        // 不変条件
         throw new Error(
           `[html reducer] how can I delete page that wasn't created (?)`
         )
       }
 
       htmlFile.isDeleted = true
-      // TBD if dirtiness need to change
+      // ダーティの状態を変える必要があるかは未定
       return state
     }
 
     case `PAGE_QUERY_RUN`: {
-      // Despite action name, this action is actually emitted for both page and static queries.
-      // In here we actually only care about static query result (particularly its hash).
-      // We don't care about page query result because we don't actually use page query result
-      // directly when generating html. We care about page-data (which contains page query result).
-      // Handling of page-data that transitively handles page query result is done in handler for
-      // `ADD_PAGE_DATA_STATS` action.
+      // アクション名に反して、このアクションは実際にはページクエリと静的クエリの両方で発行される。
+      // ここで実際に関心があるのは、静的クエリの結果（特にそのハッシュ）だけである。
+      // ページクエリの結果には関心がない。html を生成するときにページクエリの結果を直接は
+      // 使わないためである。関心があるのは（ページクエリの結果を含む）page-data である。
+      // page-data の処理は、間接的にページクエリの結果も扱うことになり、
+      // `ADD_PAGE_DATA_STATS` アクションのハンドラーで行う。
       if (action.payload.queryType === `static`) {
-        // static query case
+        // 静的クエリの場合
         let staticQueryResult = state.trackedStaticQueryResults.get(
           action.payload.queryHash
         )
@@ -149,7 +149,7 @@ export function htmlReducer(
     case `ADD_PAGE_DATA_STATS`: {
       const htmlFile = state.trackedHtmlFiles.get(action.payload.pagePath)
       if (!htmlFile) {
-        // invariant
+        // 不変条件
         throw new Error(
           `[html reducer] I received event that query for a page finished running, but I'm not aware of the page it ran for (?)`
         )
@@ -226,9 +226,9 @@ export function htmlReducer(
     case `SET_SSR_WEBPACK_COMPILATION_HASH`: {
       if (state.ssrCompilationHash !== action.payload) {
         state.ssrCompilationHash = action.payload
-        // we will mark every html file as dirty, so we can safely reset
-        // unsafeBuiltinWasUsedInSSR flag, which might be set again if
-        // ssr bundle continue to use those
+        // すべての html ファイルにダーティの印を付けるので、
+        // unsafeBuiltinWasUsedInSSR フラグは安全にリセットできる。ssr バンドルが
+        // 引き続きそれらを使っていれば、フラグは再び設定される
         state.unsafeBuiltinWasUsedInSSR = false
         state.trackedHtmlFiles.forEach(htmlFile => {
           htmlFile.dirty |= FLAG_DIRTY_SSR_COMPILATION_HASH
@@ -243,10 +243,10 @@ export function htmlReducer(
     }
 
     case `HTML_TRACKED_PAGES_CLEANUP`: {
-      // this is to cleanup variants of page paths that don't result in artifacts deletion
-      // but page path should be pruned for cases like page changing path from "/foo" to "/foo/" (or vice versa)
-      // where produced artifacts filenames are the same and we don't want to delete them after building,
-      // but we still want to cleanup state here.
+      // これは、成果物の削除にはつながらないページパスのバリエーションを片付けるためのものである
+      // たとえばページのパスが "/foo" から "/foo/" に変わる（またはその逆）場合、生成される成果物の
+      // ファイル名は同じなので、ビルド後に削除したくはない。しかしその場合でもページパスは取り除くべきであり、
+      // ここで状態を片付けておきたい。
       for (const path of action.payload) {
         state.trackedHtmlFiles.delete(path)
       }
@@ -258,8 +258,8 @@ export function htmlReducer(
         const htmlFile = state.trackedHtmlFiles.get(path)
         if (htmlFile) {
           htmlFile.dirty = 0
-          // if we regenerated html, slice placeholders will be empty and we will have to fill
-          // them in, so we are marking that page for stitching
+          // html を再生成した場合、スライスのプレースホルダーは空になっており、埋める必要が
+          // あるので、そのページにつなぎ合わせ（stitching）の対象の印を付ける
           state.pagesThatNeedToStitchSlices.add(path)
         }
       }
@@ -268,7 +268,7 @@ export function htmlReducer(
     }
 
     case `HTML_MARK_DIRTY_BECAUSE_STATIC_QUERY_RESULT_CHANGED`: {
-      // mark pages as dirty
+      // ページにダーティの印を付ける
       for (const path of action.payload.pages) {
         const htmlFile = state.trackedHtmlFiles.get(path)
         if (htmlFile) {
@@ -277,7 +277,7 @@ export function htmlReducer(
       }
 
       if (_CFLAGS_.GATSBY_MAJOR === `5` && process.env.GATSBY_SLICES) {
-        // mark slices as dirty
+        // スライスにダーティの印を付ける
         for (const sliceName of action.payload.slices) {
           const sliceProps = state.slicesProps.bySliceName.get(sliceName)
           if (sliceProps) {
@@ -286,7 +286,7 @@ export function htmlReducer(
         }
       }
 
-      // mark static queries as not dirty anymore (we flushed their dirtiness into pages)
+      // 静的クエリのダーティの印を外す（ダーティの状態はページへ反映した）
       for (const staticQueryHash of action.payload.staticQueryHashes) {
         const staticQueryResult =
           state.trackedStaticQueryResults.get(staticQueryHash)
@@ -296,7 +296,7 @@ export function htmlReducer(
       }
 
       if (_CFLAGS_.GATSBY_MAJOR === `5` && process.env.GATSBY_SLICES) {
-        // loop through slice names and mark their slice props as dirty
+        // スライス名を順に処理し、それぞれのスライスの props にダーティの印を付ける
         for (const sliceNameInfo of state.slicesProps.bySliceName.values()) {
           if (sliceNameInfo.dirty) {
             for (const sliceId of sliceNameInfo.props) {

@@ -31,7 +31,7 @@ jest.mock(`@parcel/core`, () => {
   class MockedParcel extends OriginalParcel {
     constructor(options) {
       super(options)
-      this.options = options // Expose for assertions
+      this.options = options // アサーションのために公開する
     }
   }
 

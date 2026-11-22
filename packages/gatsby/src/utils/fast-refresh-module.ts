@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-// Use `self` here instead of `window` so it works in non-window environments (like Workers)
+// window のない環境（Worker など）でも動くように、ここでは `self` を使い、`window` は使わない
 self._gatsbyEvents = self._gatsbyEvents || []
 
 export function clearCompileError(): void {

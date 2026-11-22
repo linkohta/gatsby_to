@@ -99,9 +99,9 @@ export async function runQueriesInWorkersQueue(
         .catch(handleRunQueriesInWorkersQueueError)
     }
 
-    // note that we only await on this and not on anything before (`.setComponents()` or `.runQueries()`)
-    // because gatsby-worker will queue tasks internally and worker will never execute multiple tasks at the same time
-    // so awaiting `.saveQueriesDependencies()` is enough to make sure `.setComponents()` and `.runQueries()` finished
+    // ここで await するのはこれだけで、それより前のもの（`.setComponents()` や `.runQueries()`）は await しない点に注意
+    // gatsby-worker は内部でタスクをキューに入れ、ワーカーが複数のタスクを同時に実行することはないので、
+    // `.saveQueriesDependencies()` を await すれば `.setComponents()` と `.runQueries()` が終わったことも保証できる
     await Promise.all(pool.all.saveQueriesDependencies())
   } catch (e) {
     handleRunQueriesInWorkersQueueError(e)
@@ -140,7 +140,7 @@ export async function mergeWorkerState(
     }
 
     if (Object.keys(payload).length) {
-      // When there are too little queries, some worker can be inactive and its state is empty
+      // クエリが少なすぎると、一部のワーカーが動かず、その状態が空になることがある
       store.dispatch({
         type: `MERGE_WORKER_QUERY_STATE`,
         payload: {
@@ -161,7 +161,7 @@ async function replayWorkerActions(
   for (const action of actions) {
     store.dispatch(action)
 
-    // Give event loop some breath
+    // イベントループに少し余裕を与える
     if (i++ % 100 === 0) {
       await new Promise(resolve => process.nextTick(resolve))
     }

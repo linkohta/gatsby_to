@@ -187,11 +187,11 @@ describe(`merges explicit and inferred type definitions`, () => {
         const nestedFields = schema.getType(`Nested`).getFields()
         const nestedNestedFields = schema.getType(`NestedNested`).getFields()
 
-        // Non-conflicting top-level fields added
+        // 衝突しないトップレベルのフィールドは追加される
         expect(fields.foo.type.toString()).toBe(`Boolean`)
         expect(fields.bar.type.toString()).toBe(`Boolean!`)
 
-        // Non-conflicting fields added on nested type
+        // 衝突しないフィールドは、ネストした型に追加される
         expect(fields.nested.type.toString()).toBe(`Nested!`)
         expect(fields.nestedArray.type.toString()).toBe(`[Nested!]!`)
         expect(nestedFields.foo.type.toString()).toBe(`Boolean`)
@@ -199,8 +199,8 @@ describe(`merges explicit and inferred type definitions`, () => {
         expect(nestedNestedFields.foo.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.bar.type.toString()).toBe(`Boolean!`)
 
-        // When type is referenced more than once on typeDefs, all non-conflicting
-        // fields are added
+        // 型が typeDefs で複数回参照されている場合は、衝突しない
+        // すべてのフィールドが追加される
         expect(nestedFields.extra.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.notExtra.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.extraExtra.type.toString()).toBe(`Boolean`)
@@ -208,7 +208,7 @@ describe(`merges explicit and inferred type definitions`, () => {
           `Boolean`
         )
 
-        // Explicit typeDefs have proprity in case of type conflict
+        // 型が衝突した場合は、明示的な typeDefs が優先される
         expect(fields.conflictType.type.toString()).toBe(`String!`)
         expect(fields.conflictArray.type.toString()).toBe(`Int!`)
         expect(fields.conflictArrayReverse.type.toString()).toBe(`[Int!]!`)
@@ -220,11 +220,11 @@ describe(`merges explicit and inferred type definitions`, () => {
           `[Nested!]!`
         )
 
-        // Explicit typeDefs have priority on nested types as well
+        // ネストした型でも、明示的な typeDefs が優先される
         expect(nestedFields.conflict.type.toString()).toBe(`String!`)
         expect(nestedNestedFields.conflict.type.toString()).toBe(`String!`)
 
-        // Date resolvers
+        // Date のリゾルバー
         expect(fields.explicitDate.resolve).toBeDefined()
         expect(fields.inferDate.resolve).toBeDefined()
       })
@@ -238,11 +238,11 @@ describe(`merges explicit and inferred type definitions`, () => {
         const nestedFields = schema.getType(`Nested`).getFields()
         const nestedNestedFields = schema.getType(`NestedNested`).getFields()
 
-        // Non-conflicting top-level fields added
+        // 衝突しないトップレベルのフィールドは追加される
         expect(fields.foo.type.toString()).toBe(`Boolean`)
         expect(fields.bar.type.toString()).toBe(`Boolean!`)
 
-        // Non-conflicting fields added on nested type
+        // 衝突しないフィールドは、ネストした型に追加される
         expect(fields.nested.type.toString()).toBe(`Nested!`)
         expect(fields.nestedArray.type.toString()).toBe(`[Nested!]!`)
         expect(nestedFields.foo.type.toString()).toBe(`Boolean`)
@@ -250,8 +250,8 @@ describe(`merges explicit and inferred type definitions`, () => {
         expect(nestedNestedFields.foo.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.bar.type.toString()).toBe(`Boolean!`)
 
-        // When type is referenced more than once on typeDefs, all non-conflicting
-        // fields are added
+        // 型が typeDefs で複数回参照されている場合は、衝突しない
+        // すべてのフィールドが追加される
         expect(nestedFields.extra.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.notExtra.type.toString()).toBe(`Boolean`)
         expect(nestedNestedFields.extraExtra.type.toString()).toBe(`Boolean`)
@@ -259,7 +259,7 @@ describe(`merges explicit and inferred type definitions`, () => {
           `Boolean`
         )
 
-        // Explicit typeDefs have proprity in case of type conflict
+        // 型が衝突した場合は、明示的な typeDefs が優先される
         expect(fields.conflictType.type.toString()).toBe(`String!`)
         expect(fields.conflictArray.type.toString()).toBe(`Int!`)
         expect(fields.conflictArrayReverse.type.toString()).toBe(`[Int!]!`)
@@ -271,11 +271,11 @@ describe(`merges explicit and inferred type definitions`, () => {
           `[Nested!]!`
         )
 
-        // Explicit typeDefs have priority on nested types as well
+        // ネストした型でも、明示的な typeDefs が優先される
         expect(nestedFields.conflict.type.toString()).toBe(`String!`)
         expect(nestedNestedFields.conflict.type.toString()).toBe(`String!`)
 
-        // Date resolvers
+        // Date のリゾルバー
         expect(fields.explicitDate.resolve).toBe(defaultResolver)
         expect(fields.inferDate.resolve).toBeDefined()
       })
@@ -288,10 +288,10 @@ describe(`merges explicit and inferred type definitions`, () => {
         const nestedFields = schema.getType(`Nested`).getFields()
         const nestedNestedFields = schema.getType(`NestedNested`).getFields()
 
-        // Non-conflicting top-level fields added
+        // 衝突しないトップレベルのフィールドは追加される
         expect(fields.bar.type.toString()).toBe(`Boolean!`)
 
-        // Not adding inferred fields
+        // 推論されたフィールドは追加しない
         expect(fields.foo).toBeUndefined()
         expect(nestedFields.foo).toBeUndefined()
         expect(nestedNestedFields.foo).toBeUndefined()
@@ -300,17 +300,17 @@ describe(`merges explicit and inferred type definitions`, () => {
         expect(nestedNestedFields.extraExtraExtra).toBeUndefined()
         expect(fields.inferDate).toBeUndefined()
 
-        // Non-conflicting fields added on nested type
+        // 衝突しないフィールドは、ネストした型に追加される
         expect(fields.nested.type.toString()).toBe(`Nested!`)
         expect(fields.nestedArray.type.toString()).toBe(`[Nested!]!`)
         expect(nestedFields.bar.type.toString()).toBe(`Boolean!`)
         expect(nestedNestedFields.bar.type.toString()).toBe(`Boolean!`)
 
-        // When type is referenced more than once on typeDefs, all non-conflicting
-        // fields are added
+        // 型が typeDefs で複数回参照されている場合は、衝突しない
+        // すべてのフィールドが追加される
         expect(nestedNestedFields.notExtra.type.toString()).toBe(`Boolean`)
 
-        // Explicit typeDefs have proprity in case of type conflict
+        // 型が衝突した場合は、明示的な typeDefs が優先される
         expect(fields.conflictType.type.toString()).toBe(`String!`)
         expect(fields.conflictArray.type.toString()).toBe(`Int!`)
         expect(fields.conflictArrayReverse.type.toString()).toBe(`[Int!]!`)
@@ -322,11 +322,11 @@ describe(`merges explicit and inferred type definitions`, () => {
           `[Nested!]!`
         )
 
-        // Explicit typeDefs have priority on nested types as well
+        // ネストした型でも、明示的な typeDefs が優先される
         expect(nestedFields.conflict.type.toString()).toBe(`String!`)
         expect(nestedNestedFields.conflict.type.toString()).toBe(`String!`)
 
-        // Date resolvers
+        // Date のリゾルバー
         expect(fields.explicitDate.resolve).toBe(defaultResolver)
       })
     })

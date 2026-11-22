@@ -19,16 +19,16 @@ const staticallyAnalyzeExports = (
   try {
     absPath = resolver(modulePath) as string
   } catch (err) {
-    return exportNames // doesn't exist
+    return exportNames // 存在しない
   }
-  const code = fs.readFileSync(absPath, `utf8`) // get file contents
+  const code = fs.readFileSync(absPath, `utf8`) // ファイルの内容を取得する
 
   let ast
   try {
     ast = babelParseToAst(code, absPath)
   } catch (err) {
     if (err instanceof SyntaxError) {
-      // Pretty print syntax errors
+      // 構文エラーを整形して出力する
       const codeFrame = codeFrameColumns(
         code,
         {
@@ -43,7 +43,7 @@ const staticallyAnalyzeExports = (
         `Syntax error in "${absPath}":\n${err.message}\n${codeFrame}`
       )
     } else {
-      // if it's not syntax error, just throw it
+      // 構文エラーでなければ、そのまま投げる
       throw err
     }
   }
@@ -51,9 +51,9 @@ const staticallyAnalyzeExports = (
   let isCommonJS = false
   let isES6 = false
 
-  // extract names of exports from file
+  // ファイルから export の名前を取り出す
   traverse(ast, {
-    // Check if the file is using ES6 imports
+    // ファイルが ES6 の import を使っているかを確認する
     ImportDeclaration: function ImportDeclaration() {
       isES6 = true
     },
@@ -61,7 +61,7 @@ const staticallyAnalyzeExports = (
     ExportNamedDeclaration: function ExportNamedDeclaration(astPath) {
       const declaration = astPath.node.declaration
 
-      // get foo from `export const foo = bar`
+      // `export const foo = bar` から foo を取得する
       if (
         declaration?.type === `VariableDeclaration` &&
         declaration.declarations[0]?.id.type === `Identifier`
@@ -70,7 +70,7 @@ const staticallyAnalyzeExports = (
         exportNames.push(declaration.declarations[0].id.name)
       }
 
-      // get foo from `export function foo()`
+      // `export function foo()` から foo を取得する
       if (
         declaration?.type === `FunctionDeclaration` &&
         declaration.id?.type === `Identifier`
@@ -80,8 +80,8 @@ const staticallyAnalyzeExports = (
       }
     },
 
-    // get foo from `export { foo } from 'bar'`
-    // get foo from `export { foo }`
+    // `export { foo } from 'bar'` から foo を取得する
+    // `export { foo }` から foo を取得する
     ExportSpecifier: function ExportSpecifier(astPath) {
       isES6 = true
       const exp = astPath?.node?.exported
@@ -129,7 +129,7 @@ const staticallyAnalyzeExports = (
         return
       }
 
-      // ignore marker property `__esModule`
+      // 目印のプロパティ `__esModule` は無視する
       if (
         t.isIdentifier(nodeLeft.property) &&
         nodeLeft.property.name === `__esModule`
@@ -137,7 +137,7 @@ const staticallyAnalyzeExports = (
         return
       }
 
-      // get foo from `exports.foo = bar`
+      // `exports.foo = bar` から foo を取得する
       if (
         t.isIdentifier(nodeLeft.object) &&
         nodeLeft.object.name === `exports`
@@ -146,7 +146,7 @@ const staticallyAnalyzeExports = (
         exportNames.push((nodeLeft.property as t.Identifier).name)
       }
 
-      // get foo from `module.exports.foo = bar`
+      // `module.exports.foo = bar` から foo を取得する
       if (t.isMemberExpression(nodeLeft.object)) {
         const exp: t.MemberExpression = nodeLeft.object
 
@@ -185,16 +185,16 @@ interface IResolveModuleExportsOptions {
 }
 
 /**
- * Given a path to a module, return an array of the module's exports.
+ * モジュールへのパスを受け取り、そのモジュールの export の配列を返す。
  *
- * It can run in two modes:
- * 1. `analysis` mode gets exports via static analysis by traversing the file's AST with babel
- * 2. `import` mode gets exports by directly importing the module and accessing its properties
+ * 2 つのモードで実行できる:
+ * 1. `analysis` モードは、babel でファイルの AST を走査する静的解析によって export を取得する
+ * 2. `import` モードは、モジュールを直接 import し、そのプロパティにアクセスして export を取得する
  *
- * At the time of writing, analysis mode is used for files that can be jsx (e.g. gatsby-browser, gatsby-ssr)
- * and import mode is used for files that can be js or mjs.
+ * 執筆時点では、analysis モードは jsx になりうるファイル（gatsby-browser、gatsby-ssr など）に使い、
+ * import モードは js または mjs になりうるファイルに使う。
  *
- * Returns [] for invalid paths and modules without exports.
+ * 無効なパスや export のないモジュールに対しては [] を返す。
  */
 export async function resolveModuleExports(
   modulePath: string,
@@ -219,7 +219,7 @@ export async function resolveModuleExports(
         maybeAddFileProtocol(moduleFilePath)
       )
 
-      // If the module is cjs, the properties we care about are nested under a top-level `default` property
+      // モジュールが cjs の場合、必要なプロパティはトップレベルの `default` プロパティの下にネストされている
       const importedModule = preferDefault(rawImportedModule)
 
       return Object.keys(importedModule).filter(
@@ -227,8 +227,8 @@ export async function resolveModuleExports(
       )
     } catch (error) {
       if (!testImportError(modulePath, error)) {
-        // if module exists, but requiring it cause errors,
-        // show the error to the user and terminate build
+        // モジュールは存在するが require するとエラーになる場合は、
+        // ユーザーにエラーを表示してビルドを終了する
         report.panic(`Error in "${modulePath}":`, error)
       }
     }

@@ -30,8 +30,8 @@ export const jobsV2Reducer = (
 ): IGatsbyState["jobsV2"] => {
   switch (action.type) {
     case `DELETE_CACHE`: {
-      // Wipe the cache if state shape doesn't match the initial shape
-      // It is possible when the old cache is loaded for the new version of this reducer
+      // 状態の形が初期状態の形と一致しない場合は、キャッシュを消す
+      // このレデューサーの新しいバージョンで古いキャッシュが読み込まれると、起こりうる
       const cleanState = initialState()
       const cleanStateKeys = Object.keys(cleanState)
 
@@ -68,7 +68,7 @@ export const jobsV2Reducer = (
 
       state.incomplete.delete(job.contentDigest)
 
-      // inputPaths is used to make sure the job is not stale
+      // inputPaths は、ジョブが古くなっていないことを確認するために使う
       state.complete.set(job.contentDigest, {
         result,
         inputPaths: job.inputPaths,

@@ -18,25 +18,25 @@ const getGraphqlTypegenConfig = (ctx: IBuildContext): boolean =>
   !!ctx.store!.getState().config.graphqlTypegen
 
 /**
- * This is the top-level state machine for the `gatsby develop` command
+ * これは `gatsby develop` コマンドのトップレベルのステートマシンである
  */
 const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
   predictableActionArguments: true,
   id: `build`,
   initial: `initializing`,
-  // These are mutation events, sent to this machine by the mutation listener
-  // in `services/listen-for-mutations.ts`
+  // これらは変更イベントであり、`services/listen-for-mutations.ts` の
+  // 変更リスナーからこのマシンへ送られる
   on: {
-    // These are deferred node mutations, mainly `createNode`
+    // これらは遅延されたノードの変更であり、主に `createNode` である
     ADD_NODE_MUTATION: {
       actions: `addNodeMutation`,
     },
-    // Sent when webpack or chokidar sees a changed file
+    // webpack または chokidar がファイルの変更を検出したときに送られる
     SOURCE_FILE_CHANGED: {
       actions: `markSourceFilesDirty`,
     },
-    // These are calls to the refresh endpoint. Also used by Gatsby Preview.
-    // Saves the webhook body from the event into context, then reloads data
+    // これらは refresh エンドポイントへの呼び出しである。Gatsby Preview でも使われる。
+    // イベントの webhook のボディをコンテキストに保存し、データを再読み込みする
     WEBHOOK_RECEIVED: {
       target: `reloadingData`,
       actions: `assignWebhookBody`,
@@ -56,10 +56,10 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     },
   },
   states: {
-    // Here we handle the initial bootstrap
+    // ここで最初の bootstrap を処理する
     initializing: {
       on: {
-        // Ignore mutation events because we'll be running everything anyway
+        // いずれにしてもすべてを実行するので、変更イベントは無視する
         ADD_NODE_MUTATION: undefined,
         SOURCE_FILE_CHANGED: undefined,
         WEBHOOK_RECEIVED: undefined,
@@ -76,10 +76,10 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
       },
     },
-    // Sourcing nodes, customising and inferring schema, then running createPages
+    // ノードを取得し、スキーマをカスタマイズして推論し、その後 createPages を実行する
     initializingData: {
       on: {
-        // We need to run mutations immediately when in this state
+        // この状態では、変更をすぐに実行する必要がある
         ADD_NODE_MUTATION: {
           actions: `callApi`,
         },
@@ -125,7 +125,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         onDone: `runningQueries`,
       },
     },
-    // Running page and static queries and generating the SSRed HTML and page data
+    // ページクエリと静的クエリを実行し、SSR した HTML とページデータを生成する
     runningQueries: {
       on: {
         SOURCE_FILE_CHANGED: {
@@ -141,7 +141,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       invoke: {
         id: `run-queries`,
         src: `runQueries`,
-        // This is all the data that we're sending to the child machine
+        // これが、子のマシンへ送るデータのすべてである
         data: ({
           program,
           store,
@@ -165,7 +165,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
         onDone: [
           {
-            // If we're at the recompile limit and nodes were mutated again then panic
+            // 再コンパイルの上限に達していて、ノードが再び変更された場合は panic にする
             target: `waiting`,
             actions: `panicBecauseOfInfiniteLoop`,
             cond: ({
@@ -176,7 +176,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
               nodesMutatedDuringQueryRunRecompileCount >= RECOMPILE_PANIC_LIMIT,
           },
           {
-            // Nodes were mutated while querying, so we need to re-run everything
+            // クエリの実行中にノードが変更されたので、すべてを再実行する必要がある
             target: `recreatingPages`,
             cond: ({ nodesMutatedDuringQueryRun }: IBuildContext): boolean =>
               !!nodesMutatedDuringQueryRun,
@@ -187,21 +187,21 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
             ],
           },
           {
-            // If we have no compiler (i.e. it's first run), then spin up the
-            // webpack and socket.io servers
+            // コンパイラーがない場合（つまり初回の実行）は、webpack と socket.io の
+            // サーバーを起動する
             target: `startingDevServers`,
             actions: [`setQueryRunningFinished`, `clearPendingQueryRuns`],
             cond: ({ compiler }: IBuildContext): boolean => !compiler,
           },
           {
-            // If source files have changed, then recompile the JS bundle
+            // ソースファイルが変更されている場合は、JS バンドルを再コンパイルする
             target: `recompiling`,
             cond: ({ sourceFilesDirty }: IBuildContext): boolean =>
               !!sourceFilesDirty,
             actions: [`clearPendingQueryRuns`],
           },
           {
-            // ...otherwise just wait.
+            // ...そうでなければ、待つだけである。
             target: `waiting`,
             actions: [`clearPendingQueryRuns`],
           },
@@ -213,11 +213,11 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       },
       exit: assign<IBuildContext>({ shouldRunInitialTypegen: false }),
     },
-    // Recompile the JS bundle
+    // JS バンドルを再コンパイルする
     recompiling: {
-      // Important: mark source files as clean when recompiling starts
-      // Doing this `onDone` will wipe all file change events that occur **during** recompilation
-      // See https://github.com/gatsbyjs/gatsby/issues/27609
+      // 重要: 再コンパイルの開始時に、ソースファイルをクリーンとして印を付ける
+      // これを `onDone` で行うと、再コンパイルの **途中** で起きたファイル変更イベントがすべて消えてしまう
+      // https://github.com/gatsbyjs/gatsby/issues/27609 を参照
       entry: [`setRecompiledFiles`, `markSourceFilesClean`],
       invoke: {
         src: `recompile`,
@@ -230,7 +230,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
       },
     },
-    // Spin up webpack and socket.io
+    // webpack と socket.io を起動する
     startingDevServers: {
       invoke: {
         src: `startWebpackServer`,
@@ -262,7 +262,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
       },
     },
-    // Idle, waiting for events that make us rebuild
+    // アイドル状態。再ビルドのきっかけになるイベントを待つ
     waiting: {
       always: [
         {
@@ -273,14 +273,14 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       ],
       entry: [`saveDbState`, `resetRecompileCount`],
       on: {
-        // Forward these events to the child machine, so it can handle batching
+        // バッチ処理を扱えるように、これらのイベントを子のマシンへ転送する
         ADD_NODE_MUTATION: {
           actions: forwardTo(`waiting`),
         },
         SOURCE_FILE_CHANGED: {
           actions: [forwardTo(`waiting`), `markSourceFilesDirty`],
         },
-        // This event is sent from the child
+        // このイベントは子から送られる
         EXTRACT_QUERIES_NOW: {
           target: `runningQueries`,
         },
@@ -288,7 +288,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       invoke: {
         id: `waiting`,
         src: `waitForMutations`,
-        // Send existing queued mutations to the child machine, which will execute them
+        // キューに入っている既存の変更を子のマシンへ送り、子がそれらを実行する
         data: ({
           store,
           nodeMutationBatch = [],
@@ -301,7 +301,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
             runningBatch: [],
           }
         },
-        // "done" means we need to rebuild
+        // "done" は、再ビルドが必要であることを意味する
         onDone: {
           actions: `assignServiceResult`,
           target: `recreatingPages`,
@@ -311,10 +311,10 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
       },
     },
-    // Almost the same as initializing data, but skips various first-run stuff
+    // データの初期化とほぼ同じだが、初回の実行に関するさまざまな処理をスキップする
     reloadingData: {
       on: {
-        // We need to run mutations immediately when in this state
+        // この状態では、変更をすぐに実行する必要がある
         ADD_NODE_MUTATION: {
           actions: `callApi`,
         },
@@ -355,10 +355,10 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         },
       },
     },
-    // Rebuild pages if a node has been mutated outside of sourceNodes
+    // sourceNodes の外でノードが変更された場合は、ページを再ビルドする
     recreatingPages: {
       on: {
-        // We need to run mutations immediately when in this state
+        // この状態では、変更をすぐに実行する必要がある
         ADD_NODE_MUTATION: {
           actions: `callApi`,
         },

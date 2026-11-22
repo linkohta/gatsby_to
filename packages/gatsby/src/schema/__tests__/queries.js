@@ -12,12 +12,12 @@ const mockActualOrderBy = jest.requireActual(`lodash`).orderBy
 jest.mock(`lodash/orderBy`, () => jest.fn(mockActualOrderBy))
 const orderBySpy = require(`lodash/orderBy`)
 
-// Some tests here rely on triggering garbage collection with `global.gc()`. GC events are not
-// deterministic - there is no guarantee that `WeakRef.prototype.deref()` will trigger a GC
-// immediately and return `undefined`:
+// ここにあるテストの一部は、`global.gc()` でガベージコレクションを起動することに依存している。GC のイベントは
+// 決定的ではない。`WeakRef.prototype.deref()` がすぐに GC を起動して `undefined` を返すという
+// 保証はない:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef#notes_on_weakrefs
-// Node.js 20 introduced GC behaviour changes that make these tests unreliable. Only run them on
-// Node < 20 where they've historically passed.
+// Node.js 20 で GC の動作が変わり、これらのテストは当てにならなくなった。これまで通っていた
+// Node < 20 でだけ実行する。
 const shouldTestGC = Number(process.versions.node.split(`.`)[0]) < 20
 
 const getTestNodes = require(`./fixtures/queries`)
@@ -117,13 +117,13 @@ describe(`Query schema`, () => {
             Frontmatter: {
               authors: {
                 async resolve(source, args, context, info) {
-                  // NOTE: When using the first field resolver argument (here called
-                  // `source`, also called `parent` or `root`), it is important to
-                  // take care of the fact that the resolver can be called more than once
-                  // in one query, e.g. when the field is referenced both in the input filter
-                  // and in the selection set. In this test example, the `authors` field will
-                  // already have been expanded to an array of full `Author` nodes when the
-                  // resolver is called the second time.
+                  // NOTE: フィールドリゾルバーの第 1 引数（ここでは `source` と呼んでいる。
+                  // `parent` や `root` とも呼ばれる）を使うときは、1 つのクエリの中で
+                  // リゾルバーが複数回呼ばれうることに注意しなければならない。
+                  // たとえば、そのフィールドが入力のフィルターと選択セットの両方で
+                  // 参照されている場合である。このテストの例では、リゾルバーが 2 回目に
+                  // 呼ばれるとき、`authors` フィールドはすでに完全な `Author` ノードの
+                  // 配列に展開されている。
                   if (
                     source.authors.some(
                       author => author && typeof author === `object`
@@ -340,8 +340,8 @@ describe(`Query schema`, () => {
       expect(results.data).toEqual(expected)
     })
 
-    // NOTE: Also tests handling children fields being in both
-    // input filter and selection set.
+    // NOTE: children のフィールドが入力のフィルターと選択セットの両方に
+    // ある場合の処理もテストする。
     it(`handles query arguments on children fields`, async () => {
       const query = `
         {
@@ -1239,7 +1239,7 @@ describe(`Query schema`, () => {
       ;(shouldTestGC ? it : it.skip)(
         `works correctly if GC happen mid running`,
         async () => {
-          // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+          // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
           const v8 = require(`v8`)
           const vm = require(`vm`)
           v8.setFlagsFromString(`--expose_gc`)
@@ -1252,16 +1252,16 @@ describe(`Query schema`, () => {
             // eslint-disable-next-line no-undef
             const weakNode = new WeakRef(getNode(`md1`))
 
-            // spy is keeping nodes in memory due to `.calls` array
+            // スパイは `.calls` 配列によってノードをメモリーに保持し続ける
             apiRunnerNode.mockClear()
-            // very implementation specific case:
-            // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-            // GCed mid execution of query. For this test we force all weakly held nodes to be
-            // dropped
+            // 実装にかなり依存したケース:
+            // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+            // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+            // 強制的に解放する
             clearKeptObjects()
             gc()
 
-            // now we shouldn't have that node in memory
+            // これでそのノードはメモリー上にないはずである
             if (weakNode.deref()) {
               throw new Error(
                 `Test setup is broken, something is keeping a node in memory`
@@ -1273,10 +1273,10 @@ describe(`Query schema`, () => {
 
           expect(orderBySpy).not.toBeCalled()
 
-          // sort added only to hit code path using `orderBy`,
-          // which we use to force GC to simulate node "randomly"
-          // releasing nodes from memory as they shouldn't be strongly
-          // held
+          // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
+          // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
+          // 状況をシミュレートする。ノードは強参照で保持されないはず
+          // だからである
           const query = `
           {
             allMarkdown(sort: { fields: id }) {
@@ -1296,7 +1296,7 @@ describe(`Query schema`, () => {
         `
           const results = await runQuery(query)
 
-          // make sure we released all nodes from memory in middle of the run
+          // 実行の途中ですべてのノードをメモリーから解放したことを確認する
           expect(orderBySpy).toBeCalled()
 
           const expected = {
@@ -1428,7 +1428,7 @@ describe(`Query schema`, () => {
       ;(shouldTestGC ? it : it.skip)(
         `works correctly if GC happen mid running`,
         async () => {
-          // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+          // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
           const v8 = require(`v8`)
           const vm = require(`vm`)
           v8.setFlagsFromString(`--expose_gc`)
@@ -1441,16 +1441,16 @@ describe(`Query schema`, () => {
             // eslint-disable-next-line no-undef
             const weakNode = new WeakRef(getNode(`md1`))
 
-            // spy is keeping nodes in memory due to `.calls` array
+            // スパイは `.calls` 配列によってノードをメモリーに保持し続ける
             apiRunnerNode.mockClear()
-            // very implementation specific case:
-            // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-            // GCed mid execution of query. For this test we force all weakly held nodes to be
-            // dropped
+            // 実装にかなり依存したケース:
+            // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+            // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+            // 強制的に解放する
             clearKeptObjects()
             gc()
 
-            // now we shouldn't have that node in memory
+            // これでそのノードはメモリー上にないはずである
             if (weakNode.deref()) {
               throw new Error(
                 `Test setup is broken, something is keeping a node in memory`
@@ -1462,10 +1462,10 @@ describe(`Query schema`, () => {
 
           expect(orderBySpy).not.toBeCalled()
 
-          // sort added only to hit code path using `orderBy`,
-          // which we use to force GC to simulate node "randomly"
-          // releasing nodes from memory as they shouldn't be strongly
-          // held
+          // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
+          // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
+          // 状況をシミュレートする。ノードは強参照で保持されないはず
+          // だからである
           const query = `
           {
             allMarkdown(sort: { fields: id }) {
@@ -1475,7 +1475,7 @@ describe(`Query schema`, () => {
         `
           const results = await runQuery(query)
 
-          // make sure we released all nodes from memory in middle of the run
+          // 実行の途中ですべてのノードをメモリーから解放したことを確認する
           expect(orderBySpy).toBeCalled()
 
           const expected = {
@@ -1532,7 +1532,7 @@ describe(`Query schema`, () => {
         ;(shouldTestGC ? it : it.skip)(
           `works correctly on fields with resolver if GC happen mid running`,
           async () => {
-            // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+            // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
             const v8 = require(`v8`)
             const vm = require(`vm`)
             v8.setFlagsFromString(`--expose_gc`)
@@ -1545,16 +1545,16 @@ describe(`Query schema`, () => {
               // eslint-disable-next-line no-undef
               const weakNode = new WeakRef(getNode(`md1`))
 
-              // spy is keeping nodes in memory due to `.calls` array
+              // スパイは `.calls` 配列によってノードをメモリーに保持し続ける
               apiRunnerNode.mockClear()
-              // very implementation specific case:
-              // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-              // GCed mid execution of query. For this test we force all weakly held nodes to be
-              // dropped
+              // 実装にかなり依存したケース:
+              // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+              // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+              // 強制的に解放する
               clearKeptObjects()
               gc()
 
-              // now we shouldn't have that node in memory
+              // これでそのノードはメモリー上にないはずである
               if (weakNode.deref()) {
                 throw new Error(
                   `Test setup is broken, something is keeping a node in memory`
@@ -1566,10 +1566,10 @@ describe(`Query schema`, () => {
 
             expect(orderBySpy).not.toBeCalled()
 
-            // sort added only to hit code path using `orderBy`,
-            // which we use to force GC to simulate node "randomly"
-            // releasing nodes from memory as they shouldn't be strongly
-            // held
+            // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
+            // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
+            // 状況をシミュレートする。ノードは強参照で保持されないはず
+            // だからである
             const query = `
           {
             allMarkdown(sort: { fields: id }) {
@@ -1579,7 +1579,7 @@ describe(`Query schema`, () => {
         `
             const results = await runQuery(query)
 
-            // make sure we released all nodes from memory in middle of the run
+            // 実行の途中ですべてのノードをメモリーから解放したことを確認する
             expect(orderBySpy).toBeCalled()
 
             expect(results.errors).toBeUndefined()
@@ -1630,7 +1630,7 @@ describe(`Query schema`, () => {
         ;(shouldTestGC ? it : it.skip)(
           `works correctly on fields with resolver if GC happen mid running`,
           async () => {
-            // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+            // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
             const v8 = require(`v8`)
             const vm = require(`vm`)
             v8.setFlagsFromString(`--expose_gc`)
@@ -1643,16 +1643,16 @@ describe(`Query schema`, () => {
               // eslint-disable-next-line no-undef
               const weakNode = new WeakRef(getNode(`md1`))
 
-              // spy is keeping nodes in memory due to `.calls` array
+              // スパイは `.calls` 配列によってノードをメモリーに保持し続ける
               apiRunnerNode.mockClear()
-              // very implementation specific case:
-              // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-              // GCed mid execution of query. For this test we force all weakly held nodes to be
-              // dropped
+              // 実装にかなり依存したケース:
+              // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+              // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+              // 強制的に解放する
               clearKeptObjects()
               gc()
 
-              // now we shouldn't have that node in memory
+              // これでそのノードはメモリー上にないはずである
               if (weakNode.deref()) {
                 throw new Error(
                   `Test setup is broken, something is keeping a node in memory`
@@ -1664,10 +1664,10 @@ describe(`Query schema`, () => {
 
             expect(orderBySpy).not.toBeCalled()
 
-            // sort added only to hit code path using `orderBy`,
-            // which we use to force GC to simulate node "randomly"
-            // releasing nodes from memory as they shouldn't be strongly
-            // held
+            // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
+            // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
+            // 状況をシミュレートする。ノードは強参照で保持されないはず
+            // だからである
             const query = `
           {
             allMarkdown(sort: { fields: id }) {
@@ -1677,7 +1677,7 @@ describe(`Query schema`, () => {
         `
             const results = await runQuery(query)
 
-            // make sure we released all nodes from memory in middle of the run
+            // 実行の途中ですべてのノードをメモリーから解放したことを確認する
             expect(orderBySpy).toBeCalled()
 
             expect(results.errors).toBeUndefined()
@@ -1727,7 +1727,7 @@ describe(`Query schema`, () => {
         ;(shouldTestGC ? it : it.skip)(
           `works correctly on fields with resolver if GC happen mid running`,
           async () => {
-            // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+            // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
             const v8 = require(`v8`)
             const vm = require(`vm`)
             v8.setFlagsFromString(`--expose_gc`)
@@ -1740,16 +1740,16 @@ describe(`Query schema`, () => {
               // eslint-disable-next-line no-undef
               const weakNode = new WeakRef(getNode(`md1`))
 
-              // spy is keeping nodes in memory due to `.calls` array
+              // スパイは `.calls` 配列によってノードをメモリーに保持し続ける
               apiRunnerNode.mockClear()
-              // very implementation specific case:
-              // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-              // GCed mid execution of query. For this test we force all weakly held nodes to be
-              // dropped
+              // 実装にかなり依存したケース:
+              // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+              // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+              // 強制的に解放する
               clearKeptObjects()
               gc()
 
-              // now we shouldn't have that node in memory
+              // これでそのノードはメモリー上にないはずである
               if (weakNode.deref()) {
                 throw new Error(
                   `Test setup is broken, something is keeping a node in memory`
@@ -1761,10 +1761,10 @@ describe(`Query schema`, () => {
 
             expect(orderBySpy).not.toBeCalled()
 
-            // sort added only to hit code path using `orderBy`,
-            // which we use to force GC to simulate node "randomly"
-            // releasing nodes from memory as they shouldn't be strongly
-            // held
+            // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
+            // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
+            // 状況をシミュレートする。ノードは強参照で保持されないはず
+            // だからである
             const query = `
           {
             allMarkdown(sort: { fields: id }) {
@@ -1774,7 +1774,7 @@ describe(`Query schema`, () => {
         `
             const results = await runQuery(query)
 
-            // make sure we released all nodes from memory in middle of the run
+            // 実行の途中ですべてのノードをメモリーから解放したことを確認する
             expect(orderBySpy).toBeCalled()
 
             expect(results.errors).toBeUndefined()
@@ -2221,8 +2221,8 @@ describe(`Query schema`, () => {
 
   describe(`with regex filter`, () => {
     /**
-     * double-escape character escape sequences when written inline (test only)
-     * (see also the test src/utils/__tests__/prepare-regex.ts)
+     * インラインで書く場合は、文字のエスケープシーケンスを二重にエスケープする（テストのみ）
+     * （テスト src/utils/__tests__/prepare-regex.ts も参照）
      */
     it(`escape sequences work when correctly escaped`, async () => {
       const query = `
@@ -2271,7 +2271,7 @@ describe(`Query schema`, () => {
     })
 
     /**
-     * queries are read from file and parsed with babel
+     * クエリはファイルから読み込まれ、babel でパースされる
      */
     it(`escape sequences work when correctly escaped`, async () => {
       const fs = require(`fs`)
@@ -2469,7 +2469,7 @@ describe(`Query schema`, () => {
       }
 
       {
-        // we didn't find a node above, but let's make sure there is a node with given id
+        // 上ではノードが見つからなかったが、指定した ID のノードが存在することを確認しておく
         const results = await runQuery(
           `
             query($id: String!) {
@@ -2519,8 +2519,8 @@ describe(`Query schema`, () => {
         `Markdown File 1`
       )
 
-      // main assertion - markdown.frontmatter.fileRef is a file referenced by local path
-      // we want to make sure it finds node correctly (and doesn't crash)
+      // 主なアサーション: markdown.frontmatter.fileRef は、ローカルパスで参照されるファイルである
+      // ノードを正しく見つけること（そしてクラッシュしないこと）を確認したい
       expect(
         results?.data?.markdown?.frontmatter?.fileRef?.childMarkdown
           ?.frontmatter?.title

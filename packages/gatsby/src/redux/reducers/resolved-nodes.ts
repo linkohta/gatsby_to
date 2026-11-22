@@ -15,24 +15,24 @@ export const resolvedNodesCacheReducer = (
       const { key, nodes } = action.payload
       const existingResolvedNodes = state.get(key)
       if (existingResolvedNodes) {
-        // merge new resolved fields for given type with previously existing ones
+        // 指定された型の新しい解決済みフィールドを、既存のものとマージする
         for (const [nodeId, resolvedFields] of nodes.entries()) {
           const previouslyResolvedNodeFields = existingResolvedNodes.get(nodeId)
           if (previouslyResolvedNodeFields) {
-            // merge new resolved fields for given node id with previously existing ones
+            // 指定されたノード ID の新しい解決済みフィールドを、既存のものとマージする
             existingResolvedNodes.set(
               nodeId,
               merge(previouslyResolvedNodeFields, resolvedFields)
             )
           } else {
-            // we didn't have any resolved fields for this node id, so we can just set new
-            // ones as-is
+            // このノード ID の解決済みフィールドはまだなかったので、新しいものを
+            // そのまま設定すればよい
             existingResolvedNodes.set(nodeId, resolvedFields)
           }
         }
       } else {
-        // we didn't have resolved fields for this type yet, so
-        // we can just set it
+        // この型の解決済みフィールドはまだなかったので、
+        // そのまま設定すればよい
         state.set(key, nodes)
       }
       return state

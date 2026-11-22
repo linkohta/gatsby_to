@@ -3,7 +3,7 @@ import { LoaderContext } from "webpack"
 const Template = require(`webpack/lib/Template`)
 
 /**
- * Loader that creates virtual file with imports to client components
+ * クライアントコンポーネントへの import をまとめた仮想ファイルを作るローダー
  */
 module.exports = function virtual(
   this: LoaderContext<{
@@ -16,7 +16,7 @@ module.exports = function virtual(
 
   const code = requests
     .filter(Boolean)
-    // Filter out css files on the server
+    // サーバー側では css ファイルを除外する
     .map(request => {
       const chunkName = Template.toPath(request)
 

@@ -1,4 +1,4 @@
-// NOTE: Previously `infer-graphql-input-type-test.js`
+// NOTE: 以前は `infer-graphql-input-type-test.js` だった
 
 const { graphql } = require(`graphql`)
 const { createSchemaComposer } = require(`../../schema-composer`)
@@ -199,11 +199,11 @@ describe(`GraphQL Input args`, () => {
   })
 
   it(`Replaces unsupported values in keys`, async () => {
-    // NOTE: This does not make much sense anymore (we sanitize
-    // fieldnames for ObjectType, and derive InputType from there)
+    // NOTE: これはもうあまり意味がない（ObjectType のフィールド名を
+    // サニタイズし、そこから InputType を導出しているため）
 
-    // Add a key with unsupported values to test
-    // if they're replaced.
+    // 対応していない値を持つキーを追加して、
+    // それらが置き換えられるかをテストする。
 
     const nodes = [
       {
@@ -225,7 +225,7 @@ describe(`GraphQL Input args`, () => {
   })
 
   it.skip(`Removes specific root fields`, async () => {
-    // We don't do that anymoe
+    // これはもう行っていない
   })
 
   it(`infers number types`, async () => {

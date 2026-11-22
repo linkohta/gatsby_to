@@ -20,10 +20,10 @@ type IndexField = [fieldName: string, orderDirection: number]
 type IndexFields = Array<IndexField>
 
 /**
- * Suggest index fields for this combination of filter and sort.
+ * このフィルターとソートの組み合わせに対して、インデックスのフィールドを提案する。
  *
- * Prioritizes sort fields over filter fields when can't use index
- * for both because sorting is expensive both CPU and memory-wise.
+ * 両方にインデックスを使えない場合は、フィルターのフィールドよりもソートのフィールドを優先する。
+ * ソートは CPU とメモリの両面でコストが高いためである。
  */
 export function suggestIndex({
   filter,
@@ -44,22 +44,22 @@ export function suggestIndex({
     return dedupeAndTrim(toIndexFields(filterQueriesThatCanUseIndex), maxFields)
   }
 
-  // Combined index for filter+sort only makes sense when all prefix fields have `eq` predicate
-  // Same as https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/#sort-and-non-prefix-subset-of-an-index
+  // フィルターとソートの複合インデックスは、接頭辞のすべてのフィールドが `eq` 述語を持つ場合にだけ意味がある
+  // https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/#sort-and-non-prefix-subset-of-an-index と同じである
   const sortDirection = sortFields[0][1]
   const eqFilterQueries = getEqQueries(filterQueriesThatCanUseIndex)
   const eqFilterFields = toIndexFields(eqFilterQueries, sortDirection)
 
-  // Index prefix should not contain eq filters overlapping with sort fields
+  // インデックスの接頭辞は、ソートフィールドと重なる eq フィルターを含むべきではない
   const overlap = findOverlappingFields(eqFilterQueries, sortFields)
 
   return dedupeAndTrim(
     [
       ...eqFilterFields.filter(([name]) => !overlap.has(name)),
       ...sortFields,
-      // Still append other filter fields to the tail of the index to leverage additional filtering
-      //  of results using data stored in the index (without loading full node object)
-      //  Note: fields previously listed in eqFilterFields and sortFields will be removed in dedupeAndTrim
+      // それでも、他のフィルターフィールドをインデックスの末尾に追加する。インデックスに保存されたデータを使った
+      //  結果の追加の絞り込み（ノードオブジェクト全体を読み込まずに行う）を活用するためである
+      //  注: eqFilterFields と sortFields にすでに列挙されているフィールドは、dedupeAndTrim で取り除かれる
       ...toIndexFields(filterQueriesThatCanUseIndex, sortDirection),
     ],
     maxFields
@@ -78,8 +78,8 @@ const canUseIndex = new Set([
 ])
 
 /**
- * Returns queries that can potentially use index.
- * Returned list is sorted by query specificity
+ * インデックスを使える可能性のあるクエリを返す。
+ * 返される一覧は、クエリの具体性の順にソートされている
  */
 function getQueriesThatCanUseIndex(all: Array<DbQuery>): Array<DbQuery> {
   return sortBySpecificity(
@@ -98,8 +98,8 @@ function getSortFieldsThatCanUseIndex(
     const field = sort.fields[i]
     const order = isDesc(sort.order[i]) ? -1 : 1
     if (order !== initialOrder) {
-      // Mixed sort order is not supported by our indexes yet :/
-      // See https://github.com/DoctorEvidence/lmdb-store/discussions/62#discussioncomment-898949
+      // 昇順と降順が混在するソートには、インデックスがまだ対応していない :/
+      // https://github.com/DoctorEvidence/lmdb-store/discussions/62#discussioncomment-898949 を参照
       break
     }
     sortFields.push([field, order])

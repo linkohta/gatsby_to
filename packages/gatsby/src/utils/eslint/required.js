@@ -1,6 +1,6 @@
 module.exports = {
   rules: {
-    // Custom ESLint rules from Gatsby
+    // Gatsby 独自の ESLint ルール
     "no-anonymous-exports-page-templates": `warn`,
     "limited-exports-page-templates": `warn`,
   },

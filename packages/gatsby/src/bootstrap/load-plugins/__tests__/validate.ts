@@ -49,10 +49,10 @@ describe(`collatePluginAPIs`, () => {
   }
 
   beforeEach(() => {
-    // We call the manual /__mocks__/ implementation of resolveModuleExports,
-    // which in addition to the normal parameters, also takes a mock results.
-    // In the future, we might just use jest to mock the return value instead
-    // of relying on manual mocks.
+    // resolveModuleExports の手動の /__mocks__/ 実装を呼び出す。
+    // これは通常の引数に加えて、モックの結果も受け取る。
+    // 将来的には、手動のモックに頼らず、jest で戻り値をモックするだけに
+    // するかもしれない。
     resolveModuleExports(MOCK_RESULTS as any)
   })
 

@@ -157,7 +157,7 @@ describe(`Resolve module exports`, () => {
     expect(
       // @ts-ignore
       reporter.panic.mock.calls.map(c =>
-        // Remove console colors + trim whitespace
+        // コンソールの色を取り除き、空白をトリムする
         // eslint-disable-next-line
         c[0].replace(/\x1B[[(?);]{0,2}(;?\d)*./g, ``).trim()
       )

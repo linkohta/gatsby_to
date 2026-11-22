@@ -6,9 +6,9 @@ import type {
 
 const DEFAULT_LIMIT = `100kb`
 
-// similar to `GatsbyFunctionBodyParserConfig` and `IGatsbyFunctionConfigProcessed`
-// from index.d.ts, just with fields required (not optional).
-// `createConfig()` will fill in defaults
+// index.d.ts の `GatsbyFunctionBodyParserConfig` と `IGatsbyFunctionConfigProcessed` に
+// 似ているが、フィールドが必須（省略不可）になっている。
+// デフォルト値は `createConfig()` が埋める
 export interface IGatsbyBodyParserConfigProcessed {
   json: GatsbyFunctionBodyParserCommonMiddlewareConfig
   raw: GatsbyFunctionBodyParserCommonMiddlewareConfig

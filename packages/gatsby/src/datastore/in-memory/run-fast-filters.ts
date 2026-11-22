@@ -40,14 +40,14 @@ type ISortParameters =
   | undefined
 
 /**
- * Creates a key for one filterCache inside FiltersCache
+ * FiltersCache 内の 1 つの filterCache に対応するキーを作成する
  */
 function createFilterCacheKey(
   typeNames: Array<string>,
   filter: DbQuery | null
 ): FilterCacheKey {
-  // Note: while `elemMatch` is a special case, in the key it's just `elemMatch`
-  // (This function is future proof for elemMatch support, won't receive it yet)
+  // 注: `elemMatch` は特別なケースだが、キーの中では単に `elemMatch` である
+  // （この関数は将来の elemMatch 対応を見越しているが、まだ受け取ることはない）
   let filterStep = filter
   let comparator = ``
   const paths: Array<string> = []
@@ -56,8 +56,8 @@ function createFilterCacheKey(
     if (filterStep.type === `elemMatch`) {
       const q: IDbQueryElemMatch = filterStep
       filterStep = q.nestedQuery
-      // Make distinction between filtering `a.elemMatch.b.eq` and `a.b.eq`
-      // In practice this is unlikely to be an issue, but it might
+      // `a.elemMatch.b.eq` と `a.b.eq` のフィルターを区別する
+      // 実際に問題になる可能性は低いが、ありうる
       paths.push(`elemMatch`)
     } else {
       const q: IDbQueryQuery = filterStep
@@ -66,17 +66,17 @@ function createFilterCacheKey(
     }
   }
 
-  // Note: the separators (`,` and `/`) are arbitrary but must be different
+  // 注: 区切り文字（`,` と `/`）は任意だが、互いに異なっていなければならない
   return typeNames.join(`,`) + `/` + paths.join(`,`) + `/` + comparator
 }
 
 /**
- * Given the path of a set of filters, return the sets of nodes that pass the
- * filter.
- * Only nodes of given node types will be considered
- * A fast index is created if one doesn't exist yet so cold call is slower.
+ * フィルターの集合のパスを受け取り、フィルターを通過するノードの集合を
+ * 返す。
+ * 指定したノードの型のノードだけを対象にする
+ * 高速なインデックスがまだなければ作成するので、初回の呼び出しは遅くなる。
  *
- * Note: Not a public API. Exported for tests.
+ * 注: 公開 API ではない。テストのために export している。
  */
 export function applyFastFilters(
   filters: Array<DbQuery>,
@@ -86,7 +86,7 @@ export function applyFastFilters(
   resolvedFields: any
 ): Array<IGatsbyNodePartial> | null {
   if (!filtersCache) {
-    // If no filter cache is passed on, explicitly don't use one
+    // フィルターキャッシュが渡されなかった場合は、明示的に使わない
     return null
   }
 
@@ -105,14 +105,14 @@ export function applyFastFilters(
   if (nodesPerValueArrs.length === 0) {
     return []
   } else {
-    // Put smallest last (we'll pop it)
+    // 最小のものを最後に置く（後で pop する）
     nodesPerValueArrs.sort((a, b) => b.length - a.length)
 
-    // All elements of nodesPerValueArrs should be sorted by counter and deduped
-    // So if there's only one bucket in this list the next loop is skipped
+    // nodesPerValueArrs のすべての要素は、counter の順にソートされ、重複がないはずである
+    // そのため、この一覧にバケットが 1 つしかない場合、次のループはスキップされる
 
     while (nodesPerValueArrs.length > 1) {
-      // TS limitation: cannot guard against .pop(), so we must double cast
+      // TS の制約: .pop() に対して型ガードができないので、二重にキャストする必要がある
       const a = nodesPerValueArrs.pop() as unknown as Array<IGatsbyNodePartial>
       const b = nodesPerValueArrs.pop() as unknown as Array<IGatsbyNodePartial>
       nodesPerValueArrs.push(intersectNodesByCounter(a, b))
@@ -121,7 +121,7 @@ export function applyFastFilters(
     const result = nodesPerValueArrs[0]
 
     if (result.length === 0) {
-      // Intersection came up empty. Not one node appeared in every bucket.
+      // 積集合が空になった。すべてのバケットに現れるノードは 1 つもなかった。
       return null
     }
 
@@ -130,7 +130,7 @@ export function applyFastFilters(
 }
 
 /**
- * If this returns undefined it means at least one cache was not found
+ * これが undefined を返す場合、少なくとも 1 つのキャッシュが見つからなかったことを意味する
  */
 function getBucketsForFilters(
   filters: Array<DbQuery>,
@@ -141,11 +141,11 @@ function getBucketsForFilters(
 ): Array<Array<IGatsbyNodePartial>> | undefined {
   const nodesPerValueArrs: Array<Array<IGatsbyNodePartial>> = []
 
-  // Fail fast while trying to create and get the value-cache for each path
+  // 各パスの値のキャッシュを作成して取得する過程で、失敗したらすぐに打ち切る
   const every = filters.every(filter => {
     const filterCacheKey = createFilterCacheKey(nodeTypeNames, filter)
     if (filter.type === `query`) {
-      // (Let TS warn us if a new query type gets added)
+      // （新しいクエリの種類が追加されたら TS に警告させる）
       const q: IDbQueryQuery = filter
       return getBucketsForQueryFilter(
         filterCacheKey,
@@ -157,7 +157,7 @@ function getBucketsForFilters(
         resolvedFields
       )
     } else {
-      // (Let TS warn us if a new query type gets added)
+      // （新しいクエリの種類が追加されたら TS に警告させる）
       const q: IDbQueryElemMatch = filter
       return collectBucketForElemMatch(
         filterCacheKey,
@@ -175,13 +175,13 @@ function getBucketsForFilters(
     return nodesPerValueArrs
   }
 
-  // "failed at least one"
+  // 「少なくとも 1 つ失敗した」
   return undefined
 }
 
 /**
- * Fetch all buckets for given query filter. That means it's not elemMatch.
- * Returns `false` if it found none.
+ * 指定したクエリフィルターのバケットをすべて取得する。つまり elemMatch ではない。
+ * 1 つも見つからなければ `false` を返す。
  */
 function getBucketsForQueryFilter(
   filterCacheKey: FilterCacheKey,
@@ -221,15 +221,15 @@ function getBucketsForQueryFilter(
     return false
   }
 
-  // In all other cases this must be a non-empty arr because the indexing
-  // mechanism does not create an array unless there's a IGatsbyNode for it
+  // それ以外の場合はすべて、空でない配列でなければならない。インデックスの
+  // 仕組みは、対応する IGatsbyNode がない限り配列を作成しないためである
   nodesPerValueArrs.push(nodesPerValue)
 
   return true
 }
 
 /**
- * Matching node arrs are put in given array by reference
+ * 一致したノードの配列は、渡された配列へ参照で入れられる
  */
 function collectBucketForElemMatch(
   filterCacheKey: FilterCacheKey,
@@ -240,8 +240,8 @@ function collectBucketForElemMatch(
   sortFields: Array<string>,
   resolvedFields: any
 ): boolean {
-  // Get comparator and target value for this elemMatch
-  let comparator: FilterOp = `$eq` // (Must be overridden but TS requires init)
+  // この elemMatch の比較演算子と対象の値を取得する
+  let comparator: FilterOp = `$eq` // （必ず上書きされるが、TS が初期化を要求する）
   let targetValue: FilterValueNullable = null
   let f: DbQuery = filter
   while (f) {
@@ -278,23 +278,23 @@ function collectBucketForElemMatch(
     return false
   }
 
-  // In all other cases this must be a non-empty arr because the indexing
-  // mechanism does not create an array unless there's a IGatsbyNode for it
+  // それ以外の場合はすべて、空でない配列でなければならない。インデックスの
+  // 仕組みは、対応する IGatsbyNode がない限り配列を作成しないためである
   nodesPerValueArrs.push(nodesByValue)
 
   return true
 }
 
 /**
- * Filters and sorts a list of nodes using mongodb-like syntax.
+ * mongodb に似た構文を使って、ノードの一覧をフィルターしてソートする。
  *
- * @param args raw graphql query filter/sort as an object
+ * @param args 生の graphql クエリの filter/sort を表すオブジェクト
  * @property {{filter?: Object, sort?: Object, skip?: number, limit?: number} | undefined} args.queryArgs
- * @property {FiltersCache} args.filtersCache A cache of indexes where you can
- *   look up Nodes grouped by a FilterCacheKey, which yields a Map which holds
- *   an arr of Nodes for the value that the filter is trying to query against.
- *   This object lives in query/query-runner.js and is passed down runQuery.
- * @returns Collection of results. Collection will be sliced by `skip` and `limit`
+ * @property {FiltersCache} args.filtersCache インデックスのキャッシュ。FilterCacheKey で
+ *   グループ化されたノードを検索できる。検索結果は Map で、フィルターが
+ *   クエリしようとしている値に対応するノードの配列を保持する。
+ *   このオブジェクトは query/query-runner.js にあり、runQuery へ渡される。
+ * @returns 結果のコレクション。コレクションは `skip` と `limit` でスライスされる
  */
 export function runFastFiltersAndSort(args: IRunFilterArg): IQueryResult {
   const {
@@ -327,7 +327,7 @@ export function runFastFiltersAndSort(args: IRunFilterArg): IQueryResult {
 }
 
 /**
- * Return a collection of results.
+ * 結果のコレクションを返す。
  */
 function convertAndApplyFastFilters(
   filterFields: IInputQuery | undefined,
@@ -371,9 +371,9 @@ function convertAndApplyFastFilters(
       )
     }
 
-    // If there's a filter, there (now) must be an entry for this cache key
+    // フィルターがある場合、このキャッシュキーに対するエントリーが（この時点で）存在しなければならない
     const filterCache = filtersCache.get(filterCacheKey) as IFilterCache
-    // If there is no filter then the ensureCache step will populate this:
+    // フィルターがない場合は、ensureCache のステップがこれを埋める:
     const cache = filterCache.meta.orderedByCounter as Array<IGatsbyNodePartial>
 
     return cache.slice(0)
@@ -395,7 +395,7 @@ function convertAndApplyFastFilters(
   }
 
   if (stats) {
-    // to mean, "empty results"
+    // 「結果が空」を意味する
     stats.totalSiftHits++
   }
 
@@ -425,8 +425,8 @@ function filterToStats(
 }
 
 /**
- * Given a list of filtered nodes and sorting parameters, sort the nodes
- * Returns same reference as input, sorted inline
+ * フィルター済みのノードの一覧とソートのパラメーターを受け取り、ノードをソートする
+ * 入力と同じ参照を返す。その場でソートする
  */
 function sortNodes(
   nodes: Array<IGatsbyNodePartial>,
@@ -438,7 +438,7 @@ function sortNodes(
     return nodes
   }
 
-  // create functions that return the item to compare on
+  // 比較に使う項目を返す関数を作成する
   const sortFields = getSortFieldIdentifierKeys(sort.fields, resolvedFields)
   const sortFns = sortFields.map(
     field =>

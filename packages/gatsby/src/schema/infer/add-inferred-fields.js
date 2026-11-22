@@ -132,12 +132,12 @@ const getFieldConfig = ({
 
   let fieldConfig
   if (hasMapping(typeMapping, selector)) {
-    // TODO: Use `prefix` instead of `selector` in hasMapping and getFromMapping?
-    // i.e. does the config contain sanitized field names?
+    // TODO: hasMapping と getFromMapping で、`selector` の代わりに `prefix` を使うか？
+    // つまり、config にはサニタイズされたフィールド名が入っているのか？
     fieldConfig = getFieldConfigFromMapping({ typeMapping, selector })
   } else if (unsanitizedKey.includes(`___NODE`)) {
-    // TODO(v5): Remove ability to use foreign keys like this (e.g. author___NODE___contact___email)
-    // and recommend using schema customization instead
+    // TODO(v5): このような外部キー（例: author___NODE___contact___email）を使える機能を削除し、
+    // 代わりにスキーマのカスタマイズを使うことを推奨する
 
     fieldConfig = getFieldConfigFromFieldNameConvention({
       schemaComposer,
@@ -164,7 +164,7 @@ const getFieldConfig = ({
   unsanitizedFieldPath.pop()
   if (!fieldConfig) return null
 
-  // Proxy resolver to unsanitized fieldName in case it contained invalid characters
+  // 無効な文字が含まれていた場合に備えて、サニタイズ前の fieldName へリゾルバーをプロキシする
   if (key !== unsanitizedKey.split(`___NODE`)[0]) {
     fieldConfig = {
       ...fieldConfig,
@@ -201,8 +201,8 @@ const resolveMultipleFields = possibleFields => {
   return _.sortBy(possibleFields, field => field.unsanitizedKey)[0]
 }
 
-// XXX(freiksenet): removing this as it's a breaking change
-// Deeper nested levels should be inferred as JSON.
+// XXX(freiksenet): 破壊的変更になるので、これは削除する
+// これより深いネストのレベルは JSON として推論すべきである。
 // const MAX_DEPTH = 5
 
 const hasMapping = (mapping, selector) =>
@@ -218,14 +218,14 @@ const getFieldConfigFromMapping = ({ typeMapping, selector }) => {
   }
 }
 
-// probably should be in example value
+// おそらく example value の中にあるべき
 const getFieldConfigFromFieldNameConvention = ({
   schemaComposer,
   value,
   key,
 }) => {
   const path = key.split(`___NODE___`)[1]
-  // Allow linking by nested fields, e.g. `author___NODE___contact___email`
+  // ネストしたフィールドによるリンクを許可する。例: `author___NODE___contact___email`
   const foreignKey = path && path.replace(/___/g, `.`)
   const linkedTypesSet = new Set()
 
@@ -257,11 +257,11 @@ const getFieldConfigFromFieldNameConvention = ({
   )
 
   let type
-  // If the field value is an array that links to more than one type,
-  // create a GraphQLUnionType. Note that we don't support the case where
-  // scalar fields link to different types. Similarly, an array of objects
-  // with foreign-key fields will produce union types if those foreign-key
-  // fields are arrays, but not if they are scalars. See the tests for an example.
+  // フィールドの値が、複数の型にリンクする配列である場合は、
+  // GraphQLUnionType を作成する。スカラーのフィールドが異なる型に
+  // リンクするケースには対応していないことに注意。同様に、外部キーのフィールドを持つ
+  // オブジェクトの配列は、その外部キーのフィールドが配列であれば union 型になるが、
+  // スカラーであればならない。例についてはテストを参照。
   if (linkedTypes.length > 1) {
     const typeName = linkedTypes.sort().join(``) + `Union`
     type = schemaComposer.getOrCreateUTC(typeName, utc => {
@@ -301,10 +301,10 @@ const getSimpleFieldConfig = ({
         return { type: `Date`, extensions: { dateformat: {} } }
       }
       if (isFile(unsanitizedFieldPath, value)) {
-        // NOTE: For arrays of files, where not every path references
-        // a File node in the db, it is semi-random if the field is
-        // inferred as File or String, since the exampleValue only has
-        // the first entry (which could point to an existing file or not).
+        // NOTE: ファイルの配列で、すべてのパスが db の File ノードを
+        // 参照しているわけではない場合、フィールドが File と String の
+        // どちらとして推論されるかは半ばランダムである。exampleValue は
+        // 最初のエントリー（既存のファイルを指しているとは限らない）しか持たないためである。
         return { type: `File`, extensions: { fileByRelativePath: {} } }
       }
       return { type: `String` }
@@ -319,12 +319,12 @@ const getSimpleFieldConfig = ({
         let fieldTypeComposer
         if (typeComposer.hasField(key)) {
           fieldTypeComposer = typeComposer.getFieldTC(key)
-          // If we have an object as a field value, but the field type is
-          // explicitly defined as something other than an ObjectType
-          // we can bail early.
+          // フィールドの値がオブジェクトであるのに、フィールドの型が
+          // ObjectType 以外のものとして明示的に定義されている場合は、
+          // 早めに抜けられる。
           if (!(fieldTypeComposer instanceof ObjectTypeComposer)) return null
-          // If the array depth of the field value and of the explicitly
-          // defined field type don't match we can also bail early.
+          // フィールドの値の配列の深さと、明示的に定義された
+          // フィールドの型の配列の深さが一致しない場合も、早めに抜けられる。
           let lists = 0
           let fieldType = typeComposer.getFieldType(key)
           while (fieldType.ofType) {
@@ -333,13 +333,13 @@ const getSimpleFieldConfig = ({
           }
           if (lists !== arrays) return null
         } else {
-          // When the field type has not been explicitly defined, we
-          // don't need to continue in case of @dontInfer
+          // フィールドの型が明示的に定義されていない場合、
+          // @dontInfer であれば続ける必要はない
           if (!config.shouldAddFields) return null
 
           const typeName = createTypeName(selector)
           if (schemaComposer.has(typeName)) {
-            // Type could have been already created via schema customization
+            // 型は、スキーマのカスタマイズによってすでに作成されているかもしれない
             fieldTypeComposer = schemaComposer.getOTC(typeName)
           } else {
             fieldTypeComposer = ObjectTypeComposer.create(
@@ -358,8 +358,8 @@ const getSimpleFieldConfig = ({
           }
         }
 
-        // Inference config options are either explicitly defined on a type
-        // with directive/extension, or inherited from the parent type.
+        // 推論の設定オプションは、ディレクティブや拡張によって型に明示的に
+        // 定義されているか、親の型から継承されているかのどちらかである。
         const inferenceConfig = getInferenceConfig({
           typeComposer: fieldTypeComposer,
           defaults: config,
@@ -390,12 +390,12 @@ const createTypeName = selector => {
 const NON_ALPHA_NUMERIC_EXPR = new RegExp(`[^a-zA-Z0-9_]`, `g`)
 
 /**
- * GraphQL field names must be a string and cannot contain anything other than
- * alphanumeric characters and `_`. They also can't start with `__` which is
- * reserved for internal fields (`___foo` doesn't work either).
+ * GraphQL のフィールド名は文字列でなければならず、英数字と `_` 以外を
+ * 含めることはできない。また、`__` で始めることもできない。これは
+ * 内部のフィールド用に予約されている（`___foo` も使えない）。
  */
 const createFieldName = key => {
-  // Check if the key is really a string otherwise GraphQL will throw.
+  // キーが本当に文字列であるかを確認する。そうでなければ GraphQL が例外を投げる。
   invariant(
     typeof key === `string`,
     `GraphQL field name (key) is not a string: \`${key}\`.`
@@ -404,12 +404,12 @@ const createFieldName = key => {
   const fieldName = key.split(`___NODE`)[0]
   const replaced = fieldName.replace(NON_ALPHA_NUMERIC_EXPR, `_`)
 
-  // key is invalid; normalize with leading underscore and rest with x
+  // キーが無効である。先頭にアンダースコアを付け、残りを x で置き換えて正規化する
   if (replaced.match(/^__/)) {
     return replaced.replace(/_/g, (char, index) => (index === 0 ? `_` : `x`))
   }
 
-  // key is invalid (starts with numeric); normalize with leading underscore
+  // キーが無効である（数字で始まっている）。先頭にアンダースコアを付けて正規化する
   if (replaced.match(/^[0-9]/)) {
     return `_` + replaced
   }

@@ -27,7 +27,7 @@ export async function createPages({
   const timestamp = Date.now()
   const currentPages = new Map<string, IGatsbyPage>(store.getState().pages)
 
-  // Wrap the GraphQL function so we can measure how long it takes to run.
+  // 実行にかかる時間を計測できるように、GraphQL の関数をラップする。
   const originalGraphQL = gatsbyNodeGraphQLFunction
   // eslint-disable-next-line
   async function wrappedGraphQL() {

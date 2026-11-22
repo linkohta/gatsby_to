@@ -26,7 +26,7 @@ export const createGraphQLRunner = (
     graphqlTracing: false,
   }
 ): Runner => {
-  // TODO: Move tracking of changed state inside GraphQLRunner itself. https://github.com/gatsbyjs/gatsby/issues/20941
+  // TODO: 変更された state の追跡を GraphQLRunner 自体の中へ移す。https://github.com/gatsbyjs/gatsby/issues/20941
   let runner: GraphQLRunner | undefined = new GraphQLRunner(store, {
     graphqlTracing,
   })
@@ -62,7 +62,7 @@ export const createGraphQLRunner = (
         if (result.errors) {
           const structuredErrors = result.errors
             .map(e => {
-              // Find the file where graphql was called.
+              // graphql が呼ばれたファイルを見つける。
               const file = stackTrace
                 .parse(e)
                 .find(file => /createPages/.test(file.getFunctionName()))
@@ -91,7 +91,7 @@ export const createGraphQLRunner = (
             .filter(Boolean as unknown as (match) => match is IMatch)
 
           if (structuredErrors.length) {
-            // panic on build exits the process
+            // ビルド時の panic はプロセスを終了する
             reporter.panicOnBuild(structuredErrors)
           }
         }

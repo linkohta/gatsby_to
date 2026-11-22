@@ -362,7 +362,7 @@ describe(`File parser`, () => {
       addError
     )
 
-    // Check that invalid entries are not in the results and thus haven't been extracted
+    // 不正なエントリーが結果に含まれておらず、抽出されていないことを確認する
     expect(results).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ filePath: `static-query-hooks-commonjs.js` }),
@@ -394,7 +394,7 @@ describe(`File parser`, () => {
       value: `staticZhADollarpercentandJs1125018085`,
     })
 
-    // TODO(v6): Remove since StaticQuery is deprecated
+    // TODO(v6): StaticQuery は非推奨なので削除する
     const { astDefinitions: ast2 } = await parser.parseFile(
       `static-${specialChars}.js`,
       jest.fn()

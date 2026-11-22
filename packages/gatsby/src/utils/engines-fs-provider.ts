@@ -1,7 +1,7 @@
-// This module should be imported as first or one first modules in engines.
-// It allows to provide alternative `fs` module by setting `global._fsWrapper`
-// variable before importing engine. It will automatically fallback to regular
-// `fs` if alternative `fs` is not provided.
+// このモジュールは、エンジンの中で最初、または最初のほうのモジュールとして import すべきである。
+// エンジンを import する前に変数 `global._fsWrapper` を設定することで、
+// 代わりの `fs` モジュールを渡せるようにする。代わりの `fs` が渡されなければ、
+// 自動的に通常の `fs` にフォールバックする。
 
 /* eslint-disable @typescript-eslint/no-namespace */
 
@@ -21,11 +21,11 @@ declare const __non_webpack_require__: typeof require
 if (global._fsWrapper) {
   global._actualFsWrapper = global._fsWrapper
 } else {
-  // fs alternative not provided - falling back to regular fs
+  // 代わりの fs が渡されなかったので、通常の fs にフォールバックする
   global._actualFsWrapper = __non_webpack_require__(`fs`)
 }
 
-// hydrate webpack module cache (consume global, so it's not lazy)
+// webpack のモジュールキャッシュにデータを入れる（グローバルを使うので、遅延はされない）
 require(`fs`)
 
 // https://stackoverflow.com/a/59499895

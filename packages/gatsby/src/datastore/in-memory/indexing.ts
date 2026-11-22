@@ -10,8 +10,8 @@ import _ from "lodash"
 import { getValueAt } from "../../utils/get-value-at"
 import { getResolvedFields } from "../../schema/utils"
 
-// Only list supported ops here. "CacheableFilterOp"
-// TODO: merge with DbComparator ?
+// 対応している演算子だけをここに列挙する。"CacheableFilterOp"
+// TODO: DbComparator と統合するか
 export type FilterOp =
   | "$eq"
   | "$ne"
@@ -21,7 +21,7 @@ export type FilterOp =
   | "$gte"
   | "$in"
   | "$nin"
-  | "$regex" // Note: this includes $glob
+  | "$regex" // 注: これは $glob を含む
 
 export type FilterCacheKey = string
 type GatsbyNodeID = string
@@ -44,23 +44,23 @@ const nodeIdToIdentifierMap = new Map<
 >()
 
 /**
- * Grabs an instance of IGatsbyNodePartial for the given node.
- * This accepts an IGatsbyNode or IGatsbyNodePartial as input, which allows
- * us to conditionally store index fields on the partial if we encounter
- * one that hasn't been stored on the partial yet.
+ * 指定したノードに対応する IGatsbyNodePartial のインスタンスを取得する。
+ * 入力として IGatsbyNode または IGatsbyNodePartial を受け取る。これにより、
+ * partial にまだ保存されていないインデックスフィールドに出会ったときに、
+ * 条件付きで partial に保存できる。
  */
 export const getGatsbyNodePartial = (
   node: IGatsbyNode | IGatsbyNodePartial,
   indexFields: Array<string>,
   resolvedFields: Record<string, any>
 ): IGatsbyNodePartial => {
-  // first, check if we have the partial in the cache
+  // まず、キャッシュに partial があるかを確認する
   const cacheKey = `${node.id}_____${node.internal.counter}`
   let derefPartial: IGatsbyNodePartial | undefined = undefined
   if (nodeIdToIdentifierMap.has(cacheKey)) {
     derefPartial = nodeIdToIdentifierMap.get(cacheKey)?.deref()
 
-    // now check if we have it in memory and it has all the fields we need
+    // 次に、メモリ上にあり、必要なフィールドをすべて持っているかを確認する
     if (
       derefPartial &&
       _.every(
@@ -73,8 +73,8 @@ export const getGatsbyNodePartial = (
     }
   }
 
-  // find all the keys of fields and store them and their values on the partial
-  // if we've already passed this partial, merge both sets of index fields
+  // フィールドのキーをすべて見つけ、キーとその値を partial に保存する
+  // この partial がすでに渡されている場合は、両方のインデックスフィールドの集合をマージする
   const dottedFields = {}
   const fieldsToStore = derefPartial
     ? new Set([
@@ -105,8 +105,8 @@ export const getGatsbyNodePartial = (
           dottedField.slice(`__gatsby_resolved.`.length)
         )
       } else {
-        // if we haven't gotten the full node object, fetch it once
-        // use the full node object to fetch the value
+        // 完全なノードオブジェクトをまだ取得していない場合は、1 回だけ取得する
+        // 完全なノードオブジェクトを使って値を取得する
         if (!fullNodeObject) {
           fullNodeObject = getNode(node.id)!
         }
@@ -115,7 +115,7 @@ export const getGatsbyNodePartial = (
     }
   }
 
-  // create the partial object
+  // partial オブジェクトを作成する
   const partial = Object.assign(dottedFields, {
     id: node.id,
     internal: {
@@ -127,7 +127,7 @@ export const getGatsbyNodePartial = (
     },
   })
 
-  // set the object in the cache for later fetching
+  // 後で取得できるよう、オブジェクトをキャッシュに設定する
   nodeIdToIdentifierMap.set(cacheKey, new WeakRef<IGatsbyNodePartial>(partial))
 
   return partial
@@ -138,30 +138,30 @@ const sortByIds = (a: IGatsbyNodePartial, b: IGatsbyNodePartial): number =>
 
 export interface IFilterCache {
   op: FilterOp
-  // In this map `undefined` values represent nodes that did not have the path
-  // The individual arrays are ordered asc by internal.counter which will
-  // preserve insertion order and guarantee uniqueness and it's a number so our
-  // .sort() calls can subtract one from the other which is nice :)
-  // This arrays may contain duplicates (!) because those only get filtered in the
-  // last step.
-  // TODO: We might decide to make sure these buckets _are_ deduped for eq perf
+  // このマップでは、`undefined` の値はそのパスを持たなかったノードを表す
+  // 個々の配列は internal.counter の昇順に並んでいる。これにより
+  // 挿入順が保たれ、一意性が保証される。また、数値なので
+  // .sort() の呼び出しで単に引き算ができて都合がよい :)
+  // これらの配列は重複を含むことがある (!)。重複は最後のステップでしか
+  // 取り除かれないためである。
+  // TODO: eq のパフォーマンスのために、これらのバケットを確実に重複なしにすることを検討する
   byValue: Map<FilterValueNullable, Array<IGatsbyNodePartial>>
   meta: {
-    // Used by ne/nin, which will create a Set from this array and then remove another set(s) and sort
+    // ne/nin が使う。この配列から Set を作り、別の Set を取り除いてからソートする
     nodesUnordered?: Array<IGatsbyNodePartial>
-    // Flat list of all nodes by requested types, ordered by counter (cached for empty filters)
+    // 要求された型のすべてのノードを平坦にした一覧。counter の順に並ぶ（フィルターが空の場合のためにキャッシュする）
     orderedByCounter?: Array<IGatsbyNodePartial>
-    // Ordered list of all values (by `<`) found by this filter. No null / undefs
+    // このフィルターで見つかったすべての値の順序付きの一覧（`<` による）。null と undefined は含まない
     valuesAsc?: Array<FilterValue>
-    // Flat list of nodes, ordered by valueAsc
+    // ノードを平坦にした一覧。valueAsc の順に並ぶ
     nodesByValueAsc?: Array<IGatsbyNodePartial>
-    // Ranges of nodes per value, maps to the nodesByValueAsc array
+    // 値ごとのノードの範囲。nodesByValueAsc 配列に対応する
     valueRangesAsc?: Map<FilterValue, [number, number]>
-    // Ordered list of all values (by `>`) found by this filter. No null / undefs
+    // このフィルターで見つかったすべての値の順序付きの一覧（`>` による）。null と undefined は含まない
     valuesDesc?: Array<FilterValue>
-    // Flat list of nodes, ordered by valueDesc
+    // ノードを平坦にした一覧。valueDesc の順に並ぶ
     nodesByValueDesc?: Array<IGatsbyNodePartial>
-    // Ranges of nodes per value, maps to the nodesByValueDesc array
+    // 値ごとのノードの範囲。nodesByValueDesc 配列に対応する
     valueRangesDesc?: Map<FilterValue, [number, number]>
   }
 }
@@ -171,8 +171,8 @@ export function postIndexingMetaSetup(
   filterCache: IFilterCache,
   op: FilterOp
 ): void {
-  // Loop through byValue and make sure the buckets are sorted by counter
-  // Since we don't do insertion sort, we have to do it afterwards
+  // byValue をループし、バケットが counter の順にソートされているようにする
+  // 挿入ソートをしていないので、後から行う必要がある
   for (const bucket of filterCache.byValue) {
     bucket[1].sort(sortByIds)
   }
@@ -185,17 +185,17 @@ export function postIndexingMetaSetup(
 }
 
 function postIndexingMetaSetupNeNin(filterCache: IFilterCache): void {
-  // Note: edge cases regarding `null` and `undefined`. Here `undefined` signals
-  // that the property did not exist as the filters do not support actual
-  // `undefined` values.
-  // For $ne, `null` only returns nodes that actually have the property
-  // and in that case the property cannot be `null` either. For any other value,
-  // $ne will return all nodes where the value is not actually the needle,
-  // including nodes where the value is null.
-  // A $nin does the same as an $ne except it filters multiple values instead
-  // of just one.
-  // For `$ne` we will take the list of all targeted nodes and eliminate the
-  // bucket of nodes with a particular value, if it exists at all..
+  // 注: `null` と `undefined` に関するエッジケース。ここでの `undefined` は、
+  // プロパティが存在しなかったことを示す。フィルターは実際の
+  // `undefined` の値に対応していないためである。
+  // $ne では、`null` はそのプロパティを実際に持つノードだけを返す。
+  // その場合、プロパティは `null` でもありえない。それ以外の値では、
+  // $ne は値が実際に needle ではないすべてのノードを返す。
+  // 値が null のノードも含む。
+  // $nin は $ne と同じことをするが、1 つではなく複数の値を
+  // 除外する点が異なる。
+  // `$ne` では、対象となるすべてのノードの一覧を取り、特定の値を持つ
+  // ノードのバケットが存在すれば、それを除外する。
 
   const arr: Array<IGatsbyNodePartial> = []
   filterCache.meta.nodesUnordered = arr
@@ -210,40 +210,40 @@ function postIndexingMetaSetupLtLteGtGte(
   filterCache: IFilterCache,
   op: FilterOp
 ): void {
-  // Create an ordered array of individual nodes, ordered (grouped) by the
-  // value to which the filter resolves. Nodes per value are ordered by
-  // internal.counter, asc.
-  // This way non-eq ops can simply slice the array to get a range.
+  // 個々のノードの順序付きの配列を作成する。フィルターの解決結果の値で
+  // 並べる（グループ化する）。値ごとのノードは
+  // internal.counter の昇順に並ぶ。
+  // こうしておくと、eq 以外の演算子は配列をスライスするだけで範囲を取得できる。
 
   const entriesNullable: Array<
     [FilterValueNullable, Array<IGatsbyNodePartial>]
   > = [...filterCache.byValue.entries()]
 
-  // These range checks never return `null` or `undefined` so filter those out
-  // By filtering them out early, the sort should be faster. Could be ...
+  // これらの範囲チェックは `null` や `undefined` を返さないので、取り除いておく
+  // 早い段階で取り除くことで、ソートが速くなるはずである。おそらく ...
   const entries: Array<[FilterValue, Array<IGatsbyNodePartial>]> =
     entriesNullable.filter(([v]) => v != null) as Array<
       [FilterValue, Array<IGatsbyNodePartial>]
     >
 
-  // Sort all arrays by its value, asc. Ignore/allow potential type casting.
-  // Note: while `<` is the inverse of `>=`, the ordering might coerce values.
-  // This coercion makes the op no longer idempotent (normally the result of
-  // `a < b` is the opposite of `b >= a` for any a or b of the same type). The
-  // exception is a number that is `NaN`, which we're ignoring here as it's most
-  // likely a bug in the user code. However, when coercing the ops may end up
-  // comparing against `NaN`, too. For example: `("abc" <= 12) !== (12 > "abc")`
-  // which ends up doing `NaN <= 12` and `NaN > "abc"`, which will both yield
-  // false.
-  // So instead we potentially track two ordered lists; ascending and descending
-  // and the only difference when comparing the inverse of one to the other
-  // should be how these `NaN` cases end up getting ordered.
-  // It's fine for `lt` and `lte` to use the same ordered list. Same for gt/gte.
+  // すべての配列を値の昇順でソートする。型変換が起こる可能性は無視（許容）する。
+  // 注: `<` は `>=` の逆だが、順序付けの際に値が型変換されることがある。
+  // この型変換により、演算は冪等ではなくなる（通常は、同じ型の任意の a と b について、
+  // `a < b` の結果は `b >= a` の逆になる）。例外は
+  // `NaN` である数値だが、これはユーザーのコードのバグである可能性が高いので、
+  // ここでは無視している。しかし、型変換の結果、演算が `NaN` と
+  // 比較することになる場合もある。例: `("abc" <= 12) !== (12 > "abc")`
+  // これは結局 `NaN <= 12` と `NaN > "abc"` を行うことになり、どちらも
+  // false になる。
+  // そのため、昇順と降順の 2 つの順序付きの一覧を持つことがある。
+  // 一方の逆ともう一方を比較したときの違いは、これらの `NaN` のケースが
+  // どう並ぶかだけのはずである。
+  // `lt` と `lte` が同じ順序付きの一覧を使うのは問題ない。gt/gte も同様である。
   if (op === `$lt` || op === `$lte`) {
-    // Order ascending; first value is lowest
+    // 昇順に並べる。最初の値が最小
     entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
   } else if (op === `$gt` || op === `$gte`) {
-    // Order descending; first value is highest
+    // 降順に並べる。最初の値が最大
     entries.sort(([a], [b]) => (a > b ? -1 : a < b ? 1 : 0))
   }
 
@@ -251,12 +251,12 @@ function postIndexingMetaSetupLtLteGtGte(
   const orderedValues: Array<FilterValue> = []
   const offsets: Map<FilterValue, [number, number]> = new Map()
   entries.forEach(([v, bucket]: [FilterValue, Array<IGatsbyNodePartial>]) => {
-    // Record the range containing all nodes with as filter value v
-    // The last value of the range should be the offset of the next value
-    // (So you should be able to do `nodes.slice(start, stop)` to get them)
+    // フィルターの値が v であるすべてのノードを含む範囲を記録する
+    // 範囲の最後の値は、次の値のオフセットになるはずである
+    // （つまり、`nodes.slice(start, stop)` で取得できるはずである）
     offsets.set(v, [orderedNodes.length, orderedNodes.length + bucket.length])
-    // We could do `arr.push(...bucket)` here but that's not safe with very
-    // large sets, so we use a regular loop
+    // ここで `arr.push(...bucket)` とすることもできるが、非常に大きな集合では
+    // 安全ではないので、通常のループを使う
     bucket.forEach(node => orderedNodes.push(node))
     orderedValues.push(v)
   })
@@ -264,26 +264,26 @@ function postIndexingMetaSetupLtLteGtGte(
   if (op === `$lt` || op === `$lte`) {
     filterCache.meta.valuesAsc = orderedValues
     filterCache.meta.nodesByValueAsc = orderedNodes
-    // The nodesByValueAsc is ordered by value, but multiple nodes per value are
-    // not ordered. To make lt as fast as lte, we must know the start and stop
-    // index for each value. Similarly useful for for `ne`.
+    // nodesByValueAsc は値の順に並んでいるが、同じ値を持つ複数のノードは
+    // 並んでいない。lt を lte と同じ速さにするには、各値の開始と終了の
+    // インデックスを知っている必要がある。`ne` でも同様に役立つ。
     filterCache.meta.valueRangesAsc = offsets
   } else if (op === `$gt` || op === `$gte`) {
     filterCache.meta.valuesDesc = orderedValues
     filterCache.meta.nodesByValueDesc = orderedNodes
-    // The nodesByValueDesc is ordered by value, but multiple nodes per value are
-    // not ordered. To make gt as fast as gte, we must know the start and stop
-    // index for each value. Similarly useful for for `ne`.
+    // nodesByValueDesc は値の順に並んでいるが、同じ値を持つ複数のノードは
+    // 並んでいない。gt を gte と同じ速さにするには、各値の開始と終了の
+    // インデックスを知っている必要がある。`ne` でも同様に役立つ。
     filterCache.meta.valueRangesDesc = offsets
   }
 }
 
 /**
- * Given a single non-elemMatch filter path, a list of node types, and a
- * cache, create a cache that for each resulting value of the filter contains
- * all the Nodes in a list.
- * This cache is used for applying the filter and is a massive improvement over
- * looping over all the nodes, when the number of pages (/nodes) scales up.
+ * elemMatch ではない単一のフィルターパス、ノードの型の一覧、キャッシュを
+ * 受け取り、フィルターの結果の値ごとに、該当するすべてのノードを
+ * 一覧として持つキャッシュを作成する。
+ * このキャッシュはフィルターの適用に使う。ページ（ノード）の数が増えたときに、
+ * すべてのノードをループするのに比べて大幅な改善になる。
  */
 export const ensureIndexByQuery = (
   op: FilterOp,
@@ -301,9 +301,9 @@ export const ensureIndexByQuery = (
   } as IFilterCache
   filtersCache.set(filterCacheKey, filterCache)
 
-  // We cache the subsets of nodes by type, but only one type. So if searching
-  // through one node type we can prevent a search through all nodes, otherwise
-  // it's probably faster to loop through all nodes. Perhaps. Maybe.
+  // ノードの部分集合を型ごとにキャッシュするが、1 つの型だけである。そのため、
+  // 1 つのノードの型を検索する場合は、すべてのノードの検索を避けられる。そうでない場合は、
+  // すべてのノードをループするほうがおそらく速い。たぶん。もしかすると。
 
   if (nodeTypeNames.length === 1) {
     getDataStore()
@@ -318,8 +318,8 @@ export const ensureIndexByQuery = (
         })
       })
   } else {
-    // Here we must first filter for the node type
-    // This loop is expensive at scale (!)
+    // ここでは、まずノードの型で絞り込む必要がある
+    // このループは規模が大きいとコストが高い (!)
     getDataStore()
       .iterateNodes()
       .forEach(node => {
@@ -347,17 +347,17 @@ export function ensureEmptyFilterCache(
   indexFields: Array<string>,
   resolvedFields: Record<string, any>
 ): void {
-  // This is called for queries without any filters
-  // We want to cache the result since it's basically a list of nodes by type(s)
-  // There are sites that have multiple queries which are empty
+  // フィルターが 1 つもないクエリで呼ばれる
+  // 結果は基本的に型ごとのノードの一覧なので、キャッシュしておきたい
+  // 空のクエリを複数持つサイトがある
 
   const orderedByCounter: Array<IGatsbyNodePartial> = []
 
   filtersCache.set(filterCacheKey, {
-    op: `$eq`, // Ignore.
+    op: `$eq`, // 無視する。
     byValue: new Map<FilterValueNullable, Array<IGatsbyNodePartial>>(),
     meta: {
-      orderedByCounter, // This is what we want
+      orderedByCounter, // これが求めているもの
     },
   })
 
@@ -370,8 +370,8 @@ export function ensureEmptyFilterCache(
         )
       })
   } else {
-    // Here we must first filter for the node type
-    // This loop is expensive at scale (!)
+    // ここでは、まずノードの型で絞り込む必要がある
+    // このループは規模が大きいとコストが高い (!)
     getDataStore()
       .iterateNodes()
       .forEach(node => {
@@ -383,8 +383,8 @@ export function ensureEmptyFilterCache(
       })
   }
 
-  // Since each node can only have one type, we shouldn't have to be concerned
-  // about duplicates in this array. Just make sure they're sorted.
+  // 各ノードは型を 1 つしか持てないので、この配列での重複を心配する
+  // 必要はないはずである。ソートされていることだけを保証する。
   orderedByCounter.sort(sortByIds)
 }
 
@@ -403,8 +403,8 @@ function addNodeToFilterCache({
   resolvedFields: Record<string, any>
   valueOffset?: any
 }): void {
-  // - for plain query, valueOffset === node
-  // - for elemMatch, valueOffset is sub-tree of the node to continue matching
+  // - 通常のクエリでは、valueOffset === node
+  // - elemMatch では、valueOffset は照合を続けるノードのサブツリー
   let v = valueOffset as any
   let i = 0
   while (i < chain.length && v) {
@@ -424,9 +424,9 @@ function addNodeToFilterCache({
     i !== chain.length
   ) {
     if (i === chain.length && Array.isArray(v)) {
-      // The op resolved to an array
-      // Add an entry for each element of the array. This would work for ops
-      // like eq and ne, but not sure about range ops like lt,lte,gt,gte.
+      // 演算子の解決結果が配列だった
+      // 配列の各要素についてエントリーを追加する。これは eq や ne のような
+      // 演算子では機能するが、lt、lte、gt、gte のような範囲の演算子については不明である。
 
       v.forEach(v =>
         markNodeForValue(filterCache, node, v, indexFields, resolvedFields)
@@ -435,10 +435,10 @@ function addNodeToFilterCache({
       return
     }
 
-    // This means that either
-    // - The filter resolved to `undefined`, or
-    // - The filter resolved to something other than a primitive
-    // Set the value to `undefined` to mark "path does not (fully) exist"
+    // これは次のどちらかを意味する
+    // - フィルターの解決結果が `undefined` だった
+    // - フィルターの解決結果がプリミティブ以外だった
+    // 値を `undefined` に設定し、「パスが（完全には）存在しない」ことを示す
     v = undefined
   }
 
@@ -473,8 +473,8 @@ export const ensureIndexByElemMatch = (
   indexFields: Array<string>,
   resolvedFields: Record<string, any>
 ): void => {
-  // Given an elemMatch filter, generate the cache that contains all nodes that
-  // matches a given value for that sub-query
+  // elemMatch フィルターを受け取り、そのサブクエリで指定した値に一致する
+  // すべてのノードを含むキャッシュを生成する
 
   const filterCache: IFilterCache = {
     op,
@@ -497,7 +497,7 @@ export const ensureIndexByElemMatch = (
         })
       })
   } else {
-    // Expensive at scale
+    // 規模が大きいとコストが高い
     getDataStore()
       .iterateNodes()
       .forEach(node => {
@@ -521,14 +521,14 @@ export const ensureIndexByElemMatch = (
 
 function addNodeToBucketWithElemMatch({
   node,
-  valueAtCurrentStep, // Arbitrary step on the path inside the node
+  valueAtCurrentStep, // ノード内のパス上の任意のステップ
   filter,
   filterCache,
   indexFields,
   resolvedFields,
 }: {
   node: IGatsbyNode
-  valueAtCurrentStep: any // Arbitrary step on the path inside the node
+  valueAtCurrentStep: any // ノード内のパス上の任意のステップ
   filter: IDbQueryElemMatch
   filterCache: IFilterCache
   indexFields: Array<string>
@@ -536,7 +536,7 @@ function addNodeToBucketWithElemMatch({
 }): void {
   const { path, nestedQuery } = filter
 
-  // Find the value to apply elemMatch to
+  // elemMatch を適用する値を見つける
   let i = 0
   while (i < path.length && valueAtCurrentStep) {
     const nextProp = path[i++]
@@ -548,20 +548,20 @@ function addNodeToBucketWithElemMatch({
   }
 
   if (path.length !== i) {
-    // Found undefined before the end of the path
+    // パスの終わりに達する前に undefined が見つかった
     return
   }
 
-  // `v` should now be an elemMatch target, probably an array (but maybe not)
+  // `v` はここで elemMatch の対象になっているはずである。おそらく配列だが、そうでないこともある
   if (!Array.isArray(valueAtCurrentStep)) {
-    // It's possible to `elemMatch` on a non-array so let's support that too
+    // 配列以外に対して `elemMatch` することも可能なので、それにも対応する
     valueAtCurrentStep = [valueAtCurrentStep]
   }
 
-  // Note: We need to check all elements because the node may need to be added
-  // to multiple buckets (`{a:[{b:3},{b:4}]}`, for `a.elemMatch.b/eq` that
-  // node ends up in buckets for value 3 and 4. This may lead to duplicate
-  // work when elements resolve to the same value, but that can't be helped.
+  // 注: すべての要素を確認する必要がある。ノードを複数のバケットに追加しなければ
+  // ならないことがあるためである（`{a:[{b:3},{b:4}]}` の場合、`a.elemMatch.b/eq` では
+  // そのノードは値 3 と 4 のバケットに入る）。要素が同じ値に解決されると
+  // 作業が重複することがあるが、それは避けられない。
   valueAtCurrentStep.forEach(elem => {
     if (nestedQuery.type === `elemMatch`) {
       addNodeToBucketWithElemMatch({
@@ -573,7 +573,7 @@ function addNodeToBucketWithElemMatch({
         resolvedFields,
       })
     } else {
-      // Now take same route as non-elemMatch filters would take
+      // ここからは、elemMatch ではないフィルターと同じ経路をたどる
       addNodeToFilterCache({
         node,
         chain: nestedQuery.path,
@@ -587,7 +587,7 @@ function addNodeToBucketWithElemMatch({
 }
 
 const binarySearchAsc = (
-  values: Array<FilterValue>, // Assume ordered asc
+  values: Array<FilterValue>, // 昇順に並んでいると仮定する
   needle: FilterValue
 ): [number, number] | undefined => {
   let min = 0
@@ -596,33 +596,33 @@ const binarySearchAsc = (
   while (min <= max) {
     const value = values[pivot]
     if (needle < value) {
-      // Move pivot to middle of nodes left of current pivot
+      // ピボットを、現在のピボットより左にあるノードの中央へ移す
       // assert pivot < max
       max = pivot
     } else if (needle > value) {
-      // Move pivot to middle of nodes right of current pivot
+      // ピボットを、現在のピボットより右にあるノードの中央へ移す
       // assert pivot > min
       min = pivot
     } else {
-      // This means needle === value
-      // TODO: except for NaN ... and potentially certain type casting cases
+      // これは needle === value を意味する
+      // TODO: NaN の場合と、おそらく一部の型変換のケースは除く
       return [pivot, pivot]
     }
 
     if (max - min <= 1) {
-      // End of search. Needle not found (as expected). Use pivot as index.
-      // If the needle was not found, max-min==1 and max is returned.
+      // 探索の終わり。needle は見つからなかった（想定どおり）。ピボットをインデックスとして使う。
+      // needle が見つからなかった場合は max-min==1 であり、max が返される。
       return [min, max]
     }
 
     pivot = min + Math.floor((max - min) / 2)
   }
 
-  // Shouldn't be reachable
+  // 到達しないはず
   return undefined
 }
 const binarySearchDesc = (
-  values: Array<FilterValue>, // Assume ordered desc
+  values: Array<FilterValue>, // 降順に並んでいると仮定する
   needle: FilterValue
 ): [number, number] | undefined => {
   let min = 0
@@ -631,43 +631,43 @@ const binarySearchDesc = (
   while (min <= max) {
     const value = values[pivot]
     if (needle < value) {
-      // Move pivot to middle of nodes right of current pivot
+      // ピボットを、現在のピボットより右にあるノードの中央へ移す
       // assert pivot < min
       min = pivot
     } else if (needle > value) {
-      // Move pivot to middle of nodes left of current pivot
+      // ピボットを、現在のピボットより左にあるノードの中央へ移す
       // assert pivot > max
       max = pivot
     } else {
-      // This means needle === value
-      // TODO: except for NaN ... and potentially certain type casting cases
+      // これは needle === value を意味する
+      // TODO: NaN の場合と、おそらく一部の型変換のケースは除く
       return [pivot, pivot]
     }
 
     if (max - min <= 1) {
-      // End of search. Needle not found (as expected). Use pivot as index.
-      // If the needle was not found, max-min==1 and max is returned.
+      // 探索の終わり。needle は見つからなかった（想定どおり）。ピボットをインデックスとして使う。
+      // needle が見つからなかった場合は max-min==1 であり、max が返される。
       return [min, max]
     }
 
     pivot = min + Math.floor((max - min) / 2)
   }
 
-  // Shouldn't be reachable
+  // 到達しないはず
   return undefined
 }
 
 /**
- * Given the cache key for a filter and a target value return the list of nodes
- * that resolve to this value. The returned array should be ordered by id.
- * This returns `undefined` if there is no such node
+ * フィルターのキャッシュキーと対象の値を受け取り、その値に解決されるノードの
+ * 一覧を返す。返される配列は id の順に並んでいるはずである。
+ * 該当するノードがない場合は `undefined` を返す
  *
- * Basically if the filter was {a: {b: {slug: {eq: "foo/bar"}}}} then it will
- * return all the nodes that have `node.slug === "foo/bar"`. That usually (but
- * not always) at most one node for slug, but this filter can apply to anything.
+ * 基本的に、フィルターが {a: {b: {slug: {eq: "foo/bar"}}}} であれば、
+ * `node.slug === "foo/bar"` であるすべてのノードを返す。slug の場合は通常
+ * （常にではないが）多くても 1 ノードだが、このフィルターは何にでも適用できる。
  *
- * Arrays returned by this function must be ordered by internal.counter and
- * not contain duplicate nodes (!)
+ * この関数が返す配列は internal.counter の順に並んでいなければならず、
+ * 重複するノードを含んではならない (!)
  */
 export const getNodesFromCacheByValue = (
   filterCacheKey: FilterCacheKey,
@@ -683,18 +683,18 @@ export const getNodesFromCacheByValue = (
   const op = filterCache.op
 
   if (op === `$eq`) {
-    // Arrays in byValue are assumed to be ordered by counter
+    // byValue 内の配列は counter の順に並んでいると仮定する
 
     if (filterValue == null) {
-      // Edge case for null; fetch all nodes for `null` and `undefined` because
-      // `$eq` also returns nodes without the path when searching for `null`.
-      // Not all ops do so, so we map non-existing paths to `undefined`.
+      // null のエッジケース。`null` と `undefined` のすべてのノードを取得する。
+      // `$eq` は、`null` を検索するときにパスを持たないノードも返すためである。
+      // すべての演算子がそうするわけではないので、存在しないパスは `undefined` に対応付ける。
 
       const arrNull = filterCache.byValue.get(null) ?? []
       const arrUndef = filterCache.byValue.get(undefined) ?? []
 
-      // Merge the two (ordered) arrays and return an ordered deduped array
-      // TODO: is there a reason left why we cant just cache this merged list?
+      // 2 つの（順序付きの）配列をマージし、重複のない順序付きの配列を返す
+      // TODO: このマージ済みの一覧を単にキャッシュできない理由はまだ残っているか
       return unionNodesByCounter(arrNull, arrUndef)
     }
 
@@ -709,28 +709,28 @@ export const getNodesFromCacheByValue = (
 
     const set: Set<IGatsbyNodePartial> = new Set()
 
-    // TODO: we can also mergeSort for every step. this may perform worse because of how memory in js works.
-    // For every value in the needle array, find the bucket of nodes for
-    // that value, add this bucket of nodes to one list, return the list.
+    // TODO: ステップごとにマージソートすることもできる。JS のメモリの仕組み上、こちらのほうが遅くなるかもしれない。
+    // needle 配列の各値について、その値に対応するノードのバケットを見つけ、
+    // そのバケットを 1 つの一覧に追加して、その一覧を返す。
     filterValueArr.forEach((v: FilterValueNullable) =>
       filterCache.byValue.get(v)?.forEach(v => set.add(v))
     )
 
-    const arr = [...set] // this is bad for perf but will guarantee us a unique set :(
+    const arr = [...set] // パフォーマンスには悪いが、一意な集合であることが保証される :(
     arr.sort(sortByIds)
 
-    // Note: it's very unlikely that the list of filter values is big so .includes should be fine here
+    // 注: フィルターの値の一覧が大きくなることはまずないので、ここでは .includes で問題ないはずである
     if (filterValueArr.includes(null)) {
-      // Like all other ops, `in: [null]` behaves weirdly, allowing all nodes
-      // that do not actually have a (complete) path (v=undefined)
+      // 他のすべての演算子と同様に、`in: [null]` は奇妙な動作をし、
+      // （完全な）パスを実際には持たない（v=undefined）すべてのノードを許容する
       const nodes = filterCache.byValue.get(undefined)
       if (nodes) {
-        // This will also dedupe so don't do that immediately
+        // これは重複の除去も行うので、すぐには行わない
         return unionNodesByCounter(nodes, arr)
       }
     }
 
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe first
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、先に重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
@@ -739,8 +739,8 @@ export const getNodesFromCacheByValue = (
   }
 
   if (op === `$nin`) {
-    // This is essentially the same as the $ne operator, just with multiple
-    // values to exclude.
+    // これは本質的に $ne 演算子と同じで、除外する値が
+    // 複数になっただけである。
 
     if (!Array.isArray(filterValue)) {
       throw new Error(`The $nin operator expects an array as value`)
@@ -749,13 +749,13 @@ export const getNodesFromCacheByValue = (
     const values: Set<FilterValueNullable> = new Set(filterValue)
     const set = new Set(filterCache.meta.nodesUnordered)
 
-    // Do the action for "$ne" for each element in the set of values
+    // 値の集合の各要素について、"$ne" の処理を行う
     values.forEach(filterValue => {
       removeBucketFromSet(filterValue, filterCache, set)
     })
 
-    // TODO: there's probably a more efficient algorithm to do set
-    //       subtraction in such a way that we don't have to re-sort
+    // TODO: 再ソートが不要になるような形で集合の差を求める、
+    //       より効率的なアルゴリズムがおそらくある
     return [...set].sort(sortByIds)
   }
 
@@ -764,17 +764,17 @@ export const getNodesFromCacheByValue = (
 
     removeBucketFromSet(filterValue, filterCache, set)
 
-    // TODO: there's probably a more efficient algorithm to do set
-    //       subtraction in such a way that we don't have to resort here
+    // TODO: ここで再ソートが不要になるような形で集合の差を求める、
+    //       より効率的なアルゴリズムがおそらくある
     return [...set].sort(sortByIds)
   }
 
   if (op === `$regex`) {
-    // Note: $glob is converted to $regex so $glob filters go through here, too
-    // Aside from the input pattern format, further behavior is exactly the same.
+    // 注: $glob は $regex に変換されるので、$glob フィルターもここを通る
+    // 入力パターンの形式を除けば、その後の挙動はまったく同じである。
 
-    // The input to the filter must be a string (including leading/trailing slash and regex flags)
-    // By the time the filter reaches this point, the filterValue has to be a regex.
+    // フィルターへの入力は文字列でなければならない（先頭と末尾のスラッシュ、および正規表現のフラグを含む）
+    // フィルターがここに到達するまでに、filterValue は正規表現になっていなければならない。
 
     if (!(filterValue instanceof RegExp)) {
       throw new Error(
@@ -785,19 +785,19 @@ export const getNodesFromCacheByValue = (
 
     const arr: Array<IGatsbyNodePartial> = []
     filterCache.byValue.forEach((nodes, value) => {
-      // TODO: does the value have to be a string for $regex? Can we auto-ignore any non-strings? Or does it coerce.
-      // Note: for legacy reasons partial paths should also be included for regex
+      // TODO: $regex では値は文字列でなければならないのか。文字列以外は自動的に無視できるのか。それとも型変換されるのか。
+      // 注: 歴史的な理由により、正規表現では部分的なパスも含めるべきである
       if (value !== undefined && regex.test(String(value))) {
         nodes.forEach(node => arr.push(node))
       }
     })
 
-    // TODO: we _can_ cache this list as well. Might make sense if it turns out that $regex is mostly used with literals
-    // TODO: it may make sense to first collect all buckets and then to .concat them, or merge sort them
+    // TODO: この一覧もキャッシュ _できる_。$regex が主にリテラルで使われていると分かれば、意味があるかもしれない
+    // TODO: まずすべてのバケットを集めてから .concat する、またはマージソートするほうがよいかもしれない
 
     arr.sort(sortByIds)
 
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
@@ -807,12 +807,12 @@ export const getNodesFromCacheByValue = (
 
   if (filterValue == null) {
     if (op === `$lt` || op === `$gt`) {
-      // Nothing is lt/gt null
+      // null より小さい、または大きいものはない
       return undefined
     }
 
-    // This is an edge case and this value should be directly indexed
-    // For `lte`/`gte` this should only return nodes for `null`, not a "range"
+    // これはエッジケースであり、この値は直接インデックス化されているはずである
+    // `lte`/`gte` では、「範囲」ではなく `null` のノードだけを返すべきである
     return filterCache.byValue.get(filterValue)
   }
 
@@ -823,16 +823,16 @@ export const getNodesFromCacheByValue = (
   }
 
   if (filterValue instanceof RegExp) {
-    // This is most likely an internal error, although it is possible for
-    // users to talk to this API more directly.
+    // これは内部エラーである可能性が高い。ただし、ユーザーがこの API を
+    // より直接的に呼び出すことも可能である。
     throw new Error(
       `A RegExp instance is only valid for $regex and $glob comparators`
     )
   }
 
   if (op === `$lt`) {
-    // First try a direct approach. If a value is queried that also exists then
-    // we can prevent a binary search through the whole list, O(1) vs O(log n)
+    // まず直接の方法を試す。クエリされた値がそのまま存在する場合は、
+    // リスト全体の二分探索を省ける。O(1) 対 O(log n) である
 
     const ranges = filterCache.meta.valueRangesAsc
     const nodes = filterCache.meta.nodesByValueAsc
@@ -841,47 +841,47 @@ export const getNodesFromCacheByValue = (
     if (range) {
       const arr = nodes!.slice(0, range[0])
       arr.sort(sortByIds)
-      // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+      // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
       if (wasElemMatch) {
         expensiveDedupeInline(arr)
       }
       return arr
     }
 
-    // Query may ask for a value that doesn't appear in the list, like if the
-    // list is [1, 2, 5, 6] and the query is <= 3. In that case we have to
-    // apply a search (we'll do binary) to determine the offset to slice from.
+    // クエリは、リストにない値を求めることがある。たとえばリストが
+    // [1, 2, 5, 6] で、クエリが <= 3 の場合である。その場合は、スライスの
+    // 開始位置を決めるために探索（二分探索を使う）を行う必要がある。
 
-    // Note: for lte, the valueAsc array must be list at this point
+    // 注: lte の場合、この時点で valueAsc 配列はリストになっていなければならない
     const values = filterCache.meta.valuesAsc as Array<FilterValue>
-    // It shouldn't find the targetValue (but it might) and return the index of
-    // the two value between which targetValue sits, or first/last element.
+    // targetValue は見つからないはずだが（見つかることもある）、targetValue を
+    // 挟む 2 つの値のインデックス、または最初か最後の要素を返す。
     const point = binarySearchAsc(values, filterValue)
     if (!point) {
       return undefined
     }
     const [pivotMin, pivotMax] = point
 
-    // Each pivot index must have a value and a range
-    // The returned min/max index may include the lower/upper bound, so we still
-    // have to do lte checks for both values.
+    // 各ピボットのインデックスには値と範囲がなければならない
+    // 返される min/max のインデックスは下限や上限を含むことがあるので、
+    // 両方の値に対して lte のチェックが必要である。
     let pivotValue = values[pivotMax]
     if (pivotValue > filterValue) {
       pivotValue = values[pivotMin]
     }
 
-    // Note: the pivot value _shouldnt_ match the filter value because that
-    // means the value was actually found, but those should have been indexed
-    // so should have yielded a result in the .get() above.
+    // 注: ピボットの値はフィルターの値と一致 _しないはず_ である。一致するなら
+    // 値が実際に見つかったことになるが、そうした値はインデックス化されているので、
+    // 上の .get() で結果が得られていたはずである。
 
     const [exclPivot, inclPivot] = ranges!.get(pivotValue) as [number, number]
 
-    // Note: technically, `5 <= "5" === true` but `5` would not be cached.
-    // So we have to consider weak comparison and may have to include the pivot
+    // 注: 厳密には `5 <= "5" === true` だが、`5` はキャッシュされない。
+    // そのため、緩い比較を考慮する必要があり、ピボットを含めなければならないことがある
     const until = pivotValue < filterValue ? inclPivot : exclPivot
     const arr = nodes!.slice(0, until)
     arr.sort(sortByIds)
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
@@ -889,8 +889,8 @@ export const getNodesFromCacheByValue = (
   }
 
   if (op === `$lte`) {
-    // First try a direct approach. If a value is queried that also exists then
-    // we can prevent a binary search through the whole list, O(1) vs O(log n)
+    // まず直接の方法を試す。クエリされた値がそのまま存在する場合は、
+    // リスト全体の二分探索を省ける。O(1) 対 O(log n) である
 
     const ranges = filterCache.meta.valueRangesAsc
     const nodes = filterCache.meta.nodesByValueAsc
@@ -899,47 +899,47 @@ export const getNodesFromCacheByValue = (
     if (range) {
       const arr = nodes!.slice(0, range[1])
       arr.sort(sortByIds)
-      // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+      // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
       if (wasElemMatch) {
         expensiveDedupeInline(arr)
       }
       return arr
     }
 
-    // Query may ask for a value that doesn't appear in the list, like if the
-    // list is [1, 2, 5, 6] and the query is <= 3. In that case we have to
-    // apply a search (we'll do binary) to determine the offset to slice from.
+    // クエリは、リストにない値を求めることがある。たとえばリストが
+    // [1, 2, 5, 6] で、クエリが <= 3 の場合である。その場合は、スライスの
+    // 開始位置を決めるために探索（二分探索を使う）を行う必要がある。
 
-    // Note: for lte, the valueAsc array must be list at this point
+    // 注: lte の場合、この時点で valueAsc 配列はリストになっていなければならない
     const values = filterCache.meta.valuesAsc as Array<FilterValue>
-    // It shouldn't find the targetValue (but it might) and return the index of
-    // the two value between which targetValue sits, or first/last element.
+    // targetValue は見つからないはずだが（見つかることもある）、targetValue を
+    // 挟む 2 つの値のインデックス、または最初か最後の要素を返す。
     const point = binarySearchAsc(values, filterValue)
     if (!point) {
       return undefined
     }
     const [pivotMin, pivotMax] = point
 
-    // Each pivot index must have a value and a range
-    // The returned min/max index may include the lower/upper bound, so we still
-    // have to do lte checks for both values.
+    // 各ピボットのインデックスには値と範囲がなければならない
+    // 返される min/max のインデックスは下限や上限を含むことがあるので、
+    // 両方の値に対して lte のチェックが必要である。
     let pivotValue = values[pivotMax]
     if (pivotValue > filterValue) {
       pivotValue = values[pivotMin]
     }
 
-    // Note: the pivot value _shouldnt_ match the filter value because that
-    // means the value was actually found, but those should have been indexed
-    // so should have yielded a result in the .get() above.
+    // 注: ピボットの値はフィルターの値と一致 _しないはず_ である。一致するなら
+    // 値が実際に見つかったことになるが、そうした値はインデックス化されているので、
+    // 上の .get() で結果が得られていたはずである。
 
     const [exclPivot, inclPivot] = ranges!.get(pivotValue) as [number, number]
 
-    // Note: technically, `5 <= "5" === true` but `5` would not be cached.
-    // So we have to consider weak comparison and may have to include the pivot
+    // 注: 厳密には `5 <= "5" === true` だが、`5` はキャッシュされない。
+    // そのため、緩い比較を考慮する必要があり、ピボットを含めなければならないことがある
     const until = pivotValue <= filterValue ? inclPivot : exclPivot
     const arr = nodes!.slice(0, until)
     arr.sort(sortByIds)
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
@@ -947,8 +947,8 @@ export const getNodesFromCacheByValue = (
   }
 
   if (op === `$gt`) {
-    // First try a direct approach. If a value is queried that also exists then
-    // we can prevent a binary search through the whole list, O(1) vs O(log n)
+    // まず直接の方法を試す。クエリされた値がそのまま存在する場合は、
+    // リスト全体の二分探索を省ける。O(1) 対 O(log n) である
 
     const ranges = filterCache.meta.valueRangesDesc
     const nodes = filterCache.meta.nodesByValueDesc
@@ -957,47 +957,47 @@ export const getNodesFromCacheByValue = (
     if (range) {
       const arr = nodes!.slice(0, range[0]).reverse()
       arr.sort(sortByIds)
-      // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+      // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
       if (wasElemMatch) {
         expensiveDedupeInline(arr)
       }
       return arr
     }
 
-    // Query may ask for a value that doesn't appear in the list, like if the
-    // list is [1, 2, 5, 6] and the query is <= 3. In that case we have to
-    // apply a search (we'll do binary) to determine the offset to slice from.
+    // クエリは、リストにない値を求めることがある。たとえばリストが
+    // [1, 2, 5, 6] で、クエリが <= 3 の場合である。その場合は、スライスの
+    // 開始位置を決めるために探索（二分探索を使う）を行う必要がある。
 
-    // Note: for gte, the valueDesc array must be list at this point
+    // 注: gte の場合、この時点で valueDesc 配列はリストになっていなければならない
     const values = filterCache.meta.valuesDesc as Array<FilterValue>
-    // It shouldn't find the targetValue (but it might) and return the index of
-    // the two value between which targetValue sits, or first/last element.
+    // targetValue は見つからないはずだが（見つかることもある）、targetValue を
+    // 挟む 2 つの値のインデックス、または最初か最後の要素を返す。
     const point = binarySearchDesc(values, filterValue)
     if (!point) {
       return undefined
     }
     const [pivotMin, pivotMax] = point
 
-    // Each pivot index must have a value and a range
-    // The returned min/max index may include the lower/upper bound, so we still
-    // have to do gte checks for both values.
+    // 各ピボットのインデックスには値と範囲がなければならない
+    // 返される min/max のインデックスは下限や上限を含むことがあるので、
+    // 両方の値に対して gte のチェックが必要である。
     let pivotValue = values[pivotMax]
     if (pivotValue < filterValue) {
       pivotValue = values[pivotMin]
     }
 
-    // Note: the pivot value _shouldnt_ match the filter value because that
-    // means the value was actually found, but those should have been indexed
-    // so should have yielded a result in the .get() above.
+    // 注: ピボットの値はフィルターの値と一致 _しないはず_ である。一致するなら
+    // 値が実際に見つかったことになるが、そうした値はインデックス化されているので、
+    // 上の .get() で結果が得られていたはずである。
 
     const [exclPivot, inclPivot] = ranges!.get(pivotValue) as [number, number]
 
-    // Note: technically, `5 >= "5" === true` but `5` would not be cached.
-    // So we have to consider weak comparison and may have to include the pivot
+    // 注: 厳密には `5 >= "5" === true` だが、`5` はキャッシュされない。
+    // そのため、緩い比較を考慮する必要があり、ピボットを含めなければならないことがある
     const until = pivotValue > filterValue ? inclPivot : exclPivot
     const arr = nodes!.slice(0, until).reverse()
     arr.sort(sortByIds)
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
@@ -1005,8 +1005,8 @@ export const getNodesFromCacheByValue = (
   }
 
   if (op === `$gte`) {
-    // First try a direct approach. If a value is queried that also exists then
-    // we can prevent a binary search through the whole list, O(1) vs O(log n)
+    // まず直接の方法を試す。クエリされた値がそのまま存在する場合は、
+    // リスト全体の二分探索を省ける。O(1) 対 O(log n) である
 
     const ranges = filterCache.meta.valueRangesDesc
     const nodes = filterCache.meta.nodesByValueDesc
@@ -1015,54 +1015,54 @@ export const getNodesFromCacheByValue = (
     if (range) {
       const arr = nodes!.slice(0, range[1]).reverse()
       arr.sort(sortByIds)
-      // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+      // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
       if (wasElemMatch) {
         expensiveDedupeInline(arr)
       }
       return arr
     }
 
-    // Query may ask for a value that doesn't appear in the list, like if the
-    // list is [1, 2, 5, 6] and the query is <= 3. In that case we have to
-    // apply a search (we'll do binary) to determine the offset to slice from.
+    // クエリは、リストにない値を求めることがある。たとえばリストが
+    // [1, 2, 5, 6] で、クエリが <= 3 の場合である。その場合は、スライスの
+    // 開始位置を決めるために探索（二分探索を使う）を行う必要がある。
 
-    // Note: for gte, the valueDesc array must be list at this point
+    // 注: gte の場合、この時点で valueDesc 配列はリストになっていなければならない
     const values = filterCache.meta.valuesDesc as Array<FilterValue>
-    // It shouldn't find the targetValue (but it might) and return the index of
-    // the two value between which targetValue sits, or first/last element.
+    // targetValue は見つからないはずだが（見つかることもある）、targetValue を
+    // 挟む 2 つの値のインデックス、または最初か最後の要素を返す。
     const point = binarySearchDesc(values, filterValue)
     if (!point) {
       return undefined
     }
     const [pivotMin, pivotMax] = point
 
-    // Each pivot index must have a value and a range
-    // The returned min/max index may include the lower/upper bound, so we still
-    // have to do gte checks for both values.
+    // 各ピボットのインデックスには値と範囲がなければならない
+    // 返される min/max のインデックスは下限や上限を含むことがあるので、
+    // 両方の値に対して gte のチェックが必要である。
     let pivotValue = values[pivotMax]
     if (pivotValue < filterValue) {
       pivotValue = values[pivotMin]
     }
 
-    // Note: the pivot value _shouldnt_ match the filter value because that
-    // means the value was actually found, but those should have been indexed
-    // so should have yielded a result in the .get() above.
+    // 注: ピボットの値はフィルターの値と一致 _しないはず_ である。一致するなら
+    // 値が実際に見つかったことになるが、そうした値はインデックス化されているので、
+    // 上の .get() で結果が得られていたはずである。
 
     const [exclPivot, inclPivot] = ranges!.get(pivotValue) as [number, number]
 
-    // Note: technically, `5 >= "5" === true` but `5` would not be cached.
-    // So we have to consider weak comparison and may have to include the pivot
+    // 注: 厳密には `5 >= "5" === true` だが、`5` はキャッシュされない。
+    // そのため、緩い比較を考慮する必要があり、ピボットを含めなければならないことがある
     const until = pivotValue >= filterValue ? inclPivot : exclPivot
     const arr = nodes!.slice(0, until).reverse()
     arr.sort(sortByIds)
-    // elemMatch can cause a node to appear in multiple buckets so we must dedupe
+    // elemMatch によって 1 つのノードが複数のバケットに現れることがあるので、重複を取り除く必要がある
     if (wasElemMatch) {
       expensiveDedupeInline(arr)
     }
     return arr
   }
 
-  // Unreachable because we checked all values of FilterOp (which op is)
+  // FilterOp（op の型）のすべての値を確認済みなので、到達しない
   return undefined
 }
 
@@ -1072,26 +1072,26 @@ function removeBucketFromSet(
   set: Set<IGatsbyNodePartial>
 ): void {
   if (filterValue === null) {
-    // Edge case: $ne with `null` returns only the nodes that contain the full
-    // path and that don't resolve to null, so drop `undefined` as well.
+    // エッジケース: `null` を指定した $ne は、完全なパスを持ち、かつ null に
+    // 解決されないノードだけを返す。そのため `undefined` も取り除く。
     let cache = filterCache.byValue.get(undefined)
     if (cache) cache.forEach(node => set.delete(node))
     cache = filterCache.byValue.get(null)
     if (cache) cache.forEach(node => set.delete(node))
   } else {
-    // Not excluding null so it should include undefined leafs or leafs where
-    // only the partial path exists for whatever reason.
+    // null を除外していないので、undefined の末端や、何らかの理由で
+    // パスが部分的にしか存在しない末端も含めるべきである。
     const cache = filterCache.byValue.get(filterValue)
     if (cache) cache.forEach(node => set.delete(node))
   }
 }
 
 /**
- * Finds the intersection of two arrays in O(n) with n = min(a.length, b.length)
- * The returned set should not contain duplicate nodes.
+ * 2 つの配列の積集合を O(n) で求める。n = min(a.length, b.length)
+ * 返される集合は重複するノードを含まないはずである。
  *
- * The input should be ordered by node.internal.counter and it will return a
- * list that is also ordered by node.internal.counter
+ * 入力は node.internal.counter の順に並んでいる必要があり、返される一覧も
+ * node.internal.counter の順に並ぶ
  */
 export function intersectNodesByCounter(
   a: Array<IGatsbyNodePartial>,
@@ -1099,11 +1099,11 @@ export function intersectNodesByCounter(
 ): Array<IGatsbyNodePartial> {
   let pointerA = 0
   let pointerB = 0
-  // TODO: perf check: is it helpful to init the array to min(maxA,maxB) items?
+  // TODO: パフォーマンスの確認: 配列を min(maxA,maxB) 個の要素で初期化すると効果があるか
   const result: Array<IGatsbyNodePartial> = []
   const maxA = a.length
   const maxB = b.length
-  let lastAdded: IGatsbyNodePartial | undefined = undefined // Used to dedupe the list
+  let lastAdded: IGatsbyNodePartial | undefined = undefined // 一覧の重複を取り除くために使う
 
   while (pointerA < maxA && pointerB < maxB) {
     const counterA = a[pointerA].internal.counter
@@ -1119,10 +1119,10 @@ export function intersectNodesByCounter(
           `Invariant violation: inconsistent node counters detected`
         )
       }
-      // nodeA===nodeB. Make sure we didn't just add this node already.
-      // Since input arrays are sorted, the same node should be grouped
-      // back to back, so even if both input arrays contained the same node
-      // twice, this check would prevent the result from getting duplicate nodes
+      // nodeA===nodeB。このノードを直前に追加していないことを確認する。
+      // 入力の配列はソートされているので、同じノードは連続して並ぶはずである。
+      // そのため、両方の入力配列が同じノードを 2 回含んでいても、
+      // このチェックによって結果に重複するノードが入ることを防げる
       if (lastAdded !== a[pointerA]) {
         result.push(a[pointerA])
         lastAdded = a[pointerA]
@@ -1136,19 +1136,19 @@ export function intersectNodesByCounter(
 }
 
 /**
- * Merge two lists of nodes.
- * The returned set should not contain duplicate nodes.
+ * ノードの 2 つの一覧をマージする。
+ * 返される集合は重複するノードを含まないはずである。
  *
- * The input should be ordered by node.internal.counter and it will return a
- * list that is also ordered by node.internal.counter
+ * 入力は node.internal.counter の順に並んでいる必要があり、返される一覧も
+ * node.internal.counter の順に並ぶ
  */
 export function unionNodesByCounter(
   a: Array<IGatsbyNodePartial>,
   b: Array<IGatsbyNodePartial>
 ): Array<IGatsbyNodePartial> {
-  // TODO: perf check: is it helpful to init the array to max(maxA,maxB) items?
+  // TODO: パフォーマンスの確認: 配列を max(maxA,maxB) 個の要素で初期化すると効果があるか
   const arr: Array<IGatsbyNodePartial> = []
-  let lastAdded: IGatsbyNodePartial | undefined = undefined // Used to dedupe the list
+  let lastAdded: IGatsbyNodePartial | undefined = undefined // 一覧の重複を取り除くために使う
 
   let pointerA = 0
   let pointerB = 0
@@ -1201,18 +1201,18 @@ export function unionNodesByCounter(
 }
 
 function expensiveDedupeInline(arr: Array<IGatsbyNodePartial>): void {
-  // An elemMatch filter may cause duplicates to appear in a bucket.
-  // Since the bucket is sorted those should now be back to back
-  // Worst case this is a fast O(n) loop that does nothing.
+  // elemMatch フィルターによって、バケットに重複が現れることがある。
+  // バケットはソートされているので、重複は連続して並んでいるはずである
+  // 最悪の場合でも、これは何もしない高速な O(n) のループである。
   let prev: IGatsbyNodePartial | undefined = undefined
 
-  // We copy-on-find because a splice is expensive and we can't use Sets
+  // splice はコストが高く、Set も使えないので、重複を見つけた時点でコピーする
 
   let j = 0
   for (let i = 0; i < arr.length; ++i) {
     const node = arr[i]
     if (node !== prev) {
-      // Only start copying the remainder of the list once a dupe is found
+      // 重複が見つかってから初めて、一覧の残りのコピーを開始する
       if (i !== j) {
         arr[j] = node
       }

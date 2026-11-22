@@ -43,7 +43,7 @@ const PARSER_OPTIONS: ParserOptions = {
 }
 
 export function getBabelParserOptions(filePath: string): ParserOptions {
-  // Flow and TypeScript plugins can't be enabled simultaneously
+  // Flow のプラグインと TypeScript のプラグインは、同時には有効にできない
   if (/\.tsx?/.test(filePath)) {
     const { plugins } = PARSER_OPTIONS
     return {

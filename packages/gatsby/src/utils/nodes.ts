@@ -4,7 +4,7 @@ import { IGatsbyNode } from "../redux/types"
 import { store } from "../redux"
 
 /**
- * Determine if node has changed.
+ * ノードが変更されたかを判定する。
  */
 export const hasNodeChanged = (id: string, digest: string): boolean => {
   const node = getNode(id)
@@ -16,7 +16,7 @@ export const hasNodeChanged = (id: string, digest: string): boolean => {
 }
 
 /**
- * Get node and save path dependency.
+ * ノードを取得し、パスの依存を保存する。
  */
 export const getNodeAndSavePathDependency = (
   id: string,
@@ -36,14 +36,14 @@ export const getNodeAndSavePathDependency = (
 }
 
 /**
- * Get content for a node from the plugin that created it.
+ * ノードを作成したプラグインから、そのノードのコンテンツを取得する。
  */
 export async function loadNodeContent(node: IGatsbyNode): Promise<string> {
   if (typeof node.internal.content === `string`) {
     return node.internal.content
   }
 
-  // Load plugin's loader function
+  // プラグインのローダー関数を読み込む
   const plugin = store
     .getState()
     .flattenedPlugins.find(plug => plug.name === node.internal.owner)

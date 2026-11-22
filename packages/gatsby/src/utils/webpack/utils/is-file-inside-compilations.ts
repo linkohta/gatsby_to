@@ -19,8 +19,8 @@ export function setFilesFromDevelopHtmlCompilation(
 }
 
 /**
- * Checks if a file is inside either `develop` or `develop-html` compilation. Used to determine if
- * we should generate codeframe for this file for error overlay.
+ * ファイルが `develop` または `develop-html` のコンパイルに含まれているかを調べる。エラーオーバーレイ用に
+ * このファイルのコードフレームを生成すべきかどうかの判断に使う。
  */
 export function isFileInsideCompilations(
   absolutePath: string,

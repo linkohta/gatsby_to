@@ -50,7 +50,7 @@ interface IQueryContext {
 }
 
 export async function doRunQuery(args: IDoRunQueryArgs): Promise<IQueryResult> {
-  // Note: Keeping doRunQuery method the only async method in chain for perf
+  // 注: パフォーマンスのため、チェーンの中で非同期のメソッドは doRunQuery だけにしている
   const context = createQueryContext(args)
 
   const totalCount = async (): Promise<number> =>
@@ -98,12 +98,12 @@ function performIndexScan(context: IQueryContext): GatsbyIterable<IGatsbyNode> {
     }
     if (canUseIndexForSorting(indexMetadata, sortFields)) {
       const { nodes, usedSkip } = filterNodes(filterContext, indexMetadata)
-      // Interleave nodes of different types (not expensive for already sorted chunks)
+      // 異なる型のノードを交互に織り込む（すでにソート済みのチャンクではコストは高くない）
       result = result.mergeSorted(nodes, createNodeSortComparator(sortFields))
       resultOffset = usedSkip
       continue
     }
-    // The sad part - unlimited filter + in-memory sort
+    // 残念な部分 - 件数制限なしのフィルターとメモリ上でのソート
     const unlimited = { ...context, skip: 0, limit: undefined }
     const { nodes, usedSkip } = filterNodes(unlimited, indexMetadata)
     const sortedNodes = sortNodesInMemory(context, nodes)
@@ -160,7 +160,7 @@ function runCount(context: IQueryContext): number {
     try {
       count += countUsingIndexOnly({ ...context, indexMetadata })
     } catch (e) {
-      // We cannot reliably count using index - fallback to full iteration :/
+      // インデックスを使って確実に数えることはできないので、全件の走査にフォールバックする :/
       for (const _ of filterNodes(context, indexMetadata).nodes) count++
     }
   }
@@ -221,9 +221,9 @@ function filterNodes(
 }
 
 /**
- * Takes intermediate result and applies any remaining filterQueries.
+ * 中間結果を受け取り、残っている filterQueries を適用する。
  *
- * If result is already fully filtered - simply returns.
+ * 結果がすでに完全にフィルター済みであれば、そのまま返す。
  */
 function completeFiltering(
   context: IQueryContext,
@@ -234,7 +234,7 @@ function completeFiltering(
   if (isFullyFiltered(dbQueries, usedQueries)) {
     return intermediateResult
   }
-  // Apply remaining filter operations directly (last resort: slow)
+  // 残りのフィルター操作を直接適用する（最後の手段: 遅い）
   const resolvedNodes = store.getState().resolvedNodesCache
 
   const filtersToApply: Array<[string, IDbFilterStatement]> = dbQueries
@@ -248,7 +248,7 @@ function completeFiltering(
       const tmp = resolveFieldValue(dottedField, node, resolvedFields)
       const value = Array.isArray(tmp) ? tmp : [tmp]
       if (value.some(v => !matchesFilter(filter, v))) {
-        // Mimic AND semantics
+        // AND の意味論を模倣する
         return false
       }
     }
@@ -260,8 +260,8 @@ function sortNodesInMemory(
   context: IQueryContext,
   nodes: GatsbyIterable<IGatsbyNode>
 ): GatsbyIterable<IGatsbyNode> {
-  // TODO: Sort using index data whenever possible (maybe store data needed for sorting in index values)
-  // TODO: Nodes can be partially sorted by index prefix - we can (and should) exploit this
+  // TODO: 可能な限りインデックスのデータを使ってソートする（ソートに必要なデータをインデックスの値に保存するとよいかもしれない）
+  // TODO: ノードはインデックスの接頭辞によって部分的にソートされていることがある。これは活用できる（し、活用すべきである）
   return new GatsbyIterable(() => {
     const arr = Array.from(nodes)
     arr.sort(createNodeSortComparator(context.sortFields))
@@ -299,8 +299,8 @@ function needsSorting(context: IQueryContext): boolean {
 }
 
 /**
- * Based on assumption that if all sort fields exist in index
- * then any result received from this index is fully sorted
+ * すべてのソートフィールドがインデックスに存在するなら、
+ * このインデックスから得られる結果は完全にソート済みである、という前提に基づく
  */
 function canUseIndexForSorting(
   index: IIndexMetadata,

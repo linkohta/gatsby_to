@@ -1,12 +1,12 @@
 export function register() {
   // no-op
   //
-  // We are actually failing the build when `ts-node` exists in webpack's dependency graph
-  // because it's known to not work and cause failures.
+  // `ts-node` が webpack の依存グラフにある場合は、実際にはビルドを失敗させている。
+  // 動かず、失敗の原因になることが分かっているためである。
   //
-  // This shim for `ts-node` just skips trying to bundle the actual `ts-node`
-  // so webpack has less work to do during bundling.
+  // この `ts-node` 用の shim は、実際の `ts-node` をバンドルしようとするのをスキップするだけであり、
+  // バンドル中の webpack の処理を減らす。
   //
-  // Using or not this shim, functionally doesn't make a difference - we will still
-  // fail the build with same actionable error anyway.
+  // この shim を使っても使わなくても、機能上の違いはない。いずれにしても、
+  // 対処方法の分かる同じエラーでビルドを失敗させる。
 }

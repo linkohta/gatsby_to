@@ -9,7 +9,7 @@ type OmitUndefined = (data: Data) => Partial<Data>
 
 /**
  * @param {Object|Array} data
- * @returns {Object|Array} data without undefined values
+ * @returns {Object|Array} undefined の値を取り除いたデータ
  */
 const omitUndefined: OmitUndefined = data => {
   const isPlainObject = _.isPlainObject(data)
@@ -24,7 +24,7 @@ type isTypeSupported = (data: Data) => boolean
 
 /**
  * @param {*} data
- * @return {boolean} Boolean if type is supported
+ * @return {boolean} 型に対応しているかを表す真偽値
  */
 const isTypeSupported: isTypeSupported = data => {
   if (data === null) {
@@ -48,8 +48,8 @@ type sanitizeNode = (
 ) => Data | undefined
 
 /**
- * Make data serializable
- * @param {(Object|Array)} data to sanitize
+ * データをシリアライズできるようにする
+ * @param {(Object|Array)} data サニタイズするデータ
  * @param {boolean} isNode = true
  * @param {Set<string>} path = new Set
  */
@@ -70,7 +70,7 @@ export const sanitizeNode: sanitizeNode = (
       : ([] as Array<IGatsbyNode>)
     let anyFieldChanged = false
 
-    // _.each is a "Collection" method and thus objects with "length" property are iterated as arrays
+    // _.each は "Collection" のメソッドなので、"length" プロパティを持つオブジェクトは配列として反復処理される
     const hasLengthProperty = isPlainObject
       ? Object.prototype.hasOwnProperty.call(data, `length`)
       : false
@@ -104,7 +104,7 @@ export const sanitizeNode: sanitizeNode = (
       data = omitUndefined(returnData as Data) as Data
     }
 
-    // arrays and plain objects are supported - no need to to sanitize
+    // 配列とプレーンオブジェクトには対応しているので、サニタイズする必要はない
     return data
   }
 

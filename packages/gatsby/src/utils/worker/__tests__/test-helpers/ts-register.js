@@ -1,4 +1,4 @@
-// spawned process won't use jest config to support TS, so we need to add support ourselves
+// 起動したプロセスは TS 対応のための jest の設定を使わないので、自前で対応を追加する必要がある
 require(`@babel/register`)({
   extensions: [`.js`, `.ts`],
   configFile: require.resolve(`../../../../../babel.config.js`),

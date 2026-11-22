@@ -828,7 +828,7 @@ describe(`rebuilds node types having existing relations`, () => {
   const rebuild = async nodes => {
     i++
     nodes.forEach(node => {
-      // Adding new field to enforce type structure change
+      // 型の構造を強制的に変えるために、新しいフィールドを追加する
       node[`field${i}`] = i
       node.id = `${node.id}${i}`
     })
@@ -868,7 +868,7 @@ describe(`rebuilds node types having existing relations`, () => {
     await expect(rebuild(nodes(`Bar1`, `Foo1`))).resolves.toBeDefined()
     await expect(rebuild(nodes(`Baz1`, `Foo1`))).resolves.toBeDefined()
 
-    // Make sure types were actually rebuilt (having all those field1, field2, etc)
+    // 型が実際に再ビルドされたこと（field1、field2 などをすべて持つこと）を確認する
     const print = typePrinter(schema)
     expect(print(`Foo`)).toMatchSnapshot()
     expect(print(`Bar`)).toMatchSnapshot()
@@ -958,7 +958,7 @@ describe(`rebuilds node types having existing relations`, () => {
     await expect(rebuild(nodes(`Bar1`, `Foo1`))).resolves.toBeDefined()
     await expect(rebuild(nodes(`Baz1`, `Foo1`))).resolves.toBeDefined()
 
-    // Make sure types were actually rebuilt (having all those field1, field2, etc)
+    // 型が実際に再ビルドされたこと（field1、field2 などをすべて持つこと）を確認する
     const print = typePrinter(schema)
     expect(print(`Foo`)).toMatchSnapshot()
     expect(print(`Bar`)).toMatchSnapshot()
@@ -1196,7 +1196,7 @@ describe(`Compatibility with addThirdPartySchema`, () => {
       }"
     `)
 
-    // Expect resolvers to be overridden by createResolvers
+    // リゾルバーが createResolvers によって上書きされるはずである
     const query = `
     {
       external {

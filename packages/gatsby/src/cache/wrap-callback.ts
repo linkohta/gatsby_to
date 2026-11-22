@@ -1,4 +1,4 @@
-// Initial file from https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d
+// 最初のファイルは https://github.com/rolandstarke/node-cache-manager-fs-hash @ af52d2d から取得した
 /* !
 The MIT License (MIT)
 
@@ -24,7 +24,7 @@ SOFTWARE.
 */
 
 /**
- * adds an callback param to the original function
+ * 元の関数にコールバックの引数を追加する
  * @param {function} fn
  * @returns {function}
  */

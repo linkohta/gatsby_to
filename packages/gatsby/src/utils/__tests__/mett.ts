@@ -59,7 +59,7 @@ describe(`mett`, (): void => {
       const spy = jest.fn()
 
       met.on(`foo`, spy)
-      met.off(`barr`, spy) // NOT the original event
+      met.off(`barr`, spy) // 元のイベントではない
       met.emit(`foo`, `pass`)
 
       expect(spy).toHaveBeenCalledWith(`pass`, `foo`)
@@ -157,7 +157,7 @@ describe(`mett`, (): void => {
 
       met.emit(`foo`, `pass`)
 
-      // Note: i before d now
+      // 注: ここでは i が d より先になる
       expect(out).toBe(`abcefghjklmnopid`)
     })
 
@@ -287,16 +287,16 @@ describe(`mett`, (): void => {
 
       let out = ``
 
-      // Order is relevant here
+      // ここでは順序が重要である
       met.on(`foo`, (): string => (out += `a`))
       met.on(`*`, (): string => (out += `b`))
-      // Reverse order
+      // 逆の順序
       met.on(`*`, (): string => (out += `c`))
       met.on(`foo`, (): string => (out += `d`))
 
       met.emit(`foo`, `pass`)
 
-      // the stars should last, in fifo order otherwise
+      // スターは最後になるはずである。それ以外は fifo の順序になる
       expect(out).toBe(`adbc`)
     })
   })

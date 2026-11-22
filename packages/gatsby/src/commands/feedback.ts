@@ -4,8 +4,8 @@ import {
 } from "../utils/feedback"
 import { IProgram } from "./types"
 
-// This is because we splat command line arguments onto this object.
-// A good refactor would be to put this inside a key like `cliArgs`
+// コマンドライン引数をこのオブジェクトに展開しているためである。
+// `cliArgs` のようなキーの中に入れるのが、よいリファクタリングになるだろう
 interface IFeedbackProgram extends IProgram {
   disable?: boolean
   enable?: boolean

@@ -10,7 +10,7 @@ function countFilesInCacheDir() {
 
 describe(`DiskStore`, function () {
   let cache
-  // remove test directory before each test
+  // 各テストの前にテスト用のディレクトリを削除する
   beforeEach(async function () {
     return new Promise(resolve => {
       removeDir(cacheDirectory, () => {
@@ -19,7 +19,7 @@ describe(`DiskStore`, function () {
       })
     })
   })
-  // remove test directory after last test
+  // 最後のテストの後にテスト用のディレクトリを削除する
   afterEach(async function () {
     return new Promise(resolve => removeDir(cacheDirectory, resolve))
   })
@@ -250,11 +250,11 @@ describe(`DiskStore`, function () {
         cache2.get(`key`),
         cache3.get(`key`),
       ])
-      // all caches should be the same
+      // すべてのキャッシュが同じであるはず
       expect(values[0]).toEqual(values[1])
       expect(values[0]).toEqual(values[2])
 
-      // the cache should be one of the values that was stored to it
+      // キャッシュは、保存された値のいずれかであるはず
       try {
         expect(values[0]).toEqual(values[1])
       } catch (e) {

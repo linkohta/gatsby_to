@@ -1,17 +1,17 @@
 declare module "lmdb" {
-  // currently lmdb doesn't have typings for this export
+  // 現在、lmdb にはこの export の型定義がない
   export function clearKeptObjects(): void
 }
 
 import { clearKeptObjects } from "lmdb"
 /**
- * Wrapper for any iterable providing chainable interface and convenience methods
- * similar to array.
+ * 任意のイテラブルのラッパー。配列に似た、チェーン可能なインターフェースと
+ * 便利なメソッドを提供する。
  *
- * Additionally provides convenience methods for sorted iterables.
+ * さらに、ソート済みのイテラブル向けの便利なメソッドも提供する。
  *
- * Note: avoiding async iterables because of perf reasons, see https://github.com/nodejs/node/issues/31979
- * (fortunately lmdb can traverse stuff in sync manner very fast)
+ * 注: パフォーマンス上の理由から非同期イテラブルは避けている。https://github.com/nodejs/node/issues/31979 を参照
+ * （幸い、lmdb は同期的に非常に高速に走査できる）
  */
 export class GatsbyIterable<T> {
   constructor(private source: Iterable<T> | (() => Iterable<T>)) {}
@@ -24,10 +24,10 @@ export class GatsbyIterable<T> {
     for (const val of source) {
       yield val
 
-      // clearKeptObjects just make it possible for WeakRefs used in any way during current
-      // sync execution tick to be garbage collected. It doesn't force GC, just remove
-      // internal strong references in V8.
-      // see https://github.com/kriszyp/weak-lru-cache/issues/4
+      // clearKeptObjects は、現在の同期実行のティック中に何らかの形で使われた WeakRef を
+      // ガベージコレクションの対象にできるようにするだけである。GC を強制するのではなく、
+      // V8 内部の強参照を取り除く。
+      // https://github.com/kriszyp/weak-lru-cache/issues/4 を参照
       if (++i % 100 === 0) {
         clearKeptObjects()
       }
@@ -66,10 +66,10 @@ export class GatsbyIterable<T> {
   }
 
   /**
-   * Assuming both this and the other iterable are sorted
-   * produces the new sorted iterable with interleaved values.
+   * this ともう一方のイテラブルがどちらもソート済みであることを前提に、
+   * 値を交互に織り込んだ新しいソート済みのイテラブルを生成する。
    *
-   * Note: this method is not removing duplicates
+   * 注: このメソッドは重複を取り除かない
    */
   mergeSorted<U = T>(
     other: Iterable<U>,
@@ -79,9 +79,9 @@ export class GatsbyIterable<T> {
   }
 
   /**
-   * Assuming both this and the other iterable are sorted
-   * produces the new sorted iterable with values from this iterable
-   * that also exist in the other iterable.
+   * this ともう一方のイテラブルがどちらもソート済みであることを前提に、
+   * this のイテラブルの値のうち、もう一方のイテラブルにも存在するものからなる
+   * 新しいソート済みのイテラブルを生成する。
    */
   intersectSorted<U = T>(
     other: Iterable<U>,
@@ -91,13 +91,13 @@ export class GatsbyIterable<T> {
   }
 
   /**
-   * Assuming this iterable is sorted, removes duplicates from it
-   * by applying comparator(prev, current) to sibling iterable values.
+   * このイテラブルがソート済みであることを前提に、隣り合う値に
+   * comparator(prev, current) を適用して重複を取り除く。
    *
-   * Comparator function is expected to return 0 when items are equal,
-   * similar to Array.prototype.sort() argument.
+   * comparator 関数は、Array.prototype.sort() の引数と同じように、
+   * 項目が等しいときに 0 を返すことが期待される。
    *
-   * If comparator is not set, uses strict === comparison
+   * comparator が設定されていない場合は、厳密な === での比較を使う
    */
   deduplicateSorted(comparator?: (a: T, b: T) => number): GatsbyIterable<T> {
     return new GatsbyIterable<T>(() => deduplicateSorted(this, comparator))
@@ -105,7 +105,7 @@ export class GatsbyIterable<T> {
 }
 
 /**
- * Returns true when passed value is iterable
+ * 渡された値がイテラブルであれば true を返す
  */
 export function isIterable(obj: unknown): obj is Iterable<any> {
   if (typeof obj !== `object` || obj === null) {
@@ -169,7 +169,7 @@ function* deduplicateSequence<T>(
   source: Iterable<T>,
   keyFn?: (entry: T) => unknown
 ): Generator<T> {
-  // TODO: this can be potentially improved by using bloom filters?
+  // TODO: ブルームフィルターを使えば改善できるかもしれない
   const registered = new Set<unknown>()
 
   for (const current of source) {
@@ -194,7 +194,7 @@ function* deduplicateSorted<T>(
   }
 }
 
-// Merge two originally sorted iterables:
+// もともとソート済みの 2 つのイテラブルをマージする:
 function* mergeSorted<T, U = T>(
   firstSorted: Iterable<T>,
   secondSorted: Iterable<U>,
@@ -223,8 +223,8 @@ function* mergeSorted<T, U = T>(
       b = iter2.next()
     }
   } finally {
-    // If generator is exited early, make sure to close iterators too
-    // See https://raganwald.com/2017/07/22/closing-iterables-is-a-leaky-abstraction.html#more-about-closing-iterators-explicitly
+    // ジェネレーターが途中で終了した場合は、イテレーターも必ず閉じる
+    // https://raganwald.com/2017/07/22/closing-iterables-is-a-leaky-abstraction.html#more-about-closing-iterators-explicitly を参照
     if (typeof iter1.return === `function`) iter1.return()
     if (typeof iter2.return === `function`) iter2.return()
   }

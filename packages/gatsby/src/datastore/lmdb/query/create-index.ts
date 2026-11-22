@@ -9,7 +9,7 @@ interface IIndexingContext {
   datastore: IDataStore
 }
 
-export type IndexFields = Map<string, number> // name, direction
+export type IndexFields = Map<string, number> // 名前、方向
 
 export interface IIndexMetadata {
   state: "ready" | "building" | "stale" | "error" | "initial"
@@ -19,8 +19,8 @@ export interface IIndexMetadata {
   keyFields: Array<[fieldName: string, orderDirection: number]>
   multiKeyFields: Array<string>
 
-  // Stats for multi-key indexes
-  // (e.g. when node is { id: `id`, foo: [1,2] } it translates into two index keys: [1,`id`], [2,`id`])
+  // マルチキーインデックスの統計情報
+  // （たとえばノードが { id: `id`, foo: [1,2] } の場合、[1,`id`] と [2,`id`] の 2 つのインデックスキーになる）
   stats: {
     keyCount: number
     itemCount: number
@@ -59,8 +59,8 @@ export async function createIndex(
       try {
         await lockIndex(context, indexName)
       } catch (err) {
-        // Index is being updated in some other process.
-        // Wait and assume it's in a good state when done
+        // インデックスが他のプロセスで更新中である。
+        // 待機し、完了したら正常な状態になっていると仮定する
         return indexReady(context, indexName)
       }
       return doCreateIndex(context, typeName, indexFields)
@@ -98,11 +98,11 @@ async function doCreateIndex(
   const label = `Indexing ${indexName}`
   console.time(label)
 
-  // Assuming materialization was run before creating index
+  // インデックスの作成前にマテリアライズが実行されていると仮定する
   const resolvedNodes = store.getState().resolvedNodesCache.get(typeName)
 
-  // TODO: iterate only over dirty nodes
-  // TODO: wrap in async transaction?
+  // TODO: dirty なノードだけを走査する
+  // TODO: 非同期トランザクションで包むか
   const stats: IIndexMetadata["stats"] = {
     maxKeysPerItem: 0,
     keyCount: 0,
@@ -120,8 +120,8 @@ async function doCreateIndex(
   try {
     let i = 0
     for (const node of datastore.iterateNodesByType(typeName)) {
-      // Assuming materialization was run (executing custom resolvers for fields in `filter` and `sort` clauses)
-      //  And materialized values of those fields are stored in resolvedNodes
+      // マテリアライズ（`filter` 句と `sort` 句のフィールドに対するカスタムリゾルバーの実行）が実行済みであると仮定する
+      //  また、それらのフィールドのマテリアライズされた値が resolvedNodes に保存されていると仮定する
       const resolvedFields = resolvedNodes?.get(node.id)
       const { keys, multiKeyFields } = prepareIndexKeys(
         node,
@@ -135,11 +135,11 @@ async function doCreateIndex(
       indexMetadata.multiKeyFields.push(...multiKeyFields)
 
       for (const indexKey of keys) {
-        // Note: this may throw if indexKey exceeds 1978 chars (lmdb limit) or contain objects/buffers/etc
+        // 注: indexKey が 1978 文字（lmdb の上限）を超える場合や、オブジェクトや Buffer などを含む場合は、例外を投げることがある
         indexes.put(indexKey, node.id)
       }
       if (++i % 5000 === 0) {
-        // Do not block event loop too much
+        // イベントループを長くブロックしすぎないようにする
         await new Promise(resolve => setTimeout(resolve, 3))
       }
     }
@@ -159,17 +159,17 @@ async function doCreateIndex(
 }
 
 /**
- * Returns a list of index keys for a given node.
- * One node may produce multiple index entries when indexing over array values.
+ * 指定したノードのインデックスキーの一覧を返す。
+ * 配列の値をインデックス化する場合、1 つのノードが複数のインデックスエントリーを生成することがある。
  *
- * For example:
+ * 例:
  *  Node: { foo: [{ bar: `bar1`}, { bar: `bar2` }] }
- *  Index fields: [`foo.bar`] will produce the following elements: [`bar1`, `bar2`]
+ *  Index fields: [`foo.bar`] は次の要素を生成する: [`bar1`, `bar2`]
  *
- * Keys are prefixed with index name and suffixed with node counter for stable sort.
+ * 安定したソートのために、キーにはインデックス名の接頭辞とノードの counter の接尾辞が付く。
  *
- * If materialization result (resolvedFields) exists for a given index field
- *  it is used as a key element, otherwise the a raw node value is used.
+ * あるインデックスフィールドにマテリアライズの結果（resolvedFields）が存在する場合は、
+ *  それをキーの要素として使う。そうでなければノードの生の値を使う。
  */
 function prepareIndexKeys(
   node: IGatsbyNode,
@@ -177,7 +177,7 @@ function prepareIndexKeys(
   indexName: string,
   indexFields: IndexFields
 ): { keys: Array<IndexKey>; multiKeyFields: Array<string> } {
-  // TODO: use index id vs index name (shorter)
+  // TODO: インデックス名ではなくインデックス id を使う（より短い）
   const indexKeyElements: Array<Array<IndexFieldValue>> = []
   const multiKeyFields: Array<string> = []
 
@@ -186,7 +186,7 @@ function prepareIndexKeys(
     const fieldValue = resolveFieldValue(dottedField, node, resolvedFields)
     let indexFieldValue = jsValueToLmdbKey(fieldValue)
 
-    // Got value that can't be stored in lmdb key
+    // lmdb のキーに保存できない値を受け取った
     if (typeof indexFieldValue === `undefined`) {
       const path = `${node.internal.type}.${dottedField} (id: ${node.id})`
       throw new Error(`Bad value at ${path}: ${inspect(fieldValue)}`)
@@ -248,9 +248,9 @@ async function indexReady(
 }
 
 /**
- * Autogenerate index name based on parameters.
+ * パラメーターに基づいてインデックス名を自動生成する。
  *
- * Example:
+ * 例:
  *
  * buildIndexName(`Foo`, { foo: 1, bar: -1 }) -> `Foo/foo:1/bar:-1
  */
@@ -278,11 +278,11 @@ function jsValueToLmdbKey(value: unknown): IndexFieldValue | undefined {
     return value
   }
   if (typeof value === `undefined`) {
-    // Array keys containing `undefined` are not supported by lmdb-store
-    //  But we can't exclude those nodes from an index because
-    //  filters { eq: null, gte: null, lte: null } are expected to return such nodes
-    // Furthermore, lmdb-store puts those keys before others and we want them to be below
-    //  so need to add additional padding
+    // `undefined` を含む配列のキーには、lmdb-store が対応していない
+    //  しかし、それらのノードをインデックスから除外することはできない。
+    //  フィルター { eq: null, gte: null, lte: null } は、そうしたノードを返すことが期待されるためである
+    // さらに、lmdb-store はそれらのキーを他より前に置くが、ここでは下に置きたいので、
+    //  追加のパディングを加える必要がある
     return undefinedSymbol
   }
   if (Array.isArray(value)) {
@@ -290,13 +290,13 @@ function jsValueToLmdbKey(value: unknown): IndexFieldValue | undefined {
     for (const item of value) {
       const lmdbKey = jsValueToLmdbKey(item)
       if (typeof lmdbKey === `undefined`) {
-        return undefined // bad value
+        return undefined // 不正な値
       }
       result.push(lmdbKey)
     }
     return result
   }
-  // FIXME: not sure if we want this but there are tests for this :/
+  // FIXME: これが望ましいかは分からないが、これに対するテストがある :/
   if (typeof value === `object`) {
     return JSON.stringify(value)
   }

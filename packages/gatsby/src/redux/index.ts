@@ -47,30 +47,30 @@ const reducers = persistedReduxKeys.reduce((acc, key) => {
   return acc
 }, rawReducers)
 
-// Create event emitter for actions
+// アクション用のイベントエミッターを作成する
 export const emitter = mett()
 
-// Read old node data from cache.
+// キャッシュから古いノードデータを読み込む。
 export const readState = (): IGatsbyState => {
   try {
     const state = readFromCache() as IGatsbyState
     if (state.nodes) {
-      // re-create nodesByType
+      // nodesByType を作り直す
       state.nodesByType = new Map()
       state.nodes.forEach(node => {
         const { type } = node.internal
         if (!state.nodesByType.has(type)) {
           state.nodesByType.set(type, new Map())
         }
-        // The `.has` and `.set` calls above make this safe
+        // 上の `.has` と `.set` の呼び出しによって、これは安全である
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         state.nodesByType.get(type)!.set(node.id, node)
       })
     }
 
-    // jsonDataPaths was removed in the per-page-manifest
-    // changes. Explicitly delete it here to cover case where user
-    // runs gatsby the first time after upgrading.
+    // jsonDataPaths は、ページごとのマニフェストへの変更で
+    // 削除された。アップグレード後に初めて gatsby を実行する場合に
+    // 対応するために、ここで明示的に削除する。
     delete state[`jsonDataPaths`]
 
     return state
@@ -86,7 +86,7 @@ export interface IMultiDispatch {
 }
 
 /**
- * Redux middleware handling array of actions
+ * アクションの配列を扱う Redux ミドルウェア
  */
 const multi: Middleware<IMultiDispatch> =
   ({ dispatch }) =>
@@ -119,7 +119,7 @@ export const store: GatsbyReduxStore = configureStore(
 )
 
 /**
- * Allows overloading some reducers (e.g. when setting a custom datastore)
+ * 一部のレデューサーを差し替えられるようにする（たとえば独自のデータストアを設定する場合）
  */
 export function replaceReducer(
   customReducers: Partial<ReducersMapObject<IGatsbyState>>
@@ -129,12 +129,12 @@ export function replaceReducer(
   )
 }
 
-// Persist state.
+// 状態を永続化する。
 export const saveState = (): void => {
   if (process.env.GATSBY_DISABLE_CACHE_PERSISTENCE) {
-    // do not persist cache if above env var is set.
-    // this is to temporarily unblock builds that hit the v8.serialize related
-    // Node.js buffer size exceeding kMaxLength fatal crashes
+    // 上の環境変数が設定されている場合は、キャッシュを永続化しない。
+    // これは、v8.serialize に関連して Node.js のバッファーサイズが kMaxLength を超え、
+    // 致命的なクラッシュになるビルドを、一時的に通せるようにするためのものである
     return undefined
   }
 
@@ -164,7 +164,7 @@ export const loadPartialStateFromDisk = (
   try {
     return readFromCache(slices, optionalPrefix) as DeepPartial<IGatsbyState>
   } catch (e) {
-    // ignore errors.
+    // エラーは無視する。
   }
   return {} as IGatsbyState
 }

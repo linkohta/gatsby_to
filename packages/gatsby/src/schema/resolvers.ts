@@ -91,16 +91,16 @@ export function findManyPaginated<TSource, TArgs>(
     context,
     info
   ): Promise<IGatsbyConnection<IGatsbyNode>> {
-    // Peek into selection set and pass on the `field` arg of `group` and
-    // `distinct` which might need to be resolved.
+    // 選択セットをのぞき見て、解決が必要かもしれない `group` と
+    // `distinct` の `field` 引数を渡す。
     const group = getProjectedField(info, `group`)
     const distinct = getProjectedField(info, `distinct`)
     const max = getProjectedField(info, `max`)
     const min = getProjectedField(info, `min`)
     const sum = getProjectedField(info, `sum`)
 
-    // Apply paddings for pagination
-    // (for previous/next node and also to detect if there is a previous/next page)
+    // ページネーションのために余分に取得する
+    // （前後のノードのため、および前後のページがあるかを検出するため）
     const skip = typeof args.skip === `number` ? Math.max(0, args.skip - 1) : 0
     const limit = typeof args.limit === `number` ? args.limit + 2 : undefined
 
@@ -114,7 +114,7 @@ export function findManyPaginated<TSource, TArgs>(
       skip,
       limit,
     }
-    // Note: stats are passed to telemetry in src/commands/build.ts
+    // 注: stats は src/commands/build.ts でテレメトリーに渡される
     if (context.stats) {
       context.stats.totalRunQuery++
       context.stats.totalPluralRunQuery++
@@ -271,9 +271,9 @@ export function createGroupResolver(
             acc[key] = (acc[key] || []).concat(node)
           })
         return acc
-        // Note: using Object.create on purpose:
-        //   object key may be arbitrary string including reserved words (i.e. `constructor`)
-        //   see: https://github.com/gatsbyjs/gatsby/issues/22508
+        // 注: 意図的に Object.create を使っている:
+        //   オブジェクトのキーは、予約語（`constructor` など）を含む任意の文字列になりうる
+        //   参照: https://github.com/gatsbyjs/gatsby/issues/22508
       },
       Object.create(null)
     )
@@ -367,8 +367,8 @@ export function link<TSource, TArgs>(
     TArgs
   >
 ): GatsbyResolver<TSource, TArgs> {
-  // Note: we explicitly make an attempt to prevent using the `async` keyword because often
-  //       it does not return a promise and this makes a significant difference at scale.
+  // 注: `async` キーワードを使わないように明示的に工夫している。多くの場合は
+  //       Promise を返さず、規模が大きくなるとこれが大きな違いになるためである。
 
   return function linkResolver(
     source,
@@ -383,7 +383,7 @@ export function link<TSource, TArgs>(
       fromNode: options.from ? options.fromNode : info.fromNode,
     })
 
-    // Note: for this function, at scale, conditional .then is more efficient than generic await
+    // 注: この関数では、規模が大きくなると、汎用の await よりも条件付きの .then のほうが効率的である
     if (typeof fieldValueOrPromise?.then === `function`) {
       return fieldValueOrPromise.then(fieldValue =>
         linkResolverValue(fieldValue, args, context, info)
@@ -420,7 +420,7 @@ export function link<TSource, TArgs>(
       }
     }
 
-    // Return early if fieldValue is [] since { in: [] } doesn't make sense
+    // fieldValue が [] の場合は早めに戻る。{ in: [] } は意味をなさないためである
     if (Array.isArray(fieldValue) && fieldValue.length === 0) {
       return fieldValue
     }
@@ -521,8 +521,8 @@ export function fileByPath<TSource, TArgs>(
       return null
     }
 
-    // Find the File node for this node (we assume the node is something
-    // like markdown which would be a child node of a File node).
+    // このノードに対応する File ノードを探す（このノードは markdown のような
+    // もので、File ノードの子ノードであると想定している）。
     const parentFileNode = context.nodeModel.findRootNodeAncestor(
       source,
       node => node.internal && node.internal.type === `File`
@@ -711,9 +711,9 @@ It's likely that this has happened in a schemaCustomization with manually invoke
 export function wrappingResolver<TSource, TArgs>(
   resolver: GatsbyResolver<TSource, TArgs>
 ): GatsbyResolver<TSource, TArgs> {
-  // Note: we explicitly make an attempt to prevent using the `async` keyword because often
-  //       it does not return a promise and this makes a significant difference at scale.
-  //       GraphQL will gracefully handle the resolver result of a promise or non-promise.
+  // 注: `async` キーワードを使わないように明示的に工夫している。多くの場合は
+  //       Promise を返さず、規模が大きくなるとこれが大きな違いになるためである。
+  //       GraphQL は、リゾルバーの結果が Promise でもそうでなくても適切に処理する。
 
   if (resolver[`isTracingResolver`]) {
     return resolver

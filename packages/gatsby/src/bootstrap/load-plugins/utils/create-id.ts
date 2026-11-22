@@ -2,12 +2,12 @@ import { createNodeId } from "../../../utils/create-node-id"
 import { IPluginRefObject } from "../types"
 
 /**
- * Make sure key is unique to plugin options. E.g. there could
- * be multiple source-filesystem plugins, with different names
- * (docs, blogs).
+ * キーがプラグインのオプションに対して一意になるようにする。たとえば、
+ * 名前の異なる（docs、blogs）複数の source-filesystem プラグインが
+ * 存在することがある。
  *
- * @param name Name of the plugin
- * @param pluginObject Object of the plugin
+ * @param name プラグインの名前
+ * @param pluginObject プラグインのオブジェクト
  */
 export const createPluginId = (
   name: string,

@@ -22,16 +22,16 @@ it(`can load config and execute node API in worker`, async () => {
   const siteDirectory = path.join(__dirname, `fixtures`, `sample-site`)
   await compileGatsbyFiles(siteDirectory)
 
-  // plugin options for custom local plugin contains function (() => `foo`)
+  // カスタムのローカルプラグインのプラグインオプションには関数が含まれる (() => `foo`)
   await Promise.all(
     worker.all.loadConfigAndPlugins({
       siteDirectory,
     })
   )
 
-  // plugin API execute function from plugin options and store result in `global`
+  // プラグイン API がプラグインオプションの関数を実行し、結果を `global` に保存する
   await Promise.all(worker.all.runAPI(`createSchemaCustomization`))
 
-  // getting result stored in `global`
+  // `global` に保存された結果を取得する
   expect(await worker.single.getAPIRunResult()).toEqual(`foo`)
 })

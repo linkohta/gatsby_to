@@ -97,7 +97,7 @@ async function startQueryJob(
 ): Promise<ExecutionResult> {
   let isPending = true
 
-  // Print out warning when query takes too long
+  // クエリに時間がかかりすぎている場合は警告を出力する
   const timeoutId = setTimeout(() => {
     if (isPending) {
       reportLongRunningQueryJob(queryJob)
@@ -131,9 +131,9 @@ export async function queryRunner(
     })
   )
 
-  // Run query
+  // クエリを実行する
   let result: IExecutionResult
-  // Nothing to do if the query doesn't exist.
+  // クエリが存在しなければ何もしない。
   if (!queryJob.query || queryJob.query === ``) {
     result = {}
   } else {
@@ -141,11 +141,11 @@ export async function queryRunner(
   }
 
   if (result.errors) {
-    // If there's a graphql error then log the error and exit
+    // graphql のエラーがある場合は、エラーをログに出して終了する
     panicQueryJobError(queryJob, result.errors)
   }
 
-  // Add the page/slice context onto the results.
+  // ページやスライスのコンテキストを結果に追加する。
   if (queryJob) {
     if (queryJob.queryType === `page`) {
       result[`pageContext`] = Object.assign({}, queryJob.context)
@@ -154,7 +154,7 @@ export async function queryRunner(
     }
   }
 
-  // Delete internal data from pageContext
+  // pageContext から内部データを削除する
   if (result.pageContext) {
     delete result.pageContext.path
     delete result.pageContext.internalComponentName
@@ -178,10 +178,10 @@ export async function queryRunner(
 
   let resultHashCacheKey = queryJob.id
   if (queryJob.queryType === `static`) {
-    // For static queries we use hash for a file path we output results to.
-    // With automatic sort and aggregation graphql codemod it is possible
-    // to have same result, but different query text hashes which would skip
-    // writing out file to disk if we don't check query hash as well
+    // 静的クエリでは、結果を出力するファイルのパスにハッシュを使う。
+    // sort と aggregation を自動で書き換える graphql の codemod によって、結果は同じでも
+    // クエリテキストのハッシュが異なることがある。そのため、クエリのハッシュも確認しないと、
+    // ディスクへのファイルの書き出しがスキップされてしまう
     resultHashCacheKey += `-${queryJob.hash}`
   }
 
@@ -193,8 +193,8 @@ export async function queryRunner(
     await resultHashCache.set(resultHashCacheKey, resultHash)
 
     if (queryJob.queryType === `page` || queryJob.queryType === `slice`) {
-      // We need to save this temporarily in cache because
-      // this might be incomplete at the moment
+      // この時点ではまだ不完全かもしれないので、
+      // 一時的にキャッシュに保存しておく必要がある
       await savePageQueryResult(queryJob.id, resultJSON)
       if (queryJob.queryType === `page`) {
         store.dispatch({
@@ -207,7 +207,7 @@ export async function queryRunner(
         store.dispatch({
           type: `ADD_PENDING_SLICE_DATA_WRITE`,
           payload: {
-            name: queryJob.id.substring(7), // remove "slice--" prefix
+            name: queryJob.id.substring(7), // "slice--" プレフィックスを取り除く
           },
         })
       }
@@ -224,7 +224,7 @@ export async function queryRunner(
     }
   }
 
-  // Broadcast that a page's query has run.
+  // ページのクエリが実行されたことを通知する。
   store.dispatch(
     actions.pageQueryRun({
       path: queryJob.id,

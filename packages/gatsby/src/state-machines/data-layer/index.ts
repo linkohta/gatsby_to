@@ -112,7 +112,7 @@ const options: Partial<MachineOptions<IDataLayerContext, any>> = {
 }
 
 /**
- * Machine used during first run
+ * 初回の実行で使うマシン
  */
 
 export const initializeDataMachine = createMachine(
@@ -131,7 +131,7 @@ export const initializeDataMachine = createMachine(
 )
 
 /**
- * Machine used when we need to source nodes again
+ * ノードをもう一度取得する必要があるときに使うマシン
  */
 
 export const reloadDataMachine = createMachine(
@@ -150,8 +150,8 @@ export const reloadDataMachine = createMachine(
 )
 
 /**
- * Machine used when we need to re-create pages after a
- * node mutation outside of sourceNodes
+ * sourceNodes の外でノードが変更された後に、ページを
+ * 作り直す必要があるときに使うマシン
  */
 export const recreatePagesMachine = createMachine(
   {

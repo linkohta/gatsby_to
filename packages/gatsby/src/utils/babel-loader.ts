@@ -12,19 +12,19 @@ import type { Stage } from "../commands/types"
 import { getBrowsersList } from "./browserslist"
 
 /**
- * Gatsby's custom loader for webpack & babel
+ * webpack と babel のための Gatsby 独自のローダー
  *
- * Gatsby allows sites to either use our Babel setup (the default)
- * or to add a .babelrc to take control.
+ * Gatsby では、サイトは Gatsby の Babel の構成（デフォルト）を使うことも、
+ * .babelrc を追加して自分で制御することもできる。
  *
- * Our default setup is defined in the fallbackPlugins/fallbackPresets arrays
- * below.
+ * デフォルトの構成は、下の fallbackPlugins/fallbackPresets 配列で
+ * 定義している。
  *
- * After using either the fallback or user supplied setup, we add on a handful
- * of required plugins and finally merge in any presets/plugins supplied
- * by Gatsby plugins.
+ * フォールバックまたはユーザーが用意した構成を使った後に、いくつかの
+ * 必須のプラグインを追加し、最後に、Gatsby のプラグインが渡した
+ * プリセットとプラグインをマージする。
  *
- * You can find documentation for the custom loader here: https://babeljs.io/docs/en/next/babel-core.html#loadpartialconfig
+ * 独自のローダーのドキュメントはこちら: https://babeljs.io/docs/en/next/babel-core.html#loadpartialconfig
  */
 
 interface IBabelCustomLoader {
@@ -38,7 +38,7 @@ const babelrcFileToCacheKey = new Map()
 
 const customBabelLoader = babelLoader.custom(babel => {
   return {
-    // Passed the loader options.
+    // ローダーのオプションが渡される。
     customOptions({
       stage = `test` as Stage,
       reactRuntime = `classic`,
@@ -80,19 +80,19 @@ const customBabelLoader = babelLoader.custom(babel => {
       return toReturn
     },
 
-    // Passed Babel's 'PartialConfig' object.
+    // Babel の 'PartialConfig' オブジェクトが渡される。
     config(partialConfig, { customOptions }): Babel.TransformOptions {
       const { stage, isPageTemplate, resourceQuery } = customOptions
       let configCacheKey = `${stage}-${isPageTemplate}-${resourceQuery}`
 
       if (partialConfig.hasFilesystemConfig()) {
-        // partialConfig.files is a Set that accumulates used config files (absolute paths)
+        // partialConfig.files は、使われた設定ファイル（絶対パス）を蓄積する Set である
         partialConfig.files.forEach(configFilePath => {
           configCacheKey += `_${configFilePath}`
         })
 
-        // after generating configCacheKey add link between babelrc files and cache keys that rely on it
-        // so we can invalidate memoized configs when used babelrc file changes
+        // configCacheKey を生成した後に、babelrc ファイルと、それに依存するキャッシュキーを結び付ける
+        // これにより、使われている babelrc ファイルが変わったときに、メモ化した設定を無効化できる
         partialConfig.files.forEach(configFilePath => {
           let cacheKeysToInvalidate = babelrcFileToCacheKey.get(configFilePath)
           if (!cacheKeysToInvalidate) {
@@ -117,8 +117,8 @@ const customBabelLoader = babelLoader.custom(babel => {
         fallbackPresets,
       ] = prepareOptions(babel, customOptions)
 
-      // If there is no filesystem babel config present, add our fallback
-      // presets/plugins.
+      // ファイルシステムに babel の設定がない場合は、フォールバックの
+      // プリセットとプラグインを追加する。
       if (!partialConfig.hasFilesystemConfig()) {
         options = {
           ...options,
@@ -126,18 +126,18 @@ const customBabelLoader = babelLoader.custom(babel => {
           presets: [...fallbackPresets, ...requiredPresets],
         }
       } else {
-        // With a babelrc present, only add our required plugins/presets
+        // babelrc がある場合は、必須のプラグインとプリセットだけを追加する
         options = {
           ...options,
           plugins: [...options.plugins, ...requiredPlugins],
           presets: [...options.presets, ...requiredPresets],
         }
-        // User-defined preset likely contains `babel-preset-gatsby`
-        // Make sure to pass required dynamic options (e.g. `stage` to it):
+        // ユーザー定義のプリセットには、`babel-preset-gatsby` が含まれている可能性が高い
+        // 必須の動的なオプション（たとえば `stage`）を必ず渡すようにする:
         addRequiredPresetOptions(babel, options.presets, customOptions)
       }
 
-      // Merge in presets/plugins added from gatsby plugins.
+      // gatsby のプラグインが追加したプリセットとプラグインをマージする。
       reduxPresets.forEach(preset => {
         options.presets = mergeConfigItemOptions({
           items: options.presets,
@@ -156,10 +156,10 @@ const customBabelLoader = babelLoader.custom(babel => {
         })
       })
 
-      // cache just plugins and presets, because config also includes things like
-      // filenames - this is mostly to not call `mergeConfigItemOptions` for each file
-      // as that function call `babel.createConfigItem` and is quite expensive but also
-      // skips quite a few nested loops on top of that
+      // プラグインとプリセットだけをキャッシュする。config にはファイル名なども
+      // 含まれるためである。これは主に、ファイルごとに `mergeConfigItemOptions` を
+      // 呼ばないようにするためである。この関数は `babel.createConfigItem` を呼ぶのでかなりコストが高い。
+      // それに加えて、ネストしたループもかなり省ける
       configCache.set(configCacheKey, {
         plugins: options.plugins,
         presets: options.presets,

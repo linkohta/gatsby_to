@@ -16,13 +16,13 @@ export const callApi: ActionFunction<IWaitingContext, AnyEventObject> = (
 ) => callRealApi(event.payload, store)
 
 /**
- * Event handler used when we're not ready to process node mutations.
- * Instead we add it to a batch to process when we're next idle
+ * ノードの変更を処理する準備ができていないときに使うイベントハンドラー。
+ * 処理する代わりにバッチに追加し、次にアイドルになったときに処理する
  */
 export const addNodeMutation: AssignAction<IWaitingContext, AnyAction> = assign(
   {
     nodeMutationBatch: ({ nodeMutationBatch = [] }, { payload }) => {
-      // It's not pretty, but it's much quicker than concat
+      // きれいではないが、concat よりずっと速い
       nodeMutationBatch.push(payload)
       return nodeMutationBatch
     },

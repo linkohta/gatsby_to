@@ -11,9 +11,9 @@ import {
 import { slash } from "gatsby-core-utils/path"
 
 /**
- * Remove the export query param from a path that can
- * a) contain only the ?export= query param
- * b) but also contain ?__contentFilePath&export=
+ * パスから export クエリパラメーターを取り除く。パスには次の 2 通りがある
+ * a) ?export= クエリパラメーターだけを含む
+ * b) ?__contentFilePath&export= も含む
  */
 export const removeExportQueryParam = (
   path: string | undefined
@@ -33,7 +33,7 @@ export const removeExportQueryParam = (
 }
 
 /**
- * Checks if a module matches a resourcePath
+ * モジュールが resourcePath に一致するかを調べる
  */
 function doesModuleMatchResourcePath(
   resourcePath: string,
@@ -46,7 +46,7 @@ function doesModuleMatchResourcePath(
 }
 
 /**
- * A helper to set/get path resolving
+ * パスの解決結果を設定、取得するためのヘルパー
  */
 function getRealPath(
   cache: Map<string, string>,
@@ -77,7 +77,7 @@ export class StaticQueryMapper {
     } = this.store.getState()
 
     compiler.hooks.done.tap(this.name, stats => {
-      // In dev mode we want to write page-data when compilation succeeds
+      // 開発モードでは、コンパイルが成功したときに page-data を書き出したい
       if (!stats.hasErrors() && compiler.watchMode) {
         enqueueFlush()
       }
@@ -132,8 +132,8 @@ export class StaticQueryMapper {
 
         for (const webpackModule of compilation.modules) {
           if (!(webpackModule instanceof NormalModule)) {
-            // the only other type can be CssModule at this stage, which we don't care about
-            // this also acts as a type guard, providing fuller typeing for webpackModule
+            // この段階でほかにあり得る型は CssModule だけで、それは対象外である
+            // これは型ガードも兼ねており、webpackModule の型がより詳しくなる
             continue
           }
 
@@ -228,7 +228,7 @@ export class StaticQueryMapper {
           const component = componentModules.get(module)
           if (component) {
             config.onComponent(component)
-            // don't return here yet, as component might be imported by another one, and we want to traverse up until we reach async-requires
+            // ここではまだ return しない。コンポーネントが別のコンポーネントから import されている可能性があり、async-requires に届くまで上へたどりたいためである
           }
 
           if (entryModules.has(module)) {

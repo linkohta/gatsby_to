@@ -70,7 +70,7 @@ const buildSchema = async ({
   inferenceMetadata,
   parentSpan,
 }) => {
-  // FIXME: consider removing .ready here - it is needed for various tests to pass (although probably harmless)
+  // FIXME: ここの .ready の削除を検討する - さまざまなテストを通すために必要である（おそらく無害だが）
   await getDataStore().ready()
   await updateSchemaComposer({
     schemaComposer,
@@ -96,19 +96,19 @@ module.exports = {
   buildSchema,
 }
 
-// Workaround for https://github.com/graphql-compose/graphql-compose/issues/319
-//  FIXME: remove this when fixed in graphql-compose
+// https://github.com/graphql-compose/graphql-compose/issues/319 の回避策
+//  FIXME: graphql-compose で修正されたら削除する
 const freezeTypeComposers = (schemaComposer, excluded = new Set()) => {
   Array.from(schemaComposer.values()).forEach(tc => {
     const isCompositeTC =
       tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer
 
     if (isCompositeTC && !excluded.has(tc.getTypeName())) {
-      // typeComposer.getType() actually mutates the underlying GraphQL type
-      //   and always re-assigns type._fields with a thunk.
-      //   It causes continuous redundant field re-definitions when running queries
-      //   (affects performance significantly).
-      //   Prevent the mutation and "freeze" the type:
+      // typeComposer.getType() は、実際には元になる GraphQL の型を変更し、
+      //   常に type._fields に thunk を代入し直す。
+      //   そのため、クエリの実行時にフィールドの冗長な再定義が繰り返し起きる
+      //   （パフォーマンスに大きく影響する）。
+      //   変更を防ぎ、型を「凍結」する:
       const type = tc.getType()
       tc.getType = () => type
     }
@@ -161,7 +161,7 @@ const updateSchemaComposer = async ({
       parentSpan: activity.span,
     })
     if (enginePrintConfig) {
-      // make sure to print schema that will be used when bundling graphql-engine
+      // graphql-engine をバンドルするときに使われるスキーマを確実に出力する
       await printTypeDefinitions({
         config: enginePrintConfig,
         schemaComposer,
@@ -233,8 +233,8 @@ const processTypeComposer = async ({
     if (isNodeInterface(typeComposer)) {
       await addNodeInterfaceFields({ schemaComposer, typeComposer, parentSpan })
 
-      // We only process field extensions for queryable Node interfaces, so we get
-      // the input args on the root query type, e.g. `formatString` etc. for `dateformat`
+      // フィールド拡張を処理するのは、クエリできる Node インターフェースだけである。そのため、
+      // ルートのクエリ型に入力引数（たとえば `dateformat` の `formatString` など）が付く
       await processFieldExtensions({
         schemaComposer,
         typeComposer,
@@ -354,8 +354,8 @@ const mergeTypes = ({
   createdFrom,
   parentSpan,
 }) => {
-  // The merge is considered safe when a user or a plugin owning the type extend this type
-  // TODO: add proper conflicts detection and reporting (on the field level)
+  // 型を所有するユーザーまたはプラグインがこの型を拡張する場合、マージは安全と見なす
+  // TODO: （フィールド単位での）適切な衝突の検出とレポートを追加する
   const typeOwner = typeComposer.getExtension(`plugin`)
   const isOverridableBuiltInType =
     !typeOwner && overridableBuiltInTypeNames.has(typeComposer.getTypeName())
@@ -540,11 +540,11 @@ const addExtensions = ({
         })
       }
 
-      // Validate field extension args. `graphql-compose` already checks the
-      // type of directive args in `parseDirectives`, but we want to check
-      // extensions provided with type builders as well. Also, we warn if an
-      // extension option was provided which does not exist in the field
-      // extension definition.
+      // フィールド拡張の引数を検証する。`graphql-compose` は `parseDirectives` で
+      // ディレクティブの引数の型をすでに確認しているが、Type Builder で
+      // 渡された拡張も確認したい。また、フィールド拡張の定義に
+      // 存在しない拡張のオプションが渡された場合は、
+      // 警告を出す。
       const fieldExtensions = typeComposer.getFieldExtensions(fieldName)
       const typeName = typeComposer.getTypeName()
       Object.keys(fieldExtensions)
@@ -563,7 +563,7 @@ const addExtensions = ({
           try {
             const definition = schemaComposer.getDirective(name)
 
-            // Handle `defaultValue` when not provided as directive
+            // ディレクティブとして渡されていない場合の `defaultValue` を処理する
             definition.args.forEach(({ name, defaultValue }) => {
               if (args[name] === undefined && defaultValue !== undefined) {
                 args[name] = defaultValue
@@ -641,9 +641,9 @@ const createTypeComposerFromGatsbyType = ({
           if (type.config.interfaces) {
             return type.config.interfaces.map(iface => {
               if (typeof iface === `string`) {
-                // Sadly, graphql-compose runs this function too early - before we have
-                // all of those interfaces actually created in the schema, so have to create
-                // a temporary placeholder composer :/
+                // 残念ながら、graphql-compose はこの関数を実行するのが早すぎる。これらの
+                // インターフェースがすべてスキーマに実際に作成される前に実行されるので、
+                // 一時的なプレースホルダーのコンポーザーを作らなければならない :/
                 if (!schemaComposer.has(iface)) {
                   const tmpComposer = schemaComposer.createInterfaceTC(iface)
                   tmpComposer.setExtension(`isPlaceholder`, true)
@@ -677,9 +677,9 @@ const createTypeComposerFromGatsbyType = ({
           if (type.config.types) {
             return type.config.types.map(typeName => {
               if (!schemaComposer.has(typeName)) {
-                // Sadly, graphql-compose runs this function too early - before we have
-                // all of those types actually created in the schema, so have to create
-                // a temporary placeholder composer :/
+                // 残念ながら、graphql-compose はこの関数を実行するのが早すぎる。これらの
+                // 型がすべてスキーマに実際に作成される前に実行されるので、
+                // 一時的なプレースホルダーのコンポーザーを作らなければならない :/
                 const tmpComposer = schemaComposer.createObjectTC(typeName)
                 tmpComposer.setExtension(`isPlaceholder`, true)
                 return tmpComposer
@@ -704,9 +704,9 @@ const createTypeComposerFromGatsbyType = ({
           if (type.config.interfaces) {
             return type.config.interfaces.map(iface => {
               if (typeof iface === `string`) {
-                // Sadly, graphql-compose runs this function too early - before we have
-                // all of those interfaces actually created in the schema, so have to create
-                // a temporary placeholder composer :/
+                // 残念ながら、graphql-compose はこの関数を実行するのが早すぎる。これらの
+                // インターフェースがすべてスキーマに実際に作成される前に実行されるので、
+                // 一時的なプレースホルダーのコンポーザーを作らなければならない :/
                 if (!schemaComposer.has(iface)) {
                   const tmpComposer = schemaComposer.createInterfaceTC(iface)
                   tmpComposer.setExtension(`isPlaceholder`, true)
@@ -738,7 +738,7 @@ const createTypeComposerFromGatsbyType = ({
     }
   }
   if (typeComposer) {
-    // Workaround for https://github.com/graphql-compose/graphql-compose/issues/311
+    // https://github.com/graphql-compose/graphql-compose/issues/311 の回避策
     typeComposer.schemaComposer = schemaComposer
   }
   return typeComposer
@@ -753,7 +753,7 @@ const addSetFieldsOnGraphQLNodeTypeFields = ({ schemaComposer, parentSpan }) =>
           type: {
             name: typeName,
             get nodes() {
-              // TODO STRICT_MODE: return iterator instead of array
+              // TODO STRICT_MODE: 配列の代わりにイテレーターを返す
               return getNodesByType(typeName)
             },
           },
@@ -761,10 +761,10 @@ const addSetFieldsOnGraphQLNodeTypeFields = ({ schemaComposer, parentSpan }) =>
           parentSpan,
         })
         if (result) {
-          // NOTE: `setFieldsOnGraphQLNodeType` only allows setting
-          // nested fields with a path as property name, i.e.
-          // `{ 'frontmatter.published': 'Boolean' }`, but not in the form
-          // `{ frontmatter: { published: 'Boolean' }}`
+          // NOTE: `setFieldsOnGraphQLNodeType` では、ネストしたフィールドは、
+          // パスをプロパティ名にする形でしか設定できない。つまり
+          // `{ 'frontmatter.published': 'Boolean' }` は使えるが、
+          // `{ frontmatter: { published: 'Boolean' }}` の形は使えない
           result.forEach(fields => tc.addNestedFields(fields))
         }
       }
@@ -786,8 +786,8 @@ const addThirdPartySchemas = ({
     })
     schemaComposer.Query.addFields(queryTC.getFields())
 
-    // Explicitly add the third-party schema's types, so they can be targeted
-    // in `createResolvers` API.
+    // `createResolvers` API で対象にできるように、サードパーティーのスキーマの型を
+    // 明示的に追加する。
     const types = schema.getTypeMap()
     Object.keys(types).forEach(typeName => {
       const type = types[typeName]
@@ -802,23 +802,23 @@ const addThirdPartySchemas = ({
           type instanceof GraphQLObjectType ||
           type instanceof GraphQLInterfaceType
 
-        // Workaround for an edge case typical for Relay Classic-compatible schemas.
-        // For example, GitHub API contains this piece:
+        // Relay Classic 互換のスキーマでよくあるエッジケースへの回避策。
+        // たとえば、GitHub API には次の部分がある:
         //   type Query { relay: Query }
-        // And gatsby-source-graphql transforms it to:
+        // gatsby-source-graphql はこれを次のように変換する:
         //   type Query { github: GitHub }
         //   type GitHub { relay: Query }
-        // The problem:
-        //   schemaComposer.createTC(type) for type `GitHub` will eagerly create type composers
-        //   for all fields (including `relay` and it's type: `Query` of the third-party schema)
-        //   This unexpected `Query` composer messes up with our own Query type composer and produces duplicate types.
-        //   The workaround is to make sure fields of the GitHub type are lazy and are evaluated only when
-        //   this Query type is already replaced with our own root `Query` type (see processThirdPartyTypeFields):
+        // 問題:
+        //   型 `GitHub` に対する schemaComposer.createTC(type) は、すべてのフィールドの型コンポーザーを
+        //   先行して作成する（`relay` と、その型であるサードパーティーのスキーマの `Query` を含む）
+        //   この想定外の `Query` コンポーザーが、こちらの Query 型のコンポーザーと干渉し、重複した型を作ってしまう。
+        //   回避策は、GitHub 型のフィールドを遅延させ、この Query 型がこちらのルートの `Query` 型に
+        //   すでに置き換えられた後にだけ評価されるようにすることである（processThirdPartyTypeFields を参照）:
         if (typeHasFields && typeof type._fields === `object`) {
           const fields = type._fields
           type._fields = () => fields
         }
-        // ^^^ workaround done
+        // ^^^ 回避策はここまで
         const typeComposer = schemaComposer.createTC(type)
         if (typeHasFields) {
           processThirdPartyTypeFields({
@@ -835,17 +835,17 @@ const addThirdPartySchemas = ({
 }
 
 const resetOverriddenThirdPartyTypeFields = ({ typeComposer }) => {
-  // The problem: createResolvers API mutates third party schema instance.
-  //   For example it can add a new field referencing a type from our main schema
-  //   Then if we rebuild the schema this old type instance will sneak into
-  //   the new schema and produce the famous error:
+  // 問題: createResolvers API は、サードパーティーのスキーマのインスタンスを変更する。
+  //   たとえば、メインのスキーマの型を参照する新しいフィールドを追加することがある
+  //   その後でスキーマを再ビルドすると、この古い型のインスタンスが新しいスキーマに
+  //   紛れ込み、次の有名なエラーを引き起こす:
   //   "Schema must contain uniquely named types but contains multiple types named X"
-  // This function only affects schema rebuilding pathway.
-  //   It cleans up artifacts created by the `createResolvers` API of the previous build
-  //   so that we return the third party schema to its initial state (hence can safely re-add)
-  // TODO: the right way to fix this would be not to mutate the third party schema in
-  //   the first place. But unfortunately mutation happens in the `graphql-compose`
-  //   and we don't have an easy way to avoid it without major rework
+  // この関数が影響するのは、スキーマを再ビルドする経路だけである。
+  //   前回のビルドの `createResolvers` API が作った生成物を片付けて、
+  //   サードパーティーのスキーマを最初の状態に戻す（そのため安全に追加し直せる）
+  // TODO: これを直す正しい方法は、そもそもサードパーティーのスキーマを変更しない
+  //   ことである。しかし残念ながら、変更は `graphql-compose` の中で起きており、
+  //   大幅な作り直しなしにそれを避ける簡単な方法がない
   typeComposer.getFieldNames().forEach(fieldName => {
     const createdFrom = typeComposer.getFieldExtension(fieldName, `createdFrom`)
     if (createdFrom === `createResolvers`) {
@@ -870,11 +870,11 @@ const processThirdPartyTypeFields = ({
   type,
   schemaQueryType,
 }) => {
-  // Fix for types that refer to Query. Thanks Relay Classic!
+  // Query を参照する型のための修正。Relay Classic のおかげである
   const fields = type.getFields()
   Object.keys(fields).forEach(fieldName => {
-    // Remove customization that we could have added via `createResolvers`
-    // to make it work with schema rebuilding
+    // スキーマの再ビルドでも動くように、`createResolvers` で
+    // 追加したかもしれないカスタマイズを取り除く
     const fieldType = String(fields[fieldName].type)
     if (fieldType.replace(/[[\]!]/g, ``) === schemaQueryType.name) {
       typeComposer.extendField(fieldName, {
@@ -934,7 +934,7 @@ const addCustomResolveFunctions = async ({ schemaComposer, parentSpan }) => {
               }
               tc.extendField(fieldName, newConfig)
 
-              // See resetOverriddenThirdPartyTypeFields for explanation
+              // 説明は resetOverriddenThirdPartyTypeFields を参照
               if (tc.getExtension(`createdFrom`) === `thirdPartySchema`) {
                 tc.setFieldExtension(
                   fieldName,
@@ -954,7 +954,7 @@ const addCustomResolveFunctions = async ({ schemaComposer, parentSpan }) => {
             tc.addFields({
               [fieldName]: fieldConfig,
             })
-            // See resetOverriddenThirdPartyTypeFields for explanation
+            // 説明は resetOverriddenThirdPartyTypeFields を参照
             tc.setFieldExtension(fieldName, `createdFrom`, `createResolvers`)
           }
         })
@@ -1159,14 +1159,14 @@ const addInferredChildOfExtensions = ({ schemaComposer }) => {
 
 const addInferredChildOfExtension = ({ schemaComposer, typeComposer }) => {
   const shouldInfer = typeComposer.getExtension(`infer`)
-  // With `@dontInfer`, only parent-child
-  // relations explicitly set with the `@childOf` extension are added.
+  // `@dontInfer` の場合は、`@childOf` 拡張で明示的に設定された
+  // 親子関係だけが追加される。
   if (shouldInfer === false) return
 
   const parentTypeName = typeComposer.getTypeName()
 
-  // This is expensive.
-  // TODO: We should probably collect this info during inference metadata pass
+  // これはコストが高い。
+  // TODO: おそらく、この情報は推論のメタデータを作る段階で集めるべきである
   const childNodeTypes = new Set()
   for (const node of getDataStore().iterateNodesByType(parentTypeName)) {
     const children = (node.children || []).map(getNode)
@@ -1184,10 +1184,10 @@ const addInferredChildOfExtension = ({ schemaComposer, typeComposer }) => {
     if (isExplicitChild({ typeComposer, childTypeComposer })) {
       return
     }
-    // Set `@childOf` extension automatically
-    // This will cause convenience children fields like `childImageSharp`
-    // to be added in `addConvenienceChildrenFields` method.
-    // Also required for proper printing of the `@childOf` directive in the snapshot plugin
+    // `@childOf` 拡張を自動的に設定する
+    // これにより、`childImageSharp` のような便利な children のフィールドが
+    // `addConvenienceChildrenFields` メソッドで追加される。
+    // スナップショットプラグインで `@childOf` ディレクティブを正しく出力するためにも必要である
     if (!childOfExtension) {
       childOfExtension = {}
     }
@@ -1249,7 +1249,7 @@ const addTypeToRootQuery = ({ schemaComposer, typeComposer }) => {
   })
 
   const typeName = typeComposer.getTypeName()
-  // not strictly correctly, result is `npmPackage` and `allNpmPackage` from type `NPMPackage`
+  // 厳密には正しくないが、型 `NPMPackage` からの結果は `npmPackage` と `allNpmPackage` になる
   const queryName = fieldNames.query(typeName)
   const queryNamePlural = fieldNames.queryAll(typeName)
 
@@ -1294,21 +1294,21 @@ const parseTypes = ({
     checkIsAllowedTypeName(name)
 
     if (schemaComposer.has(name)) {
-      // We don't check if ast.kind matches composer type, but rely
-      // that this will throw when something is wrong and get
-      // reported by `reportParsingError`.
+      // ast.kind がコンポーザーの型と一致するかは確認しない。何かが
+      // おかしければ例外が投げられ、`reportParsingError` によって
+      // 報告されることに頼っている。
 
-      // Keep the original type composer around
+      // 元の型コンポーザーを取っておく
       const typeComposer = schemaComposer.get(name)
 
-      // After this, the parsed type composer will be registered as the composer
-      // handling the type name (requires cleanup after merging, see below)
+      // この後、パースした型コンポーザーが、その型名を扱うコンポーザーとして
+      // 登録される（マージ後に片付けが必要。下を参照）
       const parsedType = schemaComposer.typeMapper.makeSchemaDef(def)
 
-      // Merging types require implemented interfaces to already exist.
-      // Depending on type creation order, interface might have not been
-      // processed yet. We check if interface already exist and create
-      // placeholder for it, if it doesn't exist yet.
+      // 型をマージするには、実装しているインターフェースがすでに存在している必要がある。
+      // 型を作成する順序によっては、インターフェースがまだ処理されていない
+      // ことがある。インターフェースがすでに存在するかを確認し、
+      // まだ存在しなければプレースホルダーを作成する。
       if (parsedType.getInterfaces) {
         parsedType.getInterfaces().forEach(iface => {
           const ifaceName = iface.getTypeName()
@@ -1319,7 +1319,7 @@ const parseTypes = ({
         })
       }
 
-      // Merge the parsed type with the original
+      // パースした型を元の型とマージする
       mergeTypes({
         schemaComposer,
         typeComposer,
@@ -1329,11 +1329,11 @@ const parseTypes = ({
         parentSpan,
       })
 
-      // Cleanup:
-      // Set the original type composer (with the merged fields added)
-      // as the correct composer for the type name and remove the temporary one
-      // `graphql-compose` doesn't make that easy 🤯
-      // TODO: clean this up when this issue is fixed:
+      // 片付け:
+      // 元の型コンポーザー（マージしたフィールドが追加されたもの）を
+      // その型名の正しいコンポーザーとして設定し、一時的なものを取り除く
+      // `graphql-compose` ではこれが簡単にはできない 🤯
+      // TODO: 次の Issue が修正されたら、ここを整理する:
       //  https://github.com/graphql-compose/graphql-compose/issues/311
       schemaComposer.set(typeComposer.getTypeName(), typeComposer)
       schemaComposer.set(typeComposer._gqType, typeComposer)
@@ -1352,7 +1352,7 @@ const stringifyArray = arr =>
     Array.isArray(item) ? stringifyArray(item) : item.toString()
   )}]`
 
-// TODO: Import this directly from graphql-compose once we update to v7
+// TODO: v7 に更新したら、これを graphql-compose から直接 import する
 const isNamedTypeComposer = type =>
   type instanceof ObjectTypeComposer ||
   type instanceof InputTypeComposer ||

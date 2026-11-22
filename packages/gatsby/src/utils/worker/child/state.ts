@@ -1,7 +1,7 @@
 import { GatsbyStateKeys } from "../../../redux/types"
 import { loadPartialStateFromDisk, store } from "../../../redux"
 
-// Calls loadPartialStateFromDisk(slices) and mutates the redux store with the results
+// loadPartialStateFromDisk(slices) を呼び出し、その結果で redux ストアを書き換える
 export function setState(slices: Array<GatsbyStateKeys>): void {
   const res = loadPartialStateFromDisk(slices)
 

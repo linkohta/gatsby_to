@@ -375,7 +375,7 @@ describe(`node schema`, () => {
         type: `Type`,
         contentDigest: `bar`,
 
-        // this is added by gatsby
+        // これは gatsby が追加する
         owner: `gatsby-source-foo`,
       },
     }
@@ -391,7 +391,7 @@ describe(`node schema`, () => {
         type: `Type`,
         contentDigest: `bar`,
 
-        // this is added by gatsby
+        // これは gatsby が追加する
         owner: `gatsby-source-foo`,
       },
     }
@@ -411,7 +411,7 @@ describe(`node schema`, () => {
 
         customField: `this should cause failure`,
 
-        // this is added by gatsby
+        // これは gatsby が追加する
         owner: `gatsby-source-foo`,
       },
     }

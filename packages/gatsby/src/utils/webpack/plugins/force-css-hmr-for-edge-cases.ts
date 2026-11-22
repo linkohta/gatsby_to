@@ -1,16 +1,16 @@
 import { Compiler, Module } from "webpack"
 
 /**
- * This is total hack that is meant to handle:
+ * これは次の問題に対処するための完全なハックである:
  *  - https://github.com/webpack-contrib/mini-css-extract-plugin/issues/706
  *  - https://github.com/webpack-contrib/mini-css-extract-plugin/issues/708
- * The way it works it is looking up what HotModuleReplacementPlugin checks internally
- * and tricks it by checking up if any modules that uses mini-css-extract-plugin
- * changed or was newly added and then modifying blank.css hash.
- * blank.css is css module that is used by all pages and is there from the start
- * so changing hash of that _should_ ensure that:
- *  - when new css is imported it will reload css
- *  - when css imported by not loaded (by runtime) page template changes it will reload css
+ * 仕組みとしては、HotModuleReplacementPlugin が内部で確認している内容を調べ、
+ * mini-css-extract-plugin を使うモジュールが変更された、または新しく追加されたかを
+ * 確認したうえで blank.css のハッシュを変更して、このプラグインを欺いている。
+ * blank.css はすべてのページで使われ、最初から存在する css モジュールなので、
+ * そのハッシュを変更すれば、次のことが保証される _はず_ である:
+ *  - 新しい css が import されたとき、css が再読み込みされる
+ *  - （ランタイムが）まだ読み込んでいないページテンプレートが import している css が変更されたとき、css が再読み込みされる
  */
 export class ForceCssHMRForEdgeCases {
   private name: string
@@ -35,9 +35,9 @@ export class ForceCssHMRForEdgeCases {
 
         const seenCssInThisCompilation = new Set<string>()
         /**
-         * We will get list of css modules that are removed in this compilation
-         * by starting with list of css used in last compilation and removing
-         * all modules that are used in this one.
+         * 前回のコンパイルで使われた css の一覧から、今回のコンパイルで使われている
+         * モジュールをすべて取り除くことで、今回のコンパイルで削除された css モジュールの
+         * 一覧を得る。
          */
         const cssRemovedInThisCompilation = this.previouslySeenCss
 
@@ -89,9 +89,9 @@ export class ForceCssHMRForEdgeCases {
           }
         }
 
-        // If css file was edited or new css import was added (`newOrUpdatedCss`)
-        // or if css import was removed (`cssRemovedInThisCompilation.size > 0`)
-        // trick Webpack's HMR into thinking `blank.css` file changed.
+        // css ファイルが編集された、または新しい css の import が追加された場合（`newOrUpdatedCss`）、
+        // あるいは css の import が削除された場合（`cssRemovedInThisCompilation.size > 0`）は、
+        // webpack の HMR に `blank.css` ファイルが変更されたと思い込ませる。
         if (
           (newOrUpdatedCss || cssRemovedInThisCompilation.size > 0) &&
           this.originalBlankCssHash &&

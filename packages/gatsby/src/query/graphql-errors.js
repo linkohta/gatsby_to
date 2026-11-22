@@ -11,9 +11,9 @@ import { getCodeFrame } from "./graphql-errors-codeframe"
 
 type RelayGraphQLError = Error & { validationErrors?: Object }
 
-// These handle specific errors throw by RelayParser. If an error matches
-// you get a pointer to the location in the query that is broken, otherwise
-// we show the error and the query.
+// これらは、RelayParser が投げる特定のエラーを処理する。エラーが一致すれば、
+// クエリの中の壊れている位置へのポインターが得られる。一致しなければ、
+// エラーとクエリを表示する。
 const handlers = [
   [
     /Unknown field `(.+)` on type `(.+)`/i,
@@ -66,7 +66,7 @@ function extractError(error: Error): { message: string, docName: string } {
   let docName = ``
   let codeBlock = ``
   while ((matches = docRegex.exec(error.toString())) !== null) {
-    // This is necessary to avoid infinite loops with zero-width matches
+    // 幅ゼロの一致による無限ループを避けるために必要である
     if (matches.index === docRegex.lastIndex) docRegex.lastIndex++
     ;[, , message, docName, codeBlock] = matches
   }
@@ -103,8 +103,8 @@ function getCodeFrameFromRelayError(
   const { start, source } = findLocation(extractedMessage, def) || {}
   const query = source ? source.body : print(def)
 
-  // we can't reliably get a location without the location source, since
-  // the printed query may differ from the original.
+  // 位置の元になるソースがなければ、位置を確実には取得できない。
+  // 出力したクエリは元のクエリと異なることがあるためである。
   const { line, column } = (source && getLocation(source, start)) || {}
   return getCodeFrame(query, line, column)
 }
@@ -122,9 +122,9 @@ export function multipleRootQueriesError(
     _.camelCase(otherName)
   )}`
 
-  // colors are problematic for tests as we can different
-  // results depending on platform, so we don't
-  // highlight code for tests
+  // 色は、プラットフォームによって結果が変わることがあり、テストでは
+  // 問題になる。そのため、テストではコードを
+  // ハイライトしない
   const highlightCode = process.env.NODE_ENV !== `test`
 
   return {

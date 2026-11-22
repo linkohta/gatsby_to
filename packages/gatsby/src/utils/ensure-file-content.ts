@@ -8,7 +8,7 @@ export async function ensureFileContent(
   try {
     previousContent = await readFile(file, `utf8`)
   } catch (e) {
-    // whatever throws, we'll just write the file
+    // 何が投げられても、とにかくファイルを書き込む
   }
 
   if (previousContent !== data) {

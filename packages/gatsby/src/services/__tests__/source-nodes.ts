@@ -31,7 +31,7 @@ describe(`Stateful source plugins`, () => {
             {
               actions: Object.keys(actions).reduce((acc, actionName) => {
                 acc[actionName] = (...args): any =>
-                  // add test plugin to all actions
+                  // すべてのアクションにテスト用のプラグインを追加する
                   store.dispatch(actions[actionName](...args, testPlugin, opts))
                 return acc
               }, {}),
@@ -94,7 +94,7 @@ describe(`Stateful source plugins`, () => {
     const allNodesInFirstSource = lmdb.getNodes()
     expect(allNodesInFirstSource.length).toBe(2)
 
-    // simulate a new process start up where the cache is warm and no nodes are touched yet
+    // キャッシュがウォームで、まだどのノードもタッチされていない状態での、新しいプロセスの起動をシミュレートする
     is.initialSourceNodesOfCurrentNodeProcess = true
     store.getState().nodesTouched = new Set()
     await runSourceNodesWithPluginImplementation(api => {
@@ -107,11 +107,11 @@ describe(`Stateful source plugins`, () => {
     const allNodesInSecondSource = lmdb.getNodes()
 
     if (needToTouchNodes) {
-      // stale node should be deleted. Only one was touched and two were created
+      // 古いノードは削除されるはずである。タッチされたのは 1 つだけで、2 つが作成された
       expect(allNodesInSecondSource.length).toBe(1)
       expect(allNodesInSecondSource[0].id).toBe(`2`)
     } else {
-      // stale node should not be deleted
+      // 古いノードは削除されないはずである
       expect(allNodesInSecondSource.length).toBe(2)
       expect(allNodesInSecondSource[0].id).toBe(`1`)
     }

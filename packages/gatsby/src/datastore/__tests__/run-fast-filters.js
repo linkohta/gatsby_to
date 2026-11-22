@@ -195,7 +195,7 @@ describe(`fast filter tests`, () => {
         filtersCache: new Map(),
       })
 
-      // `id-1` node is not of queried type, so results should be empty
+      // `id-1` のノードはクエリ対象の型ではないので、結果は空になるはず
       expect(resultSingular).toEqual([])
       expect(resultMany).toEqual([])
       expect(await totalCount()).toEqual(0)
@@ -447,7 +447,7 @@ describe(`applyFastFilters`, () => {
       []
     )
 
-    // Count is irrelevant as long as it is non-zero and they all match filter
+    // 0 でなく、すべてがフィルターに一致していれば、件数は問わない
     expect(Array.isArray(results)).toBe(true)
     expect(results.length).toEqual(1)
     expect(getNode(results[0].id).slog).toEqual(`def`)
@@ -485,8 +485,8 @@ describe(`edge cases (yay)`, () => {
 
   it(`throws when node counters are messed up`, async () => {
     const filter = {
-      slog: { $eq: `def` }, // matches id_2 and id_4
-      deep: { flat: { search: { chain: { $eq: 500 } } } }, // matches id_2
+      slog: { $eq: `def` }, // id_2 と id_4 に一致する
+      deep: { flat: { search: { chain: { $eq: 500 } } } }, // id_2 に一致する
     }
 
     const result = applyFastFilters(
@@ -497,14 +497,14 @@ describe(`edge cases (yay)`, () => {
       []
     )
 
-    // Sanity-check
+    // 健全性の確認
     expect(result.length).toEqual(1)
     expect(result[0].id).toEqual(`id_2`)
 
-    // After process restart node.internal.counter is reset and conflicts with counters from the previous run
-    //  in some situations this leads to incorrect intersection of filtered results.
-    //  Below we set node.internal.counter to same value that existing node id_4 has and leads
-    //  to bad intersection of filtered results
+    // プロセスの再起動後は node.internal.counter がリセットされ、前回の実行時のカウンターと衝突する
+    //  状況によっては、これがフィルター結果の誤った積集合につながる。
+    //  以下では node.internal.counter を既存のノード id_4 と同じ値に設定し、
+    //  フィルター結果の誤った積集合を引き起こす
     const badNode = {
       id: `bad-node`,
       deep: { flat: { search: { chain: 500 } } },
@@ -540,12 +540,12 @@ describe(`edge cases (yay)`, () => {
   })
 
   it(`works with subsequent, different filters (issue #34910)`, () => {
-    // shared filter cache
+    // 共有のフィルターキャッシュ
     const filtersCache = new Map()
 
     {
       const filter1 = {
-        slog: { $eq: `def` }, // matches id_2 and id_4
+        slog: { $eq: `def` }, // id_2 と id_4 に一致する
       }
 
       const result1 = applyFastFilters(
@@ -563,16 +563,16 @@ describe(`edge cases (yay)`, () => {
 
     {
       const filter2 = {
-        slog: { $eq: `def` }, // matches id_2 and id_4
-        // important - new filter element
-        deep: { flat: { search: { chain: { $eq: 500 } } } }, // matches id_2
+        slog: { $eq: `def` }, // id_2 と id_4 に一致する
+        // 重要 - 新しいフィルター要素
+        deep: { flat: { search: { chain: { $eq: 500 } } } }, // id_2 に一致する
       }
 
       const result2 = applyFastFilters(
         createDbQueriesFromObject(filter2),
         [typeName],
         filtersCache,
-        [`string`], // important - new sort field
+        [`string`], // 重要 - 新しいソートフィールド
         []
       )
 

@@ -22,10 +22,10 @@ import { compileGatsbyFiles } from "../../parcel/compile-gatsby-files"
 
 let worker: GatsbyTestWorkerPool | undefined
 
-// when we load config and run sourceNodes on "main process" we start file watchers
-// because of default `gatsby-plugin-page-creator` which would prevent test process from
-// exiting gracefully without forcing exit
-// to prevent that we keep track of created watchers and close them after all tests are done
+// 「メインプロセス」で設定を読み込んで sourceNodes を実行すると、デフォルトの
+// `gatsby-plugin-page-creator` がファイルウォッチャーを起動する。そのままでは
+// 強制終了しない限りテストプロセスが正常に終了できない
+// これを防ぐため、作成されたウォッチャーを記録しておき、すべてのテストが終わった後に閉じる
 const mockWatchersToClose = new Set<ReturnType<typeof ChokidarWatchType>>()
 jest.mock(`chokidar`, () => {
   const chokidar = jest.requireActual(`chokidar`)
@@ -191,7 +191,7 @@ describe(`worker (queries)`, () => {
     await Promise.all(worker.all.setComponents())
     await worker.single.runQueries(queryIdsSmall)
     await Promise.all(worker.all.saveQueriesDependencies())
-    // Pass "1" as workerId as the test only have one worker
+    // このテストにはワーカーが 1 つしかないので、workerId として "1" を渡す
     const result = loadPartialStateFromDisk([`queries`, `telemetry`], `1`)
 
     expect(result).toMatchInlineSnapshot(`
@@ -291,7 +291,7 @@ describe(`worker (queries)`, () => {
     // @ts-ignore - worker is defined
     await runQueriesInWorkersQueue(worker, queryIdsBig, { chunkSize: 10 })
 
-    // Called the complete ABC so we can test _a
+    // _a をテストできるように、ABC をすべて実行した
     const pageQueryResultA = await readPageQueryResult(`/a`)
 
     expect(JSON.parse(pageQueryResultA).data).toStrictEqual({
@@ -350,7 +350,7 @@ describe(`worker (queries)`, () => {
       expect(action.type).toBeOneOf(Object.keys(expectedActionShapes))
       expect(action.payload).toContainKeys(expectedActionShapes[action.type])
     }
-    // Double-check that important actions are actually present
+    // 重要なアクションが実際に含まれていることを念のため確認する
     expect(result).toContainValue(
       expect.objectContaining({ type: `QUERY_START` })
     )

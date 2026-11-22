@@ -13,8 +13,8 @@ const addInferredTypes = ({
   inferenceMetadata,
   parentSpan,
 }) => {
-  // XXX(freiksenet): Won't be needed after plugins set typedefs
-  // Infer File first so all the links to it would work
+  // XXX(freiksenet): プラグインが typedefs を設定するようになれば不要になる
+  // File へのすべてのリンクが動くように、File を最初に推論する
   const { typeMap } = inferenceMetadata
   const typesWithNodes = Object.keys(typeMap).filter(typeName =>
     hasNodes(typeMap[typeName])
@@ -82,8 +82,8 @@ const addInferredType = ({
   parentSpan,
 }) => {
   const typeName = typeComposer.getTypeName()
-  // TODO: Move this to where the type is created once we can get
-  // node type owner information directly from store
+  // TODO: ノードの型の所有者の情報をストアから直接取得できるように
+  // なったら、これを型を作成する場所へ移す
   if (
     typeComposer.getExtension(`createdFrom`) === `inference` &&
     hasNodes(inferenceMetadata.typeMap[typeName])

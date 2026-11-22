@@ -6,7 +6,7 @@ import { ICreateNodeAction } from "./types"
 
 type Plugin = any // TODO
 
-// This might make sense to live somewhere else
+// これは別の場所に置くほうがよいかもしれない
 interface ICreatePageAction {
   graphql<TData, TVariables = any>(
     query: string,
@@ -60,8 +60,8 @@ export const startPluginRunner = (): void => {
     })
   }
 
-  // We make page nodes outside of the normal action for speed so we manually
-  // call onCreateNode here for SitePage nodes.
+  // ページのノードは、速度のために通常のアクションの外で作成しているので、
+  // ここで SitePage ノードに対して onCreateNode を手動で呼ぶ。
   if (pluginsImplementingOnCreateNode.length > 0) {
     emitter.on(`CREATE_NODE`, (action: ICreateNodeAction) => {
       const node = action.payload

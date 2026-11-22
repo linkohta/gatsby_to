@@ -87,7 +87,7 @@ describe(`node sanitization`, () => {
     }
 
     const result = sanitizeNode(testNodeWithoutUnserializableData)
-    // should be same instance
+    // 同じインスタンスであるはず
     expect(result).toBe(testNodeWithoutUnserializableData)
   })
 

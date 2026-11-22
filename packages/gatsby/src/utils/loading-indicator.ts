@@ -1,14 +1,14 @@
 import { Express } from "express"
 import { writeModule } from "./gatsby-webpack-virtual-modules"
 
-// set value to undefined first, because env vars needed to determine if indicator
-// should ever be enabled by default might not be set yet - we set it to "initial"
-// first time we write out module if loading indicator is allowed
-// "initial" means that browser will decide if it should show it
-// for now we do disable it by default when running in cypress
-// to not cause problems for users when they iterate on their E2E tests
-// this check could be expanded in the future to add support for more scenarios
-// like that.
+// 最初に値を undefined に設定する。インジケーターをデフォルトで有効にすべきかを
+// 判定するのに必要な環境変数が、まだ設定されていないかもしれないためである。ローディング
+// インジケーターが許可されている場合は、モジュールを最初に書き出すときに "initial" に設定する
+// "initial" は、表示すべきかをブラウザーが判断することを意味する
+// 今のところ、cypress で実行されているときはデフォルトで無効にしている。
+// ユーザーが E2E テストを繰り返し調整するときに、問題を起こさないようにするためである
+// この確認は、将来、同様の他の状況にも対応するように
+// 拡張できる。
 let indicatorEnabled: "auto" | true | false | undefined = undefined
 
 export function writeVirtualLoadingIndicatorModule(): void {

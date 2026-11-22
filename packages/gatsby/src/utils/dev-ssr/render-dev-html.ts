@@ -43,10 +43,10 @@ export const initDevWorkerPool = (): void => {
 let changeCount = 0
 export const restartWorker = (htmlComponentRendererPath: string): void => {
   changeCount += 1
-  // Forking is expensive — each time we re-require the outputted webpack
-  // file, memory grows ~10 mb — 25 regenerations means ~250mb which seems
-  // like an acceptable amount of memory to grow before we reclaim it
-  // by rebooting the worker process.
+  // fork はコストが高い。出力された webpack のファイルを require し直すたびに、
+  // メモリーが約 10 mb 増える。25 回の再生成で約 250mb になり、ワーカープロセスを
+  // 再起動して回収するまでに増えるメモリーの量としては、
+  // 許容できると思われる。
   if (changeCount > 25) {
     const oldWorker = worker
     const newWorker = startWorker()
@@ -66,7 +66,7 @@ const searchFileForString = (
   new Promise(resolve => {
     const escapedSubString = substring.replace(/[.*+?^${}()|[\]\\]/g, `\\$&`)
 
-    // See if the chunk is in the newComponents array (not the notVisited).
+    // チャンクが（notVisited ではなく）newComponents 配列にあるかを調べる。
     const chunkRegex = RegExp(
       `exports.ssrComponents.*${escapedSubString}.*}`,
       `gs`
@@ -93,23 +93,23 @@ const ensurePathComponentInSSRBundle = async (
   directory: string,
   allowTimedFallback: boolean
 ): Promise<boolean> => {
-  // This shouldn't happen.
+  // これは起こらないはずである。
   if (!page) {
     report.panic(`page not found`, page)
   }
 
-  // Now check if it's written to the correct path
+  // 次に、正しいパスに書き込まれているかを確認する
   const htmlComponentRendererPath = nodePath.join(
     directory,
     ROUTES_DIRECTORY,
     `render-page.js`
   )
 
-  // This search takes 1-10ms
-  // We do it as there can be a race conditions where two pages
-  // are requested at the same time which means that both are told render-page.js
-  // has changed when the first page is complete meaning the second
-  // page's component won't be in the render meaning its SSR will fail.
+  // この検索には 1〜10ms かかる
+  // これを行うのは競合状態がありうるためである。2 つのページが
+  // 同時にリクエストされると、最初のページが完了した時点で、両方に render-page.js が
+  // 変更されたと通知される。その場合、2 番目のページのコンポーネントは
+  // render に含まれておらず、その SSR は失敗する。
   let found = await searchFileForString(
     page.componentChunkName,
     htmlComponentRendererPath
@@ -175,29 +175,29 @@ export const renderDevHTML = ({
 
     const { actions } = require(`../../redux/actions`)
     const { createServerVisitedPage } = actions
-    // Record this page was requested. This will kick off adding its page
-    // component to the ssr bundle (if that's not already happened)
+    // このページがリクエストされたことを記録する。これをきっかけに、そのページ
+    // コンポーネントが ssr バンドルに追加される（まだ追加されていない場合）
     store.dispatch(createServerVisitedPage(pageObj.componentChunkName))
 
-    // Ensure the query has been run and written out.
+    // クエリが実行され、書き出されていることを確認する。
     try {
       await getPageDataExperimental(
         pageObj.path,
-        // 15000 is default timeout for this function - we keep it here for scenarios
-        // that allow waiting on it, and set to impossibly high value in case
-        // we want to ensure SSR happens
+        // 15000 はこの関数のデフォルトのタイムアウトである。待つことが許される場合のために
+        // ここではこの値を残し、SSR が確実に行われるようにしたい場合は、
+        // ありえないほど大きな値を設定する
         allowTimedFallback ? 15000 : Number.MAX_SAFE_INTEGER
       )
     } catch {
-      // If we can't get the page, it was probably deleted recently
-      // so let's just do a 404 page.
+      // ページを取得できない場合は、おそらく最近削除されたので、
+      // 404 ページを返すだけにする。
       return reject(`404 page`)
     }
 
-    // Resume the webpack watcher and wait for any compilation necessary to happen.
-    // We timeout after 1.5s as the user might not care per se about SSR.
+    // webpack のウォッチャーを再開し、必要なコンパイルが行われるのを待つ。
+    // ユーザーは SSR 自体を特に気にしていないかもしれないので、1.5 秒でタイムアウトする。
     //
-    // We pause and resume so there's no excess webpack activity during normal development.
+    // 通常の開発中に webpack の余計な動作が起きないように、一時停止と再開をしている。
     const { recompileAndResumeWatching, needToRecompileSSRBundle } =
       getDevSSRWebpack()
 
@@ -206,11 +206,11 @@ export const renderDevHTML = ({
       stopWatching = await recompileAndResumeWatching(allowTimedFallback)
     }
 
-    // Wait for html-renderer to update w/ the page component.
-    // Note that webpack is still in watching mode, so even if it didn't recompile
-    // everything needed yet (there is debouncing happening in webpack), it still
-    // might update the bundle (until we call `stopWatching()` after check that component
-    // is in bundle)
+    // html-renderer がページコンポーネントを反映して更新されるのを待つ。
+    // webpack はまだ監視モードなので、必要なものをすべて再コンパイルし終えて
+    // いなくても（webpack の中でデバウンスが行われている）、バンドルを
+    // 更新する可能性があることに注意（コンポーネントがバンドルに含まれることを
+    // 確認した後に `stopWatching()` を呼ぶまで）
     const found = await ensurePathComponentInSSRBundle(
       pageObj,
       directory,
@@ -221,17 +221,17 @@ export const renderDevHTML = ({
       stopWatching()
     }
 
-    // If we can't find the page, just force set isClientOnlyPage
-    // which skips rendering the body (so we just serve a shell)
-    // and the page will render normally on the client.
+    // ページが見つからない場合は、isClientOnlyPage を強制的に設定する。
+    // これにより、body のレンダリングをスキップし（シェルだけを配信する）、
+    // ページはクライアントで通常どおりレンダリングされる。
     //
-    // This only happens on the first time we try to render a page component
-    // and it's taking a while to bundle its page component.
+    // これは、ページコンポーネントを初めてレンダリングしようとして、
+    // そのページコンポーネントのバンドルに時間がかかっている場合にだけ起きる。
     if (!found) {
       isClientOnlyPage = true
     }
 
-    // If the user added the query string `skip-ssr`, we always just render an empty shell.
+    // ユーザーがクエリ文字列 `skip-ssr` を付けた場合は、常に空のシェルだけをレンダリングする。
     if (skipSsr) {
       isClientOnlyPage = true
     }

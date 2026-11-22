@@ -1,37 +1,37 @@
 /**
- * This test suite assert correctness of caching query results.
+ * このテストスイートは、クエリ結果のキャッシュが正しく動くことを確認する。
  *
- * It checks if:
- *  - gatsby will run all expected queries when running with empty cache
- *  - gatsby will rerun queries that should be invalidated
- *  - gatsby will NOT run any unneeded queries (if it reuses cached queries)
- * Usual test structure:
- *  - sanity check that gatsby runs all queries after cache is cleaned
- *  - changing single node, rerunning queries and asserting only expected queries were run
- *    - without restarting gatsby process (relying on in-memory cache)
- *    - with restarting gatsby process (relying on data loaded from persisted cache)
+ * 確認する内容:
+ *  - キャッシュが空の状態で実行したとき、gatsby が期待されるすべてのクエリを実行すること
+ *  - 無効化されるべきクエリを gatsby が再実行すること
+ *  - gatsby が不要なクエリを実行しないこと（キャッシュされたクエリを再利用する場合）
+ * テストの基本的な構成:
+ *  - キャッシュを消した後に gatsby がすべてのクエリを実行することを、念のため確認する
+ *  - ノードを 1 つ変更してクエリを再実行し、期待したクエリだけが実行されたことを確認する
+ *    - gatsby のプロセスを再起動しない場合（インメモリーのキャッシュに頼る）
+ *    - gatsby のプロセスを再起動する場合（永続化されたキャッシュから読み込んだデータに頼る）
  *
- * Tests rely on query running adding data dependencies on top level connection and single fields correctly
- * (asserting correctness of this is not part of this test suite).
+ * このテストは、クエリの実行によって、トップレベルの connection と単一フィールドへのデータ依存が正しく追加されることを前提にしている
+ * （それが正しいことの確認は、このテストスイートの対象ではない）。
  *
- * Mocked systems:
- *  - fs-extra (to not write query results to filesystem when LMDB_STORE is not enabled)
- *  - cache-lmdb (to not write query results to lmdb when LMDB_STORE is enabled)
- *  - reporter (to not spam output of test runner)
- *  - api-runner-node (to be able to dynamically adjust `sourceNodes` and `createPage` API hooks)
- *  - query-runner (it's not really mocked - it still uses real query-runner, this is just cleanest way to add spy to default commonJS export I could find)
+ * モックしている仕組み:
+ *  - fs-extra（LMDB_STORE が有効でないときに、クエリ結果をファイルシステムへ書き込まないため）
+ *  - cache-lmdb（LMDB_STORE が有効なときに、クエリ結果を lmdb へ書き込まないため）
+ *  - reporter（テストランナーの出力を埋め尽くさないため）
+ *  - api-runner-node（`sourceNodes` と `createPage` の API フックを動的に調整できるようにするため）
+ *  - query-runner（実際にはモックしておらず、本物の query-runner を使っている。commonJS のデフォルト export にスパイを付ける方法として、見つけた中でこれが最もきれいだった）
  *
- * Concerns:
- *  - `setup()` function re-implements subset of gatsby functionality (parts of bootstrap, develop and build commands) to limit time cost of running this test
- *     - this test might need extra maintenance when gatsby internals are being changed,
- *     - it might report false positives in unforeseen scenarios after internal changes.
+ * 懸念点:
+ *  - `setup()` 関数は、このテストの実行時間を抑えるために、gatsby の機能の一部（bootstrap、develop、build コマンドの一部）を再実装している
+ *     - gatsby の内部が変更されると、このテストにも追加の保守が必要になるかもしれない
+ *     - 内部の変更の後、予期しない状況で誤検知を報告するかもしれない。
  */
 
 jest.mock(`fs-extra`, () => {
   return {
     outputFile: jest.fn(),
     ensureDir: jest.fn(),
-    readFileSync: jest.fn(() => `foo`), // createPage action reads the page template file trying to find `getServerData`
+    readFileSync: jest.fn(() => `foo`), // createPage アクションは、`getServerData` を探すためにページテンプレートのファイルを読み込む
   }
 })
 
@@ -216,7 +216,7 @@ const setup = async ({ restart = isFirstRun, clearCache = false } = {}) => {
   )
 
   await require(`../../utils/source-nodes`).default({})
-  // trigger page-hot-reloader (if it was setup in previous test)
+  // page-hot-reloader を起動する（前のテストでセットアップされていた場合）
   emitter.emit(`API_RUNNING_QUEUE_EMPTY`)
 
   if (restart) {
@@ -236,7 +236,7 @@ const setup = async ({ restart = isFirstRun, clearCache = false } = {}) => {
   })
 
   Object.entries(staticQueries).forEach(([id, query]) => {
-    // Mimic real code behavior by only calling this action when static query text changes
+    // 実際のコードの動作に合わせて、静的クエリのテキストが変わったときだけこのアクションを呼ぶ
     const lastQuery = mockPersistedState.staticQueryComponents?.get(`sq--${id}`)
     if (lastQuery?.query !== query) {
       store.dispatch({
@@ -377,10 +377,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual(indexBarFooArray)
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 99999)
@@ -389,10 +389,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // no changes should mean no queries to run
+      // 変更がなければ、実行するクエリもないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 99999)
@@ -403,10 +403,10 @@ describe(`query caching between builds`, () => {
           restart: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // no changes should mean no queries to run
+      // 変更がなければ、実行するクエリもないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 99999)
@@ -418,10 +418,10 @@ describe(`query caching between builds`, () => {
           clearCache: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual(indexBarFooArray)
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 99999)
@@ -467,10 +467,10 @@ describe(`query caching between builds`, () => {
           clearCache: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual(indexBarFooArray)
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 99999)
@@ -479,10 +479,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // it should not rerun any page query
+      // ページクエリは 1 つも再実行されないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 999999)
@@ -493,10 +493,10 @@ describe(`query caching between builds`, () => {
           restart: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // it should not rerun any page query
+      // ページクエリは 1 つも再実行されないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 999999)
@@ -542,10 +542,10 @@ describe(`query caching between builds`, () => {
           clearCache: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual(indexBarFooArray)
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 99999)
@@ -554,10 +554,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // we changed one node, so connection (`/`) and one detail page (`/bar/`) should run
+      // ノードを 1 つ変更したので、connection（`/`）と詳細ページ 1 つ（`/bar/`）が実行されるはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`, `/bar/`])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -568,10 +568,10 @@ describe(`query caching between builds`, () => {
           restart: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // we changed one node, so connection (`/`) and one detail page (`/bar/`) should run
+      // ノードを 1 つ変更したので、connection（`/`）と詳細ページ 1 つ（`/bar/`）が実行されるはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`, `/bar/`])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -620,10 +620,10 @@ describe(`query caching between builds`, () => {
           clearCache: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual(indexBarFooArray)
       expect(staticQueriesThatRan).toEqual([`static-query-1`])
     }, 99999)
@@ -632,10 +632,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // no queries should run
+      // クエリは 1 つも実行されないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -646,10 +646,10 @@ describe(`query caching between builds`, () => {
           restart: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual(indexBarFooArray)
 
-      // no queries should run
+      // クエリは 1 つも実行されないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -700,21 +700,21 @@ describe(`query caching between builds`, () => {
         clearCache: true,
       })
 
-      // all queries to run
+      // すべてのクエリが実行される
       expect(staticQueriesThatRan).toEqual([`static-query-1`, `static-query-2`])
     }, 99999)
 
     it(`changing node to be used by any query triggers running that query (no restart)`, async () => {
       const { staticQueriesThatRan } = await setup()
 
-      // runs the query with filter `slug: { eq: "foo1" }`
+      // フィルター `slug: { eq: "foo1" }` を指定してクエリを実行する
       expect(staticQueriesThatRan).toEqual([`static-query-1`, `static-query-2`])
     }, 999999)
 
     it(`changing node to be used by any query triggers running that query (with restart)`, async () => {
       const { staticQueriesThatRan } = await setup({ restart: true })
 
-      // runs the query with filter `slug: { eq: "foo2" }`
+      // フィルター `slug: { eq: "foo2" }` を指定してクエリを実行する
       expect(staticQueriesThatRan).toEqual([`static-query-2`])
     }, 999999)
   })
@@ -736,7 +736,7 @@ describe(`query caching between builds`, () => {
             edited content #${nodeChangeCounter++}`,
           })
 
-          // this node will not change
+          // このノードは変更されない
           createTestBNode({
             id: `test-b`,
             slug: `foo`,
@@ -820,7 +820,7 @@ describe(`query caching between builds`, () => {
         clearCache: true,
       })
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(staticQueriesThatRan).toEqual([
         `all-test-b-query-1`,
         `all-test-b-query-2`,
@@ -883,7 +883,7 @@ describe(`query caching between builds`, () => {
             content: `Consectetur adipiscing elit.`,
           })
 
-          // this is just to trigger createPages without restarting
+          // これは、再起動せずに createPages を起動するためだけのもの
           createSiteNode({
             id: `Site`,
             siteMetadata: {
@@ -927,20 +927,20 @@ describe(`query caching between builds`, () => {
         clearCache: true,
       })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/`])
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
     }, 99999)
 
     it(`changing page context should rerun query (no restart)`, async () => {
       const { pathsOfPagesWithQueriesThatRan, pages } = await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/`])
 
-      // it should rerun query for page with changed context
+      // コンテキストが変わったページのクエリは再実行されるはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
     }, 999999)
 
@@ -949,19 +949,19 @@ describe(`query caching between builds`, () => {
         restart: true,
       })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/`])
 
-      // it should rerun query for page with changed context
+      // コンテキストが変わったページのクエリは再実行されるはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
     }, 999999)
   })
 
   /*
-    We need to make sure we clear data dependency when we (re)run queries to make
-    sure we don't accumulate stale dependencies over time. Having stale dependencies
-    wouldn't cause build artificats problems, but it would cause unneeded query running
-    in some scenarios
+    古い依存が時間とともに溜まっていかないように、クエリを（再）実行するときには
+    データ依存を消去する必要がある。古い依存が残っていても、ビルドの成果物に問題は
+    起きないが、状況によっては不要なクエリの実行が
+    発生する
    */
   describe(`Clears data dependencies when query result is dirty`, () => {
     let stage
@@ -983,7 +983,7 @@ describe(`query caching between builds`, () => {
             stage,
           })
 
-          // this node is not queried - just to ensure schema contains `link` field
+          // このノードはクエリされない。スキーマに `link` フィールドが含まれるようにするためだけのもの
           dirtyNodeCreator({
             id: `mock`,
             link___NODE: `mock`,
@@ -1034,10 +1034,10 @@ describe(`query caching between builds`, () => {
             restart: true,
             clearCache: true,
           })
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // on initial we want all queries to run
+        // 初回はすべてのクエリが実行されてほしい
         expect(staticQueriesThatRan).toEqual([`dirty-test`])
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
       }, 999999)
@@ -1047,11 +1047,11 @@ describe(`query caching between builds`, () => {
         const { staticQueriesThatRan, pathsOfPagesWithQueriesThatRan, pages } =
           await setup({ restart: withRestarts })
 
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // we changed node that we query directly (by removing link field)
-        // we should rerun all queries
+        // 直接クエリしているノードを変更した（link フィールドを削除した）ので、
+        // すべてのクエリを再実行するはずである
         expect(staticQueriesThatRan).toEqual([`dirty-test`])
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
       }, 999999)
@@ -1061,11 +1061,11 @@ describe(`query caching between builds`, () => {
         const { staticQueriesThatRan, pathsOfPagesWithQueriesThatRan, pages } =
           await setup({ restart: withRestarts })
 
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // we changed linked node, but last query run didn't use it
-        // so we shouldn't rerun any queries
+        // リンク先のノードを変更したが、前回のクエリ実行ではそれを使っていなかったので、
+        // クエリは 1 つも再実行しないはずである
         expect(staticQueriesThatRan).toEqual([])
         expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       }, 999999)
@@ -1100,13 +1100,13 @@ describe(`query caching between builds`, () => {
             createContentDigest,
           })
 
-          // in every stage:
+          // すべての段階で:
           typeACreator({
             id: `type-A-1`,
             test: `Node A1`,
           })
 
-          // in every stage other than initial
+          // 初回以外のすべての段階で
           if (stage !== `initial`) {
             typeACreator({
               id: `type-A-2`,
@@ -1175,10 +1175,10 @@ describe(`query caching between builds`, () => {
           restart: true,
           clearCache: true,
         })
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // on initial we want query to run
+        // 初回はクエリが実行されてほしい
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
       }, 999999)
 
@@ -1188,11 +1188,11 @@ describe(`query caching between builds`, () => {
           restart: withRestarts,
         })
 
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // we add node of type that implements node interface we query
-        // we should rerun query
+        // クエリしているノードインターフェースを実装する型のノードを追加したので、
+        // クエリを再実行するはずである
 
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
       }, 999999)
@@ -1203,11 +1203,11 @@ describe(`query caching between builds`, () => {
           restart: withRestarts,
         })
 
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // we add node of type that implements node interface we query
-        // we should rerun query
+        // クエリしているノードインターフェースを実装する型のノードを追加したので、
+        // クエリを再実行するはずである
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/`])
       }, 999999)
 
@@ -1217,11 +1217,11 @@ describe(`query caching between builds`, () => {
           restart: withRestarts,
         })
 
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/`])
 
-        // we add node of type that implements node interface we query
-        // we should rerun query
+        // クエリしているノードインターフェースを実装する型のノードを追加したので、
+        // クエリを再実行するはずである
         expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       }, 999999)
     }
@@ -1235,7 +1235,7 @@ describe(`query caching between builds`, () => {
     })
   })
 
-  // this should be last test, it adds page that doesn't have queries (so it won't create any dependencies)
+  // これは最後のテストにすること。クエリを持たないページを追加する（そのため依存は何も作られない）
   describe(`Running "queries" for page without query`, () => {
     beforeAll(() => {
       setAPIhooks({
@@ -1258,10 +1258,10 @@ describe(`query caching between builds`, () => {
           clearCache: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/no-dep-page/`])
 
-      // on initial we want all queries to run
+      // 初回はすべてのクエリが実行されてほしい
       expect(pathsOfPagesWithQueriesThatRan).toEqual([`/no-dep-page/`])
       expect(staticQueriesThatRan).toEqual([])
     }, 99999)
@@ -1270,10 +1270,10 @@ describe(`query caching between builds`, () => {
       const { pathsOfPagesWithQueriesThatRan, staticQueriesThatRan, pages } =
         await setup()
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/no-dep-page/`])
 
-      // no queries should run
+      // クエリは 1 つも実行されないはずである
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -1284,11 +1284,11 @@ describe(`query caching between builds`, () => {
           restart: true,
         })
 
-      // sanity check, to make sure test setup is correct
+      // テストのセットアップが正しいことを念のため確認する
       expect(pages).toEqual([`/no-dep-page/`])
 
-      // no queries should run
-      // Currently it actually re-run query for `/no-dep-page`
+      // クエリは 1 つも実行されないはずである
+      // 現状では、実際には `/no-dep-page` のクエリが再実行される
       expect(pathsOfPagesWithQueriesThatRan).toEqual([])
       expect(staticQueriesThatRan).toEqual([])
     }, 999999)
@@ -1299,7 +1299,7 @@ describe(`query caching between builds`, () => {
     beforeAll(() => {
       setAPIhooks({
         createSchemaCustomization: ({ actions: { createTypes }, schema }) => {
-          // Define fields with custom resolvers first
+          // 独自のリゾルバーを持つフィールドを先に定義する
           const resolveOne = type => (value, args, context) =>
             context.nodeModel.findOne({
               query: { testId: { eq: value.id } },
@@ -1362,7 +1362,7 @@ describe(`query caching between builds`, () => {
             content: `Lorem ipsum.`,
           })
 
-          // Note: there are no `Foo` nodes initially
+          // 注: 最初は `Foo` ノードが 1 つもない
           createBarNode({
             id: `bar-1`,
             testId: `test-1`,
@@ -1452,10 +1452,10 @@ describe(`query caching between builds`, () => {
           restart: true,
           clearCache: true,
         })
-        // sanity check, to make sure test setup is correct
+        // テストのセットアップが正しいことを念のため確認する
         expect(pages).toEqual([`/bar-list/`, `/bar/`, `/foo-list/`, `/foo/`])
 
-        // on initial we want query to run
+        // 初回はクエリが実行されてほしい
         expect(pathsOfPagesWithQueriesThatRan).toEqual([
           `/bar-list/`,
           `/bar/`,
@@ -1470,8 +1470,8 @@ describe(`query caching between builds`, () => {
           restart: withRestarts,
         })
 
-        // Since there was no single "foo" node before - we will also re-run the "/foo"
-        // (as maybe the new node matches this query now)
+        // これまで "foo" ノードが 1 つもなかったので、"/foo" も再実行する
+        // （新しいノードがこのクエリに一致するようになったかもしれないため）
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/foo-list/`, `/foo/`])
       }, 999999)
 
@@ -1490,11 +1490,11 @@ describe(`query caching between builds`, () => {
           restart: withRestarts,
         })
 
-        // Note: we don't re-run "/bar" query because tracked relation is "node: bar-1".
-        // Adding node "bar-2" doesn't affect this relation.
-        // FIXME: this can be actually wrong behavior when filtering by any field other than "id"
-        //   we should rework this to use connection + filter for tracking.
-        //   In this case this test will also re-run "/bar" query (also affects other bar-related tests)
+        // 注: "/bar" のクエリは再実行しない。追跡している関係が "node: bar-1" だからである。
+        // ノード "bar-2" を追加しても、この関係には影響しない。
+        // FIXME: "id" 以外のフィールドでフィルターする場合、これは実際には誤った動作になりうる
+        //   追跡に connection とフィルターを使うように作り直すべきである。
+        //   そうすると、このテストでも "/bar" のクエリが再実行されるようになる（bar に関係する他のテストにも影響する）
         expect(pathsOfPagesWithQueriesThatRan).toEqual([`/bar-list/`])
       }, 999999)
 

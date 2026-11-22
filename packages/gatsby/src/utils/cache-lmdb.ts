@@ -2,13 +2,13 @@ import { open, RootDatabase, Database, DatabaseOptions } from "lmdb"
 import * as fs from "fs-extra"
 import * as path from "path"
 
-// Since the regular GatsbyCache saves to "caches" this should be "caches-lmdb"
+// 通常の GatsbyCache は "caches" に保存するので、これは "caches-lmdb" にする
 const cacheDbFile =
   process.env.NODE_ENV === `test`
     ? `caches-lmdb-${
-        // FORCE_TEST_DATABASE_ID will be set if this gets executed in worker context
-        // when running jest tests. JEST_WORKER_ID will be set when this gets executed directly
-        // in test context (jest will use jest-worker internally).
+        // jest のテストの実行時に、これがワーカーのコンテキストで実行されると、FORCE_TEST_DATABASE_ID が
+        // 設定される。テストのコンテキストで直接実行されると、JEST_WORKER_ID が設定される
+        // （jest は内部で jest-worker を使う）。
         process.env.FORCE_TEST_DATABASE_ID ?? process.env.JEST_WORKER_ID
       }`
     : `caches-lmdb`
@@ -29,11 +29,11 @@ export default class GatsbyCacheLmdb {
   private db: Database | undefined
   private encoding: DatabaseOptions["encoding"]
   public readonly name: string
-  // Needed for plugins that want to write data to the cache directory
+  // キャッシュディレクトリにデータを書き込みたいプラグインのために必要である
   public readonly directory: string
-  // TODO: remove `.cache` in v4. This is compat mode - cache-manager cache implementation
-  // expose internal cache that gives access to `.del` function that wasn't available in public
-  // cache interface (gatsby-plugin-sharp use it to clear no longer needed data)
+  // TODO: v4 で `.cache` を削除する。これは互換モードである。cache-manager のキャッシュ実装は
+  // 内部のキャッシュを公開しており、公開のキャッシュインターフェースにはなかった `.del` 関数を
+  // 使えるようにしていた（gatsby-plugin-sharp が、不要になったデータを消去するために使っている）
   public readonly cache: GatsbyCacheLmdb
 
   constructor({

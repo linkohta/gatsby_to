@@ -1,9 +1,9 @@
-// `.cache/page-ssr/lambda.js` is the entry point of the SSR/DSG serverless
-// function. Adapters ship it as-is, so it has to be standalone - it can't
-// require anything from `node_modules`. It's bundled here, at package build
-// time, instead of during every `gatsby build`, because nothing in it is
-// site-specific: the few site-specific values are `%PLACEHOLDER%` strings
-// that `utils/page-ssr-module/bundle-webpack.ts` substitutes at build time.
+// `.cache/page-ssr/lambda.js` は、SSR/DSG のサーバーレス関数のエントリーポイントである。
+// アダプターはこれをそのまま配布するので、単体で動作する必要があり、
+// `node_modules` から何も require できない。`gatsby build` のたびにではなく、
+// パッケージのビルド時にここでバンドルするのは、中身にサイト固有のものが
+// ないためである。わずかなサイト固有の値は `%PLACEHOLDER%` という文字列になっており、
+// `utils/page-ssr-module/bundle-webpack.ts` がビルド時に置き換える。
 const path = require(`path`)
 const webpack = require(`webpack`)
 
@@ -24,8 +24,8 @@ const compiler = webpack({
   resolve: {
     extensions: [`.ts`, `.mjs`, `.js`, `.json`],
   },
-  // written out next to the bundle by `bundle-webpack.ts` at `gatsby build`
-  // time, so they have to stay runtime requires
+  // `gatsby build` の実行時に `bundle-webpack.ts` がバンドルの隣へ書き出すので、
+  // 実行時の require のままにしておく必要がある
   externals: [`./index`, `../query-engine`],
   module: {
     rules: [

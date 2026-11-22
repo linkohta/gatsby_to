@@ -22,7 +22,7 @@ const checkAndRemoveEmptyDir = (publicDir: string, pagePath: string): void => {
     `page-data`,
     fixedPagePath(pagePath)
   )
-  // if page's folder is empty also remove matching page-data folder
+  // ページのフォルダーが空の場合は、対応する page-data フォルダーも削除する
   if (checkFolderIsEmpty(pageHtmlDirectory)) {
     fs.removeSync(pageHtmlDirectory)
   }
@@ -58,7 +58,7 @@ export const removePageFiles = async (
   )
 
   return Promise.all([...removePages, ...removePageDataList]).then(() => {
-    // Sort removed pageKeys by nested directories and remove if empty.
+    // 削除された pageKeys をネストしたディレクトリの順に並べ替え、空であれば削除する。
     sortedPageKeysByNestedLevel(pageKeys).forEach(pagePath => {
       checkAndRemoveEmptyDir(publicDir, pagePath)
     })
@@ -74,8 +74,8 @@ function normalizePagePath(path: string): string {
   }
 
   if (FSisCaseInsensitive) {
-    // e.g. /TEST/ and /test/ would produce "same" artifacts on case insensitive
-    // file systems
+    // たとえば、大文字と小文字を区別しないファイルシステムでは、/TEST/ と /test/ は
+    // 「同じ」成果物を生成する
     path = path.toLowerCase()
   }
 
@@ -84,7 +84,7 @@ function normalizePagePath(path: string): string {
 
 type PageGenerationAction = "delete" | "regenerate" | "reuse"
 const pageGenerationActionPriority: Record<PageGenerationAction, number> = {
-  // higher the number, higher the priority
+  // 数値が大きいほど優先度が高い
   regenerate: 2,
   reuse: 1,
   delete: 0,
@@ -107,13 +107,13 @@ export function calcDirtyHtmlFiles(state: IGatsbyState): {
   >()
 
   /**
-   * multiple page paths can result in same html and page-data filenames
-   * so we need to keep that in mind when generating list of pages
-   * to regenerate and more importantly - to delete (so we don't delete html and page-data file
-   * when path changes slightly but it would still result in same html and page-data filenames
-   * for example adding/removing trailing slash between builds or even mid build with plugins
-   * like `gatsby-plugin-remove-trailing-slashes`). Additionally similar consideration need to
-   * be accounted for cases where page paths casing on case-insensitive file systems.
+   * 複数のページパスが、同じ html と page-data のファイル名になることがある
+   * そのため、再生成するページの一覧、そしてより重要な削除するページの一覧を
+   * 生成するときに、この点を考慮する必要がある（パスが少し変わっても同じ html と
+   * page-data のファイル名になる場合に、それらのファイルを削除しないようにするため。
+   * たとえば、ビルドの間に、あるいは `gatsby-plugin-remove-trailing-slashes` のような
+   * プラグインによってビルドの途中で、末尾のスラッシュが追加または削除される場合）。
+   * さらに、大文字と小文字を区別しないファイルシステムでのページパスの大文字小文字についても、同様の考慮が必要である。
    */
   function markActionForPage(path: string, action: PageGenerationAction): void {
     const normalizedPagePath = normalizePagePath(path)
@@ -129,8 +129,8 @@ export function calcDirtyHtmlFiles(state: IGatsbyState): {
         overwritePreviousAction = true
         toCleanupFromTrackedState.add(previousAction.actualPath)
         if (previousAction.action === `delete`) {
-          // "reuse" or "regenerate" will take over, so we should
-          // remove path from list of paths to delete
+          // "reuse" または "regenerate" が引き継ぐので、
+          // 削除するパスの一覧からパスを取り除くべきである
           toDelete.delete(previousAction.actualPath)
         }
       }
@@ -158,8 +158,8 @@ export function calcDirtyHtmlFiles(state: IGatsbyState): {
   state.html.trackedHtmlFiles.forEach(function (htmlFile, path) {
     const page = state.pages.get(path)
     if (htmlFile.isDeleted || !page) {
-      // FIXME: checking pages state here because pages are not persisted
-      // and because of that `isDeleted` might not be set ...
+      // FIXME: ここでページの state を確認しているのは、ページが永続化されておらず、
+      // そのために `isDeleted` が設定されていないことがあるからである ...
       markActionForPage(path, `delete`)
     } else {
       if (getPageMode(page, state) === `SSG`) {
@@ -192,7 +192,7 @@ export function markHtmlDirtyIfResultOfUsedStaticQueryChanged(): void {
     }
   })
 
-  // we have dirty static query hashes - now we need to find templates that use them
+  // dirty な静的クエリのハッシュがある。次に、それらを使っているテンプレートを見つける必要がある
   const dirtyTemplates = new Set<string>()
   state.staticQueriesByTemplate.forEach(function (
     staticQueryHashes,
@@ -201,12 +201,12 @@ export function markHtmlDirtyIfResultOfUsedStaticQueryChanged(): void {
     for (const dirtyStaticQueryHash of dirtyStaticQueryResults) {
       if (staticQueryHashes.includes(dirtyStaticQueryHash)) {
         dirtyTemplates.add(componentPath)
-        break // we already know this template need to rebuild, no need to check rest of queries
+        break // このテンプレートは再ビルドが必要だとすでに分かっているので、残りのクエリを確認する必要はない
       }
     }
   })
 
-  // mark html as dirty
+  // html を dirty とマークする
   const dirtyPages = new Set<string>()
   const dirtySlices = new Set<string>()
   for (const dirtyTemplate of dirtyTemplates) {

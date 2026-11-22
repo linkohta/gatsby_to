@@ -35,7 +35,7 @@ function getNode(id: string): IGatsbyNode | undefined {
 }
 
 function getTypes(): Array<string> {
-  // Note: sorting to match the output of the LMDB version (where keys are sorted by default)
+  // 注: LMDB 版の出力（キーがデフォルトでソートされる）に合わせるためにソートしている
   return Array.from(store.getState().nodesByType.keys()).sort()
 }
 
@@ -54,8 +54,8 @@ function runQuery(args: IRunFilterArg): Promise<IQueryResult> {
 const readyPromise = Promise.resolve(undefined)
 
 /**
- * Returns promise that resolves when the store is ready for reads
- * (the in-memory store is always ready)
+ * store が読み取り可能になったときに解決される promise を返す
+ * （インメモリーの store は常に読み取り可能である）
  */
 function ready(): Promise<void> {
   return readyPromise
@@ -71,7 +71,7 @@ export function setupInMemoryStore(): IDataStore {
     iterateNodesByType,
     runQuery,
 
-    // deprecated:
+    // 非推奨:
     getNodes,
     getNodesByType,
   }

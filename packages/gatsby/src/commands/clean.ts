@@ -16,7 +16,7 @@ module.exports = async function clean(program: IProgram): Promise<void> {
   const directories = [
     `.cache`,
     `public`,
-    // Ensure we clean babel loader cache
+    // babel loader のキャッシュも確実に削除する
     findCacheDir({
       name: `babel-loader`,
     }),

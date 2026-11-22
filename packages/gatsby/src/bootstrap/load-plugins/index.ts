@@ -21,10 +21,10 @@ export async function loadPlugins(
   rawConfig: IGatsbyConfig,
   rootDir: string
 ): Promise<Array<IFlattenedPlugin>> {
-  // Turn all strings in plugins: [`...`] into the { resolve: ``, options: {} } form
+  // plugins: [`...`] 内のすべての文字列を { resolve: ``, options: {} } の形に変換する
   const config = normalizeConfig(rawConfig)
 
-  // Show errors for invalid plugin configuration
+  // 無効なプラグイン設定に対するエラーを表示する
   await validateConfigPluginsOptions(config, rootDir)
 
   const currentAPIs = getAPI({
@@ -33,10 +33,10 @@ export async function loadPlugins(
     ssr: ssrAPIs,
   })
 
-  // Collate internal plugins, site config plugins, site default plugins
+  // 内部プラグイン、サイト設定のプラグイン、サイトのデフォルトプラグインをまとめる
   const pluginInfos = loadInternalPlugins(config, rootDir)
 
-  // Create a flattened array of the plugins
+  // プラグインを平坦化した配列を作成する
   const pluginArray = flattenPlugins(pluginInfos)
 
   const { disablePlugins } = store.getState().program
@@ -47,7 +47,7 @@ export async function loadPlugins(
 
     if (disabledInfo) {
       if (!process.env.GATSBY_WORKER_ID) {
-        // show this warning only once in main process
+        // この警告はメインプロセスで 1 回だけ表示する
         reporter.warn(
           `Disabling plugin "${plugin.name}":\n${disabledInfo.reasons
             .map(line => ` - ${line}`)
@@ -59,23 +59,23 @@ export async function loadPlugins(
     return true
   })
 
-  // Work out which plugins use which APIs, including those which are not
-  // valid Gatsby APIs, aka 'badExports'
+  // どのプラグインがどの API を使っているかを割り出す。有効な Gatsby API ではないもの
+  // （いわゆる 'badExports'）も含む
   let { flattenedPlugins, badExports } = await collatePluginAPIs({
     currentAPIs,
     flattenedPlugins: pluginArrayWithoutDisabledPlugins,
     rootDir,
   })
 
-  // Show errors for any non-Gatsby APIs exported from plugins
+  // プラグインが export している Gatsby 以外の API についてエラーを表示する
   await handleBadExports({ currentAPIs, badExports })
 
-  // Show errors when ReplaceRenderer has been implemented multiple times
+  // ReplaceRenderer が複数回実装されている場合にエラーを表示する
   flattenedPlugins = handleMultipleReplaceRenderers({
     flattenedPlugins,
   })
 
-  // If we get this far, everything looks good. Update the store
+  // ここまで来れば、すべて問題ない。store を更新する
   store.dispatch({
     type: `SET_SITE_FLATTENED_PLUGINS`,
     payload: flattenedPlugins as IGatsbyState["flattenedPlugins"],

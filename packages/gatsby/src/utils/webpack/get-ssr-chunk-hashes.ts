@@ -66,8 +66,8 @@ export function getSSRChunkHashes({
       if (chunkGroup.name !== `render-page`) {
         const templatePath = componentChunkNameToTemplatePath[chunkGroup.name]
         if (!templatePath) {
-          // additional chunk group can be created by lazy imports
-          // we handle them by handling children chunk groups on top level ones
+          // 遅延 import によって追加のチャンクグループが作られることがある
+          // トップレベルのチャンクグループで子のチャンクグループを処理することで対応している
           continue
         }
         templateHashes[templatePath] = concenatedChunksByName

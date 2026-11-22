@@ -68,8 +68,8 @@ describe(`remove-stale-jobs`, () => {
     state.jobsV2.incomplete.set(`1234`, data)
 
     isJobStale.mockReturnValue(false)
-    // `enqueueJob` will be called internally and while mocked it just return a simple job result
-    // we need it to return a promise so createJobV2FromInternalJob action creator works correctly
+    // `enqueueJob` は内部で呼ばれ、モックされている間は単純なジョブの結果を返すだけである
+    // createJobV2FromInternalJob アクションクリエーターが正しく動作するよう、promise を返す必要がある
     enqueueJob.mockReturnValue(Promise.resolve({ result: true }))
 
     const toDispatch = removeStaleJobs(state.jobsV2)

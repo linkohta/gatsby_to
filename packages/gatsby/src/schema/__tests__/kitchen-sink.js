@@ -45,7 +45,7 @@ jest.mock(`gatsby-cli/lib/reporter`, () => {
   }
 })
 
-// XXX(freiksenet): Expand
+// XXX(freiksenet): 拡充する
 describe(`Kitchen sink schema test`, () => {
   let schema
   let schemaComposer
@@ -306,7 +306,7 @@ const buildThirdPartySchemas = () => {
     schemaComposer.getOTC(`ThirdPartyStuff3`)
   )
 
-  // Query type with non-default name
+  // デフォルトでない名前の Query 型
   const RootQueryType = new GraphQLObjectType({
     name: `RootQueryType`,
     fields: () => {

@@ -7,14 +7,14 @@ const lastDateKey = `feedback.lastRequestDate`
 const firstDateKey = `feedback.firstCheckDate`
 const sevenDayKey = `feedback.sevenDayFeedbackDate`
 
-// This function is designed to be used by `gatsby feedback --disable`
-// and `gatsby feedback --enable`. This key is used to determine
-// if a user is allowed to be solicited for feedback
+// この関数は、`gatsby feedback --disable` と `gatsby feedback --enable` から
+// 使われることを想定している。このキーは、ユーザーにフィードバックを
+// 依頼してよいかを判定するために使う
 export function setFeedbackDisabledValue(enabled: boolean): void {
   getConfigStore().set(feedbackKey, enabled)
 }
 
-// Print the feedback request to the user
+// フィードバックの依頼をユーザーに表示する
 export function showFeedbackRequest(): void {
   getConfigStore().set(lastDateKey, Date.now())
   report.log(
@@ -34,13 +34,13 @@ export function showSevenDayFeedbackRequest(): void {
 }
 
 const randomChanceToBeTrue = (): boolean => {
-  // This is spreading the request volume over the quarter.
-  // We are grabbing a randomNumber within the spread of a first day
-  // of a quarter, to the last day
+  // これは、依頼の量を四半期全体に分散させる。
+  // 四半期の最初の日から最後の日までの範囲で、
+  // randomNumber を取得している
   const currentQuarter = Math.floor((new Date().getMonth() + 3) / 3)
   const randomNumber = Math.floor(
     Math.random() *
-      // One quarter year in days (roughly)
+      // 四半期の日数（おおよそ）
       (30 * 3)
   )
   const randomNumberWithinQuarter = randomNumber + 30 * 3 * (currentQuarter - 1)
@@ -48,18 +48,18 @@ const randomChanceToBeTrue = (): boolean => {
   return randomNumberWithinQuarter === getDayOfYear(new Date())
 }
 
-// We are only showing feedback requests to users in if they pass a few checks:
-// 1. They pass a Math.random() check. This is a skateboard version of not sending out all requests in one day.
-// 2. Gatsby is not running in CI
-// 3. They don't have the environment variable to disable feedback present
-// 4. They haven't disabled the feedback mechanism
-// 5. It's been at least 3 months since the last feedback request
-// 6. They are on the most recent version of Gatsby
+// フィードバックの依頼は、ユーザーが次の確認をすべて通過した場合にだけ表示する:
+// 1. Math.random() の確認を通過する。これは、すべての依頼を 1 日で送ってしまわないための、最小限の実装である。
+// 2. Gatsby が CI で実行されていない
+// 3. フィードバックを無効にする環境変数が設定されていない
+// 4. フィードバックの仕組みを無効にしていない
+// 5. 前回のフィードバックの依頼から少なくとも 3 か月が経過している
+// 6. Gatsby の最新バージョンを使っている
 export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
-  // Heuristic 1
-  // We originally wrote this to have a single chance of hitting.
-  // We wanted to up the chance by 5x, so this is our crude - temporary -
-  // way of giving the user 5 chances to passing.
+  // ヒューリスティック 1
+  // 当初は、当たる機会が 1 回だけになるように書いていた。
+  // その確率を 5 倍に上げたかったので、ユーザーに通過の機会を 5 回与える
+  // この方法は、粗い、一時的な手段である。
   const randomlyPassingHeuristic =
     randomChanceToBeTrue() ||
     randomChanceToBeTrue() ||
@@ -75,11 +75,11 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
     return false
   }
 
-  // Heuristic 5
+  // ヒューリスティック 5
   const lastDateValue = getConfigStore().get(lastDateKey)
-  // 5.a if the user has never received the feedback request, this is undefined
-  //     Which is effectively a pass, because it's been ~infinity~ since they last
-  //     received a request from us.
+  // 5.a ユーザーがフィードバックの依頼を一度も受け取っていない場合、これは undefined になる
+  //     これは事実上の通過である。最後に依頼を受け取ってから ~無限~ の時間が
+  //     経過していることになるためである。
   if (lastDateValue) {
     const lastDate = new Date(lastDateValue)
     const threeMonthsAgo = new Date()
@@ -91,7 +91,7 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
   }
 
   // 5.b
-  // we don't want to give them this survey right after the seven day feedback survey
+  // 7 日後のフィードバックのアンケートの直後に、このアンケートを出したくはない
   const sevenDayFeedback = getConfigStore().get(sevenDayKey)
   if (sevenDayFeedback) {
     const sevenDayDate = new Date(sevenDayFeedback)
@@ -103,22 +103,22 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
     }
   }
 
-  // Heuristic 6
+  // ヒューリスティック 6
   const versionPoints = getGatsbyVersion().split(`.`)
   let latestVersionPoints: Array<string> = []
   try {
     const { default: latestVersion } = await import(`latest-version`)
     latestVersionPoints = (await latestVersion(`gatsby`)).split(`.`)
   } catch (e) {
-    // do nothing.
-    // if the request fails, then we should just not show the feedback request
-    // because this in theory could happen often and we don't want to be spammy.
-    // In this case, we are guaranteed to have `versionsMatchOnMajorAndMinor` === false
+    // 何もしない。
+    // リクエストが失敗した場合は、フィードバックの依頼を表示しないだけにすべきである。
+    // これは理論上は頻繁に起こりうるので、しつこくしたくないためである。
+    // この場合、`versionsMatchOnMajorAndMinor` === false であることが保証される
   }
 
-  // Since we push versions very frequently. So thinking that users will
-  // be on the latest patch is potentially unrealistic. So we are just
-  // comparing on major and minor version points.
+  // バージョンは非常に頻繁に公開している。そのため、ユーザーが最新のパッチを
+  // 使っていると考えるのは現実的ではないかもしれない。そこで、メジャーバージョンと
+  // マイナーバージョンだけを比較している。
   const versionsMatchOnMajorAndMinor =
     versionPoints[0] === latestVersionPoints[0] &&
     versionPoints[1] === latestVersionPoints[1]
@@ -127,27 +127,27 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
     return false
   }
 
-  // If all of the above passed, then the user is able to be prompted
-  // for feedback
+  // 上のすべてを通過した場合は、ユーザーにフィードバックを
+  // 依頼できる
   return true
 }
 
 function isFeedbackDisabled(): boolean {
-  // Reasoning for this order: Checking for CI fixes issues like
+  // この順序にしている理由: CI の確認を先に行うことで、次のような問題が直る
   // https://github.com/gatsbyjs/gatsby/issues/30647
-  // TODO: Additionally prevent getConfigStore from erroring
+  // TODO: あわせて、getConfigStore がエラーにならないようにする
 
-  // Heuristic 2
+  // ヒューリスティック 2
   if (isCI()) {
     return true
   }
 
-  // Heuristic 3
+  // ヒューリスティック 3
   if (process.env.GATSBY_FEEDBACK_DISABLED === `1`) {
     return true
   }
 
-  // Heuristic 4
+  // ヒューリスティック 4
   if (getConfigStore().get(feedbackKey) === true) {
     return true
   }
@@ -163,7 +163,7 @@ export async function userGetsSevenDayFeedback(): Promise<boolean> {
   const firstDateValue = getConfigStore().get(firstDateKey)
 
   if (!firstDateValue) {
-    getConfigStore().set(firstDateKey, Date.now()) // set this for the first time
+    getConfigStore().set(firstDateKey, Date.now()) // 初めてこれを設定する
     return false
   } else {
     const lastDate = new Date(firstDateValue)

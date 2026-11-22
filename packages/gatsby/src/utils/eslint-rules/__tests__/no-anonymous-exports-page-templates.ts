@@ -22,17 +22,17 @@ jest.mock(`../../eslint-rules-helpers`, () => {
 describe(`no-anonymous-exports-page-templates`, () => {
   ruleTester.run(`passes valid and invalid cases`, rule, {
     valid: [
-      // Exports with identifiers are valid
+      // 識別子を持つ export は有効である
       test({ code: `const Named = () => {}\nexport default Named` }),
       test({ code: `export default function foo() {}` }),
       test({ code: `export default class MyClass {}` }),
 
-      // Sanity check unrelated export syntaxes
+      // 関係のない export の構文について念のため確認する
       test({ code: `export * from 'foo'` }),
       test({ code: `const foo = 123\nexport { foo }` }),
       test({ code: `const foo = 123\nexport { foo as default }` }),
 
-      // Allow call expressions by default for backwards compatibility
+      // 後方互換性のため、デフォルトでは呼び出し式を許可する
       test({ code: `export default foo(bar)` }),
     ],
     invalid: [

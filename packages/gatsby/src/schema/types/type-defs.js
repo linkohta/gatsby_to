@@ -9,8 +9,8 @@ const isASTDocument = typeOrTypeDef =>
   GraphQLASTNodeKind.DOCUMENT === typeOrTypeDef.kind
 
 /**
- * Parses type definition represented as an SDL string into an AST Document.
- * Type definitions of other formats (other than SDL) are returned as is
+ * SDL の文字列で表された型定義をパースして、AST の Document にする。
+ * （SDL 以外の）他の形式の型定義は、そのまま返す
  */
 const parseTypeDef = typeOrTypeDef => {
   if (typeof typeOrTypeDef === `string`) {
@@ -47,7 +47,7 @@ const reportParsingError = error => {
 }
 
 /**
- * Given a type definition, collects type names that should skip the inference process
+ * 型定義を受け取り、推論の処理をスキップすべき型の名前を集める
  */
 const typesWithoutInference = (typeNames = [], typeOrTypeDef) => {
   if (typeof typeOrTypeDef === `string`) {

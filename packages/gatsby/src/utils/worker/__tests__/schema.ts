@@ -15,10 +15,10 @@ import { compileGatsbyFiles } from "../../parcel/compile-gatsby-files"
 
 let worker: GatsbyTestWorkerPool | undefined
 
-// when we load config and run sourceNodes on "main process" we start file watchers
-// because of default `gatsby-plugin-page-creator` which would prevent test process from
-// exiting gracefully without forcing exit
-// to prevent that we keep track of created watchers and close them after all tests are done
+// 「メインプロセス」で設定を読み込んで sourceNodes を実行すると、デフォルトの
+// `gatsby-plugin-page-creator` がファイルウォッチャーを起動する。そのままでは
+// 強制終了しない限りテストプロセスが正常に終了できない
+// これを防ぐため、作成されたウォッチャーを記録しておき、すべてのテストが終わった後に閉じる
 const mockWatchersToClose = new Set<ReturnType<typeof ChokidarWatchType>>()
 jest.mock(`chokidar`, () => {
   const chokidar = jest.requireActual(`chokidar`)

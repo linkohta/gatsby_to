@@ -10,8 +10,8 @@ const FILE_CHANGE_AGGREGATION_TIMEOUT = 200
 export type WaitingResult = Pick<IWaitingContext, "nodeMutationBatch">
 
 /**
- * This idle state also handles batching of node mutations and running of
- * mutations when we first start it
+ * このアイドル状態は、ノードの変更のバッチ処理と、最初に開始したときの
+ * 変更の実行も扱う
  */
 export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
   predictableActionArguments: true,
@@ -25,15 +25,15 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
     idle: {
       always: [
         {
-          // If we already have queued node mutations, move
-          // immediately to batching
+          // キューに入っているノードの変更がすでにある場合は、
+          // すぐにバッチ処理へ移る
           cond: (ctx): boolean => !!ctx.nodeMutationBatch.length,
           target: `batchingNodeMutations`,
         },
         {
-          // If source files are dirty upon entering this state,
-          // move immediately to aggregatingFileChanges to force re-compilation
-          // See https://github.com/gatsbyjs/gatsby/issues/27609
+          // この状態に入った時点でソースファイルがダーティである場合は、
+          // 再コンパイルを強制するために、すぐに aggregatingFileChanges へ移る
+          // https://github.com/gatsbyjs/gatsby/issues/27609 を参照
           target: `aggregatingFileChanges`,
           cond: ({ sourceFilesDirty }): boolean => Boolean(sourceFilesDirty),
         },
@@ -43,19 +43,19 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
           actions: `addNodeMutation`,
           target: `batchingNodeMutations`,
         },
-        // We only listen for this when idling because if we receive it at any
-        // other point we're already going to create pages etc
+        // これを監視するのはアイドル中だけである。他の時点で受け取った場合は、
+        // いずれにしてもページの作成などを行うためである
         SOURCE_FILE_CHANGED: {
           target: `aggregatingFileChanges`,
         },
       },
     },
     aggregatingFileChanges: {
-      // Sigh. This is because webpack doesn't expose the Watchpack
-      // aggregated file invalidation events. If we compile immediately,
-      // we won't pick up the changed files
+      // やれやれ。これは、webpack が Watchpack の集約されたファイル無効化イベントを
+      // 公開していないためである。すぐにコンパイルすると、
+      // 変更されたファイルを拾えない
       after: {
-        // The aggregation timeout
+        // 集約のタイムアウト
         [FILE_CHANGE_AGGREGATION_TIMEOUT]: {
           actions: `extractQueries`,
           target: `idle`,
@@ -68,37 +68,37 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
         },
         SOURCE_FILE_CHANGED: {
           target: undefined,
-          // External self-transition reset the timer
+          // 外部の自己遷移がタイマーをリセットする
           internal: false,
         },
       },
     },
     batchingNodeMutations: {
-      // Check if the batch is already full on entry
+      // 入った時点でバッチがすでにいっぱいかを確認する
       always: {
         cond: (ctx): boolean =>
           ctx.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
         target: `committingBatch`,
       },
       on: {
-        // More mutations added to batch
+        // バッチにさらに変更が追加された
         ADD_NODE_MUTATION: [
-          // You know the score: only run the first matching transition
+          // ご存じのとおり、最初に一致した遷移だけが実行される
           {
-            // If this fills the batch then commit it
+            // これでバッチがいっぱいになる場合は、コミットする
             actions: `addNodeMutation`,
             cond: (ctx): boolean =>
               ctx.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
             target: `committingBatch`,
           },
           {
-            // ...otherwise just add it to the batch
+            // ...そうでなければ、バッチに追加するだけである
             actions: `addNodeMutation`,
           },
         ],
       },
       after: {
-        // Time's up
+        // 時間切れ
         [NODE_MUTATION_BATCH_TIMEOUT]: `committingBatch`,
       },
     },
@@ -110,14 +110,14 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
         }
       }),
       on: {
-        // While we're running the batch we will also run new actions, as these may be cascades
+        // バッチの実行中は、新しいアクションも実行する。連鎖的に発生したものかもしれないためである
         ADD_NODE_MUTATION: {
           actions: `callApi`,
         },
       },
       invoke: {
         src: `runMutationBatch`,
-        // When we're done, clear the running batch ready for next time
+        // 終わったら、次回に備えて実行中のバッチを消去する
         onDone: {
           actions: assign<IWaitingContext, any>({
             runningBatch: [],
@@ -128,8 +128,8 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
     },
     rebuild: {
       type: `final`,
-      // This is returned to the parent. The batch includes
-      // any mutations that arrived while we were running the other batch
+      // これは親に返される。このバッチには、もう一方のバッチの
+      // 実行中に届いた変更がすべて含まれる
       data: ({ nodeMutationBatch }): WaitingResult => {
         return { nodeMutationBatch }
       },

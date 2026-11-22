@@ -71,10 +71,10 @@ import { writeTypeScriptTypes } from "../utils/graphql-typegen/ts-codegen"
 
 module.exports = async function build(
   program: IBuildArgs,
-  // Let external systems running Gatsby to inject attributes
+  // Gatsby を実行している外部システムが属性を注入できるようにする
   externalTelemetryAttributes: Record<string, any>
 ): Promise<void> {
-  // global gatsby object to use without store
+  // store なしで使うためのグローバルな gatsby オブジェクト
   global.__GATSBY = {
     buildId: uuid.v4(),
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -117,7 +117,7 @@ module.exports = async function build(
   const buildSpan = buildActivity.span
   buildSpan.setTag(`directory`, program.directory)
 
-  // Add external tags to buildSpan
+  // buildSpan に外部のタグを追加する
   if (externalTelemetryAttributes) {
     Object.entries(externalTelemetryAttributes).forEach(([key, value]) => {
       buildActivity.span.setTag(key, value)
@@ -135,8 +135,8 @@ module.exports = async function build(
     parentSpan: buildSpan,
   })
 
-  // writes sync and async require files to disk
-  // used inside routing "html" + "javascript"
+  // 同期と非同期の require ファイルをディスクに書き出す
+  // ルーティングの "html" と "javascript" の中で使われる
   await writeOutRequires({
     store,
     parentSpan: buildSpan,
@@ -234,7 +234,7 @@ module.exports = async function build(
     }
   }
 
-  // exec outer config function for each template
+  // テンプレートごとに外側の config 関数を実行する
   const pageConfigActivity = report.activityTimer(`Execute page configs`, {
     parentSpan: buildSpan,
   })
@@ -255,7 +255,7 @@ module.exports = async function build(
     )
     try {
       buildActivityTimer.start()
-      // bundle graphql-engine
+      // graphql-engine をバンドルする
       engineBundlingPromises.push(
         createGraphqlEngineBundle(program.directory, report, program.verbose)
       )
@@ -265,7 +265,7 @@ module.exports = async function build(
           rootDir: program.directory,
           components: state.components,
           staticQueriesByTemplate: state.staticQueriesByTemplate,
-          webpackCompilationHash: webpackCompilationHash as string, // we set webpackCompilationHash above
+          webpackCompilationHash: webpackCompilationHash as string, // webpackCompilationHash は上で設定している
           reporter: report,
           isVerbose: program.verbose,
         })
@@ -301,17 +301,17 @@ module.exports = async function build(
 
   const { queryIds } = await calculateDirtyQueries({ store })
 
-  // Only run queries with mode SSG
+  // モードが SSG のクエリだけを実行する
 
   queryIds.pageQueryIds = queryIds.pageQueryIds.filter(
     query => getPageMode(query) === `SSG`
   )
 
-  // Start saving page.mode in the main process (while queries run in workers in parallel)
+  // メインプロセスで page.mode の保存を開始する（その間、クエリはワーカーで並列に実行される）
   const waitMaterializePageMode = materializePageMode()
 
   let waitForWorkerPoolRestart = Promise.resolve()
-  // If one wants to debug query running you can set the CPU count to 1
+  // クエリの実行をデバッグしたい場合は、CPU 数を 1 に設定できる
   if (cpuCoreCount() === 1) {
     await runStaticQueries({
       queryIds,
@@ -330,12 +330,12 @@ module.exports = async function build(
     await runQueriesInWorkersQueue(workerPool, queryIds, {
       parentSpan: buildSpan,
     })
-    // Jobs still might be running even though query running finished
+    // クエリの実行が終わっても、ジョブはまだ実行中のことがある
     await Promise.all([
       waitUntilAllJobsComplete(),
       waitUntilWorkerJobsAreComplete(),
     ])
-    // Restart worker pool before merging state to lower memory pressure while merging state
+    // state のマージ中のメモリ負荷を下げるため、マージの前にワーカープールを再起動する
     waitForWorkerPoolRestart = workerPool.restart()
     await mergeWorkerState(workerPool, buildSpan)
   }
@@ -387,7 +387,7 @@ module.exports = async function build(
     }
   }
 
-  // create scope so we don't leak state object
+  // state オブジェクトが漏れないようにスコープを作る
   {
     const state = store.getState()
     if (
@@ -483,8 +483,8 @@ module.exports = async function build(
     }
   }
 
-  // Copy files from the static directory to
-  // an equivalent static directory within public.
+  // static ディレクトリのファイルを、public 内の
+  // 対応する static ディレクトリへコピーする。
   copyStaticDirs()
 
   store.dispatch(actions.setProgramStatus(`BOOTSTRAP_QUERY_RUNNING_FINISHED`))
@@ -493,11 +493,11 @@ module.exports = async function build(
 
   await waitUntilAllJobsComplete()
 
-  // we need to save it again to make sure our latest state has been saved
+  // 最新の state が保存されていることを保証するため、もう一度保存する必要がある
   await db.saveState()
 
   if (shouldGenerateEngines()) {
-    // well, tbf we should just generate this in `.cache` and avoid deleting it :shrug:
+    // まあ、正直なところ、これは `.cache` に生成して、削除せずに済ませるべきだろう :shrug:
     program.keepPageRenderer = true
   }
 
@@ -513,13 +513,13 @@ module.exports = async function build(
   await waitMaterializePageMode
   const waitWorkerPoolEnd = Promise.all(workerPool.end())
 
-  // create scope so we don't leak state object
+  // state オブジェクトが漏れないようにスコープを作る
   {
     const { schema, definitions, config } = store.getState()
     const directory = program.directory
     const graphqlTypegenOptions = config.graphqlTypegen
 
-    // Only generate types when the option is enabled
+    // オプションが有効な場合にだけ型を生成する
     if (graphqlTypegenOptions && graphqlTypegenOptions.generateOnBuild) {
       const typegenActivity = reporter.activityTimer(
         `Generating TypeScript types`,
@@ -559,8 +559,8 @@ module.exports = async function build(
   })
   postBuildActivityTimer.end()
 
-  // Wait for any jobs that were started in onPostBuild
-  // This could occur due to queries being run which invoke sharp for instance
+  // onPostBuild で開始されたジョブを待つ
+  // たとえば、sharp を呼び出すクエリが実行されたことで発生しうる
   await waitUntilAllJobsComplete()
 
   try {
@@ -569,7 +569,7 @@ module.exports = async function build(
     report.warn(`Error when closing WorkerPool: ${e.message}`)
   }
 
-  // Make sure we saved the latest state so we have all jobs cached
+  // すべてのジョブがキャッシュされるよう、最新の state を保存しておく
   await db.saveState()
 
   const state = store.getState()

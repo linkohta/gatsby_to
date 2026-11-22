@@ -40,7 +40,7 @@ const externalJobsMap: Map<
 > = new Map()
 
 /**
- * We want to use absolute paths to make sure they are on the filesystem
+ * ファイルシステム上に存在することを確認できるように、絶対パスを使いたい
  */
 function convertPathsToAbsolute(filePath: string): string {
   if (!path.isAbsolute(filePath)) {
@@ -50,7 +50,7 @@ function convertPathsToAbsolute(filePath: string): string {
   return slash(filePath)
 }
 /**
- * Get contenthash of a file
+ * ファイルの contenthash を取得する
  */
 function createFileHash(path: string): string {
   return hasha.fromFileSync(path, { algorithm: `sha1` })
@@ -66,7 +66,7 @@ function hasExternalJobsEnabled(): boolean {
 }
 
 /**
- * Get the local worker function and execute it on the user's machine
+ * ローカルのワーカー関数を取得し、ユーザーのマシンで実行する
  */
 async function runLocalWorker<T>(
   workerFn: { ({ inputPaths, outputDir, args }: InternalJob): T },
@@ -75,8 +75,8 @@ async function runLocalWorker<T>(
   await fs.ensureDir(job.outputDir)
 
   return new Promise((resolve, reject) => {
-    // execute worker nextTick
-    // TODO should we think about threading/queueing here?
+    // ワーカーを nextTick で実行する
+    // TODO ここでスレッド化やキューイングを検討すべきか？
     setImmediate(() => {
       try {
         resolve(
@@ -147,9 +147,9 @@ function runExternalWorker(job: InternalJob): Promise<any> {
 }
 
 /**
- * Make sure we have everything we need to run a job
- * If we do, run it locally.
- * TODO add external job execution through ipc
+ * ジョブの実行に必要なものがすべてそろっていることを確認する
+ * そろっていれば、ローカルで実行する。
+ * TODO ipc 経由での外部のジョブ実行を追加する
  */
 function runJob(
   job: InternalJob,
@@ -171,7 +171,7 @@ function runJob(
 
           return runExternalWorker(job)
         } else {
-          // only show the offloading warning once
+          // オフロードの警告は一度だけ表示する
           if (!hasShownIPCDisabledWarning) {
             hasShownIPCDisabledWarning = true
             reporter.warn(
@@ -197,22 +197,22 @@ function isInternalJob(job: JobInput | InternalJob): job is InternalJob {
 }
 
 /**
- * Create an internal job object
+ * 内部用のジョブオブジェクトを作成する
  */
 export function createInternalJob(
   job: JobInput | InternalJob,
   plugin: { name: string; version: string; resolve: string }
 ): InternalJob {
-  // It looks like we already have an augmented job so we shouldn't redo this work
+  // すでに情報を付加したジョブがあるようなので、この処理をやり直すべきではない
   if (isInternalJob(job)) {
     return job
   }
 
   const { name, inputPaths, outputDir, args } = job
 
-  // TODO see if we can make this async, filehashing might be expensive to wait for
-  // currently this needs to be sync as we could miss jobs to have been scheduled and
-  // are still processing their hashes
+  // TODO これを非同期にできないか調べる。ファイルのハッシュ計算は、待つにはコストが高いかもしれない
+  // 現状では同期である必要がある。そうしないと、予約済みでまだハッシュを処理している
+  // ジョブを見逃す可能性があるためである
   const inputPathsWithContentDigest = inputPaths.map((pth: string) => {
     return {
       path: convertPathsToAbsolute(pth),
@@ -235,7 +235,7 @@ export function createInternalJob(
     },
   }
 
-  // generate a contentDigest based on all parameters including file content
+  // ファイルの内容を含むすべての引数に基づいて、contentDigest を生成する
   internalJob.contentDigest = createContentDigest({
     name: job.name,
     inputPaths: internalJob.inputPaths.map(
@@ -255,13 +255,13 @@ const activitiesForJobTypes = new Map<
 >()
 
 /**
- * Creates a job
+ * ジョブを作成する
  */
 export async function enqueueJob(
   job: InternalJob
 ): Promise<Record<string, unknown>> {
-  // When we already have a job that's executing, return the same promise.
-  // we have another check in our createJobV2 action to return jobs that have been done in a previous gatsby run
+  // 実行中のジョブがすでにある場合は、同じ Promise を返す。
+  // 以前の gatsby の実行で完了したジョブを返すための確認は、createJobV2 アクションに別にある
   if (jobsInProcess.has(job.contentDigest)) {
     return jobsInProcess.get(job.contentDigest)!.deferred.promise
   }
@@ -270,7 +270,7 @@ export async function enqueueJob(
     hasActiveJobs = pDefer<void>()
   }
 
-  // Bump active jobs
+  // アクティブなジョブの数を増やす
   activeJobs++
   if (!activityForJobs) {
     activityForJobs = reporter.phantomActivity(`Running jobs v2`)
@@ -301,7 +301,7 @@ export async function enqueueJob(
 
   try {
     const result = await runJob(job)
-    // this check is to keep our worker results consistent for cloud
+    // この確認は、クラウドでワーカーの結果の一貫性を保つためのものである
     if (result != null && !_.isPlainObject(result)) {
       throw new Error(
         `Result of a worker should be an object, type of "${typeof result}" was given`
@@ -311,7 +311,7 @@ export async function enqueueJob(
   } catch (err) {
     deferred.reject(new WorkerError(err))
   } finally {
-    // when all jobs are done we end the activity
+    // すべてのジョブが完了したら、アクティビティを終了する
     if (--activeJobs === 0) {
       hasActiveJobs!.resolve()
       activityForJobs!.end()
@@ -326,7 +326,7 @@ export async function enqueueJob(
 }
 
 /**
- * Get in progress job promise
+ * 進行中のジョブの Promise を取得する
  */
 export function getInProcessJobPromise(
   contentDigest: string
@@ -335,14 +335,14 @@ export function getInProcessJobPromise(
 }
 
 /**
- * Remove a job from our inProgressQueue to reduce memory usage
+ * メモリー使用量を減らすために、inProgressQueue からジョブを取り除く
  */
 export function removeInProgressJob(contentDigest: string): void {
   jobsInProcess.delete(contentDigest)
 }
 
 /**
- * Wait for all processing jobs to have finished
+ * 処理中のすべてのジョブが完了するのを待つ
  */
 export async function waitUntilAllJobsComplete(): Promise<void> {
   await (hasActiveJobs ? hasActiveJobs.promise : Promise.resolve())
@@ -353,7 +353,7 @@ export async function waitUntilAllJobsComplete(): Promise<void> {
 }
 
 /**
- * Wait for specific jobs for engines
+ * エンジン向けに、特定のジョブを待つ
  */
 export async function waitJobs(jobDigests: Set<string>): Promise<void> {
   const promises: Array<Promise<any>> = []
@@ -369,12 +369,12 @@ export function isJobStale(
   job: Partial<InternalJob> & { inputPaths: InternalJob["inputPaths"] }
 ): boolean {
   const areInputPathsStale = job.inputPaths.some(inputPath => {
-    // does the inputPath still exists?
+    // inputPath はまだ存在するか？
     if (!fs.existsSync(inputPath.path)) {
       return true
     }
 
-    // check if we're talking about the same file
+    // 同じファイルを指しているかを確認する
     const fileHash = createFileHash(inputPath.path)
     return fileHash !== inputPath.contentDigest
   })

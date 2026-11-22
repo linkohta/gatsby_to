@@ -12,7 +12,7 @@ jest.mock(`../../utils/js-chunk-names`, () => {
 
 jest.mock(`fs-extra`, () => {
   return {
-    readFileSync: jest.fn(() => `foo`), // createPage action reads the page template file trying to find `getServerData`
+    readFileSync: jest.fn(() => `foo`), // createPage アクションは、`getServerData` を探すためにページテンプレートのファイルを読み込む
   }
 })
 
@@ -115,7 +115,7 @@ describe(`createPages service cleans up not recreated pages`, () => {
     expect(store.getState().pages.size).toEqual(0)
 
     if (cacheStatus === `WARM`) {
-      // add some junk
+      // 不要なデータを追加する
       store.dispatch(
         actions.createPage(
           {
@@ -175,7 +175,7 @@ describe(`createPages service cleans up not recreated pages`, () => {
     )
 
     if (cacheStatus === `WARM`) {
-      // "junk" pages were not recreated, so we expect DELETE_PAGE action to be emitted for those
+      // "junk" のページは作り直されなかったので、それらに対して DELETE_PAGE アクションが発行されるはずである
       expect(deletePageActions).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -200,7 +200,7 @@ describe(`createPages service cleans up not recreated pages`, () => {
 
     await createPages({ store, shouldRunCreatePagesStatefully: false })
 
-    // createPagesStatefully should not be called and stateful pages should remain as they were before calling `createPages` service
+    // createPagesStatefully は呼ばれず、ステートフルなページは `createPages` サービスを呼ぶ前のまま残るはずである
     expect(mockAPIs[`createPages`]).toHaveBeenCalledTimes(2)
     expect(mockAPIs[`createPagesStatefully`]).toHaveBeenCalledTimes(1)
     expect(store.getState().pages.size).toEqual(4)
@@ -214,7 +214,7 @@ describe(`createPages service cleans up not recreated pages`, () => {
       ])
     )
 
-    // 1st dynamic page was not recreated so we expect that we emitted DELETE_PAGE action
+    // 1 番目の動的ページは作り直されなかったので、DELETE_PAGE アクションが発行されたはずである
     expect(deletePageActions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

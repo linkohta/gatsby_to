@@ -16,7 +16,7 @@ export const onRenderBody: GatsbySSR[`onRenderBody`] = ({
 
   const forwards = getForwards(collectedScripts)
 
-  // Adapted from https://github.com/BuilderIO/partytown/blob/main/src/react/snippet.tsx to only include SSR logic
+  // https://github.com/BuilderIO/partytown/blob/main/src/react/snippet.tsx を基に、SSR のロジックだけを含むように改変したもの
   setHeadComponents([
     <script
       key="partytown"
@@ -31,6 +31,6 @@ export const onRenderBody: GatsbySSR[`onRenderBody`] = ({
     />,
   ])
 
-  // Clear scripts after we've used them to avoid leaky behavior
+  // 状態が漏れないように、使い終わったスクリプトを消去する
   collectedScriptsByPage.delete(pathname)
 }

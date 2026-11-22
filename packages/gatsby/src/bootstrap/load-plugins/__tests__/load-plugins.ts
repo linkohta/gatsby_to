@@ -12,9 +12,9 @@ jest.mock(`gatsby-cli/lib/reporter`, () => {
     panicOnBuild: jest.fn(),
     log: jest.fn(),
     warn: jest.fn((...args) => {
-      // filter out compatible warnings as we get a lot of
+      // 互換性の警告を取り除く。現状では
       // Plugin X is not compatible with your gatsby version X - It requires X
-      // right now
+      // という警告が大量に出るためである
       if (!args[0].includes(`is not compatible with your gatsby version`)) {
         mockNonIncompatibleWarn(...args)
       }
@@ -24,9 +24,9 @@ jest.mock(`gatsby-cli/lib/reporter`, () => {
   }
 })
 
-// Previously babel transpiled src ts plugin files (e.g. gatsby-node files) on the fly,
-// making them require-able/test-able without running compileGatsbyFiles prior (as would happen in a real scenario).
-// After switching to import to support esm, point file path resolution to the real compiled JS files in dist instead.
+// 以前は、babel が src にある ts のプラグインファイル（gatsby-node ファイルなど）をその場でトランスパイルしていたので、
+// 事前に compileGatsbyFiles を実行しなくても（実際の場面では実行される）、require やテストができた。
+// ESM に対応するために import へ切り替えた後は、ファイルパスの解決先を、dist にある実際のコンパイル済み JS ファイルに向けている。
 jest.mock(`../../resolve-js-file-path`, () => {
   return {
     resolveJSFilepath: jest.fn(({ filePath }: { filePath: string }) => {
@@ -52,10 +52,10 @@ afterEach(() => {
 
 describe(`Load plugins`, () => {
   /**
-   * Replace the resolve path and version string.
-   * Resolve path will vary depending on platform.
-   * Version can be updated (we use external plugin in default config).
-   * Both will cause snapshots to differ.
+   * 解決されたパスとバージョン文字列を置き換える。
+   * 解決されたパスはプラットフォームによって変わる。
+   * バージョンは更新されることがある（デフォルトの設定で外部のプラグインを使っている）。
+   * どちらもスナップショットの差分の原因になる。
    */
   const replaceFieldsThatCanVary = (
     plugins: Array<IFlattenedPlugin>
@@ -379,7 +379,7 @@ describe(`Load plugins`, () => {
         plugins.find(plugin => plugin.name === `gatsby-plugin-google-analytics`)
           .pluginOptions
       ).toEqual({
-        // All the options that have defaults are defined
+        // デフォルト値を持つオプションはすべて定義されている
         anonymize: false,
         enableWebVitalsTracking: false,
         exclude: [],
@@ -496,8 +496,8 @@ describe(`Load plugins`, () => {
     })
 
     it(`subplugins are resolved using "main" in package.json`, async () => {
-      // in fixtures/subplugins/node_modules/gatsby-plugin-child-with-main/package.json
-      // "main" field points to "lib/index.js"
+      // fixtures/subplugins/node_modules/gatsby-plugin-child-with-main/package.json では
+      // "main" フィールドが "lib/index.js" を指している
       const plugins = await loadPlugins(
         {
           plugins: [
@@ -515,8 +515,8 @@ describe(`Load plugins`, () => {
         __dirname + `/fixtures/subplugins`
       )
 
-      // "module.exports" in entry files for subplugins contain just a string
-      // for tests purposes (so we can assert "module" field on subplugins items)
+      // サブプラグインのエントリーファイルの "module.exports" には、テストのために
+      // 文字列だけを入れている（サブプラグインの項目の "module" フィールドを検証できるようにするため）
       expect(
         plugins.find(plugin => plugin.name === `gatsby-plugin-parent`)
           ?.pluginOptions?.testSubplugins

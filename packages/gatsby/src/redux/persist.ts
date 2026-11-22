@@ -4,7 +4,7 @@ import v8 from "v8"
 import {
   existsSync,
   mkdtempSync,
-  moveSync, // Note: moveSync over renameSync because /tmp may be on other mount
+  moveSync, // 注: renameSync ではなく moveSync を使う。/tmp が別のマウントにあるかもしれないため
   readFileSync,
   removeSync,
   writeFileSync,
@@ -22,11 +22,11 @@ import report from "gatsby-cli/lib/reporter"
 import { DeepPartial } from "redux"
 
 const getReduxCacheFolder = (): string =>
-  // This is a function for the case that somebody does a process.chdir (#19800)
+  // 誰かが process.chdir をする場合に備えて、これは関数にしている (#19800)
   path.join(process.cwd(), `.cache/redux`)
 
 const getWorkerSlicesFolder = (): string =>
-  // This is a function for the case that somebody does a process.chdir (#19800)
+  // 誰かが process.chdir をする場合に備えて、これは関数にしている (#19800)
   path.join(process.cwd(), `.cache/worker`)
 
 function reduxSharedFile(dir: string): string {
@@ -46,11 +46,11 @@ export function readFromCache(
   slices?: Array<GatsbyStateKeys>,
   optionalPrefix: string = ``
 ): DeepPartial<ICachedReduxState> {
-  // The cache is stored in two steps; the nodes and pages in chunks and the rest
-  // First we revive the rest, then we inject the nodes and pages into that obj (if any)
-  // Each chunk is stored in its own file, this circumvents max buffer lengths
-  // for sites with a _lot_ of content. Since all nodes / pages go into a Map, the order
-  // of reading them is not relevant.
+  // キャッシュは 2 段階で保存される。ノードとページはチャンクに分けて、残りはまとめて保存する
+  // まず残りを復元し、次に（あれば）ノードとページをそのオブジェクトに注入する
+  // それぞれのチャンクは個別のファイルに保存する。これにより、コンテンツが _非常に_ 多い
+  // サイトでもバッファー長の上限を回避できる。ノードとページはすべて Map に入るので、
+  // 読み込む順序は関係ない。
 
   let cacheFolder = getReduxCacheFolder()
 
@@ -70,7 +70,7 @@ export function readFromCache(
     readFileSync(reduxSharedFile(cacheFolder))
   )
 
-  // Note: at 1M pages, this will be 1M/chunkSize chunks (ie. 1m/10k=100)
+  // 注: 100 万ページでは、これは 1M/chunkSize 個のチャンクになる（つまり 1m/10k=100）
   const nodesChunks = globSync(
     reduxChunkedNodesFilePrefix(cacheFolder) + `*`
   ).map(file => v8.deserialize(readFileSync(file)))
@@ -86,7 +86,7 @@ export function readFromCache(
 
   obj.nodes = new Map(nodes)
 
-  // Note: at 1M pages, this will be 1M/chunkSize chunks (ie. 1m/10k=100)
+  // 注: 100 万ページでは、これは 1M/chunkSize 個のチャンクになる（つまり 1m/10k=100）
   const pagesChunks = globSync(
     reduxChunkedPagesFilePrefix(cacheFolder) + `*`
   ).map(file => v8.deserialize(readFileSync(file)))
@@ -102,13 +102,13 @@ export function guessSafeChunkSize(
   values: Array<[string, IGatsbyNode]> | Array<[string, IGatsbyPage]>,
   showMaxSizeWarning: boolean = false
 ): number {
-  // Pick a few random elements and measure their size then pick a chunk size
-  // ceiling based on the worst case. Each test takes time so there's trade-off.
-  // This attempts to prevent small sites with very large pages from OOMing.
-  // This heuristic could still fail if it randomly grabs the smallest nodes.
-  // TODO: test a few nodes per each type instead of from all nodes
+  // ランダムにいくつかの要素を選んでサイズを測り、最悪のケースをもとにチャンクサイズの
+  // 上限を決める。測定には 1 回ごとに時間がかかるので、トレードオフがある。
+  // これは、ページが非常に大きい小規模なサイトで OOM になるのを防ごうとするものである。
+  // たまたま最も小さいノードばかりを選んだ場合は、このヒューリスティックでも失敗しうる。
+  // TODO: すべてのノードから選ぶのではなく、型ごとにいくつかのノードを測る
 
-  const nodesToTest = 11 // Very arbitrary number
+  const nodesToTest = 11 // かなり恣意的な数値
   const valueCount = values.length
   const step = Math.max(1, Math.ceil(valueCount / nodesToTest))
   let maxSize = 0
@@ -117,16 +117,16 @@ export function guessSafeChunkSize(
     maxSize = Math.max(size, maxSize)
   }
 
-  // Sends a warning once if any of the chunkSizes exceeds approx 500kb limit
+  // いずれかの chunkSize が約 500kb の上限を超えた場合に、警告を一度だけ送る
   if (showMaxSizeWarning && maxSize > 500000) {
     report.warn(
       `The size of at least one page context chunk exceeded 500kb, which could lead to degraded performance. Consider putting less data in the page context.`
     )
   }
 
-  // Max size of a Buffer is 2gb (yeah, we're assuming 64bit system)
+  // Buffer の最大サイズは 2gb である（そう、64 ビットのシステムを前提にしている）
   // https://stackoverflow.com/questions/8974375/whats-the-maximum-size-of-a-node-js-buffer
-  // Use 1.5gb as the target ceiling, allowing for some margin of error
+  // 誤差の余裕を見て、1.5gb を目標の上限にする
   return Math.floor((1.5 * 1024 * 1024 * 1024) / maxSize)
 }
 
@@ -134,8 +134,8 @@ function prepareCacheFolder(
   targetDir: string,
   contents: DeepPartial<ICachedReduxState>
 ): void {
-  // Temporarily save the nodes and pages and remove them from the main redux store
-  // This prevents an OOM when the page nodes collectively contain too much data
+  // ノードとページを一時的に退避して、メインの redux ストアから取り除く
+  // これにより、ページのノードが全体で大量のデータを含む場合の OOM を防ぐ
   const nodesMap = contents.nodes
   contents.nodes = undefined
 
@@ -144,15 +144,15 @@ function prepareCacheFolder(
 
   writeFileSync(reduxSharedFile(targetDir), v8.serialize(contents))
 
-  // Now restore them on the redux store
+  // ここで redux ストアに戻す
   contents.nodes = nodesMap
   contents.pages = pagesMap
 
   if (nodesMap) {
     if (nodesMap.size === 0) {
-      // Nodes are actually stored in LMDB.
-      // But we need at least one node in redux state to workaround the warning above:
-      // "Cache exists but contains no nodes..." (when loading cache).
+      // ノードは実際には LMDB に保存される。
+      // ただし、（キャッシュの読み込み時の）上の警告 "Cache exists but contains no nodes..." を
+      // 回避するために、redux の状態に少なくとも 1 つのノードが必要である。
       const dummyNode: IGatsbyNode = {
         id: `dummy-node-id`,
         parent: ``,
@@ -167,7 +167,7 @@ function prepareCacheFolder(
       }
       nodesMap.set(dummyNode.id, dummyNode)
     }
-    // Now store the nodes separately, chunk size determined by a heuristic
+    // 次にノードを別に保存する。チャンクサイズはヒューリスティックで決める
     const values: Array<[string, IGatsbyNode]> = [...nodesMap.entries()]
     const chunkSize = guessSafeChunkSize(values)
     const chunks = Math.ceil(values.length / chunkSize)
@@ -181,7 +181,7 @@ function prepareCacheFolder(
   }
 
   if (pagesMap) {
-    // Now store the nodes separately, chunk size determined by a heuristic
+    // 次にノードを別に保存する。チャンクサイズはヒューリスティックで決める
     const values: Array<[string, IGatsbyPage]> = [...pagesMap.entries()]
     const chunkSize = guessSafeChunkSize(values, true)
     const chunks = Math.ceil(values.length / chunkSize)
@@ -196,11 +196,11 @@ function prepareCacheFolder(
 }
 
 function safelyRenameToBak(cacheFolder: string): string {
-  // Basically try to work around the potential of previous renamed caches
-  // not being removed for whatever reason. _That_ should not be a blocker.
+  // 要するに、以前に名前を変えたキャッシュが何らかの理由で削除されずに残っている
+  // 可能性を回避しようとしている。_それ_ が妨げになるべきではない。
   const tmpSuffix = `.bak`
   let suffixCounter = 0
-  let bakName = cacheFolder + tmpSuffix // Start without number
+  let bakName = cacheFolder + tmpSuffix // 番号なしから始める
 
   while (existsSync(bakName)) {
     ++suffixCounter
@@ -216,9 +216,9 @@ export function writeToCache(
   slices?: Array<GatsbyStateKeys>,
   optionalPrefix: string = ``
 ): void {
-  // Writing the "slices" also to the "redux" folder introduces subtle bugs when
-  // e.g. the whole folder gets replaced some "slices" are lost
-  // Thus they get written to dedicated "worker" folder
+  // "slices" も "redux" フォルダーに書き込むと、たとえばフォルダー全体が置き換えられたときに
+  // 一部の "slices" が失われる、といった分かりにくいバグが入り込む
+  // そのため、専用の "worker" フォルダーに書き込む
   if (slices) {
     const cacheFolder = getWorkerSlicesFolder()
 
@@ -231,29 +231,29 @@ export function writeToCache(
     return
   }
 
-  // Note: this should be a transactional operation. So work in a tmp dir and
-  // make sure the cache cannot be left in a corruptable state due to errors.
+  // 注: これはトランザクション的な操作であるべきである。そのため一時ディレクトリで作業し、
+  // エラーによってキャッシュが壊れうる状態で残らないようにする。
 
   const tmpDir = mkdtempSync(path.join(os.tmpdir(), `reduxcache`)) // linux / windows
 
   prepareCacheFolder(tmpDir, contents)
 
-  // Replace old cache folder with new. If the first rename fails, the cache
-  // is just stale. If the second rename fails, the cache is empty. In either
-  // case the cache is not left in a corrupt state.
+  // 古いキャッシュフォルダーを新しいものに置き換える。最初の rename が失敗した場合、
+  // キャッシュは古いままになるだけである。2 番目の rename が失敗した場合、キャッシュは空になる。
+  // どちらの場合も、キャッシュが壊れた状態で残ることはない。
 
   const reduxCacheFolder = getReduxCacheFolder()
 
   let bakName = ``
   if (existsSync(reduxCacheFolder)) {
-    // Don't drop until after swapping over (renaming is less likely to fail)
+    // 入れ替えが終わるまでは削除しない（rename のほうが失敗しにくい）
     bakName = safelyRenameToBak(reduxCacheFolder)
   }
 
-  // The redux cache folder should now not exist so we can rename our tmp to it
+  // この時点で redux のキャッシュフォルダーは存在しないはずなので、一時フォルダーをその名前に変更できる
   moveSync(tmpDir, reduxCacheFolder)
 
-  // Now try to yolorimraf the old cache folder
+  // 最後に、古いキャッシュフォルダーの削除を、失敗を気にせずに試みる
   try {
     if (bakName !== ``) {
       removeSync(bakName)

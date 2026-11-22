@@ -45,10 +45,10 @@ describe(`worker (jobs)`, () => {
       })
     )
 
-    // plugin API creates a job
+    // プラグイン API がジョブを作成する
     await Promise.all(worker.all.runAPI(`createSchemaCustomization`))
 
-    // waiting on main for all jobs to be completed
+    // すべてのジョブが完了するまでメイン側で待つ
     await waitUntilAllJobsComplete()
 
     workersJobsMeta = await Promise.all(worker.all.getJobsMeta())
@@ -82,7 +82,7 @@ describe(`worker (jobs)`, () => {
         ({ createdInThisProcess }) => createdInThisProcess.length === 6
       )
 
-      // we expect some common jobs to be created by all workers
+      // すべてのワーカーで共通のジョブがいくつか作成されるはずである
       expect(jobDescriptionsCreatedByWorkers).toSatisfyAll(
         jobDescriptionsCreatedByTheWorker =>
           jobDescriptionsCreatedByTheWorker.includes(
@@ -94,7 +94,7 @@ describe(`worker (jobs)`, () => {
           jobDescriptionsCreatedByTheWorker.includes(`try/catched awaited job`)
       )
 
-      // we expect worker specific jobs
+      // ワーカー固有のジョブが作成されるはずである
       expect(jobDescriptionsCreatedByWorkers[0][1]).toEqual(
         `Different job created in all workers (worker #1)`
       )
@@ -108,7 +108,7 @@ describe(`worker (jobs)`, () => {
 
     describe(`returned promises`, () => {
       it(`.then on createJobV2 action creator is called when job finishes`, () => {
-        // we expect .then callback in worker to be called with results
+        // ワーカー内の .then コールバックが結果とともに呼ばれるはずである
         expect(workersJobsMeta).toSatisfyAll(
           ({ dotThenWasCalledWith }: (typeof workersJobsMeta)[0]) =>
             dotThenWasCalledWith?.processed === `PROCESSED: .then() job`
@@ -146,10 +146,10 @@ describe(`worker (jobs)`, () => {
     })
 
     it(`all jobs are executed on main process`, () => {
-      // We expect all jobs to be executed in main process.
-      // ".then() job", "Awaited job" and "Same job created in all workers" is the same
-      // job created in all workers so we expect it to be deduped and only execute this job
-      // once
+      // すべてのジョブがメインプロセスで実行されるはずである。
+      // ".then() job"、"Awaited job"、"Same job created in all workers" は、すべてのワーカーで
+      // 作成される同じジョブなので、重複が取り除かれ、1 回だけ実行される
+      // はずである
       expect(
         mainProcessJobsMeta.executedInThisProcess
           .map(jobArgs => jobArgs.description)
@@ -171,7 +171,7 @@ describe(`worker (jobs)`, () => {
 
   describe(`redux state`, () => {
     it(`workers don't maintain jobs state`, () => {
-      // all of workers should have no tracking of jobs
+      // どのワーカーもジョブを追跡していない状態になっているはずである
       expect(workerStateAfter).toSatisfyAll(
         ({ complete, incomplete }) =>
           complete.length === 0 && incomplete.length === 0

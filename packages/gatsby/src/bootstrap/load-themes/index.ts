@@ -25,7 +25,7 @@ interface IThemeObj {
   configFilePath?: string
 }
 
-// get the gatsby-config file for a theme
+// テーマの gatsby-config ファイルを取得する
 const resolveTheme = async (
   themeSpec: PluginEntry,
   configFileThatDeclaredTheme: string | undefined,
@@ -37,19 +37,19 @@ const resolveTheme = async (
   let themeDir
   try {
     const scopedRequire = createRequire(`${rootDir}/:internal:`)
-    // theme is an node-resolvable module
+    // テーマは Node で解決可能なモジュールである
     themeDir = path.dirname(scopedRequire.resolve(themeName))
   } catch (e) {
     let pathToLocalTheme
 
-    // only try to look for local theme in main site
-    // local themes nested in other themes is potential source of problems:
-    // because those are not hosted by npm, there is potential for multiple
-    // local themes with same name that do different things and name being
-    // main identifier that Gatsby uses right now, it's safer not to support it for now.
+    // ローカルテーマはメインのサイトでだけ探す
+    // 他のテーマにネストされたローカルテーマは、問題の原因になりうる。
+    // それらは npm でホスティングされていないので、同じ名前で異なる動作をする
+    // ローカルテーマが複数存在する可能性がある。現在 Gatsby は名前を主な
+    // 識別子として使っているので、今のところは対応しないほうが安全である。
     if (isMainConfig) {
       pathToLocalTheme = path.join(rootDir, `plugins`, themeName)
-      // is a local plugin OR it doesn't exist
+      // ローカルプラグインであるか、または存在しない
       try {
         const { resolve } = resolvePlugin(themeName, rootDir)
         themeDir = resolve
@@ -81,7 +81,7 @@ const resolveTheme = async (
     | ((options?: Record<string, unknown>) => IGatsbyConfigInput) =
     preferDefault(configModule)
 
-  // if theme is a function, call it with the themeConfig
+  // テーマが関数の場合は、themeConfig を渡して呼び出す
   const themeConfig = isFunction(theme)
     ? theme(typeof themeSpec === `string` ? {} : themeSpec.options)
     : theme
@@ -96,24 +96,24 @@ const resolveTheme = async (
   }
 }
 
-// single iteration of a recursive function that resolve parent themes
-// It's recursive because we support child themes declaring parents and
-// have to resolve all the way `up the tree` of parent/children relationships
+// 親テーマを解決する再帰関数の 1 回分の処理
+// 再帰的なのは、子テーマが親を宣言することに対応しており、
+// 親子関係の `up the tree` を最後までたどって解決する必要があるためである
 //
-// Theoretically, there could be an infinite loop here but in practice there is
-// no use case for a loop so I expect that to only happen if someone is very
-// off track and creating their own set of themes
+// 理論上はここで無限ループになりうるが、実際にはループになるユースケースは
+// ないので、誰かが大きく道を外れて独自のテーマ群を作っている場合にしか
+// 起こらないと考えている
 const processTheme = (
   { themeName, themeConfig, themeSpec, themeDir, configFilePath }: IThemeObj,
   { rootDir }: { rootDir: string }
 ): Promise<Array<IThemeObj>> => {
   const themesList = themeConfig && themeConfig.plugins
-  // Gatsby themes don't have to specify a gatsby-config.js (they might only use gatsby-node, etc)
-  // in this case they're technically plugins, but we should support it anyway
-  // because we can't guarantee which files theme creators create first
+  // Gatsby のテーマは gatsby-config.js を指定しなくてもよい（gatsby-node などだけを使うこともある）
+  // その場合は厳密にはプラグインだが、それでも対応すべきである。
+  // テーマの作者がどのファイルを最初に作るかは保証できないためである
   if (themeConfig && themesList) {
-    // for every parent theme a theme defines, resolve the parent's
-    // gatsby config and return it in order [parentA, parentB, child]
+    // テーマが定義する親テーマごとに、親の gatsby-config を解決し、
+    // [parentA, parentB, child] の順で返す
     return mapSeries(
       themesList,
       async (spec: PluginEntry): Promise<Array<IThemeObj>> => {
@@ -133,7 +133,7 @@ const processTheme = (
       )
     )
   } else {
-    // if a theme doesn't define additional themes, return the original theme
+    // テーマが追加のテーマを定義していない場合は、元のテーマを返す
     return Promise.resolve([
       { themeName, themeConfig, themeSpec, themeDir, parentDir: rootDir },
     ])
@@ -171,12 +171,12 @@ export async function loadThemes(
     }
   ).then(arr => flattenDeep(arr))
 
-  // log out flattened themes list to aid in debugging
+  // デバッグの助けになるよう、平坦化したテーマの一覧をログに出力する
   debug(themesA)
 
-  // map over each theme, adding the theme itself to the plugins
-  // list in the config for the theme. This enables the usage of
-  // gatsby-node, etc in themes.
+  // 各テーマを順に処理し、テーマ自身をそのテーマの設定の plugins
+  // 一覧に追加する。これにより、テーマで gatsby-node などを
+  // 使えるようになる。
   return (
     mapSeries(
       themesA,
@@ -187,7 +187,7 @@ export async function loadThemes(
             ...(themeConfig.plugins || []).map(plugin =>
               normalizePluginEntry(plugin, themeDir)
             ),
-            // theme plugin is last so it's gatsby-node, etc can override it's declared plugins, like a normal site.
+            // テーマのプラグインは最後に置く。通常のサイトと同じように、その gatsby-node などが、宣言されたプラグインを上書きできるようにするためである。
             {
               resolve: themeName,
               options: typeof themeSpec === `string` ? {} : themeSpec.options,
@@ -198,10 +198,10 @@ export async function loadThemes(
       }
     )
       /**
-       * themes resolve to a gatsby-config, so here we merge all of the configs
-       * into a single config, making sure to maintain the order in which
-       * they were defined so that later configs, like the user's site and
-       * children, can override functionality in earlier themes.
+       * テーマは gatsby-config に解決されるので、ここですべての設定を
+       * 1 つの設定にマージする。その際、定義された順序を必ず維持し、
+       * ユーザーのサイトや子テーマのような後の設定が、前のテーマの機能を
+       * 上書きできるようにする。
        */
       .reduce(mergeGatsbyConfig, {})
       .then(newConfig => {

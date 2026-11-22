@@ -1,5 +1,5 @@
 /**
- * Extract undefined global variables used in server context from a reference error.
+ * サーバーのコンテキストで使われた未定義のグローバル変数を、reference error から抽出する。
  */
 export function extractUndefinedGlobal(error: ReferenceError): string {
   const match = error.message.match(

@@ -17,15 +17,15 @@ type IPageConfigFn = (arg: { params: Record<string, unknown> }) => {
 const pageConfigMap = new Map<string, IPageConfigFn>()
 
 /**
- * In develop IGatsbyPage["mode"] can change at any time, so as a general rule we need to resolve it
- * every time from page component and IGatsbyPage["defer"] value.
+ * develop では、IGatsbyPage["mode"] はいつでも変わりうる。そのため原則として、
+ * ページコンポーネントと IGatsbyPage["defer"] の値から毎回解決する必要がある。
  *
- * IGatsbyPage["mode"] is only reliable in engines and in `onPostBuild` hook.
+ * IGatsbyPage["mode"] が信頼できるのは、エンジンの中と `onPostBuild` フックの中だけである。
  */
 export function getPageMode(page: IGatsbyPage, state?: IGatsbyState): PageMode {
   const { components } = state ?? store.getState()
 
-  // assume SSG until components are actually extracted
+  // コンポーネントが実際に抽出されるまでは、SSG と仮定する
   const component = components.get(page.componentPath) ?? {
     serverData: false,
     config: false,
@@ -44,10 +44,10 @@ function resolvePageMode(
   } else if (component.config) {
     const pageConfigFn = pageConfigMap.get(page.componentChunkName)
     if (!pageConfigFn) {
-      // This is possible in warm builds when `component.config` was persisted but
-      // `preparePageTemplateConfigs` hasn't been executed yet
-      // TODO: if we move `mode` away from page and persist it in the state separately,
-      //  we can just return the old `mode` that should be in sync with `component.config`
+      // これは、ウォームビルドで、`component.config` は永続化されているが
+      // `preparePageTemplateConfigs` がまだ実行されていない場合に起こりうる
+      // TODO: `mode` をページから切り離して状態の中で別に永続化すれば、
+      //  `component.config` と同期しているはずの古い `mode` を返すだけで済む
       return `SSG`
     }
 
@@ -80,11 +80,11 @@ function resolvePageMode(
 }
 
 /**
- * Persist page.mode for SSR/DSG pages to ensure they work with `gatsby serve`
+ * SSR/DSG のページが `gatsby serve` で動くように、page.mode を永続化する
  *
- * TODO: ideally IGatsbyPage["mode"] should not exist at all and instead we need a different entity
- *   holding this information: an entity that is only created in the end of the build e.g. Route
- *   then materializePageMode transforms to createRoutes
+ * TODO: 理想的には、IGatsbyPage["mode"] は存在すべきではなく、この情報を持つ別のエンティティが
+ *   必要である。ビルドの最後にだけ作成されるエンティティ（たとえば Route）である
+ *   そうなれば、materializePageMode は createRoutes に変わる
  */
 export async function materializePageMode(): Promise<void> {
   const { pages, components } = store.getState()
@@ -97,9 +97,9 @@ export async function materializePageMode(): Promise<void> {
     }
     const pageMode = resolvePageMode(page, component)
 
-    // Do not materialize for SSG pages: saves some CPU time as `page.mode` === `SSG` by default when creating a page
-    // and our pages are re-generated on each build, not persisted
-    // (so no way to get DSG/SSR value from the previous build)
+    // SSG のページについてはマテリアライズしない。ページを作成するとき、デフォルトで `page.mode` === `SSG` なので、CPU 時間を節約できる
+    // また、ページはビルドのたびに再生成され、永続化されない
+    // （そのため、前回のビルドの DSG/SSR の値を得る方法はない）
     if (pageMode !== `SSG`) {
       const action: IMaterializePageMode = {
         type: `MATERIALIZE_PAGE_MODE`,
@@ -107,7 +107,7 @@ export async function materializePageMode(): Promise<void> {
       }
       store.dispatch(action)
     }
-    // Do not block task queue of the event loop for too long:
+    // イベントループのタスクキューを長時間ブロックしない:
     if (dispatchCount++ % 100 === 0) {
       await new Promise(resolve => setImmediate(resolve))
     }

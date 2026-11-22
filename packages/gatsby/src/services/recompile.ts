@@ -29,7 +29,7 @@ async function recompileDevBundle({
     }
     emitter.on(`COMPILATION_DONE`, finish)
     webpackWatching.resume()
-    // Suspending is just a flag, so it's safe to re-suspend right away
+    // サスペンドは単なるフラグなので、すぐにもう一度サスペンドしても安全である
     webpackWatching.suspend()
   })
 }

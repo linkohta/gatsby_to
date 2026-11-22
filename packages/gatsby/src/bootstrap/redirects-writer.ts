@@ -33,7 +33,7 @@ export const writeRedirects = async (): Promise<void> => {
         }" and redirect: "${redirect.fromPath}" -> "${redirect.toPath}"`
       )
     }
-    // Filter for redirects that are meant for the browser.
+    // ブラウザー向けのリダイレクトだけに絞り込む。
     if (redirect.redirectInBrowser) {
       browserRedirects.push({
         ...redirect,
@@ -67,7 +67,7 @@ export const writeRedirects = async (): Promise<void> => {
 }
 
 const debouncedWriteRedirects = _.debounce(() => {
-  // Don't write redirects again until bootstrap has finished.
+  // ブートストラップが完了するまで、リダイレクトを再度書き出さない。
   if (bootstrapFinished) {
     writeRedirects()
   }

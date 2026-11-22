@@ -1,4 +1,4 @@
-// `gatsby-confi.tsx` name is intentional. This is used for testing misspelled `gatsby-config` errors
+// `gatsby-confi.tsx` という名前は意図的なものである。`gatsby-config` の綴り間違いのエラーをテストするために使う
 
 import type { GatsbyConfig } from "gatsby"
 

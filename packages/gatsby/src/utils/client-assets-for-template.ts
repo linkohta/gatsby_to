@@ -1,7 +1,7 @@
 import * as path from "path"
 import * as fs from "fs-extra"
 
-// we want to force posix-style joins, so Windows doesn't produce backslashes for urls
+// Windows で url にバックスラッシュが入らないように、posix 形式の join を強制したい
 const { join } = path.posix
 
 export interface IScriptsAndStyles {
@@ -35,7 +35,7 @@ export async function getScriptsAndStylesForTemplate(
   const uniqStyles = new Map<string, IChunk>()
 
   /**
-   * Add script or style to correct bucket. Make sure those are unique (no duplicates) and that "preload" will win over any other "rel"
+   * script または style を正しいグループに追加する。それらが一意であること（重複がないこと）と、"preload" が他のどの "rel" よりも優先されることを保証する
    */
   function handleAsset(
     name: string,
@@ -44,7 +44,7 @@ export async function getScriptsAndStylesForTemplate(
   ): void {
     let uniqueAssetsMap: Map<string, IChunk> | undefined
 
-    // pick correct map depending on asset type
+    // アセットの種類に応じて正しいマップを選ぶ
     if (name.endsWith(`.js`)) {
       uniqueAssetsMap = uniqScripts
     } else if (name.endsWith(`.css`)) {
@@ -59,8 +59,8 @@ export async function getScriptsAndStylesForTemplate(
         rel === `preload` &&
         existingAsset.rel !== `preload`
       ) {
-        // if we already track this asset, but it's not preload - make sure we make it preload
-        // as it has higher priority
+        // このアセットをすでに追跡しているが preload ではない場合は、preload にする。
+        // preload のほうが優先度が高いためである
         existingAsset.rel = `preload`
       } else if (!existingAsset) {
         uniqueAssetsMap.set(name, { name, rel, shouldGenerateLink })
@@ -68,7 +68,7 @@ export async function getScriptsAndStylesForTemplate(
     }
   }
 
-  // Pick up scripts and styles that are used by a template using webpack.stats.json
+  // webpack.stats.json を使って、テンプレートが使っている script と style を集める
   for (const chunkName of [`app`, componentChunkName]) {
     let assets = webpackStats.assetsByChunkName[chunkName]
 
@@ -76,7 +76,7 @@ export async function getScriptsAndStylesForTemplate(
       continue
     }
 
-    // Remove JS asset for templates
+    // テンプレート用の JS アセットを取り除く
     if (chunkName !== `app`) {
       assets = assets.filter(asset => !asset.endsWith(`.js`))
     }
@@ -89,9 +89,9 @@ export async function getScriptsAndStylesForTemplate(
       handleAsset(asset, `preload`)
     }
 
-    // Handling for webpack magic comments, for example:
+    // webpack のマジックコメントの処理。たとえば:
     // import(/* webpackChunkName: "<chunk_name>", webpackPrefetch: true */ `<path_to_module>`)
-    // Shape of webpackStats.childAssetsByChunkName:
+    // webpackStats.childAssetsByChunkName の形:
     // {
     //   childAssetsByChunkName: {
     //     <name_of_top_level_chunk>: {
@@ -108,7 +108,7 @@ export async function getScriptsAndStylesForTemplate(
     }
 
     for (let [rel, assets] of Object.entries(childAssets)) {
-      // Remove JS asset for templates(magic comments)
+      // テンプレート用の JS アセットを取り除く（マジックコメント）
       if (chunkName !== `app`) {
         // @ts-ignore TS doesn't like that assets is not typed and especially that it doesn't know that it's Iterable
         assets = assets.filter(asset => !asset.endsWith(`.js`))
@@ -116,25 +116,25 @@ export async function getScriptsAndStylesForTemplate(
 
       // @ts-ignore TS doesn't like that assets is not typed and especially that it doesn't know that it's Iterable
       for (const asset of assets) {
-        // Use shouldGenerateLink to determines if  we should append link for magic comment asset(preload|prefetch) to head
+        // shouldGenerateLink を使って、マジックコメントのアセット（preload|prefetch）の link を head に追加すべきかを判定する
         const shouldGenerateLink = chunkName == `app` ? true : false
         handleAsset(asset, rel, shouldGenerateLink)
       }
     }
   }
 
-  // create scripts array, making sure "preload" scripts have priority
+  // scripts 配列を作成する。"preload" の script が優先されるようにする
   const scripts: Array<IChunk> = []
   for (const scriptAsset of uniqScripts.values()) {
     if (scriptAsset.rel === `preload`) {
-      // give priority to preload
+      // preload を優先する
       scripts.unshift(scriptAsset)
     } else {
       scripts.push(scriptAsset)
     }
   }
 
-  // create styles array, making sure "preload" styles have priority and that we read .css content for non-prefetch "rel"s for inlining
+  // styles 配列を作成する。"preload" の style が優先されるようにし、prefetch 以外の "rel" についてはインライン化のために .css の内容を読み込む
   const styles: Array<IChunk> = []
   for (const styleAsset of uniqStyles.values()) {
     if (styleAsset.rel !== `prefetch`) {
@@ -155,7 +155,7 @@ export async function getScriptsAndStylesForTemplate(
     }
 
     if (styleAsset.rel === `preload`) {
-      // give priority to preload
+      // preload を優先する
       styles.unshift(styleAsset)
     } else {
       styles.push(styleAsset)

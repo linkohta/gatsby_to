@@ -6,27 +6,27 @@ export interface ISiteConfig extends IRawSiteConfig {
   plugins?: Array<IPluginRefObject>
 }
 
-// There are two top-level "Plugin" concepts:
-// 1. IPluginInfo, for processed plugins, and
-// 2. PluginRef, for plugin configs
+// トップレベルの「Plugin」の概念は 2 つある:
+// 1. 処理済みのプラグインを表す IPluginInfo
+// 2. プラグインの設定を表す PluginRef
 
 export interface IPluginInfo {
-  /** Unique ID describing a plugin */
+  /** プラグインを表す一意な ID */
   id: string
 
-  /** The absolute path to the plugin */
+  /** プラグインへの絶対パス */
   resolve: string
 
-  /** The absolute path to the compiled plugin's gatsby-node module, if there is one */
+  /** コンパイル済みのプラグインの gatsby-node モジュールへの絶対パス（存在する場合） */
   resolvedCompiledGatsbyNode?: string
 
-  /** The plugin name */
+  /** プラグインの名前 */
   name: string
 
-  /** The plugin version (can be content hash) */
+  /** プラグインのバージョン（コンテンツのハッシュのこともある） */
   version: string
 
-  /** Options passed to the plugin */
+  /** プラグインに渡されるオプション */
   pluginOptions?: IPluginInfoOptions
 
   subPluginPaths?: Array<string>

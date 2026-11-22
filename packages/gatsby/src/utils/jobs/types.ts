@@ -71,7 +71,7 @@ export class WorkerError extends Error {
     if (typeof error === `string`) {
       super(error)
     } else {
-      // use error.message or else stringiyf the object so we don't get [Object object]
+      // error.message を使う。なければ、[Object object] にならないようにオブジェクトを文字列化する
       super(error.message ?? JSON.stringify(error))
     }
 
@@ -80,7 +80,7 @@ export class WorkerError extends Error {
     if (typeof error === `string`) {
       Error.captureStackTrace(this, WorkerError)
     } else {
-      // inherit stack from original error so actual stack trace persist
+      // 実際のスタックトレースが残るように、元のエラーからスタックを引き継ぐ
       this.stack = error.stack
     }
   }

@@ -82,7 +82,7 @@ const convert = <TContext = any>({
     const sortKey = prefix ? `${prefix}.${fieldName}` : fieldName
     const sortKeyFieldName = sortKey.split(`.`).join(SORT_FIELD_DELIMITER)
 
-    // XXX(freiksenet): this is to preserve legacy behaviour, this probably doesn't actually sort
+    // XXX(freiksenet): これは従来の動作を保つためのものであり、おそらく実際にはソートしない
     if (getNullableType(fieldConfig.type) instanceof GraphQLList) {
       sortFields[sortKeyFieldName] = {
         value: sortKey,
@@ -152,12 +152,12 @@ export const getSortInput = <TSource = any, TContext = any>({
   schemaComposer: SchemaComposer<TContext>
   typeComposer: ObjectTypeComposer<TSource, TContext>
 }): InputTypeComposer<TContext> => {
-  // toInputObjectType() will fail to convert fields of union types, e.g.
+  // toInputObjectType() は、union 型のフィールドの変換に失敗する。たとえば
   //   union FooBar = Foo | Bar
   //   type Baz {
   //     fooBar: FooBar
   //   }
-  // Passing `fallbackType: null` allows us to skip this field in the input type
+  // `fallbackType: null` を渡すと、入力型でこのフィールドをスキップできる
   const inputTypeComposer = toInputObjectType(typeComposer, {
     fallbackType: null,
   })
@@ -201,16 +201,16 @@ export const getSortInputNestedObjects = ({
           ? undefined
           : typeComposer.getFieldExtension(fieldName, `sortable`)
       if (sortable === SORTABLE_ENUM.NOT_SORTABLE) {
-        // stop traversing
+        // 走査を止める
         return null
       } else if (sortable === SORTABLE_ENUM.DEPRECATED_SORTABLE) {
-        // mark this and all nested fields as deprecated
+        // これと、ネストしたすべてのフィールドに非推奨の印を付ける
         return {
           deprecationReason: `Sorting on fields that need arguments to resolve is deprecated.`,
         }
       }
 
-      // continue
+      // 続行する
       return undefined
     },
     // @ts-ignore TODO: correct types

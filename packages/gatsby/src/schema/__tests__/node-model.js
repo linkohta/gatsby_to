@@ -437,11 +437,11 @@ describe(`NodeModel`, () => {
         expect(result.id).toEqual(`post2`)
       })
 
-      // FIXME: Filters on date instances are not supported yet
-      //  SIFT requires such filters to be expressed as Date instances but we
-      //  don't know if date is stored as `Date` instance or `string`
-      //  so can't really do that
-      //  See https://github.com/crcn/sift.js#date-comparison
+      // FIXME: date のインスタンスに対するフィルターはまだ対応していない
+      //  SIFT では、そのようなフィルターを Date のインスタンスで表す必要があるが、
+      //  date が `Date` のインスタンスとして保存されているのか `string` として保存されているのかが
+      //  分からないので、実際にはそうできない
+      //  https://github.com/crcn/sift.js#date-comparison を参照
       it.skip(`queries date instances in nodes`, async () => {
         const type = `Post`
         const query = {
@@ -490,8 +490,8 @@ describe(`NodeModel`, () => {
       })
 
       describe(`multiple nodes share a reference`, () => {
-        // order of loading nodes here is important, so we check variants of loading post first and person second
-        // as well as other way around
+        // ここではノードを読み込む順序が重要なので、post を先に person を後に読み込むパターンと、
+        // その逆のパターンの両方を確認する
 
         it(`load person first, then post`, () => {
           const sharedReference1 = nodeModel.getNodeById({
@@ -501,7 +501,7 @@ describe(`NodeModel`, () => {
             id: `post1`,
           })?.sharedReference
 
-          // Same object reference in 2 different nodes. Only `post1` has a `File` parent.
+          // 2 つの異なるノードに同じオブジェクトの参照がある。`File` の親を持つのは `post1` だけである。
           expect(sharedReference1 === sharedReference2).toBe(true)
 
           const predicate = obj => obj.internal && obj.internal.type === `File`
@@ -523,7 +523,7 @@ describe(`NodeModel`, () => {
             id: `person1`,
           })?.sharedReference
 
-          // Same object reference in 2 different nodes. Only `post1` has a `File` parent.
+          // 2 つの異なるノードに同じオブジェクトの参照がある。`File` の親を持つのは `post1` だけである。
           expect(sharedReference1 === sharedReference2).toBe(true)
 
           const predicate = obj => obj.internal && obj.internal.type === `File`
@@ -570,7 +570,7 @@ describe(`NodeModel`, () => {
           connection: `TeamMember`,
         })
 
-        // TeamMember is interface with Author and Contributor types implementing it
+        // TeamMember はインターフェースであり、Author 型と Contributor 型がそれを実装している
         expect(createPageDependency).toHaveBeenCalledTimes(2)
         expect(createPageDependency).toHaveBeenCalledWith({
           path: `/`,
@@ -697,7 +697,7 @@ describe(`NodeModel`, () => {
             contentDigest: `1`,
           },
         },
-        // Test2 is a special type that must have no nodes!
+        // Test2 は特別な型であり、ノードを 1 つも持ってはならない
         {
           id: `id3`,
           internal: {
@@ -851,7 +851,7 @@ describe(`NodeModel`, () => {
                 },
               },
 
-              // for concurrent materialization test
+              // 並行したマテリアライズのテスト用
               intentionallySlowResolver1: {
                 type: `Boolean!`,
                 resolve: async () => {
@@ -901,7 +901,7 @@ describe(`NodeModel`, () => {
               Date: {
                 type: `String`,
                 resolve(source) {
-                  // Swap sorting order for test
+                  // テストのためにソート順を入れ替える
                   return source.Date === `1` ? `2` : `1`
                 },
               },
@@ -1088,7 +1088,7 @@ describe(`NodeModel`, () => {
     })
 
     it(`merges query caches when filtering by nested field`, async () => {
-      // See https://github.com/gatsbyjs/gatsby/issues/26056
+      // https://github.com/gatsbyjs/gatsby/issues/26056 を参照
       nodeModel.replaceFiltersCache()
       const { entries: entries1, totalCount: totalCount1 } =
         await nodeModel.findAll(
@@ -1168,7 +1168,7 @@ describe(`NodeModel`, () => {
     })
 
     it(`always uses a custom resolvers for query fields`, async () => {
-      // See https://github.com/gatsbyjs/gatsby/issues/27368
+      // https://github.com/gatsbyjs/gatsby/issues/27368 を参照
       nodeModel.replaceFiltersCache()
       const { entries: entries1 } = await nodeModel.findAll(
         {
@@ -1207,10 +1207,10 @@ describe(`NodeModel`, () => {
     })
 
     it(`sorts correctly by fields with custom resolvers`, async () => {
-      // See https://github.com/gatsbyjs/gatsby/issues/28047
+      // https://github.com/gatsbyjs/gatsby/issues/28047 を参照
       nodeModel.replaceFiltersCache()
 
-      // This is required to setup a state after which the error reveals itself
+      // これは、エラーが表面化する状態を作るために必要である
       const result1 = await nodeModel.findOne(
         {
           query: {
@@ -1221,7 +1221,7 @@ describe(`NodeModel`, () => {
         { path: `/` }
       )
 
-      // Filter by the same regex with sorting
+      // 同じ正規表現でフィルターし、ソートも指定する
       const { entries } = await nodeModel.findAll(
         {
           query: {
@@ -1246,7 +1246,7 @@ describe(`NodeModel`, () => {
     it(`sorts correctly by fields with custom resolvers if GC happen mid query`, async () => {
       nodeModel.replaceFiltersCache()
 
-      // populate filters cache
+      // フィルターキャッシュにデータを入れる
       await nodeModel.findAll(
         {
           query: {},
@@ -1255,7 +1255,7 @@ describe(`NodeModel`, () => {
         { path: `/` }
       )
 
-      // borrowed from https://unpkg.com/browse/expose-gc@1.0.0/function.js
+      // https://unpkg.com/browse/expose-gc@1.0.0/function.js から借用
       const v8 = require(`v8`)
       const vm = require(`vm`)
       v8.setFlagsFromString(`--expose_gc`)
@@ -1266,17 +1266,17 @@ describe(`NodeModel`, () => {
       const actualOrderBy = jest.requireActual(`lodash`).orderBy
       const spy = jest.spyOn(require(`lodash`), `orderBy`)
       spy.mockImplementationOnce((...args) => {
-        // very implementation specific case:
-        // We don't hold full nodes strongly in gatsby anymore so they can be potentially
-        // GCed mid execution of query. For this test we force all weakly held nodes to be
-        // dropped
+        // 実装にかなり依存したケース:
+        // gatsby はもうノード全体を強参照で保持していないので、クエリの実行の途中で
+        // GC される可能性がある。このテストでは、弱参照で保持しているすべてのノードを
+        // 強制的に解放する
         clearKeptObjects()
         gc()
         return actualOrderBy(...args)
       })
 
-      // query will use same filters cache as previous query (important)
-      // but will use sorting that requires Materialization (sort_order has custom resolver)
+      // クエリは、前のクエリと同じフィルターキャッシュを使う（重要）
+      // ただし、マテリアライズが必要なソートを使う（sort_order には独自のリゾルバーがある）
       const { entries } = await nodeModel.findAll(
         {
           query: {
@@ -1341,8 +1341,8 @@ describe(`NodeModel`, () => {
         { path: `/` }
       )
 
-      // we batch and merge materialization runs scheduled in same event loop turn
-      // so just triggering adding small time delay so that we run 2 concurrent ones instead
+      // 同じイベントループのターンで予約されたマテリアライズの実行は、まとめてマージされる
+      // そのため、わずかな遅延を入れて、2 つが並行して実行されるようにする
 
       await new Promise(resolve => process.nextTick(resolve))
 
@@ -1358,15 +1358,15 @@ describe(`NodeModel`, () => {
 
       await Promise.all([query1Promise, query2Promise])
 
-      // make sure materialization wasn't batched (test setup is correct)
+      // マテリアライズがまとめられなかったこと（テストのセットアップが正しいこと）を確認する
       expect(materializationSpy).toBeCalledTimes(2)
 
       const resolvedFieldsForTestNodes = store
         .getState()
         .resolvedNodesCache.get(`Test`)
 
-      // resolvedFieldsForTestNodes should contain both intentionallySlowResolver1 and intentionallySlowResolver2
-      // so something like this:
+      // resolvedFieldsForTestNodes には intentionallySlowResolver1 と intentionallySlowResolver2 の両方が含まれるはずである
+      // つまり、次のようになる:
       // Map {
       //   "id1" => Object {
       //     "intentionallySlowResolver1": true,
@@ -1378,13 +1378,13 @@ describe(`NodeModel`, () => {
       //   },
       // }
 
-      // we should have resolved fields for all nodes
+      // すべてのノードについて解決済みフィールドがあるはずである
       const { entries } = await nodeModel.findAll({ type: `Test` })
       expect(Array.from(resolvedFieldsForTestNodes.keys())).toEqual(
         Array.from(entries, node => node.id)
       )
 
-      // we should have all fields merged on all nodes
+      // すべてのノードですべてのフィールドがマージされているはずである
       expect(Array.from(resolvedFieldsForTestNodes.values())).toEqual(
         expect.arrayContaining([
           {

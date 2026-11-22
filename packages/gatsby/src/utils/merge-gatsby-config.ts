@@ -7,7 +7,7 @@ export interface IPluginEntryWithParentDir {
   options?: Record<string, unknown>
   parentDir: string
 }
-// TODO export it in index.d.ts
+// TODO index.d.ts で export する
 export type PluginEntry = string | IPluginEntryWithParentDir
 
 export interface IGatsbyConfigInput {
@@ -33,14 +33,14 @@ type Mapping = IGatsbyConfigInput["mapping"]
 
 const howToMerge = {
   /**
-   * pick a truthy value by default.
-   * This makes sure that if a single value is defined, that one it used.
-   * We prefer the "right" value, because the user's config will be "on the right"
+   * デフォルトでは truthy な値を選ぶ。
+   * これにより、値が 1 つだけ定義されている場合は、その値が使われる。
+   * 「右側」の値を優先する。ユーザーの config が「右側」に来るためである
    */
   byDefault: (a: ConfigKey, b: ConfigKey): ConfigKey => b || a,
   siteMetadata: (objA: Metadata, objB: Metadata): Metadata =>
     _.merge({}, objA, objB),
-  // plugins are concatenated and uniq'd, so we don't get two of the same plugin value
+  // plugins は連結して重複を取り除くので、同じプラグインの値が 2 つになることはない
   plugins: (
     a: Array<PluginEntry> = [],
     b: Array<PluginEntry> = []
@@ -49,22 +49,22 @@ const howToMerge = {
 } as const
 
 /**
- * Defines how a theme object is merged with the user's config
+ * テーマのオブジェクトをユーザーの config とマージする方法を定義する
  */
 export const mergeGatsbyConfig = (
   a: IGatsbyConfigInput,
   b: IGatsbyConfigInput
 ): IGatsbyConfigInput => {
-  // a and b are gatsby configs, If they have keys, that means there are values to merge
+  // a と b は gatsby の config である。キーがあれば、マージする値があることを意味する
   const allGatsbyConfigKeysWithAValue = _.uniq(
     Object.keys(a).concat(Object.keys(b))
   ) as Array<ConfigKey>
 
-  // reduce the array of mergable keys into a single gatsby config object
+  // マージできるキーの配列を、1 つの gatsby の config オブジェクトにまとめる
   const mergedConfig = allGatsbyConfigKeysWithAValue.reduce(
     (config, gatsbyConfigKey) => {
-      // choose a merge function for the config key if there's one defined,
-      // otherwise use the default value merge function
+      // その config のキーに対するマージ関数が定義されていればそれを選び、
+      // なければデフォルトの値のマージ関数を使う
       const mergeFn = howToMerge[gatsbyConfigKey] || howToMerge.byDefault
       return {
         ...config,
@@ -74,6 +74,6 @@ export const mergeGatsbyConfig = (
     {} as IGatsbyConfigInput
   )
 
-  // return the fully merged config
+  // 完全にマージされた config を返す
   return mergedConfig
 }

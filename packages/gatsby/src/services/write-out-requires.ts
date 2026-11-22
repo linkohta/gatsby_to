@@ -9,7 +9,7 @@ export async function writeOutRequires({
 }: Partial<IQueryRunningContext>): Promise<void> {
   assertStore(store)
 
-  // Write out files.
+  // ファイルを書き出す。
   const activity = reporter.activityTimer(`write out requires`, {
     parentSpan,
   })

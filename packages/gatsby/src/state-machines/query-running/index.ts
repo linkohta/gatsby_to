@@ -4,7 +4,7 @@ import { queryRunningServices } from "./services"
 import { queryActions } from "./actions"
 
 /**
- * This is a child state machine, spawned to perform the query running
+ * これは子のステートマシンであり、クエリを実行するために起動される
  */
 
 const PAGE_QUERY_ENQUEUING_TIMEOUT = 50
@@ -32,17 +32,17 @@ export const queryStates: MachineConfig<IQueryRunningContext, any, any> = {
         },
       },
     },
-    // This state exists solely because "extractQueries" finishes too early.
-    // It finishes before extracted queries are enqueued for execution.
-    // As a result calculateDirtyQueries doesn't see them and they are not executed.
+    // この状態は、"extractQueries" の完了が早すぎるという理由だけで存在する。
+    // 抽出されたクエリが実行用のキューに入れられる前に完了してしまう。
+    // その結果、calculateDirtyQueries からそれらのクエリが見えず、実行されない。
     //
-    // This happens because extracted queries are enqueued for execution with setTimeout(x, 0)
-    // wrapper in actions of redux/machines/page-component which fires after "extractQueries" finishes.
+    // こうなるのは、抽出されたクエリが、redux/machines/page-component のアクションの中で
+    // setTimeout(x, 0) でラップされて実行用のキューに入れられ、それが "extractQueries" の完了後に発火するためである。
     //
-    // see https://github.com/gatsbyjs/gatsby/issues/26580
+    // https://github.com/gatsbyjs/gatsby/issues/26580 を参照
     //
-    // FIXME: this has to be fixed properly by not leaving "extractingQueries" state
-    //   until all extracted queries are enqueued for execution (but requires a refactor)
+    // FIXME: 抽出されたすべてのクエリが実行用のキューに入るまで "extractingQueries" 状態を
+    //   抜けないようにして、きちんと直す必要がある（ただしリファクタリングが必要になる）
     waitingPendingQueries: {
       id: `waiting-pending-queries`,
       after: {
@@ -108,9 +108,9 @@ export const queryStates: MachineConfig<IQueryRunningContext, any, any> = {
         },
       },
     },
-    // This waits for the jobs API to finish
+    // jobs API の完了を待つ
     waitingForJobs: {
-      // If files are dirty go and extract again
+      // ファイルがダーティであれば、もう一度抽出する
       always: [
         {
           cond: (ctx): boolean => !!ctx.filesDirty,

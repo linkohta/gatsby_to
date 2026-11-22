@@ -20,8 +20,8 @@ const inferredTypesChanged = (
 
 let lastMetadata: InferenceMetadata
 
-// API_RUNNING_QUEUE_EMPTY could be emitted multiple types
-// in a short period of time, so debounce seems reasonable
+// API_RUNNING_QUEUE_EMPTY は短時間に何度も emit されることがあるので、
+// debounce するのが妥当と思われる
 const maybeRebuildSchema = debounce(async (): Promise<void> => {
   const { inferenceMetadata } = store.getState()
 
@@ -42,9 +42,9 @@ function snapshotInferenceMetadata(): void {
 }
 
 export function bootstrapSchemaHotReloader(): void {
-  // Snapshot inference metadata at the time of the last schema rebuild
-  // (even if schema was rebuilt elsewhere)
-  // Using the snapshot later to check if inferred types actually changed since the last rebuild
+  // 最後にスキーマを再構築した時点の推論メタデータのスナップショットを取る
+  // （スキーマが別の場所で再構築された場合も含む）
+  // 後でこのスナップショットを使い、最後の再構築以降に推論された型が実際に変わったかを確認する
   snapshotInferenceMetadata()
   emitter.on(`SET_SCHEMA`, snapshotInferenceMetadata)
 
@@ -52,8 +52,8 @@ export function bootstrapSchemaHotReloader(): void {
 }
 
 export function startSchemaHotReloader(): void {
-  // Listen for node changes outside of a regular sourceNodes API call,
-  // e.g. markdown file update via watcher
+  // 通常の sourceNodes API の呼び出し以外で起きるノードの変更を待ち受ける。
+  // たとえば、ウォッチャーによる markdown ファイルの更新など
   emitter.on(`API_RUNNING_QUEUE_EMPTY`, maybeRebuildSchema)
 }
 

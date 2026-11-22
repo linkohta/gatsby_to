@@ -24,8 +24,8 @@ const itWhenV4 = _CFLAGS_.GATSBY_MAJOR !== `5` ? it : it.skip
 const itWhenV5 = _CFLAGS_.GATSBY_MAJOR === `5` ? it : it.skip
 
 /**
- * Helper identity function to trigger syntax highlighting in code editors.
- * (`gql` name serve as a hint)
+ * コードエディターでシンタックスハイライトを有効にするための、何もしないヘルパー関数。
+ * （`gql` という名前がヒントになる）
  */
 function gql(input) {
   return input
@@ -599,7 +599,7 @@ describe(`Build schema`, () => {
       )
     })
 
-    // FIXME: Fails for PluginDefined.qux with PluginDefinedNested
+    // FIXME: PluginDefinedNested を持つ PluginDefined.qux で失敗する
     it.skip(`merges user-defined type (graphql-js) with plugin-defined type`, async () => {
       createTypes(
         `type PluginDefined implements Node @infer { foo: Int, baz: PluginDefinedNested }
@@ -845,8 +845,8 @@ describe(`Build schema`, () => {
       )
     })
 
-    // FIXME: Fails with: Error: Cannot get field 'foo' from type 'PluginDefinedNested'. Field does not exist.
-    //   same as "merges user-defined type (graphql-js) with plugin-defined type"
+    // FIXME: 次のエラーで失敗する: Error: Cannot get field 'foo' from type 'PluginDefinedNested'. Field does not exist.
+    //   "merges user-defined type (graphql-js) with plugin-defined type" と同じ
     it.skip(`warns when merging plugin-defined type (graphql-js) with type defined by other plugin`, async () => {
       createTypes(
         `type PluginDefined implements Node { foo: Int, baz: PluginDefinedNested }
@@ -1386,7 +1386,7 @@ describe(`Build schema`, () => {
           sharedField: String
         }
       `)
-      // implicit assertion is that building schema doesn't throw in the process
+      // スキーマのビルドがその過程で例外を投げないことが、暗黙のアサーションである
       const schema = await buildSchema()
       expect(printType(schema.getType(`CustomInterface`)))
         .toMatchInlineSnapshot(`
@@ -1423,7 +1423,7 @@ describe(`Build schema`, () => {
               child_items: {
                 type: `[SharedInterface]`,
                 args: {
-                  // referencing derived type
+                  // 派生型を参照している
                   sort: `SharedInterfaceSortInput`,
                 },
               },
@@ -1446,7 +1446,7 @@ describe(`Build schema`, () => {
           }),
         ])
 
-        // implicit assertion is that building schema doesn't throw in the process
+        // スキーマのビルドがその過程で例外を投げないことが、暗黙のアサーションである
         const schema = await buildSchema()
         expect(printType(schema.getType(`TypeCreatedBySourcePlugin`)))
           .toMatchInlineSnapshot(`
@@ -1488,7 +1488,7 @@ describe(`Build schema`, () => {
               child_items: {
                 type: `[SharedInterface]`,
                 args: {
-                  // referencing derived type
+                  // 派生型を参照している
                   sort: `SharedInterfaceSortInput`,
                 },
               },
@@ -1511,7 +1511,7 @@ describe(`Build schema`, () => {
           }),
         ])
 
-        // implicit assertion is that building schema doesn't throw in the process
+        // スキーマのビルドがその過程で例外を投げないことが、暗黙のアサーションである
         const schema = await buildSchema()
         expect(printType(schema.getType(`TypeCreatedBySourcePlugin`)))
           .toMatchInlineSnapshot(`
@@ -1814,7 +1814,7 @@ describe(`Build schema`, () => {
       ).toEqual(`2018`)
     })
 
-    // TODO: Define what "handles being called multiple times mean"
+    // TODO: "handles being called multiple times" が何を意味するのかを定義する
     it.todo(`handles being called multiple times`)
   })
 

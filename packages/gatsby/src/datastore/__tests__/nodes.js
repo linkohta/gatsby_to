@@ -341,7 +341,7 @@ describe(`nodes db tests`, () => {
   })
 
   it(`records the node type owner when a node is created`, async () => {
-    // creating a node
+    // ノードを作成する
     store.dispatch(
       actions.createNode(
         {
@@ -356,7 +356,7 @@ describe(`nodes db tests`, () => {
         }
       )
     )
-    // and creating a second node in the same type
+    // 同じ型で 2 つ目のノードを作成する
     store.dispatch(
       actions.createNode(
         {
@@ -372,7 +372,7 @@ describe(`nodes db tests`, () => {
       )
     )
 
-    // and a third node of a different type but same plugin
+    // 型は異なるが同じプラグインによる 3 つ目のノード
     store.dispatch(
       actions.createNode(
         {
@@ -388,7 +388,7 @@ describe(`nodes db tests`, () => {
       )
     )
 
-    // fourth node by a different plugin
+    // 別のプラグインによる 4 つ目のノード
     store.dispatch(
       actions.createNode(
         {
@@ -404,7 +404,7 @@ describe(`nodes db tests`, () => {
       )
     )
 
-    // fifth node by second plugin but the node is deleted. Deleted nodes still have type owners
+    // 2 つ目のプラグインによる 5 つ目のノード。ただしこのノードは削除される。削除されたノードにも型の所有者は残る
     const nodeFive = {
       id: `5`,
       internal: {

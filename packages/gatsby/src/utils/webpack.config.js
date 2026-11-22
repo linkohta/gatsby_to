@@ -30,18 +30,18 @@ import { resolveJSFilepath } from "../bootstrap/resolve-js-file-path"
 
 const FRAMEWORK_BUNDLES = [`react`, `react-dom`, `scheduler`, `prop-types`]
 
-// This regex ignores nested copies of framework libraries so they're bundled with their issuer
+// この正規表現は、フレームワークのライブラリのネストしたコピーを無視し、それらが issuer と一緒にバンドルされるようにする
 const FRAMEWORK_BUNDLES_REGEX = new RegExp(
   `(?<!node_modules.*)[\\\\/]node_modules[\\\\/](${FRAMEWORK_BUNDLES.join(
     `|`
   )})[\\\\/]`
 )
 
-// Four stages or modes:
-//   1) develop: for `gatsby develop` command, hot reload and CSS injection into page
-//   2) develop-html: same as develop without react-hmre in the babel config for html renderer
-//   3) build-javascript: Build JS and CSS chunks for production
-//   4) build-html: build all HTML files
+// 4 つのステージ（モード）がある:
+//   1) develop: `gatsby develop` コマンド用。ホットリロードと、ページへの CSS の注入を行う
+//   2) develop-html: develop と同じだが、html レンダラー用に、babel の設定に react-hmre を含めない
+//   3) build-javascript: 本番用の JS と CSS のチャンクをビルドする
+//   4) build-html: すべての HTML ファイルをビルドする
 
 module.exports = async (
   program,
@@ -54,8 +54,8 @@ module.exports = async (
   const modulesThatUseGatsby = await getGatsbyDependents()
   const directoryPath = withBasePath(directory)
 
-  // We combine develop & develop-html stages for purposes of generating the
-  // webpack config.
+  // webpack の設定を生成する目的では、develop と develop-html のステージを
+  // まとめて扱う。
   const stage = suppliedStage
   const { rules, loaders, plugins } = createWebpackUtils(stage, program)
 
@@ -69,11 +69,11 @@ module.exports = async (
 
   function processEnv(stage, defaultNodeEnv) {
     debug(`Building env for "${stage}"`)
-    // node env should be DEVELOPMENT | PRODUCTION as these are commonly used in node land
-    // this variable is used inside webpack
+    // node の env は DEVELOPMENT | PRODUCTION にすべきである。node の世界で一般的に使われているためである
+    // この変数は webpack の中で使われる
     const nodeEnv = process.env.NODE_ENV || `${defaultNodeEnv}`
-    // config env is dependent on the env that it's run, this can be anything from staging-production
-    // this allows you to set use different .env environments or conditions in gatsby files
+    // config の env は実行される環境に依存し、staging や production など何でもありうる
+    // これにより、gatsby のファイルの中で、異なる .env の環境や条件を使い分けられる
     const configEnv = process.env.GATSBY_ACTIVE_ENV || nodeEnv
     const envFile = path.join(process.cwd(), `./.env.${configEnv}`)
     let parsed = {}
@@ -103,7 +103,7 @@ module.exports = async (
       return acc
     }, {})
 
-    // Don't allow overwriting of NODE_ENV, PUBLIC_DIR as to not break gatsby things
+    // gatsby の動作を壊さないように、NODE_ENV と PUBLIC_DIR の上書きは許可しない
     envObject.NODE_ENV = JSON.stringify(nodeEnv)
     envObject.PUBLIC_DIR = JSON.stringify(`${process.cwd()}/public`)
     envObject.BUILD_STAGE = JSON.stringify(stage)
@@ -138,20 +138,20 @@ module.exports = async (
         return {
           path: directory,
           filename: `[name].js`,
-          // Add /* filename */ comments to generated require()s in the output.
+          // 出力の中の、生成された require() に /* filename */ コメントを追加する。
           pathinfo: true,
-          // Point sourcemap entries to original disk location (format as URL on Windows)
+          // ソースマップのエントリーが、ディスク上の元の場所を指すようにする（Windows では URL の形式にする）
           publicPath: process.env.GATSBY_WEBPACK_PUBLICPATH || `/`,
           devtoolModuleFilenameTemplate: info =>
             path.resolve(info.absoluteResourcePath).replace(/\\/g, `/`),
-          // Avoid React cross-origin errors
-          // See https://reactjs.org/docs/cross-origin-errors.html
+          // React のクロスオリジンエラーを避ける
+          // https://reactjs.org/docs/cross-origin-errors.html を参照
           crossOriginLoading: `anonymous`,
         }
       case `build-html`:
       case `develop-html`:
-        // Generate the file needed to SSR pages.
-        // Deleted by build-html.js, since it's not needed for production.
+        // ページを SSR するために必要なファイルを生成する。
+        // 本番では不要なので、build-html.js が削除する。
         return {
           path: directoryPath(ROUTES_DIRECTORY),
           filename: `[name].js`,
@@ -213,8 +213,8 @@ module.exports = async (
     let configPlugins = [
       plugins.moment(),
 
-      // Add a few global variables. Set NODE_ENV to production (enables
-      // optimizations for React) and what the link prefix is (__PATH_PREFIX__).
+      // いくつかのグローバル変数を追加する。NODE_ENV を production に設定し（React の
+      // 最適化が有効になる）、リンクのプレフィックス（__PATH_PREFIX__）も設定する。
       plugins.define({
         ...processEnv(stage, `development`),
         __BASE_PATH__: JSON.stringify(program.prefixPaths ? pathPrefix : ``),
@@ -223,7 +223,7 @@ module.exports = async (
           program.prefixPaths ? assetPrefix : ``
         ),
         __TRAILING_SLASH__: JSON.stringify(trailingSlash),
-        // TODO Improve asset passing to pages
+        // TODO ページへのアセットの渡し方を改善する
         BROWSER_ESM_ONLY: JSON.stringify(hasES6ModuleSupport(directory)),
         "global.hasPartialHydration": isPartialHydrationEnabled,
       }),
@@ -259,12 +259,12 @@ module.exports = async (
 
         const isCustomEslint = hasLocalEslint(program.directory)
 
-        // if no local eslint config, then add gatsby config
+        // ローカルの eslint の設定がなければ、gatsby の設定を追加する
         if (!isCustomEslint) {
           configPlugins.push(plugins.eslint())
         }
 
-        // Enforce fast-refresh rules even with local eslint config
+        // ローカルの eslint の設定があっても、fast-refresh のルールを強制する
         if (isCustomEslint) {
           configPlugins.push(plugins.eslintRequired())
         }
@@ -278,8 +278,8 @@ module.exports = async (
               filename: `[name].[contenthash].css`,
               chunkFilename: `[name].[contenthash].css`,
             }),
-            // Write out stats object mapping named dynamic imports (aka page
-            // components) to all their async chunks.
+            // 名前付きの動的 import（つまりページコンポーネント）から、そのすべての
+            // 非同期チャンクへの対応を表す stats オブジェクトを書き出す。
             plugins.extractStats(),
             new StaticQueryMapper(store),
             isPartialHydrationEnabled
@@ -299,7 +299,7 @@ module.exports = async (
       }
       case `develop-html`:
       case `build-html`: {
-        // Add global fetch in node environments
+        // node 環境にグローバルな fetch を追加する
         configPlugins.push(
           plugins.provide({
             fetch: require.resolve(`node-fetch`),
@@ -317,8 +317,8 @@ module.exports = async (
     switch (stage) {
       case `develop`:
         return `eval-cheap-module-source-map`
-      // use a normal `source-map` for the html phases since
-      // it gives better line and column numbers
+      // html のフェーズでは、通常の `source-map` を使う。
+      // 行番号と列番号がより正確になるためである
       case `develop-html`:
       case `build-html`:
       case `build-javascript`:
@@ -341,11 +341,11 @@ module.exports = async (
   }
 
   function getModule() {
-    // Common config for every env.
+    // すべての env に共通の設定。
     // prettier-ignore
     let configRules = [
-      // Webpack expects extensions when importing ESM modules as that's what the spec describes.
-      // Not all libraries have adapted so we don't enforce its behaviour
+      // Webpack は、ESM モジュールを import するときに拡張子があることを期待する。仕様がそう定めているためである。
+      // すべてのライブラリが対応しているわけではないので、その動作は強制しない
       // @see https://github.com/webpack/webpack/issues/11467
       {
         test: /\.mjs$/i,
@@ -380,7 +380,7 @@ module.exports = async (
       rules.miscAssets(),
     ]
 
-    // TODO(v5): Remove since this is only useful during Gatsby 4 publishes
+    // TODO(v5): Gatsby 4 の公開の間しか役に立たないので削除する
     if (_CFLAGS_.GATSBY_MAJOR !== `5`) {
       configRules.push({
         test: require.resolve(`@gatsbyjs/reach-router/es/index`),
@@ -395,8 +395,8 @@ module.exports = async (
       })
     }
 
-    // Speedup 🏎️💨 the build! We only include transpilation of node_modules on javascript production builds
-    // TODO create gatsby plugin to enable this behaviour on develop (only when people are requesting this feature)
+    // ビルドを高速化する 🏎️💨。node_modules のトランスパイルを含めるのは、javascript の本番ビルドのときだけである
+    // TODO この動作を develop でも有効にする gatsby プラグインを作る（この機能を求める人がいる場合のみ）
     if (stage === `build-javascript` && !hasES6ModuleSupport(directory)) {
       configRules.push(
         rules.dependencies({
@@ -417,9 +417,9 @@ module.exports = async (
       }
       case `build-html`:
       case `develop-html`:
-        // We don't deal with CSS at all when building the HTML.
-        // The 'null' loader is used to prevent 'module not found' errors.
-        // On the other hand CSS modules loaders are necessary.
+        // HTML をビルドするときは、CSS を一切扱わない。
+        // 'null' ローダーは、'module not found' エラーを防ぐために使う。
+        // 一方で、CSS modules のローダーは必要である。
 
         // prettier-ignore
         configRules = configRules.concat([
@@ -436,12 +436,12 @@ module.exports = async (
         break
 
       case `build-javascript`:
-        // We don't deal with CSS at all when building JavaScript but we still
-        // need to process the CSS so offline-plugin knows about the various
-        // assets referenced in your CSS.
+        // JavaScript をビルドするときも CSS は一切扱わないが、
+        // offline-plugin が CSS の中で参照されているさまざまなアセットを
+        // 把握できるように、CSS の処理は必要である。
         //
-        // It's also necessary to process CSS Modules so your JS knows the
-        // classNames to use.
+        // JS が使うべき classNames を知るために、CSS Modules の処理も
+        // 必要である。
         configRules = configRules.concat([
           {
             oneOf: [rules.cssModules(), rules.css()],
@@ -468,14 +468,14 @@ module.exports = async (
   function getResolve(stage) {
     const { program } = store.getState()
     const resolve = {
-      // Use the program's extension list (generated via the
-      // 'resolvableExtensions' API hook).
+      // program の拡張子の一覧（'resolvableExtensions' API フックで
+      // 生成されたもの）を使う。
       extensions: [...program.extensions],
       alias: {
         gatsby$: directoryPath(path.join(`.cache`, `gatsby-browser-entry.js`)),
-        // Using directories for module resolution is mandatory because
-        // relative path imports are used sometimes
-        // See https://stackoverflow.com/a/49455609/6420957 for more details
+        // 相対パスの import が使われることがあるので、モジュールの解決に
+        // ディレクトリを使うことは必須である
+        // 詳しくは https://stackoverflow.com/a/49455609/6420957 を参照
         "@babel/runtime": getPackageRoot(`@babel/runtime`),
         "@reach/router": getPackageRoot(`@gatsbyjs/reach-router`),
         "react-lifecycles-compat": directoryPath(
@@ -500,7 +500,7 @@ module.exports = async (
     const target =
       stage === `build-html` || stage === `develop-html` ? `node` : `web`
     if (target === `web`) {
-      // TODO(v5): Remove since this is only useful during Gatsby 4 publishes
+      // TODO(v5): Gatsby 4 の公開の間しか役に立たないので削除する
       if (_CFLAGS_.GATSBY_MAJOR !== `5`) {
         resolve.alias[`@reach/router`] = path.join(
           getPackageRoot(`@gatsbyjs/reach-router`),
@@ -518,10 +518,10 @@ module.exports = async (
       resolve.alias[`scheduler/tracing`] = `scheduler/tracing-profiling`
     }
 
-    // SSR can have many react versions as some packages use their own version. React works best with 1 version.
-    // By resolving react,react-dom from gatsby we'll get the site versions of react & react-dom because it's specified as a peerdependency.
+    // 一部のパッケージが独自のバージョンを使うので、SSR では react のバージョンが複数になることがある。React は 1 つのバージョンで最もうまく動く。
+    // react と react-dom を gatsby から解決することで、サイトの側のバージョンの react と react-dom が得られる。peerdependency として指定されているためである。
     //
-    // we need to put this below our resolve.alias for profiling as webpack picks the first one that matches
+    // webpack は最初に一致したものを選ぶので、これはプロファイリング用の resolve.alias より下に置く必要がある
     // @see https://github.com/gatsbyjs/gatsby/issues/31098
     resolve.alias[`react`] = getPackageRoot(`react`)
     resolve.alias[`react-dom`] = getPackageRoot(`react-dom`)
@@ -549,7 +549,7 @@ module.exports = async (
 
   const config = {
     name: stage,
-    // Context is the base directory for resolving the entry option.
+    // context は、entry オプションを解決するための基準のディレクトリである。
     context: directory,
     entry: getEntry(),
     output: getOutput(),
@@ -558,8 +558,8 @@ module.exports = async (
     plugins: getPlugins(),
 
     devtool: getDevtool(),
-    // Turn off performance hints as we (for now) don't want to show the normal
-    // webpack output anywhere.
+    // （今のところ）webpack の通常の出力をどこにも表示したくないので、
+    // パフォーマンスのヒントを無効にする。
     performance: {
       hints: false,
     },
@@ -589,11 +589,11 @@ module.exports = async (
             name: `framework`,
             test: FRAMEWORK_BUNDLES_REGEX,
             priority: 40,
-            // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
+            // webpack にこのチャンクを取り除かせない（このチャンクが commons チャンクの一部になるのを防ぐ）
             enforce: true,
           },
-          // Bundle all css & lazy css into one stylesheet to make sure lazy components do not break
-          // TODO make an exception for css-modules
+          // 遅延読み込みのコンポーネントが壊れないように、すべての css と遅延読み込みの css を 1 つのスタイルシートにまとめる
+          // TODO css-modules は例外にする
           styles: {
             test(module) {
               return isCssModule(module)
@@ -611,7 +611,7 @@ module.exports = async (
 
   if (stage === `build-html` || stage === `develop-html`) {
     config.optimization = {
-      // TODO fix our partial hydration manifest
+      // TODO partial hydration のマニフェストを直す
       mangleExports: !isPartialHydrationEnabled,
       minimize: false,
     }
@@ -659,13 +659,13 @@ module.exports = async (
         framework: {
           chunks: `all`,
           name: `framework`,
-          // Important: If you change something here, also update "gatsby-plugin-preact"
+          // 重要: ここで何かを変更する場合は、"gatsby-plugin-preact" も更新すること
           test: module => {
-            // Packages like gatsby-plugin-image might import from "react-dom/server". We don't want to include react-dom-server in the framework bundle.
-            // A rawRequest might look like these:
+            // gatsby-plugin-image のようなパッケージは、"react-dom/server" から import することがある。react-dom-server を framework バンドルに含めたくはない。
+            // rawRequest は次のようになる:
             // - "react-dom/server"
             // - "node_modules/react-dom/cjs/react-dom-server-legacy.browser.production.min.js"
-            // Use a "/" before "react-dom-server" so that we don't match packages that contain "react-dom-server" in their name
+            // 名前に "react-dom-server" を含むパッケージに一致しないように、"react-dom-server" の前に "/" を付ける
             if (
               module?.rawRequest === `react-dom/server` ||
               module?.rawRequest?.includes(`/react-dom-server`)
@@ -676,10 +676,10 @@ module.exports = async (
             return FRAMEWORK_BUNDLES_REGEX.test(module.nameForCondition())
           },
           priority: 40,
-          // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
+          // webpack にこのチャンクを取り除かせない（このチャンクが commons チャンクの一部になるのを防ぐ）
           enforce: true,
         },
-        // if a module is bigger than 160kb from node_modules we make a separate chunk for it
+        // node_modules のモジュールが 160kb より大きい場合は、それ専用のチャンクを作る
         lib: {
           test(module) {
             return (
@@ -706,11 +706,11 @@ module.exports = async (
         },
         commons: {
           name: `commons`,
-          // if a chunk is used on all components we put it in commons (we need at least 2 components)
+          // チャンクがすべてのコンポーネントで使われている場合は、commons に入れる（少なくとも 2 つのコンポーネントが必要）
           minChunks: Math.max(componentsCount, 2),
           priority: 20,
         },
-        // If a chunk is used in at least 2 components we create a separate chunk
+        // チャンクが 2 つ以上のコンポーネントで使われている場合は、別のチャンクを作る
         shared: {
           test(module, { chunkGraph }) {
             for (const chunk of chunkGraph.getModuleChunksIterable(module)) {
@@ -734,8 +734,8 @@ module.exports = async (
           reuseExistingChunk: true,
         },
 
-        // Bundle all css & lazy css into one stylesheet to make sure lazy components do not break
-        // TODO make an exception for css-modules
+        // 遅延読み込みのコンポーネントが壊れないように、すべての css と遅延読み込みの css を 1 つのスタイルシートにまとめる
+        // TODO css-modules は例外にする
         styles: {
           test(module) {
             return isCssModule(module)
@@ -746,10 +746,10 @@ module.exports = async (
           enforce: true,
         },
       },
-      // We load our pages async through async-requires, maxInitialRequests doesn't have an effect on chunks derived from page components.
-      // By default webpack has set maxAsyncRequests to 6, in some cases this isn't enough an actually makes the bundle size blow up.
-      // We've set maxAsyncRequests to Infinity to negate this. This could potentionally exceed the 25 initial requests that we set before
-      // sadly I do not have a better solution.
+      // ページは async-requires を通じて非同期に読み込むので、maxInitialRequests はページコンポーネントから派生したチャンクには効果がない。
+      // webpack はデフォルトで maxAsyncRequests を 6 に設定しているが、場合によってはこれでは足りず、かえってバンドルサイズが膨れ上がる。
+      // これを打ち消すために、maxAsyncRequests を Infinity に設定している。これは、以前に設定していた初期リクエスト 25 件を超える可能性があるが、
+      // 残念ながら、これより良い解決策がない。
       maxAsyncRequests: Infinity,
       maxInitialRequests: 25,
       minSize: 20000,
@@ -759,11 +759,11 @@ module.exports = async (
       runtimeChunk: {
         name: `webpack-runtime`,
       },
-      // TODO fix our partial hydration manifest
+      // TODO partial hydration のマニフェストを直す
       mangleExports: !isPartialHydrationEnabled,
       splitChunks,
       minimizer: [
-        // TODO: maybe this option should be noMinimize?
+        // TODO: このオプションは noMinimize にすべきかもしれない
         !program.noUglify &&
           plugins.minifyJs(
             program.profile
@@ -781,28 +781,28 @@ module.exports = async (
   }
 
   if (stage === `build-html` || stage === `develop-html`) {
-    // externalize react, react-dom when develop-html or build-html(when not generating engines)
+    // develop-html または build-html（エンジンを生成しない場合）のときは、react と react-dom を externals にする
     const shouldMarkPackagesAsExternal =
       stage === `develop-html` || !shouldGenerateEngines()
 
-    // tracking = build-html (when not generating engines)
+    // tracking = build-html（エンジンを生成しない場合）
     const shouldTrackBuiltins =
       stage === `build-html` && !shouldGenerateEngines()
 
-    // removes node internals from bundle
+    // node の内部モジュールをバンドルから取り除く
     // https://webpack.js.org/configuration/externals/#externalspresets
     config.externalsPresets = {
-      // use it only when not tracking builtins (tracking builtins provide their own fallbacks)
+      // 組み込みモジュールを追跡していない場合にだけ使う（組み込みモジュールを追跡する場合は、独自のフォールバックが用意される）
       node: !shouldTrackBuiltins,
     }
     config.externals = []
 
     if (shouldMarkPackagesAsExternal) {
-      // Packages we want to externalize to save some build time
+      // ビルド時間を節約するために externals にしたいパッケージ
       // https://github.com/gatsbyjs/gatsby/pull/14208#pullrequestreview-240178728
       // const externalList = [`common-tags`, `lodash`, `semver`, /^lodash\//]
 
-      // Packages we want to externalize because meant to be user-provided
+      // ユーザーが用意するものなので externals にしたいパッケージ
       const userExternalList = [`react`, /^react-dom\//]
 
       const checkItem = (item, request) => {
@@ -819,16 +819,16 @@ module.exports = async (
         { context, getResolve, request },
         callback
       ) {
-        // allows us to resolve webpack aliases from our config
-        // helpful for when react is aliased to preact-compat
-        // Force commonjs as we're in node land
+        // config の webpack のエイリアスを解決できるようにする
+        // react が preact-compat にエイリアスされている場合に役立つ
+        // node の世界にいるので、commonjs を強制する
         const resolver = getResolve({
           dependencyType: `commonjs`,
         })
 
-        // User modules that do not need to be part of the bundle
+        // バンドルに含める必要のないユーザーのモジュール
         if (userExternalList.some(item => checkItem(item, request))) {
-          // TODO figure out to make preact work with this too
+          // TODO preact でもこれが動くようにする方法を見つける
 
           resolver(context, request, (err, newRequest) => {
             if (err) {
@@ -840,8 +840,8 @@ module.exports = async (
           })
           return
         }
-        // TODO look into re-enabling, breaks builds right now because of esm
-        // User modules that do not need to be part of the bundle
+        // TODO 再び有効にできるか調べる。現状では esm のせいでビルドが壊れる
+        // バンドルに含める必要のないユーザーのモジュール
         // if (externalList.some(item => checkItem(item, request))) {
         //   resolver(context, request, (err, request) => {
         //     if (err) {
@@ -942,7 +942,7 @@ module.exports = async (
 
   await apiRunnerNode(`onCreateWebpackConfig`, {
     getConfig,
-    // we will converge to build-html later on but for now this was the fastest way to get SSR to work
+    // いずれは build-html に統合するが、今のところは、これが SSR を動かす最も速い方法だった
     stage,
     rules,
     loaders,
@@ -951,10 +951,10 @@ module.exports = async (
   })
 
   if (fastRefreshPlugin) {
-    // Fast refresh plugin has `include` option that determines
-    // wether HMR code gets injected. We need to make sure all custom loaders
-    // (like .ts or .mdx) that use our babel-loader will be taken into account
-    // when deciding which modules get fast-refresh HMR addition.
+    // Fast refresh プラグインには、HMR のコードを注入するかどうかを決める
+    // `include` オプションがある。どのモジュールに fast-refresh の HMR を追加するかを
+    // 決めるときに、こちらの babel-loader を使うすべての独自のローダー
+    // （.ts や .mdx など）が考慮されるようにする必要がある。
     const fastRefreshIncludes = []
     const babelLoaderLoc = require.resolve(`./babel-loader`)
     for (const rule of getConfig().module.rules) {
@@ -983,11 +983,11 @@ module.exports = async (
       }
     }
 
-    // start with default include of fast refresh plugin
+    // fast refresh プラグインのデフォルトの include から始める
     const includeRegex = /\.([jt]sx?|flow)$/i
     includeRegex.test = modulePath => {
-      // drop query param from request (i.e. ?type=component for mdx-loader)
-      // so loader rule test work well
+      // ローダーのルールの test がうまく動くように、
+      // リクエストからクエリパラメーター（mdx-loader の ?type=component など）を取り除く
       const queryParamStartIndex = modulePath.indexOf(`?`)
       if (queryParamStartIndex !== -1) {
         modulePath = modulePath.slice(0, queryParamStartIndex)

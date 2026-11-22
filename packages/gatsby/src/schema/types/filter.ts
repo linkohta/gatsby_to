@@ -123,19 +123,19 @@ export const getFilterInput = ({
           : typeComposer.getFieldExtension(fieldName, `searchable`)
 
       if (searchable === SEARCHABLE_ENUM.NOT_SEARCHABLE) {
-        // stop traversing
+        // 走査を止める
         return null
       } else if (searchable === SEARCHABLE_ENUM.DEPRECATED_SEARCHABLE) {
-        // mark this and all nested fields as deprecated
+        // これと、ネストしたすべてのフィールドに非推奨の印を付ける
         return {
           deprecationReason: `Filtering on fields that need arguments to resolve is deprecated.`,
         }
       }
 
-      // continue
+      // 続行する
       return undefined
     },
     leafInputComposer: getQueryOperatorInput,
-    // elemMatch operator
+    // elemMatch 演算子
     listInputComposer: getQueryOperatorListInput,
   })

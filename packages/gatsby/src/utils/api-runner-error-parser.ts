@@ -16,9 +16,9 @@ const errorParser = ({ err }: { err: unknown }): IMatch => {
   let structured: IMatch | undefined
   let errorMessage: string | undefined
 
-  // try to handle as many type of err as possible.
-  // the err might come from a plugin so we don't
-  // know what we are getting
+  // できるだけ多くの種類の err を処理しようとする。
+  // err はプラグインから来ることもあるので、何を
+  // 受け取るかは分からない
   if (Array.isArray(err)) {
     err = err[0]
   }
@@ -39,7 +39,7 @@ const errorParser = ({ err }: { err: unknown }): IMatch => {
     }
   }
 
-  // if we haven't found any known error
+  // 既知のエラーが見つからなかった場合
   if (!structured) {
     return {
       id: `11321`,

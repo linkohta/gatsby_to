@@ -99,24 +99,24 @@ function getFieldSelectorTC({
             ? undefined
             : typeComposer.getFieldExtension(fieldName, `sortable`)
         if (sortable === SORTABLE_ENUM.NOT_SORTABLE) {
-          // stop traversing
+          // 走査を止める
           return null
         } else if (sortable === SORTABLE_ENUM.DEPRECATED_SORTABLE) {
-          // mark this and all nested fields as deprecated
+          // これと、ネストしたすべてのフィールドに非推奨の印を付ける
           return {
             deprecationReason: `Sorting on fields that need arguments to resolve is deprecated.`,
           }
         }
 
-        // continue
+        // 続行する
         return undefined
       },
       leafInputComposer: schemaComposer.getOrCreateETC(
         `FieldSelectorEnum`,
         etc => {
           etc.setFields({
-            // GraphQL spec doesn't allow using "true" (or "false" or "null") as enum values
-            // so we "SELECT"
+            // GraphQL の仕様では、enum の値として "true"（や "false" や "null"）を使えないので、
+            // "SELECT" を使う
             SELECT: { value: `SELECT` },
           })
         }
@@ -151,9 +151,9 @@ function createPagination<TSource = any, TContext = any>({
 
   const paginationTypeComposer: ObjectTypeComposer =
     schemaComposer.getOrCreateOTC(typeName, tc => {
-      // getGroup() will create a recursive call to pagination,
-      // so only add it and other aggregate functions on onCreate.
-      // Cast into their own category to avoid Typescript conflicts.
+      // getGroup() は pagination への再帰呼び出しを作るので、
+      // これと他の集約関数は onCreate でだけ追加する。
+      // Typescript の衝突を避けるために、独自のカテゴリーにキャストする。
       const aggregationFields: { [key: string]: any } = {
         distinct: {
           type: [`String!`],

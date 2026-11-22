@@ -1,6 +1,6 @@
 import { parse, DocumentNode } from "graphql"
 
-// TODO v5: mark File type as @dontInfer (requires @childOf directive to all children types like ImageSharp)
+// TODO v5: File 型に @dontInfer を付ける（ImageSharp のようなすべての子の型に @childOf ディレクティブが必要になる）
 
 const fileType = `
   type File implements Node @infer {

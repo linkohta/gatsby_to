@@ -180,8 +180,8 @@ describe(`actual compiling`, () => {
   })
 
   describe(`config queries`, () => {
-    // config query is kept as is (at least for now)
-    // it is validated but not extracted
+    // config クエリはそのまま残す（少なくとも今のところは）
+    // 検証はするが、抽出はしない
     it(`validates config query`, async () => {
       const nodes = [
         createGatsbyDoc(
@@ -1214,7 +1214,7 @@ const createGatsbyDoc = (
     hash: `hash`,
     templateLoc: {
       start: {
-        // so no idea, but it seems to work correctly on websites
+        // 理由は分からないが、実際のウェブサイトでは正しく動いているようだ
         line: 1,
         column: 0,
       },

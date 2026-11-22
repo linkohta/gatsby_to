@@ -3,16 +3,16 @@ import { pathToFileURL } from "url"
 import report from "gatsby-cli/lib/reporter"
 
 /**
- * On Windows, the file protocol is required for the path to be resolved correctly.
- * On other platforms, the file protocol is not required, but supported, so we want to just always use it.
- * Except jest doesn't work with that and in that environment we never add the file protocol.
+ * Windows では、パスを正しく解決するために file プロトコルが必要である。
+ * 他のプラットフォームでは必須ではないが対応しているので、常に使うようにしたい。
+ * ただし jest はこれでは動作しないので、その環境では file プロトコルを付けない。
  */
 export const maybeAddFileProtocol = process.env.JEST_WORKER_ID
   ? (module: string): string => module
   : (module: string): string => pathToFileURL(module).href
 
 /**
- * Figure out if the file path is .js or .mjs without relying on the fs module, and return the file path if it exists.
+ * fs モジュールに頼らずに、ファイルパスが .js か .mjs かを判定し、存在する場合はそのファイルパスを返す。
  */
 export async function resolveJSFilepath({
   rootDir,
@@ -30,7 +30,7 @@ export async function resolveJSFilepath({
     ? filePath
     : `${filePath}.mjs`
 
-  // Check if both variants exist
+  // 両方のバリエーションが存在するかを確認する
   try {
     if (
       require.resolve(filePathWithJSExtension) &&
@@ -47,16 +47,16 @@ export async function resolveJSFilepath({
       return filePathWithJSExtension
     }
   } catch (_) {
-    // Do nothing
+    // 何もしない
   }
 
-  // Check if .js variant exists
+  // .js のバリエーションが存在するかを確認する
   try {
     if (require.resolve(filePathWithJSExtension)) {
       return filePathWithJSExtension
     }
   } catch (_) {
-    // Do nothing
+    // 何もしない
   }
 
   try {
@@ -64,7 +64,7 @@ export async function resolveJSFilepath({
       return filePathWithMJSExtension
     }
   } catch (_) {
-    // Do nothing
+    // 何もしない
   }
 
   return ``

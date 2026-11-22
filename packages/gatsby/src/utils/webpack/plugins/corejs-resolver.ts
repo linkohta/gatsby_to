@@ -1,10 +1,10 @@
 import Resolver from "enhanced-resolve/lib/Resolver"
 import path from "path"
 
-// Core-js uses es6, es7 & web prefixes, which we'll convert to core-js 3
+// core-js は es6、es7、web の接頭辞を使っているので、core-js 3 のものへ変換する
 const coreJs2FileRegex = /\/modules\/(es6|es7|web)\.|\/es6\/|\/es7\//
 
-// Try to replace core-js2 files to core-js@3 to reduce file size
+// ファイルサイズを減らすため、core-js2 のファイルを core-js@3 のものへ置き換えられるか試す
 const replaceMap = [
   [`/es6.`, `/es.`],
   [`/es7.`, `/es.`],
@@ -25,17 +25,17 @@ interface IRequest {
 }
 
 /**
- * Babel-preset is set to corejs@3 which will add automatic polyfills. If a project has core-js@2 installed in their root or a package got compiled with core-js@2
- * we need to convert it to corejs@3 because core-js@2 isn't available or we might add multiple polyfills for the same problem.
+ * Babel-preset は corejs@3 に設定されており、ポリフィルを自動で追加する。プロジェクトのルートに core-js@2 がインストールされている場合や、パッケージが core-js@2 でコンパイルされている場合は、
+ * corejs@3 へ変換する必要がある。core-js@2 が利用できない、または同じ問題に対してポリフィルを複数追加してしまうおそれがあるためである。
  *
- * The resolver converts core-js@2 imports to core-js@3 imports to make our bundle as small as possible.
+ * このリゾルバーは、バンドルをできるだけ小さくするために core-js@2 の import を core-js@3 の import へ変換する。
  */
 export class CoreJSResolver {
   _coreJSNodeModulesPath: string
 
   constructor() {
-    // Get the nodemodules directory where core-js of gatsby lives
-    // it might be inside gatsby/node_modules when multiple core-js versions are loaded
+    // gatsby の core-js が置かれている node_modules ディレクトリを取得する
+    // 複数のバージョンの core-js が読み込まれている場合は gatsby/node_modules の中にあることがある
     this._coreJSNodeModulesPath = path.dirname(
       path.dirname(require.resolve(`core-js`))
     )
@@ -52,7 +52,7 @@ export class CoreJSResolver {
     ): void {
       const innerRequest = request.request || request.path
 
-      // we only care about core-js
+      // 対象は core-js だけである
       if (!innerRequest || !innerRequest.startsWith(`core-js/`)) {
         return void callback()
       }
@@ -60,7 +60,7 @@ export class CoreJSResolver {
       let coreJsRequest = innerRequest
       let resolveMessage = `alias core-js@3 to gatsby's core-js package`
 
-      // preset-env adds packages from modules/ so we rewrite them to our gatsby package
+      // preset-env は modules/ からパッケージを追加するので、それを gatsby パッケージのものへ書き換える
       if (coreJs2FileRegex.test(coreJsRequest)) {
         replaceMap.forEach(([search, replace]) => {
           coreJsRequest = coreJsRequest.replace(search, replace)
@@ -82,9 +82,9 @@ export class CoreJSResolver {
             return callback(err)
           }
 
-          // if a rename fails we try to load the original file
-          // this could error when our mapping isn't complete. I've tested this on a couple of sites
-          // and couldn't find anything but you never know.
+          // 名前の置き換えに失敗した場合は、元のファイルの読み込みを試す
+          // マッピングに漏れがあるとここでエラーになる可能性がある。いくつかのサイトで試した限りでは
+          // 何も見つからなかったが、絶対とは言い切れない。
           if (result === undefined) {
             return callback()
           }

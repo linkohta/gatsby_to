@@ -1,3 +1,3 @@
-// this will cause errors when importing it - that's fine - that's the point opf this mock
+// これは import 時にエラーを起こす。それで問題ない。それがこのモックの目的である
 // eslint-disable-next-line
 wat()

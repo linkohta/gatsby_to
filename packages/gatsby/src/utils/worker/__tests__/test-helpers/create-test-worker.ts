@@ -15,8 +15,8 @@ export function createTestWorker(numWorkers = 1): GatsbyTestWorkerPool {
     {
       numWorkers,
       env: {
-        // We are using JEST_WORKER_ID env so that worker use same test database as
-        // jest runner process
+        // JEST_WORKER_ID 環境変数を使い、ワーカーが jest のランナープロセスと同じ
+        // テスト用データベースを使うようにしている
         FORCE_TEST_DATABASE_ID: process.env.JEST_WORKER_ID,
         GATSBY_WORKER_POOL_WORKER: `true`,
         NODE_OPTIONS: `--require ${require.resolve(`./ts-register`)}`,

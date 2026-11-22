@@ -1,5 +1,5 @@
-// "engines-fs-provider" must be first import, as it sets up global
-// fs and this need to happen before anything else tries to import fs
+// "engines-fs-provider" は最初の import でなければならない。これはグローバルな
+// fs をセットアップするので、他の何かが fs を import しようとする前に行う必要がある
 import "../../utils/engines-fs-provider"
 import "./platform-and-arch-check"
 

@@ -98,8 +98,8 @@ describe(`Batcher`, () => {
   })
 
   it(`calls all callbacks`, () => {
-    // these are already set up in our beforeEach, but add them again
-    // to make sure we see double calls
+    // これらは beforeEach ですでにセットアップされているが、二重の呼び出しを
+    // 確認するために、もう一度追加する
     batcher.call(funcObj.singleCall)
     batcher.bulkCall(funcObj.bulkCall)
 

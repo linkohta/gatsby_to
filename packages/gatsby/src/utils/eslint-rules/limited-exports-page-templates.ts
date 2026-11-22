@@ -19,7 +19,7 @@ import { isPageTemplate } from "../eslint-rules-helpers"
 const DEFAULT_GRAPHQL_TAG_NAME = `graphql`
 
 function isApiExport(node: ExportNamedDeclaration, name: string): boolean {
-  // check for
+  // 次の形を確認する
   // export function name() {}
   // export async function name() {}
   if (
@@ -29,7 +29,7 @@ function isApiExport(node: ExportNamedDeclaration, name: string): boolean {
     return true
   }
 
-  // check for
+  // 次の形を確認する
   // export const name = () => {}
   if (node.declaration?.type === `VariableDeclaration`) {
     for (const declaration of node.declaration.declarations) {
@@ -44,10 +44,10 @@ function isApiExport(node: ExportNamedDeclaration, name: string): boolean {
   }
 
   if (name === `Head`) {
-    // Head can be re-exported, Head can be class components - so the checks above are not sufficient,
-    // we need to be more permisive here
+    // Head は再 export されることも、クラスコンポーネントであることもあるので、上の確認だけでは不十分であり、
+    // ここではもっと緩くする必要がある
 
-    // class component
+    // クラスコンポーネント
     if (
       node.declaration?.type === `ClassDeclaration` &&
       node.declaration?.id?.type === `Identifier` &&
@@ -56,7 +56,7 @@ function isApiExport(node: ExportNamedDeclaration, name: string): boolean {
       return true
     }
 
-    // re-exports
+    // 再 export
     if (
       node.source &&
       node.specifiers.some(
@@ -74,13 +74,13 @@ function hasOneValidNamedDeclaration(
   node: Node,
   varName: string | undefined
 ): boolean {
-  // Checks for:
+  // 次の形を確認する:
   // const query = graphql``
   // export { query }
   if (node.type === `ExportNamedDeclaration` && node.declaration === null) {
-    // For export { foobar, query } the declaration will be null and specifiers exists
-    // For { foobar, query } it'll return true, for { query } it'll return false
-    // It will ignore any { default } declarations since these are allowed
+    // export { foobar, query } の場合、declaration は null で、specifiers が存在する
+    // { foobar, query } では true を返し、{ query } では false を返す
+    // { default } の宣言は許可されているので、すべて無視する
     const nonQueryExports = node.specifiers.some(e =>
       varName
         ? (e.exported as Identifier).name !== varName &&
@@ -98,17 +98,17 @@ function isTemplateQuery(
   graphqlTagName: string,
   namespaceSpecifierName: string
 ): boolean {
-  // For export const query = 'foobar' the declaration exists with type 'VariableDeclaration'
+  // export const query = 'foobar' の場合、型が 'VariableDeclaration' の declaration が存在する
 
-  // Checks for:
+  // 次の形を確認する:
   // export const query = graphql``
-  // This case only has one item in the declarations array
-  // For export const hello = 10, world = 'foo'
-  // The array will have two items. So use every() to check if only one item exists
-  // With TaggedTemplateExpression and "graphql" name
+  // この場合、declarations 配列の項目は 1 つだけである
+  // export const hello = 10, world = 'foo' の場合、
+  // 配列の項目は 2 つになる。そのため every() を使って、TaggedTemplateExpression で
+  // 名前が "graphql" の項目が 1 つだけ存在するかを確認する
 
-  // In addition the declaration can also be a MemberExpression like
-  // Gatsby.graphql`` when the import happened with import * as Gatsby from "gatsby"
+  // さらに、declaration は、import * as Gatsby from "gatsby" で import された場合の
+  // Gatsby.graphql`` のような MemberExpression であることもある
 
   return (
     node.type === `ExportNamedDeclaration` &&
@@ -156,11 +156,11 @@ const limitedExports: Rule.RuleModule = {
     return {
       // const { graphql } = require('gatsby')
       VariableDeclaration: (node): void => {
-        // Check if require('gatsby')
+        // require('gatsby') であるかを確認する
         const requiredFromGatsby = (
           node as VariableDeclaration
         ).declarations.find(el => {
-          // Handle require(`gatsby`)
+          // require(`gatsby`) を処理する
           if (
             (el.init as CallExpression)?.arguments?.[0]?.type ===
             `TemplateLiteral`
@@ -178,7 +178,7 @@ const limitedExports: Rule.RuleModule = {
         })
 
         if (requiredFromGatsby) {
-          // Search for "graphql" in a const { graphql, Link } = require('gatsby')
+          // const { graphql, Link } = require('gatsby') の中の "graphql" を探す
           const graphqlTagSpecifier = (
             (requiredFromGatsby as VariableDeclarator).id as ObjectPattern
           )?.properties.find(
@@ -198,15 +198,15 @@ const limitedExports: Rule.RuleModule = {
       },
       // import { graphql } from "gatsby"
       ImportDeclaration: (node): void => {
-        // Make sure that the specifier is imported from "gatsby"
+        // specifier が "gatsby" から import されていることを確認する
         if ((node as ImportDeclaration).source.value === `gatsby`) {
           const graphqlTagSpecifier = (
             node as ImportDeclaration
           ).specifiers.find(el => {
-            // We only want import { graphql } from "gatsby"
-            // Not import graphql from "gatsby"
+            // 対象にしたいのは import { graphql } from "gatsby" だけであり、
+            // import graphql from "gatsby" ではない
             if (el.type === `ImportSpecifier`) {
-              // Only get the specifier with the original name of "graphql"
+              // 元の名前が "graphql" の specifier だけを取得する
               return (
                 (el.imported as Identifier).name === DEFAULT_GRAPHQL_TAG_NAME
               )
@@ -219,8 +219,8 @@ const limitedExports: Rule.RuleModule = {
             return false
           })
           if (graphqlTagSpecifier) {
-            // The local.name handles the case for import { graphql as otherName }
-            // For normal import { graphql } the imported & local name are the same
+            // local.name は、import { graphql as otherName } の場合を扱う
+            // 通常の import { graphql } では、imported の名前と local の名前は同じである
             graphqlTagName = graphqlTagSpecifier.local.name
           }
         }

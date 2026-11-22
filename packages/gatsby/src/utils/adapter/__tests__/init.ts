@@ -83,7 +83,7 @@ jest.mock(`module`, () => {
         prefix = `cache`
       }
 
-      // checking if installed in site
+      // サイトにインストールされているかを確認する
       const siteRequire = (mod: string): any => {
         if (mockPackage) {
           if (mod === `gatsby-adapter-test/package.json`) {
@@ -138,7 +138,7 @@ jest.mock(`execa`, () =>
         .find(arg => arg.includes(`gatsby-adapter-test`))
         .split(`@`)
 
-      // set mock adapter as installed in cache
+      // モックのアダプターを、キャッシュにインストール済みとして設定する
       mockInstalledInCacheAdapter = getMockedPackage(range)
       return
     }
@@ -170,7 +170,7 @@ jest.mock(`cache/gatsby-adapter-test`, () => mockCacheAdapterModule(), {
   virtual: true,
 })
 
-// note this is used only if used didn't explicitly set adapter in gatsby-config - zero-conf mode
+// 注: これが使われるのは、ユーザーが gatsby-config でアダプターを明示的に設定していない場合（ゼロコンフィグのモード）だけである
 describe(`getAdapterInit`, () => {
   beforeEach(() => {
     jest.resetModules()
@@ -181,7 +181,7 @@ describe(`getAdapterInit`, () => {
     mockAdaptersManifest = [
       {
         name: `Test`,
-        // this entry is not eligible for current environment
+        // このエントリーは現在の環境では対象にならない
         test: (): boolean => false,
         module: `gatsby-adapter-test`,
         versions: [
@@ -230,7 +230,7 @@ describe(`getAdapterInit`, () => {
       ]
 
       await getAdapterInit(`6.0.0`)
-      // panic fails the build
+      // panic はビルドを失敗させる
       expect(mockLogs.find(log => log.level === `panic`)).toBeTruthy()
       expect(getLogsForSnapshot()).toMatchInlineSnapshot(
         `"panic         \\"No version of Test adapter is compatible with your current Gatsby version 6.0.0./n/nZero-configuration deployment failed to avoid potentially broken deployment./nIf you want build to continue despite above problem/n - configure adapter manually in gatsby-config which will skip zero-configuration deployment attempt/n - or set GATSBY_CONTINUE_BUILD_ON_MISSING_ADAPTER=true environment variable to continue build without an adapter.\\""`
@@ -545,12 +545,12 @@ describe(`getAdapterInit`, () => {
     })
 
     it(`gatsby-dev`, async () => {
-      // gatsby-dev is a special case as it's not published to npm
-      // it sets package versions to ${current}-dev-${timestamp} and sometimes it's tricky with semver
-      // as for example 1.0.4-dev-1702672314858 does NOT satisfy ^1.0.4 and normally gatsby would install
-      // 1.0.4 from npm instead of using version installed in e2e-adapters site via gatsby-dev
-      // we force specific manifest in e2e-tests/adapters to always allow currently installed adapter version
-      // via GATSBY_ADAPTERS_MANIFEST env var
+      // gatsby-dev は npm に公開されていないので、特別なケースである
+      // パッケージのバージョンを ${current}-dev-${timestamp} に設定するので、semver ではやっかいなことがある
+      // たとえば 1.0.4-dev-1702672314858 は ^1.0.4 を満たさないので、通常であれば gatsby は、
+      // gatsby-dev で e2e-adapters のサイトにインストールされたバージョンを使わずに、npm から 1.0.4 をインストールする
+      // そこで、e2e-tests/adapters では環境変数 GATSBY_ADAPTERS_MANIFEST で特定のマニフェストを強制し、
+      // 現在インストールされているアダプターのバージョンを常に許可する
       mockInstalledInSiteAdapter = getMockedPackageByVersion(
         `1.0.4-dev-1702672314858`
       )

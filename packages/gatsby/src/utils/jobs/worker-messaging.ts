@@ -64,9 +64,9 @@ export const waitUntilWorkerJobsAreComplete = (): Promise<void> =>
   hasActiveWorkerJobs ? hasActiveWorkerJobs.promise : Promise.resolve()
 
 /**
- * This map is ONLY used in worker. It's purpose is to keep track of promises returned to plugins
- * when creating jobs (in worker context), so that we can resolve or reject those once main process
- * send back their status.
+ * このマップはワーカーの中で「だけ」使われる。その目的は、（ワーカーのコンテキストで）ジョブを作成するときに
+ * プラグインへ返した Promise を追跡し、メインプロセスからステータスが返ってきたときに、
+ * それらを解決または reject できるようにすることである。
  */
 const deferredWorkerPromises = new Map<
   InternalJob["id"],
@@ -110,8 +110,8 @@ export function initJobsMessagingInWorker(): void {
 }
 
 /**
- * Forwards job to main process (if executed in worker context) and returns
- * a promise. Will return `undefined` if called not in worker context.
+ * （ワーカーのコンテキストで実行されている場合は）ジョブをメインプロセスへ転送し、
+ * Promise を返す。ワーカーのコンテキスト以外で呼ばれた場合は `undefined` を返す。
  */
 export function maybeSendJobToMainProcess(
   job: InternalJob
@@ -126,7 +126,7 @@ export function maybeSendJobToMainProcess(
 
     gatsbyWorkerMessenger.sendMessage(msg)
 
-    // holds on to promise
+    // Promise を保持しておく
     deferredWorkerPromises.set(job.id, deferredWorkerPromise)
 
     return deferredWorkerPromise.promise

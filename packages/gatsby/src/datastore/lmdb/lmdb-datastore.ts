@@ -22,7 +22,7 @@ const lmdbDatastore = {
   ready,
   runQuery,
 
-  // deprecated:
+  // 非推奨:
   getNodes,
   getNodesByType,
 }
@@ -33,9 +33,9 @@ export function getDefaultDbPath(): string {
   const dbFileName =
     process.env.NODE_ENV === `test`
       ? `test-datastore-${
-          // FORCE_TEST_DATABASE_ID will be set if this gets executed in worker context
-          // when running jest tests. JEST_WORKER_ID will be set when this gets executed directly
-          // in test context (jest will use jest-worker internally).
+          // jest のテスト実行時にワーカーのコンテキストで実行された場合は、FORCE_TEST_DATABASE_ID が
+          // 設定される。テストのコンテキストで直接実行された場合は、JEST_WORKER_ID が設定される
+          // （jest は内部で jest-worker を使う）。
           process.env.FORCE_TEST_DATABASE_ID ?? process.env.JEST_WORKER_ID
         }`
       : `datastore`
@@ -85,11 +85,11 @@ function getRootDb(): RootDatabase {
 
 function getDatabases(): ILmdbDatabases {
   if (!databases) {
-    // __GATSBY_OPEN_LMDBS tracks if we already opened given db in this process
-    // In `gatsby serve` case we might try to open it twice - once for engines
-    // and second to get access to `SitePage` nodes (to power trailing slashes
-    // redirect middleware). This ensure there is single instance within a process.
-    // Using more instances seems to cause weird random errors.
+    // __GATSBY_OPEN_LMDBS は、このプロセスで指定した db をすでに開いたかどうかを追跡する
+    // `gatsby serve` の場合は 2 回開こうとすることがある。1 回はエンジンのため、
+    // もう 1 回は `SitePage` ノードへアクセスするためである（末尾のスラッシュの
+    // リダイレクトミドルウェアに使う）。これにより、プロセス内のインスタンスが 1 つであることを保証する。
+    // 複数のインスタンスを使うと、奇妙でランダムなエラーが起きるようである。
     if (!globalThis.__GATSBY_OPEN_LMDBS) {
       globalThis.__GATSBY_OPEN_LMDBS = new Map()
     }
@@ -102,13 +102,13 @@ function getDatabases(): ILmdbDatabases {
     databases = {
       nodes: rootDb.openDB({
         name: `nodes`,
-        // FIXME: sharedStructuresKey breaks tests - probably need some cleanup for it on DELETE_CACHE
+        // FIXME: sharedStructuresKey はテストを壊す。おそらく DELETE_CACHE で何らかのクリーンアップが必要である
         // sharedStructuresKey: Symbol.for(`structures`),
         // @ts-ignore
         cache: {
-          // expirer: false disables LRU part and only take care of WeakRefs
-          // this way we don't retain nodes strongly, but will continue to
-          // reuse them if they are loaded already
+          // expirer: false は LRU の部分を無効にし、WeakRef だけを扱う
+          // こうすることでノードを強参照で保持しないが、すでに読み込まれている
+          // 場合は引き続き再利用する
           expirer: false,
         },
       }),
@@ -122,7 +122,7 @@ function getDatabases(): ILmdbDatabases {
       }),
       indexes: rootDb.openDB({
         name: `indexes`,
-        // TODO: use dupSort when this is ready: https://github.com/DoctorEvidence/lmdb-store/issues/66
+        // TODO: 準備ができたら dupSort を使う: https://github.com/DoctorEvidence/lmdb-store/issues/66
         // dupSort: true
       }),
     }
@@ -160,7 +160,7 @@ function getNodesByType(type: string): Array<IGatsbyNode> {
 }
 
 function iterateNodes(): GatsbyIterable<IGatsbyNode> {
-  // Additionally fetching items by id to leverage lmdb-store cache
+  // lmdb-store のキャッシュを活用するため、項目を id でも取得する
   const nodesDb = getDatabases().nodes
   return new GatsbyIterable(
     nodesDb
@@ -199,7 +199,7 @@ function countNodes(typeName?: string): number {
     return Math.max(
       Number(stats.entryCount) - preSyncDeletedNodeIdsCache.size,
       0
-    ) // FIXME: add -1 when restoring shared structures key
+    ) // FIXME: sharedStructuresKey を元に戻すときに -1 を追加する
   }
 
   const { nodesByType } = getDatabases()
@@ -223,7 +223,7 @@ function updateDataStore(action: ActionsUnion): void {
   switch (action.type) {
     case `DELETE_CACHE`: {
       const dbs = getDatabases()
-      // Force sync commit
+      // 同期的なコミットを強制する
       dbs.nodes.transactionSync(() => {
         dbs.nodes.clearSync()
         dbs.nodesByType.clearSync()
@@ -233,7 +233,7 @@ function updateDataStore(action: ActionsUnion): void {
       break
     }
     case `SET_PROGRAM`: {
-      // TODO: remove this when we have support for incremental indexes in lmdb
+      // TODO: lmdb がインクリメンタルなインデックスに対応したら、これを削除する
       clearIndexes()
       break
     }
@@ -249,7 +249,7 @@ function updateDataStore(action: ActionsUnion): void {
       ])
       lastOperationPromise = operationPromise
 
-      // if create is used in the same transaction as delete we should remove it from cache
+      // 同じトランザクションで削除と作成の両方が使われた場合は、キャッシュから取り除くべきである
       if (action.type === `CREATE_NODE`) {
         preSyncDeletedNodeIdsCache.delete(action.payload.id)
       }
@@ -257,7 +257,7 @@ function updateDataStore(action: ActionsUnion): void {
       if (action.type === `DELETE_NODE` && action.payload?.id) {
         preSyncDeletedNodeIdsCache.add(action.payload.id)
         operationPromise.then(() => {
-          // only clear if no other operations have been done in the meantime
+          // その間に他の操作が行われていない場合にだけクリアする
           if (lastOperationPromise === operationPromise) {
             preSyncDeletedNodeIdsCache.clear()
           }
@@ -276,7 +276,7 @@ function clearIndexes(): void {
 }
 
 /**
- * Resolves when all the data is synced
+ * すべてのデータが同期されたときに解決される
  */
 async function ready(): Promise<void> {
   await lastOperationPromise
@@ -298,7 +298,7 @@ export function setupLmdbStore({
       updateDataStore(action)
     }
   })
-  // TODO: remove this when we have support for incremental indexes in lmdb
+  // TODO: lmdb がインクリメンタルなインデックスに対応したら、これを削除する
   clearIndexes()
   return lmdbDatastore
 }

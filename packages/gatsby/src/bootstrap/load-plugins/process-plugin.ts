@@ -4,7 +4,7 @@ import { resolvePlugin } from "./resolve-plugin"
 import { isString, isEmpty, set, merge } from "lodash"
 
 export function processPlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
-  // Respect the directory that the plugin was sourced from initially
+  // プラグインが最初に読み込まれた元のディレクトリを尊重する
   rootDir = (!isString(plugin) && plugin.parentDir) || rootDir
 
   if (isString(plugin)) {
@@ -20,7 +20,7 @@ export function processPlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
 
   plugin.options = plugin.options || {}
 
-  // Throw an error if there is an "option" key.
+  // "option" キーがある場合はエラーを投げる。
   if (
     isEmpty(plugin.options) &&
     !isEmpty((plugin as { option?: unknown }).option)
@@ -30,7 +30,7 @@ export function processPlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
     )
   }
 
-  // Plugins can have plugins.
+  // プラグインはプラグインを持てる。
   if (plugin.subPluginPaths) {
     for (const subPluginPath of plugin.subPluginPaths) {
       const segments = subPluginPath.split(`.`)
@@ -59,8 +59,8 @@ export function processPlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
     }
   }
 
-  // Add some default values for tests as we don't actually
-  // want to try to load anything during tests.
+  // テスト中は実際には何も読み込みたくないので、
+  // テスト用にいくつかデフォルト値を追加する。
   if (plugin.resolve === `___TEST___`) {
     const name = `TEST`
 

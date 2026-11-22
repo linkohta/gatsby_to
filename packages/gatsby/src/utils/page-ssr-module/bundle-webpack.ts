@@ -33,8 +33,8 @@ export async function copyStaticQueriesToEngine({
   const staticQueriesToCopy = new Set<string>()
 
   for (const component of components.values()) {
-    // figuring out needed slices for each pages using componentPath is not straightforward
-    // so for now we just collect static queries for all slices + engine templates
+    // componentPath を使って各ページに必要なスライスを割り出すのは簡単ではない
+    // そのため今のところは、すべてのスライスとエンジンのテンプレートの静的クエリを集めるだけにしている
     if (component.isSlice || engineTemplatePaths.has(component.componentPath)) {
       const staticQueryHashes =
         staticQueriesByTemplate.get(component.componentPath) || []
@@ -153,10 +153,10 @@ export async function createPageSSRBundle({
         config: [__filename],
       },
     },
-    // those are required in some runtime paths, but we don't need them
+    // これらは一部の実行時のパスで require されるが、ここでは必要ない
     externals: [
       /^\.\/routes/,
-      `electron`, // :shrug: `got` seems to have electron specific code path
+      `electron`, // :shrug: `got` には electron 専用のコードパスがあるようだ
       mod.builtinModules.reduce((acc, builtinModule) => {
         if (builtinModule === `fs`) {
           acc[builtinModule] = `global _actualFsWrapper`
@@ -182,9 +182,9 @@ export async function createPageSSRBundle({
           },
         },
         {
-          // For node binary relocations, include ".node" files as well here
+          // Node のバイナリの再配置のために、".node" ファイルもここに含める
           test: /\.(m?js|node)$/,
-          // it is recommended for Node builds to turn off AMD support
+          // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
           parser: { amd: false },
           use: {
             loader: require.resolve(`@vercel/webpack-asset-relocator-loader`),

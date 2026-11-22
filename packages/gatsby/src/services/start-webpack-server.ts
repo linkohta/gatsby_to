@@ -39,9 +39,9 @@ export async function startWebpackServer({
 
   compiler.hooks.invalid.tap(`log compiling`, function () {
     if (!webpackActivity) {
-      // mark webpack as pending if we are not in the middle of compilation already
-      // when input is invalidated during compilation, webpack will automatically
-      // run another compilation round before triggering `done` event
+      // すでにコンパイルの途中でなければ、webpack を保留中として印を付ける
+      // コンパイル中に入力が無効化された場合、webpack は `done` イベントを発行する前に、
+      // 自動的にもう一度コンパイルを実行する
       report.pendingActivity({ id: `webpack-develop` })
       markWebpackStatusAsPending()
     }
@@ -49,9 +49,9 @@ export async function startWebpackServer({
 
   compiler.hooks.watchRun.tapAsync(`log compiling`, function (_, done) {
     if (!webpackActivity) {
-      // there can be multiple `watchRun` events before receiving single `done` event
-      // webpack will not emit assets or `done` event until all pending invalidated
-      // inputs were compiled
+      // 1 つの `done` イベントを受け取る前に、`watchRun` イベントが複数回発生することがある
+      // webpack は、保留中の無効化された入力がすべてコンパイルされるまで、
+      // アセットも `done` イベントも出力しない
       webpackActivity = report.activityTimer(`Re-building development bundle`, {
         id: `webpack-develop`,
       })
@@ -79,8 +79,8 @@ export async function startWebpackServer({
         const isSuccessful = !stats.hasErrors()
 
         if (isSuccessful && isFirstCompile) {
-          // Show notices to users about potential experiments/feature flags they could
-          // try.
+          // 試せそうな実験的機能やフィーチャーフラグについての案内を
+          // ユーザーに表示する。
           showExperimentNotices()
           printInstructions(
             program.sitePackageJson.name || `(Unnamed package)`,

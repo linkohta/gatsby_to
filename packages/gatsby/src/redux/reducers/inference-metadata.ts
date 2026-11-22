@@ -1,5 +1,5 @@
-// Tracking structure of nodes to utilize this metadata for schema inference
-// Type descriptors stay relevant at any point in time making incremental inference trivial
+// このメタデータをスキーマの推論に利用するために、ノードの構造を追跡する
+// 型の記述子はどの時点でも有効であり続けるので、インクリメンタルな推論が簡単になる
 import { omit } from "lodash"
 import {
   addNode,
@@ -36,7 +36,7 @@ const incrementalReducer = (
     }
 
     case `BUILD_TYPE_METADATA`: {
-      // Overwrites existing metadata
+      // 既存のメタデータを上書きする
       const { nodes, typeName, clearExistingMetadata } = action.payload
       if (!state[typeName]?.ignored) {
         const initialMetadata =
@@ -50,7 +50,7 @@ const incrementalReducer = (
     }
 
     case `DISABLE_TYPE_INFERENCE`: {
-      // Note: types disabled here will be re-enabled after BUILD_TYPE_METADATA
+      // 注: ここで無効にした型は、BUILD_TYPE_METADATA の後に再び有効になる
       const types = action.payload
       types.forEach(type => {
         state[type] = disable(state[type] || initialTypeMetadata())
@@ -80,22 +80,22 @@ const incrementalReducer = (
       const { payload: node, addedField } = action
       const { type } = node.internal
 
-      // Must unregister previous fields first.
-      // Can't simply add { fields: { [addedField]: node.fields[addedField] } }
-      // because it will count `fields` key twice for the same node
+      // 先に以前のフィールドの登録を解除しなければならない。
+      // 単純に { fields: { [addedField]: node.fields[addedField] } } を追加することはできない。
+      // 同じノードについて `fields` キーを 2 回数えてしまうためである
       const previousFields = omit(node.fields, [addedField])
       state[type] = deleteNode(state[type], { ...node, fields: previousFields })
       state[type] = addNode(state[type], { ...node, fields: node.fields })
 
-      // TODO: there might be an edge case when the same field is "added" twice.
-      //   Then we'll count it twice in metadata. The only way to avoid it as I see it
-      //   is to pass original node before modifications along with a new node
-      //   in action payload and utilize original `node.fields` in deleteNode call above
+      // TODO: 同じフィールドが 2 回「追加」されるエッジケースがあるかもしれない。
+      //   その場合、メタデータで 2 回数えることになる。避ける方法として考えられるのは、
+      //   アクションのペイロードで、変更前の元のノードを新しいノードと一緒に渡し、
+      //   上の deleteNode の呼び出しで元の `node.fields` を使うことだけである
       return state
     }
 
     case `ADD_CHILD_NODE_TO_PARENT_NODE`: {
-      // Marking parent type as dirty so that it rebuilds
+      // 親の型が再ビルドされるように、ダーティの印を付ける
       const { type } = action.payload.internal
       state[type].dirty = true
       return state
@@ -134,11 +134,11 @@ export const inferenceMetadataReducer = (
     case `DELETE_NODE`:
     case `ADD_CHILD_NODE_TO_PARENT_NODE`:
     case `ADD_FIELD_TO_NODE`: {
-      // Perf: disable incremental inference until the first schema build.
-      // There are plugins which create and delete lots of nodes during bootstrap,
-      // which makes this reducer to do a lot of unnecessary work.
-      // Instead we defer the initial metadata creation until the first schema build
-      // and then enable incremental updates explicitly
+      // パフォーマンス: 最初のスキーマのビルドまでは、インクリメンタルな推論を無効にする。
+      // bootstrap 中に大量のノードを作成して削除するプラグインがあり、
+      // そのせいでこのレデューサーが不要な処理を大量に行うことになる。
+      // 代わりに、最初のメタデータの作成を最初のスキーマのビルドまで遅らせ、
+      // その後にインクリメンタルな更新を明示的に有効にする
       if (state.step === StepsEnum.initialBuild) {
         return state
       }

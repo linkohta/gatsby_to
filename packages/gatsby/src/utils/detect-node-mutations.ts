@@ -8,7 +8,7 @@ const genericProxy = createProxyHandler()
 const nodeInternalProxy = createProxyHandler({
   onGet(key, value) {
     if (key === `fieldOwners` || key === `content`) {
-      // all allowed in here
+      // ここではすべて許可される
       return value
     }
     return undefined
@@ -27,7 +27,7 @@ const nodeProxy = createProxyHandler({
     if (key === `internal`) {
       return memoizedProxy(value, nodeInternalProxy)
     } else if (key === `fields` || key === `children`) {
-      // all allowed in here
+      // ここではすべて許可される
       return value
     }
     return undefined
@@ -42,10 +42,10 @@ const nodeProxy = createProxyHandler({
 })
 
 /**
- * Every time we create proxy for object, we store it in WeakMap,
- * so that we reuse it for that object instead of creating new Proxy.
- * This also ensures reference equality: `memoizedProxy(obj) === memoizedProxy(obj)`.
- * If we didn't reuse already created proxy above comparison would return false.
+ * オブジェクトのプロキシを作成するたびに WeakMap に保存し、
+ * そのオブジェクトについては新しい Proxy を作らずに再利用する。
+ * これにより、参照の同一性も保証される: `memoizedProxy(obj) === memoizedProxy(obj)`。
+ * 作成済みのプロキシを再利用しなければ、上の比較は false を返すことになる。
  */
 const referenceMap = new WeakMap<any, any>()
 function memoizedProxy<T>(target: T, handler: ProxyHandler<any>): T {
@@ -103,7 +103,7 @@ function createProxyHandler({
 
     const fieldDescriptor = Object.getOwnPropertyDescriptor(target, key)
     if (fieldDescriptor && !fieldDescriptor.writable) {
-      // this is to prevent errors like:
+      // これは、次のようなエラーを防ぐためのものである:
       // ```
       // TypeError: 'get' on proxy: property 'constants' is a read - only and
       // non - configurable data property on the proxy target but the proxy

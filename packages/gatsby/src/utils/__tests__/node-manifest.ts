@@ -191,7 +191,7 @@ describe(`processNodeManifests() warnings`, () => {
       }
     })
 
-    // first as develop
+    // 最初は develop として
     process.env.NODE_ENV = `development`
 
     await processNodeManifests()
@@ -220,7 +220,7 @@ describe(`processNodeManifests() warnings`, () => {
       }
     })
 
-    // first as develop
+    // 最初は develop として
     process.env.NODE_ENV = `development`
 
     await processNodeManifests()
@@ -277,7 +277,7 @@ describe(`processNodeManifests() warnings`, () => {
         }
       })
 
-      // first as develop
+      // 最初は develop として
       process.env.NODE_ENV = `development`
 
       await processNodeManifests()
@@ -289,7 +289,7 @@ describe(`processNodeManifests() warnings`, () => {
         })
       )
 
-      // then as build
+      // 次に build として
       process.env.NODE_ENV = `production`
 
       await processNodeManifests()
@@ -404,7 +404,7 @@ describe(`processNodeManifests`, () => {
       }
     }
 
-    // Doesn't process manifest that is 31 days old
+    // 31 日前のマニフェストは処理しない
     nodes.forEach(node => {
       const payload = createPayload(node.id, node.updatedAt)
       store.dispatch(
@@ -418,7 +418,7 @@ describe(`processNodeManifests`, () => {
 
     process.env.NODE_MANIFEST_MAX_DAYS_OLD = `32`
 
-    // Processes all three manifests
+    // 3 つのマニフェストをすべて処理する
     nodes.forEach(node => {
       const payload = createPayload(node.id, node.updatedAt)
       store.dispatch(
@@ -446,7 +446,7 @@ describe(`processNodeManifests`, () => {
     const pendingManifests: Array<INodeManifest> = [
       ...nodes,
       {
-        // this node doesn't exist
+        // このノードは存在しない
         id: `4`,
       },
     ].map(node => {
@@ -509,8 +509,8 @@ describe(`processNodeManifests`, () => {
     expect(fs.writeJSON).toBeCalledTimes(nodes.length)
 
     pendingManifests.forEach((manifest, index) => {
-      // if a node doesn't exist for this manifest we don't want to assert that
-      // a manifest was written
+      // このマニフェストに対応するノードが存在しない場合は、マニフェストが
+      // 書き出されたことをアサートしたくない
       if (!nodes.find(node => node.id === manifest.node.id)) {
         return
       }
@@ -584,8 +584,8 @@ describe(`processNodeManifests`, () => {
           {
             pluginName: `test`,
             node: { id: `1` },
-            // A manifest id containing all of the reserved windows characters that we check
-            // for and replace
+            // 確認して置き換える対象の、windows の予約文字をすべて含む
+            // マニフェスト ID
             manifestId: `\\*"<>/:?|`,
           },
         ],

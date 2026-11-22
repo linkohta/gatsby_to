@@ -74,7 +74,7 @@ const getFilePath = (
   const looksLikeFile =
     !path.isAbsolute(relativePath) &&
     mime.getType(relativePath) !== null &&
-    // FIXME: Do we need all of this?
+    // FIXME: これは全部必要なのか？
     mime.getType(relativePath) !== `application/x-msdownload` &&
     isRelative(relativePath) &&
     isRelativeUrl(relativePath)

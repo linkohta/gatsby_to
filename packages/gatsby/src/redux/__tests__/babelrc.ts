@@ -127,7 +127,7 @@ describe(`Babelrc actions/reducer`, () => {
 
   it(`allows merging config items`, () => {
     const babel = { createConfigItem: jest.fn() } as any
-    // This merges in new change.
+    // ここで新しい変更がマージされる。
     mergeConfigItemOptions({
       items: [
         {

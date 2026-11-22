@@ -8,7 +8,7 @@ import {
 const stripTrailingSlash = (chain: Joi.StringSchema): Joi.StringSchema =>
   chain.replace(/(\w)\/+$/, `$1`)
 
-// only add leading slash on relative urls
+// 相対 URL にだけ先頭のスラッシュを付ける
 const addLeadingSlash = (chain: Joi.StringSchema): Joi.StringSchema =>
   chain.when(Joi.string().uri({ relativeOnly: true }), {
     then: chain.replace(/^([^/])/, `/$1`),
@@ -31,7 +31,7 @@ export const gatsbyConfigSchema: Joi.ObjectSchema<IGatsbyConfig> = Joi.object()
             relativeOnly: true,
           })
           .default(``)
-          // removes single / value
+          // / 1 つだけの値を取り除く
           .allow(``)
           .replace(/^\/$/, ``)
       )
@@ -117,7 +117,7 @@ export const gatsbyConfigSchema: Joi.ObjectSchema<IGatsbyConfig> = Joi.object()
       })
       .unknown(false),
   })
-  // throws when both assetPrefix and pathPrefix are defined
+  // assetPrefix と pathPrefix の両方が定義されている場合は例外を投げる
   .when(
     Joi.object({
       assetPrefix: Joi.string().uri({
@@ -178,6 +178,6 @@ export const nodeSchema: Joi.ObjectSchema<IGatsbyNode> = Joi.object()
         counter: Joi.number(),
         contentFilePath: Joi.string(),
       })
-      .unknown(false), // Don't allow non-standard fields
+      .unknown(false), // 標準でないフィールドは許可しない
   })
   .unknown()

@@ -61,7 +61,7 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
 
       if (!hasClientExportDirective) return
 
-      // Handle cases shown in `fixtures/esm-declaration.js`
+      // `fixtures/esm-declaration.js` に示したケースを処理する
       switch (node?.declaration?.type) {
         case `VariableDeclaration`:
           for (const { id } of node.declaration.declarations || []) {
@@ -109,7 +109,7 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
           break
       }
 
-      // Handle cases shown in `fixtures/esm-list.js`
+      // `fixtures/esm-list.js` に示したケースを処理する
       if (node.specifiers.length) {
         for (const specifier of node.specifiers) {
           if (
@@ -139,7 +139,7 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
       if (!hasClientExportDirective) return
 
       switch (node.declaration.type) {
-        // Handle cases shown in `fixtures/esm-default-expression.js`
+        // `fixtures/esm-default-expression.js` に示したケースを処理する
         case `Identifier`:
           if (node.declaration.name) {
             references.push(
@@ -155,14 +155,14 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
           break
       }
     },
-    // TODO: Explore how to only walk top level tokens
+    // TODO: トップレベルのトークンだけを走査する方法を検討する
     AssignmentExpression(plainAcornNode) {
       const node = plainAcornNode as unknown as AssignmentExpression
       const { left } = node
 
       if (!hasClientExportDirective) return
 
-      // Handle cases shown in `fixtures/cjs-exports.js`
+      // `fixtures/cjs-exports.js` に示したケースを処理する
       if (
         left?.type === `MemberExpression` &&
         left?.object?.type === `Identifier` &&

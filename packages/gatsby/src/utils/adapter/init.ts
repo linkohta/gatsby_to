@@ -70,7 +70,7 @@ const tryLoadingAlreadyInstalledAdapter = async ({
     )
     const adapterPackageVersion = adapterPackageJson?.version
 
-    // Check if installed adapter version is compatible with the current Gatsby version based on the manifest
+    // インストールされているアダプターのバージョンが現在の Gatsby のバージョンと互換性があるかを、マニフェストに基づいて確認する
     if (
       !satisfies(adapterPackageVersion, adapterToUse.moduleVersion, {
         includePrerelease: true,
@@ -127,11 +127,11 @@ const handleAdapterProblem = (
 export async function getAdapterInit(
   currentGatsbyVersion: string = gatsbyVersionFromPackageJson
 ): Promise<AdapterInit | undefined> {
-  // 0. Try to fetch the latest adapters manifest - if it fails, we continue with manifest packaged with current version of gatsby
+  // 0. 最新のアダプターのマニフェストの取得を試みる。失敗した場合は、現在のバージョンの gatsby に同梱されているマニフェストで続行する
   const latestAdapters = await getLatestAdapters()
 
-  // 1. Find adapter candidates that are compatible with the current environment
-  //    we find all matching adapters in case package is renamed in the future and future gatsby versions will need different package than previous ones
+  // 1. 現在の環境と互換性のあるアダプターの候補を探す
+  //    将来パッケージの名前が変わり、将来の gatsby のバージョンが以前とは別のパッケージを必要とする場合に備えて、一致するすべてのアダプターを探す
   const adapterEntry = latestAdapters.find(candidate => candidate.test())
 
   if (!adapterEntry) {
@@ -141,8 +141,8 @@ export async function getAdapterInit(
     return undefined
   }
 
-  // 2.From the manifest entry find one that supports current Gatsby version and identify it's version to use
-  //   First matching one will be used.
+  // 2. マニフェストのエントリーの中から、現在の Gatsby のバージョンに対応するものを探し、使うべきバージョンを特定する
+  //   最初に一致したものを使う。
   let adapterToUse: IAdapterToUse | undefined = undefined
 
   for (const versionEntry of adapterEntry.versions) {
@@ -168,7 +168,7 @@ export async function getAdapterInit(
   }
 
   {
-    // 3. Check if the user has manually installed the adapter and try to resolve it from there
+    // 3. ユーザーがアダプターを手動でインストールしているかを確認し、そこからの解決を試みる
     const adapterInstalledByUserResults =
       await tryLoadingAlreadyInstalledAdapter({
         adapterToUse,
@@ -190,7 +190,7 @@ export async function getAdapterInit(
   }
 
   {
-    // 4. Check if a previous run has installed the correct adapter into .cache/adapters already and try to resolve it from there
+    // 4. 以前の実行で正しいアダプターがすでに .cache/adapters にインストールされているかを確認し、そこからの解決を試みる
     const adapterPreviouslyInstalledInCacheAdaptersResults =
       await tryLoadingAlreadyInstalledAdapter({
         adapterToUse,
@@ -213,8 +213,8 @@ export async function getAdapterInit(
   }
 
   {
-    // 5. If user has not installed the adapter manually or is incompatible and we don't have cached version installed by gatsby or that version is not compatible
-    //    we try to install compatible version into .cache/adapters
+    // 5. ユーザーがアダプターを手動でインストールしていないか互換性がなく、かつ gatsby がインストールしたキャッシュ済みのバージョンがないか、そのバージョンに互換性がない場合は、
+    //    互換性のあるバージョンを .cache/adapters にインストールすることを試みる
     const installTimer = reporter.activityTimer(
       `Installing ${adapterToUse.name} adapter (${adapterToUse.module}@${adapterToUse.moduleVersion})`
     )
@@ -260,7 +260,7 @@ export async function getAdapterInit(
   }
 
   {
-    // 5. Try to load again from ".cache/adapters"
+    // 5. ".cache/adapters" からの読み込みをもう一度試みる
     const adapterAutoInstalledInCacheAdaptersResults =
       await tryLoadingAlreadyInstalledAdapter({
         adapterToUse,
@@ -275,13 +275,13 @@ export async function getAdapterInit(
         )
         return adapterAutoInstalledInCacheAdaptersResults.loadedModule
       } else {
-        // this indicates a bug as we install version with range from manifest, and now after trying to load the adapter we consider that adapter incompatible
+        // これはバグを示している。マニフェストの範囲に合うバージョンをインストールしたのに、アダプターを読み込んでみると互換性がないと判断しているためである
         return handleAdapterProblem(
           `Auto installed adapter "${adapterToUse.module}@${adapterAutoInstalledInCacheAdaptersResults.installedVersion}"`
         )
       }
     } else {
-      // this indicates a bug with adapter itself (fail to resolve main entry point) OR the adapter loading logic
+      // これは、アダプター自体のバグ（メインのエントリーポイントを解決できない）か、アダプターを読み込むロジックのバグを示している
       return handleAdapterProblem(
         `Could not load adapter "${adapterToUse.module}@${adapterToUse.moduleVersion}". Adapter entry point is not resolvable.`
       )

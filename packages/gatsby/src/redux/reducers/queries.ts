@@ -5,7 +5,7 @@ import {
   IQueryState,
 } from "../types"
 
-type QueryId = string // page query path or static query id
+type QueryId = string // ページクエリのパス、または静的クエリの ID
 type ComponentPath = string
 type NodeId = string
 type ConnectionName = string
@@ -33,7 +33,7 @@ const initialState = (): IGatsbyState["queries"] => {
 
 const initialQueryState = (): IQueryState => {
   return {
-    dirty: -1, // unknown, must be set right after init
+    dirty: -1, // 不明。init の直後に設定しなければならない
     running: 0,
   }
 }
@@ -49,13 +49,13 @@ const initialComponentState = (): IComponentState => {
 }
 
 /**
- * Tracks query dirtiness. Dirty queries are queries that:
+ * クエリのダーティの状態を追跡する。ダーティなクエリとは、次のようなクエリである。
  *
- * - depend on nodes or node collections (via `actions.createPageDependency`) that have changed.
- * - have been recently extracted (or their query text has changed)
- * - belong to newly created pages (or pages with modified context)
+ * - （`actions.createPageDependency` を通じて）依存しているノードやノードのコレクションが変更された
+ * - 最近抽出された（またはクエリのテキストが変更された）
+ * - 新しく作成されたページ（またはコンテキストが変更されたページ）に属している
  *
- * Dirty queries must be re-ran.
+ * ダーティなクエリは再実行しなければならない。
  */
 export function queriesReducer(
   state: IGatsbyState["queries"] = initialState(),
@@ -97,12 +97,12 @@ export function queriesReducer(
       return state
     }
     case `DELETE_PAGE`: {
-      // Don't actually remove the page query from trackedQueries, just mark it as "deleted". Why?
-      //   We promote a technique of a consecutive deletePage/createPage calls in onCreatePage hook,
-      //   see https://www.gatsbyjs.com/docs/creating-and-modifying-pages/#pass-context-to-pages
-      //   If we remove a query and then re-add, it will be marked as dirty.
-      //   This is OK for cold cache but with warm cache we will re-run all of those queries (unnecessarily).
-      //   We will reconcile the state after createPages API call and actually delete those queries.
+      // ページクエリを trackedQueries から実際には取り除かず、"deleted" の印を付けるだけにする。その理由は次のとおり。
+      //   onCreatePage フックの中で deletePage と createPage を続けて呼ぶ手法を推奨している。
+      //   https://www.gatsbyjs.com/docs/creating-and-modifying-pages/#pass-context-to-pages を参照
+      //   クエリを取り除いてから追加し直すと、ダーティの印が付く。
+      //   コールドキャッシュでは問題ないが、ウォームキャッシュでは、それらのクエリをすべて（不必要に）再実行してしまう。
+      //   createPages API の呼び出しの後に状態の整合を取り、そこで実際にそれらのクエリを削除する。
       state.deletedQueries.add(action.payload.path)
       return state
     }
@@ -128,16 +128,16 @@ export function queriesReducer(
       return state
     }
     case `QUERY_EXTRACTED`: {
-      // Note: this action is called even in case of
-      // extraction error or missing query (with query === ``)
-      // TODO: use hash instead of a query text
+      // 注: このアクションは、抽出エラーの場合や
+      // クエリがない場合（query === ``）にも呼ばれる
+      // TODO: クエリのテキストの代わりにハッシュを使う
       const { componentPath, query } = action.payload
       const component = registerComponent(state, componentPath)
       if (hasFlag(component.errors, FLAG_ERROR_EXTRACTION)) {
         return state
       }
       if (component.query !== query) {
-        // Invalidate all pages associated with a component when query text changes
+        // クエリのテキストが変わったら、そのコンポーネントに関連するすべてのページを無効化する
         for (const queryId of component.pages) {
           const query = state.trackedQueries.get(queryId)
           if (query) {
@@ -159,12 +159,12 @@ export function queriesReducer(
       return state
     }
     case `REPLACE_STATIC_QUERY`: {
-      // Only called when static query text has changed, so no need to compare
-      // TODO: unify the behavior?
+      // 静的クエリのテキストが変わったときにだけ呼ばれるので、比較する必要はない
+      // TODO: 動作を統一するか？
       const query = registerQuery(state, action.payload.id)
       query.dirty = setFlag(query.dirty, FLAG_DIRTY_TEXT)
-      // static queries are not on demand, so skipping tracking which
-      // queries were marked dirty recently
+      // 静的クエリはオンデマンドではないので、最近ダーティの印が付いた
+      // クエリの追跡はスキップする
       // state = trackDirtyQuery(state, action.payload.id)
       state.deletedQueries.delete(action.payload.id)
       return state
@@ -188,7 +188,7 @@ export function queriesReducer(
       return state
     }
     case `QUERY_START`: {
-      // Reset data dependencies as they will be updated when running the query
+      // データ依存は、クエリの実行時に更新されるので、リセットする
       const { path } = action.payload
       state = clearNodeDependencies(state, path)
       state = clearConnectionDependencies(state, path)
@@ -233,11 +233,11 @@ export function queriesReducer(
     }
     case `SET_PROGRAM_STATUS`: {
       if (action.payload === `BOOTSTRAP_FINISHED`) {
-        // Reset the running state (as it could've been persisted)
+        // 実行中の状態をリセットする（永続化されていた可能性があるため）
         for (const [, query] of state.trackedQueries) {
           query.running = 0
         }
-        // Reset list of dirty queries (this is used only to notify runtime and it could've been persisted)
+        // ダーティなクエリの一覧をリセットする（これはランタイムへの通知にだけ使われ、永続化されていた可能性があるため）
         state.dirtyQueriesListToEmitViaWebsocket = []
       }
       return state
@@ -247,7 +247,7 @@ export function queriesReducer(
       return state
     }
     case `MERGE_WORKER_QUERY_STATE`: {
-      // This action may be dispatched in cases where queries might not be included in the merge data
+      // このアクションは、マージするデータに queries が含まれていない場合にも dispatch されることがある
       if (!action.payload.queryStateChunk) {
         return state
       }
@@ -278,9 +278,9 @@ function addNodeDependency(
   queryId: QueryId,
   nodeId: NodeId
 ): IGatsbyState["queries"] {
-  // Perf: using two-side maps.
-  //   Without additional `queryNodes` map we would have to loop through
-  //   all existing nodes in `clearNodeDependencies` to delete node <-> query dependency
+  // パフォーマンス: 双方向のマップを使う。
+  //   追加の `queryNodes` マップがなければ、ノード <-> クエリの依存を削除するために、
+  //   `clearNodeDependencies` で既存のすべてのノードをループしなければならない
   let nodeQueries = state.byNode.get(nodeId)
   if (!nodeQueries) {
     nodeQueries = new Set<QueryId>()
@@ -301,8 +301,8 @@ function addConnectionDependency(
   queryId: QueryId,
   connection: ConnectionName
 ): IGatsbyState["queries"] {
-  // Note: not using two-side maps for connections as associated overhead
-  //   for small number of elements is greater then benefits, so no perf. gains
+  // 注: connection には双方向のマップを使わない。要素数が少ない場合は、それに伴う
+  //   オーバーヘッドのほうが利点より大きく、パフォーマンスは向上しないためである
   let queryIds = state.byConnection.get(connection)
   if (!queryIds) {
     queryIds = new Set()
@@ -383,13 +383,13 @@ function mergeWorkerDataDependencies(
 ): IGatsbyState["queries"] {
   const queryState = workerStateChunk.queryStateChunk
 
-  // First clear data dependencies for all queries tracked by worker
+  // まず、ワーカーが追跡しているすべてのクエリのデータ依存を消去する
   for (const queryId of queryState.trackedQueries.keys()) {
     state = clearNodeDependencies(state, queryId)
     state = clearConnectionDependencies(state, queryId)
   }
 
-  // Now re-add all data deps from worker
+  // 次に、ワーカーからのデータ依存をすべて追加し直す
   for (const [nodeId, queries] of queryState.byNode) {
     for (const queryId of queries) {
       state = addNodeDependency(state, queryId, nodeId)

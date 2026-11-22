@@ -89,7 +89,7 @@ describe(`the top-level develop state machine`, () => {
     expect(service.state.context.sourceFilesDirty).toBeTruthy()
   })
 
-  // This is current behaviour, but it will be queued in future
+  // これが現在の動作だが、将来はキューに入れられるようになる
   it(`handles a webhook during node sourcing`, () => {
     const webhookBody = { foo: 1 }
     const service = interpret(machine)
@@ -188,7 +188,7 @@ describe(`the top-level develop state machine`, () => {
     service.send(`SOURCE_FILE_CHANGED`)
     service.send(`done.invoke.initialize-data`)
     service.send(`done.invoke.post-bootstrap`)
-    // So we don't start webpack instead
+    // そのため、代わりに webpack を起動しない
     service.state.context.compiler = {} as any
     services.recompile.mockReset()
     service.send(`done.invoke.run-queries`)

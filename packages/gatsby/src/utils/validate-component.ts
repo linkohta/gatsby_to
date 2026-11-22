@@ -29,7 +29,7 @@ export function validateComponent(args: {
 }): { error?: IErrorMeta; panicOnBuild?: boolean } {
   const { input, pluginName, errorIdMap } = args || {}
 
-  // No component path passed
+  // コンポーネントのパスが渡されていない
   if (!input?.component) {
     return {
       error: {
@@ -50,12 +50,12 @@ export function validateComponent(args: {
     componentPath,
   }
 
-  // Component path already validated in previous pass
+  // コンポーネントのパスは、前回の処理ですでに検証済みである
   if (validationCache.has(componentPath)) {
     return {}
   }
 
-  // Component path must be absolute
+  // コンポーネントのパスは絶対パスでなければならない
   if (!path.isAbsolute(componentPath)) {
     return {
       error: {
@@ -65,7 +65,7 @@ export function validateComponent(args: {
     }
   }
 
-  // Component path must exist
+  // コンポーネントのパスは存在しなければならない
   if (isNotTestEnv) {
     if (!fs.existsSync(componentPath)) {
       return {
@@ -80,7 +80,7 @@ export function validateComponent(args: {
   if (!componentPath.includes(`/.cache/`) && isProductionEnv) {
     const fileContent = fs.readFileSync(componentPath, `utf-8`)
 
-    // Component must not be empty
+    // コンポーネントは空であってはならない
     if (fileContent === ``) {
       return {
         error: {
@@ -91,7 +91,7 @@ export function validateComponent(args: {
       }
     }
 
-    // Component must have a default export
+    // コンポーネントにはデフォルト export がなければならない
     if ([`.js`, `.jsx`, `.ts`, `.tsx`].includes(path.extname(componentPath))) {
       const includesDefaultExport =
         fileContent.includes(`export default`) ||

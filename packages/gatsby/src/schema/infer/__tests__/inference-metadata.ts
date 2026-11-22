@@ -1,4 +1,4 @@
-// NOTE: Previously `data-tree-utils-test.js`
+// NOTE: 以前は `data-tree-utils-test.js` だった
 import _ from "lodash"
 
 import {
@@ -185,7 +185,7 @@ describe(`Get example value for type inference`, () => {
   })
 
   it(`build enum values for fields from array on nodes`, () => {
-    // TODO: Should be moved to `types/__tests__/sort.js`
+    // TODO: `types/__tests__/sort.js` へ移すべき
     const { createSchemaComposer } = require(`../../schema-composer`)
     const { addInferredFields } = require(`../add-inferred-fields`)
     const { getFieldsEnum } = require(`../../types/sort`)
@@ -251,14 +251,14 @@ describe(`Get example value for type inference`, () => {
   })
 
   it(`skips unsupported types`, () => {
-    // Skips functions
+    // 関数はスキップする
     let example = getExampleValueWithoutConflicts({
       nodes: [{ foo: (): void => {} }],
       typeConflictReporter,
     })
     expect(example.foo).not.toBeDefined()
 
-    // Skips array of functions
+    // 関数の配列はスキップする
     example = getExampleValueWithoutConflicts({
       nodes: [{ foo: [(): void => {}] }],
       typeConflictReporter,
@@ -269,7 +269,7 @@ describe(`Get example value for type inference`, () => {
   it(`prefers float when multiple number types`, () => {
     let example
 
-    // nodes starting with 32-bit integer ("big" ints are float)
+    // 32 ビット整数で始まるノード（「大きな」整数は float になる）
     example = getExampleValueWithoutConflicts({
       nodes: [{ number: 5 }, { number: 2.5 }],
       typeConflictReporter,
@@ -283,7 +283,7 @@ describe(`Get example value for type inference`, () => {
     expect(example.number).toBeDefined()
     expect(example.number).toEqual(3000000000)
 
-    // with node not containing number field
+    // 数値のフィールドを含まないノードがある場合
     example = getExampleValueWithoutConflicts({
       nodes: [{ number: 5 }, {}, { number: 2.5 }],
       typeConflictReporter,
@@ -291,7 +291,7 @@ describe(`Get example value for type inference`, () => {
     expect(example.number).toBeDefined()
     expect(example.number).toEqual(2.5)
 
-    // nodes starting with float ("big" ints are float)
+    // float で始まるノード（「大きな」整数は float になる）
     example = getExampleValueWithoutConflicts({
       nodes: [{ number: 2.5 }, { number: 5 }],
       typeConflictReporter,
@@ -305,7 +305,7 @@ describe(`Get example value for type inference`, () => {
     expect(example.number).toBeDefined()
     expect(example.number).toEqual(3000000000)
 
-    // array of numbers - starting with float
+    // 数値の配列 - float で始まる
     example = getExampleValueWithoutConflicts({
       nodes: [{ numbers: [2.5, 5] }],
       typeConflictReporter,
@@ -323,7 +323,7 @@ describe(`Get example value for type inference`, () => {
     expect(example.numbers.length).toBe(1)
     expect(example.numbers[0]).toBe(3000000000)
 
-    // array of numbers - starting with 32-bit integer
+    // 数値の配列 - 32 ビット整数で始まる
     example = getExampleValueWithoutConflicts({
       nodes: [{ numbers: [5, 2.5] }],
       typeConflictReporter,
@@ -656,7 +656,7 @@ describe(`Get example value for type inference`, () => {
       })
       expect(example.dates).toEqual([`String`])
 
-      // should be valid - separate arrays of both unique types and mixed types (string is not a date) #2
+      // 有効であるはず - 一意な型と混在した型の、別々の配列（文字列は日付ではない） #2
       example = getExampleValueWithoutConflicts({
         nodes: [
           {
@@ -807,7 +807,7 @@ describe(`Get example value for type inference`, () => {
       inferenceMetadata = deleteNode(inferenceMetadata, nodes[1])
       expect(getExampleObject(inferenceMetadata)).toMatchSnapshot()
 
-      // Re-adding deleted nodes should restore original example value:
+      // 削除したノードを追加し直すと、元の example value が復元されるはずである:
       inferenceMetadata = addNodes(inferenceMetadata, [
         nodes[2],
         nodes[3],
@@ -1019,7 +1019,7 @@ describe(`Type conflicts`, () => {
     expect(conflicts).toEqual([])
   })
 
-  // We removed this warning to not confuse people
+  // 混乱を招かないように、この警告は削除した
   it.skip(`reports date and string conflicts`, () => {
     const nodes = [
       {
@@ -1149,14 +1149,14 @@ describe(`Type change detection`, () => {
 
   /* eslint-disable @typescript-eslint/naming-convention */
   it(`detects on any change of the relatedNode field`, () => {
-    // We do not know a type of the node being added hence consider and
-    // add/delete to such fields as mutations
+    // 追加されるノードの型は分からないので、そのようなフィールドへの
+    // 追加と削除は変更として扱う
     let metadata = addOne({ relatedNode___NODE: `added` })
     expect(metadata.dirty).toEqual(true)
     expect(haveEqualFields(metadata, initialMetadata)).toEqual(false)
     metadata.dirty = false
 
-    // Deleting is expected to restore initial metadata state
+    // 削除すると、メタデータは最初の状態に戻るはずである
     metadata = deleteOne({ relatedNode___NODE: `added` }, metadata)
     expect(metadata.dirty).toEqual(true)
     expect(haveEqualFields(metadata, initialMetadata)).toEqual(true)
@@ -1174,7 +1174,7 @@ describe(`Type change detection`, () => {
     expect(haveEqualFields(metadata, initialMetadata)).toEqual(false)
     metadata.dirty = false
 
-    // Deleting is expected to restore initial metadata state
+    // 削除すると、メタデータは最初の状態に戻るはずである
     metadata = deleteOne({ relatedNodeList___NODE: [`added`] }, metadata)
     expect(metadata.dirty).toEqual(true)
     expect(haveEqualFields(metadata, initialMetadata)).toEqual(true)

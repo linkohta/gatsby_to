@@ -7,37 +7,37 @@ import { store } from "../redux"
 import { getPageMode } from "./page-mode"
 
 /**
- * Add preload link headers to responses for .html files. This allows browser to schedule fetching critical resources
- * to render a page faster. Without them it would result in network waterfall (fetch js script -> parse and execute -> start downloading data)
- * With them we can start downloading data before JS executes.
+ * .html ファイルのレスポンスに preload の link ヘッダーを追加する。これにより、ブラウザーは重要なリソースの取得を前もって予約でき、
+ * ページをより速くレンダリングできる。これがないと、ネットワークのウォーターフォールが発生する（js のスクリプトを取得 -> パースして実行 -> データのダウンロードを開始）
+ * これがあれば、JS が実行される前にデータのダウンロードを開始できる。
  */
 export async function appendPreloadHeaders(
   requestPath: string,
   res: Response
 ): Promise<void> {
-  // add common.js and socket.io.js preload headers
-  // TODO: make socket.io part not blocking - we don't need it anymore to render the page
+  // common.js と socket.io.js の preload ヘッダーを追加する
+  // TODO: socket.io の部分をブロッキングでなくする。ページのレンダリングにはもう必要ない
   res.append(`Link`, `</commons.js>; rel=preload; as=script`)
   res.append(`Link`, `</socket.io/socket.io.js>; rel=preload; as=script`)
 
   const page = findPageByPath(store.getState(), requestPath, true)
-  // we fallback to 404 pages - so there should always be a page (at worst dev-404)
-  // this is just sanity check to not crash server in case it doesn't find anything
+  // 404 ページにフォールバックするので、ページは常に存在するはずである（最悪でも dev-404）
+  // これは、何も見つからなかった場合にサーバーをクラッシュさせないための、念のための確認である
   if (page) {
-    // add app-data.json preload
+    // app-data.json の preload を追加する
     res.append(
       `Link`,
       `</page-data/app-data.json>; rel=preload; as=fetch ; crossorigin`
     )
 
-    // add page-data.json preload
-    // our runtime also demands 404 and dev-404 page-data to be fetched to even render (see cache-dir/app.js)
+    // page-data.json の preload を追加する
+    // ランタイムは、レンダリングするだけでも 404 と dev-404 の page-data の取得を要求する（cache-dir/app.js を参照）
     const pagePathsToPreload = [`/404.html`, `/dev-404-page/`]
     if (
       getPageMode(page) !== `SSR` &&
       !pagePathsToPreload.includes(page.path)
     ) {
-      // let's make sure page path is first one (order shouldn't matter, just for reasonable order)
+      // ページのパスが最初になるようにする（順序は問題にならないはずだが、分かりやすい順序にするため）
       pagePathsToPreload.unshift(page.path)
     }
 
@@ -58,19 +58,19 @@ export async function appendPreloadHeaders(
           pagePath
         )
 
-        // iterate over needed static queries and add them to Set of static queries to preload
-        // Set will guarantee uniqueness in case queries are shared by requested page and 404 page.
+        // 必要な静的クエリを順に処理して、preload する静的クエリの Set に追加する
+        // Set を使うことで、リクエストされたページと 404 ページがクエリを共有している場合でも、重複しないことが保証される。
         for (const staticQueryHash of pageData.staticQueryHashes) {
           staticQueriesToPreload.add(staticQueryHash)
         }
       } catch (e) {
-        // there might be timing reasons why this fails - page-data file is not created yet
-        // as page was just recently added (so page exists already but page-data doesn't yet)
-        // in those cases we just do nothing
+        // タイミングの都合でこれが失敗することがある。ページが追加されたばかりで、page-data ファイルが
+        // まだ作成されていない場合である（ページはすでに存在するが、page-data はまだない）
+        // そのような場合は何もしない
       }
     }
 
-    // append accumulated static queries from pages we load
+    // 読み込むページから集めた静的クエリを追加する
     for (const staticQueryHash of staticQueriesToPreload) {
       res.append(
         `Link`,
@@ -78,7 +78,7 @@ export async function appendPreloadHeaders(
       )
     }
   } else {
-    // should we track cases when there is actually nothing returned to find cases
-    // where we don't add preload headers if above assumption turns out to be wrong?
+    // 上の前提が誤っていた場合に preload ヘッダーを追加していないケースを見つけるために、
+    // 実際には何も返されないケースを追跡すべきか？
   }
 }

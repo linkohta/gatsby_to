@@ -19,8 +19,8 @@ const errorParser = ({
   location = undefined,
   error = undefined,
 }: IErrorParser): IMatch => {
-  // Handle GraphQL errors. A list of regexes to match certain
-  // errors to specific callbacks
+  // GraphQL のエラーを処理する。特定のエラーを特定のコールバックに
+  // 対応付けるための正規表現の一覧
   const handlers = [
     {
       regex: /Variable "(.+)" of required type "(.+)" was not provided\./m,
@@ -128,14 +128,14 @@ const errorParser = ({
         }
       },
     },
-    // Match anything with a generic catch-all error handler
+    // 汎用のキャッチオールのエラーハンドラーで、あらゆるものに一致させる
     {
       regex: /[\s\S]*/gm,
       cb: (match): IMatch => {
         if (error instanceof Error) {
           return {
             id: `85901`,
-            error, // show stack trace
+            error, // スタックトレースを表示する
             context: { sourceMessage: match[0] },
           }
         } else {

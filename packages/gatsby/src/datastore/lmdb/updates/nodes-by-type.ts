@@ -9,7 +9,7 @@ export function updateNodesByType(
     case `CREATE_NODE`:
     case `ADD_FIELD_TO_NODE`:
     case `ADD_CHILD_NODE_TO_PARENT_NODE`: {
-      // nodesByType db uses dupSort, so `put` will effectively append an id
+      // nodesByType の db は dupSort を使うので、`put` は実質的に id を追加する
       return nodesByTypeDb.put(action.payload.internal.type, action.payload.id)
     }
     case `DELETE_NODE`: {

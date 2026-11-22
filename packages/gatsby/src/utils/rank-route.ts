@@ -1,4 +1,4 @@
-// path ranking algorithm copied (with small adjustments) from `@reach/router` (internal util, not exported from the package)
+// パスの順位付けのアルゴリズムは、`@reach/router`（内部のユーティリティで、パッケージからは export されていない）から（少し調整して）コピーしたもの
 // https://github.com/reach/router/blob/28a79e7fc3a3487cb3304210dc3501efb8a50eba/src/lib/utils.js#L216-L254
 const paramRe = /^:(.+)/
 
@@ -14,7 +14,7 @@ const isSplat = (segment: string): boolean => segment === `*`
 
 const segmentize = (uri: string): Array<string> =>
   uri
-    // strip starting/ending slashes
+    // 先頭と末尾のスラッシュを取り除く
     .replace(/(^\/+|\/+$)/g, ``)
     .split(`/`)
 
@@ -27,4 +27,4 @@ export const rankRoute = (path: string): number =>
     else score += STATIC_POINTS
     return score
   }, 0)
-// end of copied `@reach/router` internals
+// `@reach/router` の内部からコピーした部分はここまで
