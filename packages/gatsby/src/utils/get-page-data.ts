@@ -44,7 +44,7 @@ async function doGetPageData(
   if (pendingPageDataWrites.pagePaths.has(pagePath)) {
     return waitNextPageData(pagePath, waitForMS, initialWaitForMs)
   }
-  // Results are up-to-date
+  // 結果は最新である
   return readPageData(pagePath)
 }
 
@@ -72,15 +72,15 @@ async function waitNextPageData(
         if (data.payload.page === pagePath) {
           clearTimeout(timeout)
           emitter.off(`CLEAR_PENDING_PAGE_DATA_WRITE`, listener)
-          // page-data was flushed, but we don't know if query wasn't marked as stale in meantime
-          // so we call `doGetPageData` again that will make checks and wait for fresh result
-          // or resolve immediately if it's not stale.
-          // Remaining time change is not actually "correct", but timeout overall is meant to ensure
-          // we do resolve (or reject) eventually, it doesn't have to be 100% correct - we do decrease
-          // it slightly to not end up in infinite loop situations.
-          // We also need to delay calling `doGetPageData` because it can cause adding another `CLEAR_PENDING_PAGE_DATA_WRITE`
-          // callback in same tick and `mett` will run this callback (because it will happen before current callback finishes
-          // and `mett` doesn't guarantee it will only run callbacks registered before message was emitted)
+          // page-data は書き出されたが、その間にクエリに古いという印が付いていないかは分からない
+          // そのため `doGetPageData` をもう一度呼ぶ。これは確認を行い、新しい結果を待つか、
+          // 古くなっていなければすぐに解決する。
+          // 残り時間の変更は実際には「正確」ではないが、タイムアウトは全体として、最終的に必ず
+          // 解決（または reject）することを保証するためのものであり、100% 正確である必要はない。
+          // 無限ループの状況に陥らないように、少しずつ減らしている。
+          // また、`doGetPageData` の呼び出しを遅らせる必要もある。これは同じ tick の中で、別の `CLEAR_PENDING_PAGE_DATA_WRITE` の
+          // コールバックを追加することがあり、`mett` がそのコールバックを実行してしまうためである（現在のコールバックが終わる前に起き、
+          // `mett` は、メッセージが発行される前に登録されたコールバックだけを実行することを保証しない）
           process.nextTick(() =>
             resolve(
               doGetPageData(
@@ -94,8 +94,8 @@ async function waitNextPageData(
       }
     })
   } else {
-    // not ideal ... but try to push results we might have (stale)
-    // or fail/reject
+    // 理想的ではないが ... 手元にあるかもしれない（古い）結果を送ることを試みる。
+    // それもなければ失敗させる（reject する）
     return readPageData(pagePath).catch(() => {
       throw new Error(
         `Couldn't get query results for "${pagePath}" in ${(

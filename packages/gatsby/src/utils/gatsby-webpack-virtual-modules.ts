@@ -2,18 +2,18 @@ import VirtualModulesPlugin from "webpack-virtual-modules"
 import * as path from "path"
 import * as fs from "fs-extra"
 /*
- * This module allows creating virtual (in memory only) modules / files
- * that webpack compilation can access without the need to write module
- * body to actual filesystem.
+ * このモジュールを使うと、仮想的な（メモリー上にだけある）モジュールやファイルを作成でき、
+ * モジュールの本体を実際のファイルシステムに書き込まなくても、
+ * webpack のコンパイルからアクセスできる。
  *
- * It's useful for intermediate artifacts that are not part of final builds,
- * but are used in some way to generate final ones (for example `async-requires.js`).
+ * 最終的なビルドには含まれないが、最終的な成果物を生成するために何らかの形で
+ * 使われる中間の成果物（たとえば `async-requires.js`）に役立つ。
  *
- * Using virtual modules allow us to avoid unnecessary I/O to write/read those modules,
- * but more importantly using virtual modules give us immediate invalidation events
- * in webpack watching mode (as opposed to debounced/delayed events when filesystem is used).
- * Instant invalidation events make it much easier to work with various state transitions
- * in response to external events that are happening while `gatsby develop` is running.
+ * 仮想モジュールを使うと、それらのモジュールを読み書きするための不要な I/O を避けられる。
+ * しかしそれ以上に重要なのは、webpack の監視モードで無効化イベントが即座に得られることである
+ * （ファイルシステムを使う場合の、デバウンスされた遅延のあるイベントとは対照的である）。
+ * 無効化イベントが即座に得られると、`gatsby develop` の実行中に起きる外部のイベントに
+ * 応じたさまざまな状態遷移が、ずっと扱いやすくなる。
  */
 
 interface IGatsbyWebpackVirtualModulesContext {
@@ -43,12 +43,12 @@ export function writeModule(filePath: string, fileContents: string): void {
   const adjustedFilePath = getAbsolutePathForVirtualModule(filePath)
 
   if (fileContentLookup[adjustedFilePath] === fileContents) {
-    // we already have this, no need to cause invalidation
+    // これはすでにあるので、無効化を発生させる必要はない
     return
   }
 
-  // workaround webpack marking virtual modules as deleted because those files don't really exist
-  // so we create those files just so watchpack doesn't mark them as initially missing
+  // これらのファイルは実際には存在しないので、webpack は仮想モジュールを削除済みとして印を付けてしまう。その回避策である
+  // そこで、watchpack が最初から存在しないものとして印を付けないように、それらのファイルを作成する
   fs.outputFileSync(adjustedFilePath, fileContents)
 
   fileContentLookup[adjustedFilePath] = fileContents

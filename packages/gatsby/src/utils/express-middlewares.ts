@@ -17,7 +17,7 @@ export const configureTrailingSlash =
     }
 
     if (req?.path.split(`/`)?.pop()?.includes(`.`)) {
-      // Path has an extension. Do not add slash.
+      // パスに拡張子がある。スラッシュを追加しない。
       next()
       return
     }
@@ -27,32 +27,32 @@ export const configureTrailingSlash =
       return
     }
 
-    // check if it's Gatsby Page
+    // Gatsby のページであるかを確認する
     const page = findPageByPath(getState(), req.path)
 
     if (page) {
       if (option === `never`) {
         if (req.path.slice(-1) === `/` && page.path !== req.path) {
-          // Remove trailing slash
+          // 末尾のスラッシュを取り除く
           const query = req.url.slice(req.path.length)
           res.redirect(301, req.path.slice(0, -1) + query)
           return
         } else {
-          // express.static really doesn't like paths without trailing slashes
-          // so we "rewrite" request to look like request with trailing slash
-          // otherwise we'll have an infinite redirect loop. We did this because
-          // express.static automatically adds the redirect trailing slash then
+          // express.static は、末尾にスラッシュがないパスを本当に嫌う
+          // そのため、末尾にスラッシュがあるリクエストに見えるように、リクエストを「書き換える」
+          // そうしないと、リダイレクトの無限ループになる。こうしているのは、
+          // express.static が末尾のスラッシュへのリダイレクトを自動的に追加するためである
           const BASE = `http://localhost`
           const urlToMessWith = new URL(req.url, BASE)
           urlToMessWith.pathname += `/`
 
-          // The incoming req.url is relative, so we remove the base again
-          // we use new URL so that queries/hashes are handled automatically
+          // 受け取った req.url は相対的なので、base を再び取り除く
+          // クエリやハッシュが自動的に処理されるように、new URL を使う
           req.url = urlToMessWith.toString().replace(BASE, ``)
         }
       } else if (option === `always`) {
         if (req.path.slice(-1) !== `/` && page.path !== req.path) {
-          // Add trailing slash
+          // 末尾のスラッシュを追加する
           const query = req.url.slice(req.path.length)
           res.redirect(301, `${req.path}/${query}`)
           return

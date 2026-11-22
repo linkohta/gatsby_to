@@ -11,13 +11,13 @@ const getPosition = function (stackObject: Array<string>): {
   let filename = ``
   let line = 0
   let column = 0
-  // Because the JavaScript error stack has not yet been standardized,
-  // wrap the stack parsing in a try/catch for a soft fail if an
-  // unexpected stack is encountered.
+  // JavaScript のエラースタックはまだ標準化されていないので、
+  // スタックのパースを try/catch で囲み、予期しないスタックに
+  // 出会った場合でも致命的にならないようにする。
   try {
     for (const stackLine of stackObject) {
       {
-        // testing for following format:
+        // 次の形式かをテストする:
         // "    at Component (/Users/misiek/dev/gatsby/integration-tests/ssr/.cache/page-ssr/routes/render-page.js:4088:13)"
         const splitLine = stackLine.match(/(?:\()(.+):([0-9]+):([0-9]+)(?:\))$/)
         if (splitLine) {
@@ -29,7 +29,7 @@ const getPosition = function (stackObject: Array<string>): {
       }
 
       {
-        // testing for following format:
+        // 次の形式かをテストする:
         // "    at ssr/src/pages/bad-page.js:4:13"
         const splitLine = stackLine.match(/at (.+):([0-9]+):([0-9]+)$/)
         if (splitLine) {
@@ -41,7 +41,7 @@ const getPosition = function (stackObject: Array<string>): {
       }
 
       {
-        // trying to extract generic:
+        // 汎用の形式の抽出を試みる:
         // "<filepath>:<line>:<column>"
         const splitLine = stackLine.match(/(.+):([0-9]+):([0-9]+)/)
         if (splitLine) {
@@ -82,7 +82,7 @@ export interface IErrorRenderMeta {
   stack?: string
 }
 
-// Code borrowed and modified from https://github.com/watilde/parse-error
+// コードは https://github.com/watilde/parse-error から借用して変更したもの
 export const parseError = function ({
   err,
   directory,
@@ -94,7 +94,7 @@ export const parseError = function ({
   componentPath: string
   htmlComponentRendererPath: string
 }): IParsedError {
-  // convert stack trace to use source file locations and not compiled ones
+  // スタックトレースを、コンパイル後の位置ではなくソースファイルの位置を使うように変換する
   err = createErrorFromString(err, `${htmlComponentRendererPath}.map`)
 
   const stack = err.stack ? err.stack : ``
@@ -108,9 +108,9 @@ export const parseError = function ({
 
   let filename = sysPath.join(directory, relativeFileName)
 
-  // webpack tends to inject project name as first segment in stack traces
-  // so the filename / relativeFileName might not be correct - so we are checking
-  // if it points to existing file and try to remove project name if it's first segment
+  // webpack は、スタックトレースの最初のセグメントとしてプロジェクト名を入れることが多い
+  // そのため、filename / relativeFileName は正しくないことがある。そこで、存在するファイルを
+  // 指しているかを確認し、最初のセグメントがプロジェクト名であれば取り除くことを試みる
   if (!fs.existsSync(filename)) {
     try {
       const projectName = fs.readJsonSync(
@@ -126,7 +126,7 @@ export const parseError = function ({
 
       filename = sysPath.join(directory, relativeFileName)
     } catch (e) {
-      // nothing more we can do here
+      // ここでできることはもうない
     }
   }
 
@@ -137,10 +137,10 @@ export const parseError = function ({
     sourceContent = null
   }
 
-  // We prefer the file path from the stack trace as the error might not be in the
-  // component — but if source-maps fail and we just get public/render-page.js as
-  // the file, we fall back on the component filepath as at least the user
-  // will have that.
+  // エラーはコンポーネントの中にあるとは限らないので、スタックトレースのファイルパスを
+  // 優先する。ただし、ソースマップが失敗してファイルとして public/render-page.js しか
+  // 得られなかった場合は、コンポーネントのファイルパスにフォールバックする。少なくとも
+  // ユーザーの手がかりになるためである。
   const trueFileName = filename.includes(`render-page`)
     ? componentPath
     : filename

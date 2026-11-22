@@ -3,7 +3,7 @@ import report from "gatsby-cli/lib/reporter"
 
 const seedConstant = `638f7a53-c567-4eca-8fc1-b23efb1cfb2b`
 
-// This cache prevents duplicate calls to uuid which is relevant for certain cases
+// このキャッシュは、uuid の重複した呼び出しを防ぐ。特定のケースで効果がある
 const unprefixedCache: Map<string, string> = new Map()
 // ns -> name -> uuid
 const namespacedCache: Map<string, Map<string, string>> = new Map([
@@ -11,25 +11,25 @@ const namespacedCache: Map<string, Map<string, string>> = new Map([
 ])
 
 /**
- * Generate a unique id that is consistent, deterministic, and fast while resulting in predictably short hashes.
+ * 一貫性があり、決定的で、高速に生成でき、かつ予測可能な短さのハッシュになる一意な ID を生成する。
  *
- * Some characteristics for this id:
+ * この ID の特性:
  *
- * - The value of the `id` should not mean anything (it is "ours")
- * - The value does not need to be encrypted
- * - The value must be unique within our system (as little collision risk as possible on small ascii inputs)
- * - The value needs to be deterministic (same input always results in same output)
- * - The conversion needs to be fast
- * - The result should be predictably short as it may be used in urls
+ * - `id` の値は何も意味を持つべきではない（これは「こちら側のもの」である）
+ * - 値を暗号化する必要はない
+ * - 値はシステムの中で一意でなければならない（小さな ascii の入力で、衝突のリスクができるだけ小さいこと）
+ * - 値は決定的でなければならない（同じ入力からは常に同じ出力になる）
+ * - 変換は高速でなければならない
+ * - 結果は url で使われることがあるので、予測可能な短さであるべきである
  *
- * High level this step is meant to prevent people from using our `id` to have meaning in their site and it's meant
- * to make sure the id ends up being short, whatever the input size was.
+ * 大まかに言うと、このステップは、利用者がサイトの中でこの `id` に意味を持たせて使うのを防ぐことと、
+ * 入力のサイズにかかわらず ID が短くなるようにすることを目的としている。
  *
- * Note: UUID is relatively slow because it calls into the native crypto library to generate SHA-1 hashes.
- *       We do need the low collision rate of SHA-1 so we use a local (global) cache to speed up repetitive calls
+ * 注: UUID は、SHA-1 ハッシュを生成するためにネイティブの crypto ライブラリを呼ぶので、比較的遅い。
+ *       SHA-1 の衝突率の低さは必要なので、繰り返しの呼び出しを速くするためにローカルの（グローバルな）キャッシュを使う
  *
- * @param {String | Number} id - A string of arbitrary length
- * @param {String} namespace - Namespace to use for UUID
+ * @param {String | Number} id - 任意の長さの文字列
+ * @param {String} namespace - UUID に使う名前空間
  *
  * @return {String} - UUID
  */
@@ -52,8 +52,8 @@ export function createNodeId(id: string | number, namespace: string): string {
     unprefixedCache.set(namespace, nsHash)
   }
 
-  // Calling uuid is relatively expensive because it calls into crypto for sha1.
-  // We use a local map to cache calls with the same ns+id pair, which helps a lot.
+  // uuid の呼び出しは、sha1 のために crypto を呼ぶので比較的コストが高い。
+  // 同じ ns+id の組での呼び出しをローカルのマップでキャッシュしており、これが大きく効く。
   let nsCache = namespacedCache.get(namespace)
   if (!nsCache) {
     nsCache = new Map()

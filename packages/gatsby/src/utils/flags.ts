@@ -1,14 +1,14 @@
 import _ from "lodash"
 import semver from "semver"
 
-// Does this experiment run for only builds
+// この実験的機能がビルドでだけ動くか
 type executingCommand = "build" | "develop" | "all"
 
 export const satisfiesSemvers = (
   semverConstraints: Record<string, string>
 ): boolean => {
-  // Check each semver check for the flag.
-  // If any are false, then the flag doesn't pass
+  // フラグのそれぞれの semver の確認を行う。
+  // どれか 1 つでも false であれば、フラグは通過しない
   const result = _.toPairs(semverConstraints).every(
     ([packageName, semverConstraint]) => {
       let packageVersion: string
@@ -18,7 +18,7 @@ export const satisfiesSemvers = (
         return false
       }
 
-      // We care if the semver check doesn't pass.
+      // 関心があるのは、semver の確認を通過しない場合である。
       return semver.satisfies(packageVersion, semverConstraint, {
         includePrerelease: true,
       })
@@ -36,39 +36,39 @@ export interface IFlag {
   description: string
   command: executingCommand
   /**
-   * Use string identifier to track enabled flag or false to disable any tracking (useful when flag becomes new defaults)
+   * 有効化されたフラグを追跡するための文字列の識別子を使う。追跡を無効にする場合は false を使う（フラグが新しいデフォルトになったときに役立つ）
    */
   telemetryId: string | false
-  // Heuristics for deciding if a flag is experimental:
-  // - there are known bugs most people will encounter and that block being
-  // able to use Gatsby normally
-  // - very few people have tested the feature so we're not sure if we've
-  // uncovered even common problems.
+  // フラグが実験的かどうかを判断するためのヒューリスティック:
+  // - ほとんどの人が遭遇し、Gatsby を通常どおり使えなくする既知の
+  // バグがある
+  // - その機能を試した人がごく少なく、よくある問題さえ洗い出せているか
+  // 分からない。
   //
-  // Flags should start as experimental but once all serious known bugs are
-  // resolved and ~50+ people have tested it, experimental should be set to
-  // false.
+  // フラグは実験的として始めるべきだが、既知の重大なバグがすべて
+  // 解決され、約 50 人以上が試したら、experimental を false に
+  // 設定すべきである。
   experimental: boolean
   /**
-   * True means conditions for the feature are met and can be opted in by user.
+   * true は、その機能の条件が満たされており、ユーザーがオプトインできることを意味する。
    *
-   * False means it'll be disabled despite the user setting it true e.g.
-   * it just won't work e.g. it doesn't have new enough version for something.
+   * false は、ユーザーが true に設定しても無効になることを意味する。たとえば、
+   * 何かのバージョンが十分に新しくないなど、単純に動かない場合である。
    *
-   * OPT_IN means the gatsby will enable the flag (unless the user explicitly
-   * disables it.
+   * OPT_IN は、（ユーザーが明示的に無効にしない限り）gatsby がフラグを
+   * 有効にすることを意味する。
    *
-   * LOCKED_IN means that feature is enabled always (unless `noCI` condition is met).
-   * This is mostly to provide more meaningful terminal messages instead of removing
-   * flag from the flag list when users has the flag set in configuration
-   * (avoids showing unknown flag message and shows "no longer needed" message).
+   * LOCKED_IN は、その機能が常に有効であることを意味する（`noCI` の条件が満たされる場合を除く）。
+   * これは主に、ユーザーが設定でそのフラグを指定しているときに、フラグを一覧から削除する代わりに、
+   * より意味のあるメッセージをターミナルに出すためのものである
+   * （不明なフラグというメッセージを避け、「もう不要である」というメッセージを表示する）。
    */
   testFitness: (flag: IFlag) => fitnessEnum
   /**
-   * Human-readable text explaining requirements for this feature to be available
-   * (e.g. requires Node 14+)
+   * この機能を使うための要件を説明する、人が読めるテキスト
+   * （例: Node 14 以上が必要）
    *
-   * It is shown to users when testFitness() returns `false` but flag is set in gatsby-config.js
+   * testFitness() が `false` を返したが、gatsby-config.js でフラグが設定されている場合に、ユーザーに表示される
    */
   requires?: string
   includedFlags?: Array<string>

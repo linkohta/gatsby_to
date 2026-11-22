@@ -12,7 +12,7 @@ export function deleteUntouchedPages(
 ): Array<string> {
   const deletedPages: Array<string> = []
 
-  // Delete pages that weren't updated when running createPages.
+  // createPages の実行時に更新されなかったページを削除する。
   currentPages.forEach(page => {
     if (
       (shouldRunCreatePagesStatefully ||

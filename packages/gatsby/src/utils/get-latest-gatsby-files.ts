@@ -70,7 +70,7 @@ const _getFile = async <T>({
 
     fileToUse = outputFileName
   } else {
-    // if file was previously cached, use it
+    // ファイルが以前にキャッシュされていれば、それを使う
     if (await fs.pathExists(outputFileName)) {
       fileToUse = outputFileName
     }
@@ -108,9 +108,9 @@ export const getLatestAdapters = async (): Promise<
     fileName: FILE_NAMES.ADAPTERS,
     outputFileName: OUTPUT_FILES.ADAPTERS,
     defaultReturn: [],
-    // trying github first for adapters manifest to be able to faster make changes to version manifest
-    // as publishing latest version of gatsby package takes more time
+    // アダプターのマニフェストは、まず github から取得を試みる。バージョンのマニフェストへの変更をより速く反映できるようにするためである。
+    // gatsby パッケージの最新バージョンの公開には、もっと時間がかかる
     tryGithubBeforeUnpkg: true,
-    // in e2e-tests/adapters we force adapters manifest to be used
+    // e2e-tests/adapters では、アダプターのマニフェストの使用を強制する
     forcedContent: process.env.GATSBY_ADAPTERS_MANIFEST,
   })

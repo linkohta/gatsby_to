@@ -107,7 +107,7 @@ export class GatsbyWebpackStatsExtractor {
         )
 
         if (_CFLAGS_.GATSBY_MAJOR === `5` && process.env.GATSBY_SLICES) {
-          // Add chunk mapping metadata to scripts slice
+          // チャンクの対応付けのメタデータを scripts スライスに追加する
           const scriptChunkMapping = `window.___chunkMapping=${JSON.stringify(
             newChunkMapJson
           )};`

@@ -18,8 +18,8 @@ export const eslintRequiredConfig: ESLint.Options = {
       ecmaFeatures: {
         jsx: true,
       },
-      // TODO proper check for custom babel & plugins config
-      // Currently when a babelrc is added to the project, it will override our babelOptions
+      // TODO 独自の babel とプラグインの設定を正しく確認する
+      // 現状では、プロジェクトに babelrc が追加されると、こちらの babelOptions が上書きされる
       babelOptions: {
         presets: [require.resolve(`babel-preset-gatsby`)],
       },
@@ -29,7 +29,7 @@ export const eslintRequiredConfig: ESLint.Options = {
       graphql: true,
       __PATH_PREFIX__: true,
       __TRAILING_SLASH__: true,
-      __BASE_PATH__: true, // this will rarely, if ever, be used by consumers
+      __BASE_PATH__: true, // 利用者がこれを使うことは、あったとしてもまれである
     },
     extends: [eslintRequirePreset],
   },
@@ -47,7 +47,7 @@ export const eslintConfig = (
         graphql: true,
         __PATH_PREFIX__: true,
         __TRAILING_SLASH__: true,
-        __BASE_PATH__: true, // this will rarely, if ever, be used by consumers
+        __BASE_PATH__: true, // 利用者がこれを使うことは、あったとしてもまれである
       },
       extends: [
         require.resolve(`eslint-config-react-app`),
@@ -60,8 +60,8 @@ export const eslintConfig = (
         ecmaFeatures: {
           jsx: true,
         },
-        // TODO proper check for custom babel & plugins config
-        // Currently when a babelrc is added to the project, it will override our babelOptions
+        // TODO 独自の babel とプラグインの設定を正しく確認する
+        // 現状では、プロジェクトに babelrc が追加されると、こちらの babelOptions が上書きされる
         babelOptions: {
           presets: [require.resolve(`babel-preset-gatsby`)],
         },
@@ -69,11 +69,11 @@ export const eslintConfig = (
       },
       plugins: [],
       rules: {
-        // New versions of react use a special jsx runtime that remove the requirement
-        // for having react in scope for jsx. Once the jsx runtime is backported to all
-        // versions of react we can make this always be `off`.
-        // I would also assume that eslint-config-react-app will switch their flag to `off`
-        // when jsx runtime is stable in all common versions of React.
+        // 新しいバージョンの react は特別な jsx ランタイムを使っており、jsx のために
+        // react をスコープに入れておく必要がなくなった。jsx ランタイムがすべての
+        // バージョンの react にバックポートされたら、これを常に `off` にできる。
+        // jsx ランタイムが React の一般的なすべてのバージョンで安定したら、eslint-config-react-app も
+        // フラグを `off` に切り替えるだろうと思われる。
         "react/jsx-uses-react": usingAutomaticJsxRuntime ? `off` : `error`,
         "react/react-in-jsx-scope": usingAutomaticJsxRuntime ? `off` : `error`,
         "import/no-webpack-loader-syntax": [0],

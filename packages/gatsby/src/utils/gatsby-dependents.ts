@@ -45,7 +45,7 @@ const getTreeFromNodeModules = async (
           path: dirname(requireFromHere.resolve(`${name}/package.json`)),
         }
 
-        // Include anything that has `gatsby` in its name but not `gatsby` itself
+        // 名前に `gatsby` を含むものをすべて含めるが、`gatsby` 自体は含めない
         if (
           /gatsby/.test(currentDependency.name) &&
           currentDependency.name !== `gatsby`
@@ -55,8 +55,8 @@ const getTreeFromNodeModules = async (
             results.set(currentDependency.name, currentDependency)
         }
       } catch (error) {
-        // Sometimes dev dependencies of dependencies aren't installed
-        // when using `yarn`. This is okay and safe to ignore.
+        // `yarn` を使っていると、依存の dev dependencies がインストールされて
+        // いないことがある。これは問題なく、無視しても安全である。
       }
     })
   )
