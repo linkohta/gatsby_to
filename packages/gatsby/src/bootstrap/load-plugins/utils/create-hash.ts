@@ -6,7 +6,7 @@ export function createFileContentHash(
   root: string,
   globPattern: string
 ): string {
-  // TODO: Use hash-wasm
+  // TODO: hash-wasm を使う
   const hash = crypto.createHash(`md5`)
   const files = glob.sync(`${root}/${globPattern}`, { nodir: true })
 

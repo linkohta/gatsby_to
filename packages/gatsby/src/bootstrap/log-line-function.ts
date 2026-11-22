@@ -5,7 +5,7 @@
     const error: Error = new Error()
     let stack = error.stack ? error.stack.split(/\n/) : []
 
-    // Chrome includes a single "Error" line, FF doesn't.
+    // Chrome は "Error" という行を 1 行含めるが、FF は含めない。
     if (stack[0].indexOf(`Error`) === 0) {
       stack = stack.slice(1)
     }

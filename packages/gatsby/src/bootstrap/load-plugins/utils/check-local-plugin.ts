@@ -4,7 +4,7 @@ import { slash } from "gatsby-core-utils"
 import path from "path"
 
 /**
- * Checks if a plugin is a valid local plugin and returns the resolved path if it is.
+ * プラグインが有効なローカルプラグインかどうかを確認し、有効であれば解決したパスを返す。
  */
 export function checkLocalPlugin(
   plugin: PluginRef,
@@ -12,7 +12,7 @@ export function checkLocalPlugin(
 ): { validLocalPlugin: boolean; localPluginPath?: string } {
   const pluginName = typeof plugin === `string` ? plugin : plugin.resolve
 
-  // Make sure the plugin exists relatively
+  // プラグインが相対的な位置に存在することを確認する
   if (existsSync(pluginName) || !rootDir) {
     return {
       validLocalPlugin: false,
@@ -29,7 +29,7 @@ export function checkLocalPlugin(
 
   const resolvedPackageJson = existsSync(`${resolvedPath}/package.json`)
 
-  // package.json is a requirement for local plugins
+  // ローカルプラグインには package.json が必須である
   if (!resolvedPackageJson) {
     throw new Error(`Local plugin ${pluginName} requires a package.json file`)
   }

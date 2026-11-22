@@ -42,7 +42,7 @@ async function attemptImport(
     filePath: configPath,
   })
 
-  // The file does not exist, no sense trying to import it
+  // ファイルが存在しないので、import を試みる意味はない
   if (!configFilePath) {
     return { configFilePath: ``, configModule: undefined }
   }
@@ -121,7 +121,7 @@ async function attemptImportUncompiled(
     distance
   )
 
-  // gatsby-config.ts exists but compiled gatsby-config.js does not
+  // gatsby-config.ts は存在するが、コンパイル済みの gatsby-config.js が存在しない
   if (tsConfig) {
     report.panic({
       id: `10127`,
@@ -132,7 +132,7 @@ async function attemptImportUncompiled(
     })
   }
 
-  // gatsby-config is misnamed
+  // gatsby-config の名前が間違っている
   if (nearMatch) {
     const isTSX = nearMatch.endsWith(`.tsx`)
     report.panic({
@@ -146,7 +146,7 @@ async function attemptImportUncompiled(
     })
   }
 
-  // gatsby-config is incorrectly located in src directory
+  // gatsby-config が誤って src ディレクトリに置かれている
   const isInSrcDir = await resolveJSFilepath({
     rootDir: siteDirectory,
     filePath: path.join(siteDirectory, `src`, configName),

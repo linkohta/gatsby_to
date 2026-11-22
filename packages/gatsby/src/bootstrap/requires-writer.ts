@@ -66,8 +66,8 @@ export const getComponents = (
 }
 
 /**
- * Get all dynamic routes and sort them by most specific at the top
- * code is based on @reach/router match utility (https://github.com/reach/router/blob/152aff2352bc62cefc932e1b536de9efde6b64a5/src/lib/utils.js#L224-L254)
+ * すべての動的ルートを取得し、より具体的なものが上に来るように並べ替える
+ * コードは @reach/router の match ユーティリティに基づく (https://github.com/reach/router/blob/152aff2352bc62cefc932e1b536de9efde6b64a5/src/lib/utils.js#L224-L254)
  */
 const getMatchPaths = (
   pages: Array<IGatsbyPage>
@@ -106,11 +106,11 @@ const getMatchPaths = (
     }
   })
 
-  // Pages can live in matchPaths, to keep them working without doing another network request
-  // we save them in matchPath. We use `@reach/router` path ranking to score paths/matchPaths
-  // and sort them so more specific paths are before less specific paths.
-  // More info in https://github.com/gatsbyjs/gatsby/issues/16097
-  // small speedup: don't bother traversing when no matchPaths found.
+  // ページは matchPath の中に存在することがある。追加のネットワークリクエストなしで動作し続けるよう、
+  // それらを matchPath に保存する。`@reach/router` のパスの順位付けを使ってパスと matchPath に点数を付け、
+  // より具体的なパスが、あまり具体的でないパスより前に来るよう並べ替える。
+  // 詳細は https://github.com/gatsbyjs/gatsby/issues/16097 を参照
+  // 小さな高速化: matchPath が見つからない場合は走査を省く。
   if (matchPathPages.length) {
     const newMatches: Array<IMatchPathEntry> = []
 
@@ -132,20 +132,20 @@ const getMatchPaths = (
         )
       }
     })
-    // Add afterwards because the new matches are not relevant for the existing search
+    // 新しい一致は既存の検索には関係しないので、後から追加する
     matchPathPages.push(...newMatches)
   }
 
   return matchPathPages
     .sort((a, b) => {
-      // The higher the score, the higher the specificity of our matchPath
+      // 点数が高いほど、matchPath の具体性が高い
       const order = b.score - a.score
       if (order !== 0) {
         return order
       }
 
-      // if specificity is the same we do lexigraphic comparison of path to ensure
-      // deterministic order regardless of order pages where created
+      // 具体性が同じ場合は、パスを辞書順で比較する。ページが作成された順序に
+      // かかわらず、順序が決定的になるようにするためである
       return a.matchPath.localeCompare(b.matchPath)
     })
     .map(({ path, matchPath }) => {
@@ -153,7 +153,7 @@ const getMatchPaths = (
     })
 }
 
-// Write out pages information.
+// ページの情報を書き出す。
 export const writeAll = async (state: IGatsbyState): Promise<boolean> => {
   const { program, slices } = state
   const pages = [...state.pages.values()]
@@ -166,7 +166,7 @@ export const writeAll = async (state: IGatsbyState): Promise<boolean> => {
       ...(state.visitedPages.get(`server`)?.values() || []),
     ]
 
-    // Remove any page components that no longer exist.
+    // すでに存在しないページコンポーネントを取り除く。
     cleanedSSRVisitedPageComponents = components.filter(
       c =>
         ssrVisitedPageComponents.some(s => s === c.componentChunkName) ||
@@ -183,14 +183,14 @@ export const writeAll = async (state: IGatsbyState): Promise<boolean> => {
   )
 
   if (newHash === lastHash) {
-    // Nothing changed. No need to rewrite files
+    // 何も変わっていない。ファイルを書き直す必要はない
     return false
   }
 
   lastHash = newHash
 
   if (process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
-    // Create file with sync requires of visited page components files.
+    // アクセスされたページコンポーネントのファイルを同期的に require するファイルを作成する。
 
     const lazySyncRequires = `exports.ssrComponents = {\n${cleanedSSRVisitedPageComponents
       .map(
@@ -201,12 +201,12 @@ export const writeAll = async (state: IGatsbyState): Promise<boolean> => {
   }\n\n`
 
     writeModule(`$virtual/ssr-sync-requires`, lazySyncRequires)
-    // if this is executed, webpack should mark it as invalid, but sometimes there is some timing race
-    // so we also explicitly set flag here as well
+    // これが実行されると、webpack は無効とマークするはずだが、タイミングの競合が起きることがある
+    // そのため、ここでも明示的にフラグを設定する
     devSSRWillInvalidate()
   }
 
-  // Create file with sync requires of components/json files.
+  // コンポーネントと JSON のファイルを同期的に require するファイルを作成する。
   let syncRequires = `
 // prefer default export if available
 const preferDefault = m => (m && m.default) || m
@@ -221,7 +221,7 @@ const preferDefault = m => (m && m.default) || m
     .join(`,\n`)}
 }\n\n`
 
-  // Create file with async requires of components/json files.
+  // コンポーネントと JSON のファイルを非同期に require するファイルを作成する。
   let asyncRequires = ``
 
   if (
@@ -230,7 +230,7 @@ const preferDefault = m => (m && m.default) || m
   ) {
     asyncRequires = `exports.components = {\n${components
       .map((c: IGatsbyPageComponent): string => {
-        // we need a relative import path to keep contenthash the same if directory changes
+        // ディレクトリが変わっても contenthash が同じになるよう、相対的な import パスが必要である
         const relativeComponentPath = path.relative(
           getAbsolutePathForVirtualModule(`$virtual`),
           c.componentPath
@@ -252,7 +252,7 @@ exports.head = {\n${components
         if (!c.hasHeadComponent) {
           return undefined
         }
-        // we need a relative import path to keep contenthash the same if directory changes
+        // ディレクトリが変わっても contenthash が同じになるよう、相対的な import パスが必要である
         const relativeComponentPath = path.relative(
           getAbsolutePathForVirtualModule(`$virtual`),
           c.componentPath
@@ -272,7 +272,7 @@ exports.head = {\n${components
   } else {
     asyncRequires = `exports.components = {\n${components
       .map((c: IGatsbyPageComponent): string => {
-        // we need a relative import path to keep contenthash the same if directory changes
+        // ディレクトリが変わっても contenthash が同じになるよう、相対的な import パスが必要である
         const relativeComponentPath = path.relative(
           getAbsolutePathForVirtualModule(`$virtual`),
           c.componentPath
@@ -292,9 +292,9 @@ exports.head = {\n${components
   ): Promise<void> => {
     writeModule(virtualFilePath, data)
 
-    // files in .cache are not used anymore as part of webpack builds, but
-    // still can be used by other tools (for example `gatsby serve` reads
-    // `match-paths.json` to setup routing)
+    // .cache 内のファイルは、もう webpack のビルドの一部としては使われないが、
+    // 他のツールが使うことはある（たとえば `gatsby serve` は、ルーティングの設定のために
+    // `match-paths.json` を読む）
     const destination = joinPath(program.directory, `.cache`, file)
     const tmp = `${destination}.${Date.now()}`
     return fs
@@ -330,19 +330,19 @@ const debouncedWriteAll = _.debounce(
   },
   500,
   {
-    // using "leading" can cause double `writeAll` call - particularly
-    // when refreshing data using `/__refresh` hook.
+    // "leading" を使うと `writeAll` が 2 回呼ばれることがある。特に、
+    // `/__refresh` フックでデータを更新するときに起こる。
     leading: false,
   }
 )
 
 /**
- * Start listening to CREATE/DELETE_PAGE events so we can rewrite
- * files as required
+ * 必要に応じてファイルを書き直せるよう、CREATE/DELETE_PAGE イベントの
+ * 待ち受けを開始する
  */
 let listenerStarted = false
 export const startListener = (): void => {
-  // Only start the listener once.
+  // リスナーは 1 回だけ開始する。
   if (listenerStarted) {
     return
   }
@@ -350,11 +350,11 @@ export const startListener = (): void => {
 
   if (process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
     /**
-     * Start listening to CREATE_SERVER_VISITED_PAGE events so we can rewrite
-     * files as required
+     * 必要に応じてファイルを書き直せるよう、CREATE_SERVER_VISITED_PAGE イベントの
+     * 待ち受けを開始する
      */
     emitter.on(`CREATE_SERVER_VISITED_PAGE`, async (): Promise<void> => {
-      // this event only happen on new additions
+      // このイベントは新規の追加でだけ発生する
       devSSRWillInvalidate()
       reporter.pendingActivity({ id: `requires-writer` })
       debouncedWriteAll()

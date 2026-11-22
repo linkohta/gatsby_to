@@ -3,5 +3,5 @@ try {
   getLatestAPIs()
   getLatestAdapters()
 } catch (e) {
-  // we're probably just bootstrapping and not published yet!
+  // おそらくブートストラップ中で、まだ公開されていない
 }

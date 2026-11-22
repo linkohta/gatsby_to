@@ -19,11 +19,11 @@ export function loadInternalPlugins(
   config: ISiteConfig = {},
   rootDir: string
 ): Array<IPluginInfo> {
-  // Instantiate plugins.
+  // プラグインをインスタンス化する。
   const plugins: Array<IPluginInfo> = []
   const configuredPluginNames = new Set()
 
-  // Add internal plugins
+  // 内部プラグインを追加する
   const internalPlugins = [
     `../../internal-plugins/dev-404-page`,
     `../../internal-plugins/load-babel-config`,
@@ -39,7 +39,7 @@ export function loadInternalPlugins(
     plugins.push(processPlugin(absPath, rootDir))
   })
 
-  // Add plugins from the site config.
+  // サイトの設定からプラグインを追加する。
   if (config.plugins) {
     config.plugins.forEach(plugin => {
       const processedPlugin = processPlugin(plugin, rootDir)
@@ -48,11 +48,11 @@ export function loadInternalPlugins(
     })
   }
 
-  // the order of all of these page-creators matters. The "last plugin wins",
-  // so the user's site comes last, and each page-creator instance has to
-  // match the plugin definition order before that. This works fine for themes
-  // because themes have already been added in the proper order to the plugins
-  // array
+  // これらの page-creator はすべて順序が重要である。「最後のプラグインが勝つ」ので、
+  // ユーザーのサイトが最後に来る。それより前の各 page-creator インスタンスは、
+  // プラグインの定義順と一致していなければならない。テーマについてはこれで問題ない。
+  // テーマは、すでに正しい順序で plugins 配列に追加されている
+  // ためである
   plugins.forEach(plugin => {
     plugins.push(
       processPlugin(
@@ -68,14 +68,14 @@ export function loadInternalPlugins(
     )
   })
 
-  // Support Typescript by default but allow users to override it
+  // デフォルトで Typescript に対応するが、ユーザーが上書きできるようにする
   if (!configuredPluginNames.has(TYPESCRIPT_PLUGIN_NAME)) {
     const processedTypeScriptPlugin = processPlugin(
       {
         resolve: require.resolve(TYPESCRIPT_PLUGIN_NAME),
         options: {
-          // TODO(@mxstbr): Do not hard-code these defaults but infer them from the
-          // pluginOptionsSchema of gatsby-plugin-typescript
+          // TODO(@mxstbr): これらのデフォルト値をハードコードせず、
+          // gatsby-plugin-typescript の pluginOptionsSchema から推論する
           allExtensions: false,
           isTSX: false,
           jsxPragma: `React`,
@@ -86,7 +86,7 @@ export function loadInternalPlugins(
     plugins.push(processedTypeScriptPlugin)
   }
 
-  // Add the site's default "plugin" i.e. gatsby-x files in root of site.
+  // サイトのデフォルトの「プラグイン」、つまりサイトのルートにある gatsby-x ファイルを追加する。
   plugins.push({
     resolve: slash(process.cwd()),
     id: createPluginId(`default-site-plugin`),
@@ -100,7 +100,7 @@ export function loadInternalPlugins(
 
   const program = store.getState().program
 
-  // default options for gatsby-plugin-page-creator
+  // gatsby-plugin-page-creator のデフォルトのオプション
   let pageCreatorOptions: IPluginRefOptions | undefined = {
     path: slash(path.join(program.directory, `src/pages`)),
     pathCheck: false,
@@ -115,7 +115,7 @@ export function loadInternalPlugins(
           slash(path.join(program.directory, `src/pages`))
     )
     if (pageCreatorPlugin) {
-      // override the options if there are any user specified options
+      // ユーザーが指定したオプションがあれば、オプションを上書きする
       pageCreatorOptions = pageCreatorPlugin.options
     }
   }
@@ -130,9 +130,9 @@ export function loadInternalPlugins(
 
   plugins.push(processedPageCreatorPlugin)
 
-  // Partytown plugin collects usage of <Script strategy={"off-main-thread"} />
-  // in `wrapRootElement`, so we have to make sure it's the last one running to be able to
-  // collect scripts that users might inject in their `wrapRootElement`
+  // Partytown プラグインは `wrapRootElement` の中で <Script strategy={"off-main-thread"} /> の
+  // 使用を収集する。そのため、ユーザーが自分の `wrapRootElement` で注入するスクリプトも
+  // 収集できるよう、必ず最後に実行されるようにする必要がある
   plugins.push(
     processPlugin(
       path.join(__dirname, `../../internal-plugins/partytown`),

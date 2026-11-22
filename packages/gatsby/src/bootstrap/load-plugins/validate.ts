@@ -53,15 +53,15 @@ const getGatsbyUpgradeVersion = (entries: ReadonlyArray<IEntry>): string =>
     return version
   }, ``)
 
-// Given a plugin object, an array of the API names it exports and an
-// array of valid API names, return an array of invalid API exports.
+// プラグインオブジェクト、それが export する API 名の配列、有効な API 名の配列を
+// 受け取り、無効な API の export の配列を返す。
 function getBadExports(
   plugin: IPluginInfo,
   pluginAPIKeys: ReadonlyArray<string>,
   apis: ReadonlyArray<string>
 ): Array<IEntry> {
   let badExports: Array<IEntry> = []
-  // Discover any exports from plugins which are not "known"
+  // プラグインの export のうち「既知」でないものを見つける
   badExports = badExports.concat(
     _.difference(pluginAPIKeys, apis).map(e => {
       return {
@@ -134,7 +134,7 @@ function getErrorContext(
     entries,
     exportType,
     fixes,
-    // note: this is a fallback if gatsby-cli is not updated with structured error
+    // 注: これは、gatsby-cli が構造化エラーに対応したバージョンに更新されていない場合のフォールバックである
     sourceMessage: [
       `Your plugins must export known APIs from their gatsby-node.js.`,
     ]
@@ -161,7 +161,7 @@ export async function handleBadExports({
   )
   if (hasBadExports) {
     const latestAPIs = await getLatestAPIs()
-    // Output error messages for all bad exports
+    // 不正な export すべてについてエラーメッセージを出力する
     _.toPairs(badExports).forEach(badItem => {
       const [exportType, entries] = badItem
       if (entries.length > 0) {
@@ -258,7 +258,7 @@ async function validatePluginsOptions(
 
                     const normalizedPath = helpers.state.path
                       .map((key, index) => {
-                        // if subplugin is part of an array - swap concrete index key with `[]`
+                        // サブプラグインが配列の一部である場合は、具体的なインデックスのキーを `[]` に置き換える
                         if (
                           typeof key === `number` &&
                           Array.isArray(
@@ -312,8 +312,8 @@ async function validatePluginsOptions(
         }),
       })
 
-      // If rootDir and plugin.parentDir are the same, i.e. if this is a plugin a user configured in their gatsby-config.js (and not a sub-theme that added it), this will be ""
-      // Otherwise, this will contain (and show) the relative path
+      // rootDir と plugin.parentDir が同じ場合、つまりユーザーが自分の gatsby-config.js で設定したプラグインである場合（サブテーマが追加したものではない場合）は "" になる
+      // そうでなければ、相対パスが入る（そして表示される）
       const configDir =
         (plugin.parentDir &&
           rootDir &&
@@ -321,7 +321,7 @@ async function validatePluginsOptions(
         null
 
       if (!Joi.isSchema(optionsSchema) || optionsSchema.type !== `object`) {
-        // Validate correct usage of pluginOptionsSchema
+        // pluginOptionsSchema が正しく使われているかを検証する
         reporter.warn(
           `Plugin "${plugin.resolve}" has an invalid options schema so we cannot verify your configuration for it.`
         )
@@ -330,9 +330,9 @@ async function validatePluginsOptions(
 
       try {
         if (!optionsSchema.describe().keys.plugins) {
-          // All plugins have "plugins: []"" added to their options in load.ts, even if they
-          // do not have subplugins. We add plugins to the schema if it does not exist already
-          // to make sure they pass validation.
+          // すべてのプラグインは、サブプラグインを持たない場合でも、load.ts でオプションに "plugins: []"" が
+          // 追加される。検証を通るよう、スキーマに plugins がまだなければ
+          // 追加する。
           optionsSchema = optionsSchema.append({
             plugins: Joi.array().length(0),
           })
@@ -345,7 +345,7 @@ async function validatePluginsOptions(
 
         plugin.options = value
 
-        // Handle unknown key warnings
+        // 未知のキーの警告を処理する
         const validationWarnings = warning?.details
 
         if (validationWarnings?.length > 0) {
@@ -361,10 +361,10 @@ async function validatePluginsOptions(
         } if you believe this option is valid.
       `)
           )
-          // We do not increment errors++ here as we do not want to process.exit if there are only warnings
+          // 警告しかない場合に process.exit したくないので、ここでは errors++ しない
         }
 
-        // Validate subplugins if they weren't handled already
+        // サブプラグインがまだ処理されていない場合は検証する
         if (!subPluginPaths.has(`plugins`) && plugin.options?.plugins) {
           const { errors: subErrors, plugins: subPlugins } =
             await validatePluginsOptions(
@@ -425,7 +425,7 @@ export async function validateConfigPluginsOptions(
 }
 
 /**
- * Identify which APIs each plugin exports
+ * 各プラグインがどの API を export しているかを特定する
  */
 export async function collatePluginAPIs({
   currentAPIs,
@@ -439,7 +439,7 @@ export async function collatePluginAPIs({
   flattenedPlugins: Array<IFlattenedPlugin>
   badExports: IEntryMap
 }> {
-  // Get a list of bad exports
+  // 不正な export の一覧を取得する
   const badExports: IEntryMap = {
     node: [],
     browser: [],
@@ -451,9 +451,9 @@ export async function collatePluginAPIs({
     plugin.browserAPIs = []
     plugin.ssrAPIs = []
 
-    // Discover which APIs this plugin implements and store an array against
-    // the plugin node itself *and* in an API to plugins map for faster lookups
-    // later.
+    // このプラグインがどの API を実装しているかを調べ、その配列をプラグインノード自体に
+    // 保存する。*さらに*、後で高速に検索できるよう、API からプラグインへのマップにも
+    // 保存する。
     const pluginNodeExports = await resolveModuleExports(
       plugin.resolvedCompiledGatsbyNode ?? `${plugin.resolve}/gatsby-node`,
       {
@@ -476,7 +476,7 @@ export async function collatePluginAPIs({
       plugin.nodeAPIs = _.intersection(pluginNodeExports, currentAPIs.node)
       badExports.node = badExports.node.concat(
         getBadExports(plugin, pluginNodeExports, currentAPIs.node)
-      ) // Collate any bad exports
+      ) // 不正な export をまとめる
     }
 
     if (pluginBrowserExports.length > 0) {
@@ -486,14 +486,14 @@ export async function collatePluginAPIs({
       )
       badExports.browser = badExports.browser.concat(
         getBadExports(plugin, pluginBrowserExports, currentAPIs.browser)
-      ) // Collate any bad exports
+      ) // 不正な export をまとめる
     }
 
     if (pluginSSRExports.length > 0) {
       plugin.ssrAPIs = _.intersection(pluginSSRExports, currentAPIs.ssr)
       badExports.ssr = badExports.ssr.concat(
         getBadExports(plugin, pluginSSRExports, currentAPIs.ssr)
-      ) // Collate any bad exports
+      ) // 不正な export をまとめる
     }
   }
 
@@ -508,7 +508,7 @@ export const handleMultipleReplaceRenderers = ({
 }: {
   flattenedPlugins: Array<IFlattenedPlugin>
 }): Array<IFlattenedPlugin> => {
-  // multiple replaceRenderers may cause problems at build time
+  // replaceRenderer が複数あると、ビルド時に問題を起こすことがある
   const rendererPlugins = flattenedPlugins
     .filter(plugin => plugin.ssrAPIs.includes(`replaceRenderer`))
     .map(plugin => plugin.name)
@@ -532,11 +532,11 @@ export const handleMultipleReplaceRenderers = ({
       if (process.env.NODE_ENV === `production`) process.exit(1)
     }
 
-    // Now update plugin list so only final replaceRenderer will run
+    // 最後の replaceRenderer だけが実行されるよう、プラグインの一覧を更新する
     const ignorable = rendererPlugins.slice(0, -1)
 
-    // For each plugin in ignorable, set a skipSSR flag to true
-    // This prevents apiRunnerSSR() from attempting to run it later
+    // ignorable 内の各プラグインについて、skipSSR フラグを true に設定する
+    // これにより、後で apiRunnerSSR() が実行しようとするのを防ぐ
     const messages: Array<string> = []
     flattenedPlugins.forEach((fp, i) => {
       if (ignorable.includes(fp.name)) {
@@ -560,7 +560,7 @@ export function warnOnIncompatiblePeerDependency(
   name: string,
   packageJSON: PackageJson
 ): void {
-  // Note: In the future the peer dependency should be enforced for all plugins.
+  // 注: 将来的には、すべてのプラグインで peer dependency を必須にすべきである。
   const gatsbyPeerDependency = _.get(packageJSON, `peerDependencies.gatsby`)
   if (
     !isWorker &&

@@ -4,7 +4,7 @@ const path = require(`path`)
 describe(`loadThemes`, () => {
   test(`resolves themes and plugins from location of gatsby-config`, async () => {
     /*
-      Fixture used in this test is structured like this:
+      このテストで使うフィクスチャは次のような構造になっている:
 
       .
       ├── gatsby-config.js
@@ -20,8 +20,8 @@ describe(`loadThemes`, () => {
               │       └── package.json
               └── package.json
 
-      This make sure we can handle cases when plugins and themes are not hoisted to root "node_modules", as well as simulates requirements for yarn PnP or pnpm
-      (being able to import modules only declared as dependencies of current package).
+      これにより、プラグインやテーマがルートの "node_modules" に巻き上げられていない場合を扱えることを確認する。また、yarn PnP や pnpm の要件
+      （現在のパッケージの依存として宣言されたモジュールだけを import できること）を再現する。
     */
 
     const configFilePath = require.resolve(
@@ -38,11 +38,11 @@ describe(`loadThemes`, () => {
       rootDir: path.dirname(configFilePath),
     })
 
-    // implicit assertion - above doesn't throw `Couldn't find the "x" plugin`
+    // 暗黙のアサーション - 上のコードが `Couldn't find the "x" plugin` を投げない
 
     expect(plugins.length).toEqual(3)
 
-    // all nested plugins / themes are found
+    // ネストしたプラグインとテーマがすべて見つかる
     expect(plugins).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -63,7 +63,7 @@ describe(`loadThemes`, () => {
       expect.arrayContaining([
         expect.objectContaining({
           themeName: `gatsby-theme-child`,
-          // `gatsby-theme-child` is resolved to first level node_modules
+          // `gatsby-theme-child` は 1 階層目の node_modules に解決される
           themeDir: path.dirname(
             require.resolve(
               `./fixtures/resolve-from-config-location/node_modules/gatsby-theme-child`
@@ -72,7 +72,7 @@ describe(`loadThemes`, () => {
         }),
         expect.objectContaining({
           themeName: `gatsby-theme-parent`,
-          // `gatsby-theme-child` is resolved to second level node_modules
+          // `gatsby-theme-child` は 2 階層目の node_modules に解決される
           themeDir: path.dirname(
             require.resolve(
               `./fixtures/resolve-from-config-location/node_modules/gatsby-theme-child/node_modules/gatsby-theme-parent`
@@ -82,7 +82,7 @@ describe(`loadThemes`, () => {
 
         expect.objectContaining({
           themeName: `gatsby-plugin-added-by-parent-theme`,
-          // `gatsby-theme-child` is resolved to third level node_modules
+          // `gatsby-theme-child` は 3 階層目の node_modules に解決される
           themeDir: path.dirname(
             require.resolve(
               `./fixtures/resolve-from-config-location/node_modules/gatsby-theme-child/node_modules/gatsby-theme-parent/node_modules/gatsby-plugin-added-by-parent-theme`

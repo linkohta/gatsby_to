@@ -20,7 +20,7 @@ jest.mock(`../../utils/parcel/compile-gatsby-files`, () => {
   const actual = jest.requireActual(`../../utils/parcel/compile-gatsby-files`)
   return {
     ...actual,
-    COMPILED_CACHE_DIR: `compiled`, // .cache is git ignored
+    COMPILED_CACHE_DIR: `compiled`, // .cache は git の管理対象外
   }
 })
 
@@ -36,7 +36,7 @@ const reporterPanicMock = reporter.panic as jest.MockedFunction<
   typeof reporter.panic
 >
 
-// Separate config directories so cases can be tested separately
+// ケースごとに個別にテストできるよう、設定ディレクトリを分けている
 const baseDir = path.resolve(__dirname, `..`, `__mocks__`, `get-config`)
 const cjsDir = path.join(baseDir, `cjs`)
 const esmDir = path.join(baseDir, `esm`)
@@ -190,7 +190,7 @@ describe(`getConfigFile with esm files`, () => {
 
 describe(`getConfigFile with ts/tsx files`, () => {
   it(`should handle case where gatsby-config.ts exists but no compiled gatsby-config.js exists`, async () => {
-    // Force outer and inner errors so we can hit the code path that checks if gatsby-config.ts exists
+    // gatsby-config.ts が存在するかを確認するコードパスを通すために、外側と内側のエラーを強制的に発生させる
     pathJoinMock
       .mockImplementationOnce(() => `force-outer-error`)
       .mockImplementationOnce(() => `force-inner-error`)

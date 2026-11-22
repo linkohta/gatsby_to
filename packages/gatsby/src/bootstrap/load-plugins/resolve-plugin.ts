@@ -14,19 +14,19 @@ import { getResolvedFieldsForPlugin } from "../../utils/parcel/compile-gatsby-fi
 
 /**
  * @param plugin
- * This should be a plugin spec object where possible but can also be the
- * name of a plugin.
+ * 可能な限りプラグインの仕様オブジェクトにすべきだが、
+ * プラグインの名前でもよい。
  *
- * When it is a name, it can be a name of a local plugin, the name of a plugin
- * located in node_modules, or a Gatsby internal plugin. In the last case the
- * plugin will be an absolute path.
+ * 名前の場合は、ローカルプラグインの名前、node_modules にあるプラグインの名前、
+ * または Gatsby の内部プラグインのいずれかになる。最後の場合、
+ * plugin は絶対パスになる。
  * @param rootDir
- * This is the project location, from which are found the plugins
+ * プロジェクトの場所。ここを起点にプラグインを探す
  */
 export function resolvePlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
   const pluginName = isString(plugin) ? plugin : plugin.resolve
 
-  // Handle local plugins
+  // ローカルプラグインを処理する
   const { validLocalPlugin, localPluginPath = `` } = checkLocalPlugin(
     plugin,
     rootDir
@@ -50,15 +50,15 @@ export function resolvePlugin(plugin: PluginRef, rootDir: string): IPluginInfo {
   }
 
   /**
-   * Here we have an absolute path to an internal plugin, or a name of a module
-   * which should be located in node_modules.
+   * ここに来るのは、内部プラグインへの絶対パスか、node_modules にあるはずの
+   * モジュールの名前である。
    */
   try {
     const requireSource =
       rootDir !== null ? createRequire(`${rootDir}/:internal:`) : require
 
-    // If the path is absolute, resolve the directory of the internal plugin,
-    // otherwise resolve the directory containing the package.json
+    // パスが絶対パスの場合は、内部プラグインのディレクトリを解決する。
+    // そうでなければ、package.json を含むディレクトリを解決する
     const resolvedPath = slash(
       path.dirname(
         requireSource.resolve(

@@ -1,8 +1,8 @@
 import { IPluginInfo } from "../types"
 
-// Create a "flattened" array of plugins with all subplugins
-// brought to the top-level. This simplifies running gatsby-* files
-// for subplugins.
+// すべてのサブプラグインをトップレベルに引き上げた、「平坦化した」プラグインの
+// 配列を作成する。これにより、サブプラグインの gatsby-* ファイルの
+// 実行が単純になる。
 export const flattenPlugins = (
   plugins: Array<IPluginInfo>
 ): Array<IPluginInfo> => {
@@ -11,9 +11,9 @@ export const flattenPlugins = (
     if (plugin.subPluginPaths) {
       for (const subPluginPath of plugin.subPluginPaths) {
         // @pieh:
-        // subPluginPath can look like someOption.randomFieldThatIsMarkedAsSubplugins
-        // Reason for doing stringified path with . separator was that it was just easier to prevent duplicates
-        // in subPluginPaths array (as each subplugin in the gatsby-config would add subplugin path).
+        // subPluginPath は someOption.randomFieldThatIsMarkedAsSubplugins のような形になる
+        // パスを . 区切りの文字列にしたのは、subPluginPaths 配列での重複を防ぎやすかったためである
+        // （gatsby-config 内の各サブプラグインがサブプラグインのパスを追加するため）。
         const segments = subPluginPath.split(`.`)
         let roots: Array<any> = [plugin.pluginOptions]
         for (const segment of segments) {
