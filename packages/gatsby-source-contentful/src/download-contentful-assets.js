@@ -4,8 +4,8 @@ import { createUrl } from "./image-helpers"
 
 /**
  * @name distributeWorkload
- * @param workers A list of async functions to complete
- * @param {number} count The number of task runners to use (see assetDownloadWorkers in config)
+ * @param workers 完了させる非同期関数の一覧
+ * @param {number} count 使用するタスクランナーの数（設定の assetDownloadWorkers を参照）
  */
 
 async function distributeWorkload(workers, count = 50) {
@@ -22,9 +22,9 @@ async function distributeWorkload(workers, count = 50) {
 
 /**
  * @name downloadContentfulAssets
- * @description Downloads Contentful assets to the local filesystem.
- * The asset files will be downloaded and cached. Use `localFile` to link to them
- * @param gatsbyFunctions - Gatsby's internal helper functions
+ * @description Contentful のアセットをローカルのファイルシステムへダウンロードする。
+ * アセットファイルはダウンロードされ、キャッシュされる。リンクするには `localFile` を使う
+ * @param gatsbyFunctions - Gatsby の内部ヘルパー関数
  */
 
 export async function downloadContentfulAssets(gatsbyFunctions) {
@@ -39,8 +39,8 @@ export async function downloadContentfulAssets(gatsbyFunctions) {
     assetNodes,
   } = gatsbyFunctions
 
-  // Any ContentfulAsset nodes will be downloaded, cached and copied to public/static
-  // regardless of if you use `localFile` to link an asset or not.
+  // `localFile` でアセットをリンクしているかどうかにかかわらず、ContentfulAsset ノードは
+  // すべてダウンロードされ、キャッシュされ、public/static へコピーされる。
 
   const bar = reporter.createProgress(
     `Downloading Contentful Assets`,
@@ -66,15 +66,15 @@ export async function downloadContentfulAssets(gatsbyFunctions) {
       }
       const url = createUrl(node.file.url)
 
-      // Avoid downloading the asset again if it's been cached
-      // Note: Contentful Assets do not provide useful metadata
-      // to compare a modified asset to a cached version?
+      // キャッシュ済みであれば、アセットを再びダウンロードしない
+      // Note: Contentful のアセットは、変更されたアセットとキャッシュ済みのものを
+      // 比較するのに役立つメタデータを提供していないのではないか
       if (cacheRemoteData) {
         fileNodeID = cacheRemoteData.fileNodeID // eslint-disable-line prefer-destructuring
         touchNode(getNode(cacheRemoteData.fileNodeID))
       }
 
-      // If we don't have cached data, download the file
+      // キャッシュしたデータがなければ、ファイルをダウンロードする
       if (!fileNodeID) {
         const fileNode = await createRemoteFileNode({
           url,

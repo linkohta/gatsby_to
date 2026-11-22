@@ -46,21 +46,21 @@ exports.sourceNodes = async (
     typePrefix,
   })
 
-  // Normalize data & create nodes
+  // データを正規化し、ノードを作成する
   //
-  // Creates entities from object collections of entities
+  // エンティティのオブジェクトのコレクションからエンティティを作成する
   entities = normalize.normalizeEntities(entities)
 
-  // Standardizes ids & cleans keys
+  // id を標準化し、キーを整理する
   entities = normalize.standardizeKeys(entities)
 
-  // Converts to use only GMT dates
+  // GMT の日付だけを使うように変換する
   entities = normalize.standardizeDates(entities)
 
-  // creates Gatsby IDs for each entity
+  // 各エンティティの Gatsby ID を作成する
   entities = normalize.createGatsbyIds(createNodeId, entities)
 
-  // creates nodes for each entry
+  // 各エントリーのノードを作成する
   normalize.createNodesFromEntities({
     entities,
     createNode,

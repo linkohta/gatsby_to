@@ -6,12 +6,12 @@ import { formatPluginOptionsForCLI } from "./plugin-options"
 import { CODES } from "./report"
 
 /**
- * Generate a user friendly error message.
+ * ユーザーに分かりやすいエラーメッセージを生成する。
  *
- * Contentful's API has its own error message structure, which might change depending of internal server or authentification errors.
+ * Contentful の API には独自のエラーメッセージの構造があり、内部サーバーエラーか認証エラーかによって変わることがある。
  */
 const createContentfulErrorMessage = e => {
-  // Handle axios error messages
+  // axios のエラーメッセージを処理する
   if (e.isAxiosError) {
     const axiosErrorMessage = [e.code, e.status]
     const axiosErrorDetails = []
@@ -19,12 +19,12 @@ const createContentfulErrorMessage = e => {
     if (e.response) {
       axiosErrorMessage.push(e.response.status)
 
-      // Parse Contentful API error data
+      // Contentful API のエラーデータを解析する
       if (e.response?.data) {
         axiosErrorMessage.push(e.response.data.sys?.id, e.response.data.message)
       }
 
-      // Get request ID from headers
+      // ヘッダーからリクエスト ID を取得する
       const requestId =
         e.response.headers &&
         typeof e.response.headers === `object` &&
@@ -48,15 +48,15 @@ const createContentfulErrorMessage = e => {
     return axiosErrorMessage.filter(Boolean).join(` `)
   }
 
-  // If it is not an axios error, we assume that we got a Contentful SDK error and try to parse it
+  // axios のエラーでなければ、Contentful SDK のエラーを受け取ったとみなして解析を試みる
   const errorMessage = [e.name]
   const errorDetails = []
   try {
     /**
-     * Parse stringified error data from message
+     * メッセージから、文字列化されたエラーデータを解析する
      * https://github.com/contentful/contentful-sdk-core/blob/4cfcd452ba0752237a26ce6b79d72a50af84d84e/src/error-handler.ts#L71-L75
      *
-     * @todo properly type this with TS
+     * @todo TS で正しく型を付ける
      * type {
      *    status?: number
      *    statusText?: string
@@ -84,7 +84,7 @@ const createContentfulErrorMessage = e => {
       )
     }
   } catch (err) {
-    // If we can't parse it, we assume its a human readable string
+    // 解析できない場合は、人が読める文字列だとみなす
     errorMessage.push(e.message)
   }
 
@@ -126,7 +126,7 @@ function createContentfulClientOptions({
           .join(` `)
       }
 
-      // Sync progress
+      // 同期の進捗
       if (
         response.config.url === `sync` &&
         !response.isAxiosError &&
@@ -150,7 +150,7 @@ function createContentfulClientOptions({
           .join(` `)
       )
     },
-    // Allow passing of custom configuration to the Contentful SDK like headers
+    // ヘッダーなど、Contentful SDK へのカスタム設定を渡せるようにする
     ...(pluginConfig.get(`contentfulClientConfig`) || {}),
   }
 
@@ -180,7 +180,7 @@ function handleContentfulError({
       contentfulClientOptions.environment &&
       contentfulClientOptions.environment !== `master`
     ) {
-      // environments need to have access to master
+      // 環境は master にアクセスできる必要がある
       details = `Unable to access your space. Check if ${chalk.yellow(
         `environment`
       )} is correct and your ${chalk.yellow(
@@ -193,7 +193,7 @@ function handleContentfulError({
         environment: `Check if setting is correct`,
       }
     } else if (e.responseData.status === 404) {
-      // host and space used to generate url
+      // URL の生成に使う host と space
       details = `Endpoint not found. Check if ${chalk.yellow(
         `host`
       )} and ${chalk.yellow(`spaceId`)} settings are correct`
@@ -202,7 +202,7 @@ function handleContentfulError({
         spaceId: `Check if setting is correct`,
       }
     } else if (e.responseData.status === 401) {
-      // authorization error
+      // 認可エラー
       details = `Authorization error. Check if ${chalk.yellow(
         `accessToken`
       )} and ${chalk.yellow(`environment`)} are correct`
@@ -228,21 +228,21 @@ ${formatPluginOptionsForCLI(pluginConfig.getOriginalPluginOptions(), errors)}`,
 }
 
 /**
- * Fetches:
- * * Locales with default locale
- * * Entries and assets
- * * Tags
+ * 次のものを取得する:
+ * * デフォルトロケールを含むロケール
+ * * エントリーとアセット
+ * * タグ
  */
 export async function fetchContent({ syncToken, pluginConfig, reporter }) {
-  // Fetch locales and check connectivity
+  // ロケールを取得し、接続を確認する
   const contentfulClientOptions = createContentfulClientOptions({
     pluginConfig,
     reporter,
   })
   const client = createClient(contentfulClientOptions)
 
-  // The sync API puts the locale in all fields in this format { fieldName:
-  // {'locale': value} } so we need to get the space and its default local.
+  // 同期 API は、すべてのフィールドにロケールを { fieldName:
+  // {'locale': value} } の形式で入れるので、スペースとそのデフォルトロケールを取得する必要がある。
   let space
   let locales
   let defaultLocale = `en-US`
@@ -263,7 +263,7 @@ export async function fetchContent({ syncToken, pluginConfig, reporter }) {
     })
   }
 
-  // Fetch entries and assets via Contentful CDA sync API
+  // Contentful CDA の同期 API でエントリーとアセットを取得する
   const pageLimit = pluginConfig.get(`pageLimit`)
   reporter.verbose(`Contentful: Sync ${pageLimit} items per page.`)
   const syncProgress = reporter.createProgress(
@@ -294,14 +294,14 @@ export async function fetchContent({ syncToken, pluginConfig, reporter }) {
         currentSyncData = await syncClient.sync(query)
         syncSuccess = true
       } catch (e) {
-        // Back off page limit if responses content length exceeds Contentfuls limits.
+        // レスポンスのコンテンツ長が Contentful の上限を超える場合は、ページの上限を引き下げる。
         if (
           e.response?.data?.message.includes(`Response size too big`) &&
           currentPageLimit > 1
         ) {
           lastCurrentPageLimit = currentPageLimit
-          // Reduce page limit by a arbitrary 1/3 of the current limit to ensure
-          // the new and bigger entries are synced without exceeding the reponse size limit
+          // ページの上限を、現在の上限の 1/3（任意に決めた値）だけ引き下げ、新しく大きなエントリーが
+          // レスポンスサイズの上限を超えずに同期されるようにする
           currentPageLimit = Math.floor((currentPageLimit / 3) * 2) || 1
           reporter.warn(
             [
@@ -329,7 +329,7 @@ export async function fetchContent({ syncToken, pluginConfig, reporter }) {
       },
     })
   } finally {
-    // Fix output when there was no new data in Contentful
+    // Contentful に新しいデータがなかった場合の出力を補正する
     if (
       !currentSyncData?.entries.length &&
       !currentSyncData?.assets.length &&
@@ -343,7 +343,7 @@ export async function fetchContent({ syncToken, pluginConfig, reporter }) {
     syncProgress.done()
   }
 
-  // We need to fetch tags with the non-sync API as the sync API doesn't support this.
+  // 同期 API はタグに対応していないので、同期ではない API でタグを取得する必要がある。
   let tagItems = []
   if (pluginConfig.get(`enableTags`)) {
     try {
@@ -374,8 +374,8 @@ export async function fetchContent({ syncToken, pluginConfig, reporter }) {
 }
 
 /**
- * Fetches:
- * * Content types
+ * 次のものを取得する:
+ * * コンテンツタイプ
  */
 export async function fetchContentTypes({ pluginConfig, reporter }) {
   const contentfulClientOptions = createContentfulClientOptions({
@@ -392,7 +392,7 @@ export async function fetchContentTypes({ pluginConfig, reporter }) {
   try {
     reporter.verbose(`Fetching content types (${sourceId})`)
 
-    // Fetch content types from CDA API
+    // CDA API からコンテンツタイプを取得する
     try {
       contentTypes = await pagedGet(client, `getContentTypes`, pageLimit)
     } catch (e) {
@@ -418,9 +418,9 @@ export async function fetchContentTypes({ pluginConfig, reporter }) {
 }
 
 /**
- * Gets all the existing entities based on pagination parameters.
- * The first call will have no aggregated response. Subsequent calls will
- * concatenate the new responses to the original one.
+ * ページネーションのパラメーターに基づいて、既存のエンティティをすべて取得する。
+ * 最初の呼び出しには、集約済みのレスポンスがない。以降の呼び出しでは、
+ * 新しいレスポンスを元のレスポンスに連結する。
  */
 function pagedGet(
   client,

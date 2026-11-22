@@ -20,7 +20,7 @@ const {
 } = require(`./data.json`)
 
 const conflictFieldPrefix = `contentful_test`
-// restrictedNodeFields from here https://www.gatsbyjs.com/docs/node-interface/
+// restrictedNodeFields の出典は https://www.gatsbyjs.com/docs/node-interface/
 const restrictedNodeFields = [
   `id`,
   `children`,
@@ -34,7 +34,7 @@ const pluginConfig = createPluginConfig({})
 
 const unstable_createNodeManifest = jest.fn()
 
-// Counts the created nodes per node type
+// 作成されたノードの数をノードタイプごとに数える
 function countCreatedNodeTypesFromMock(mock) {
   const nodeTypeCounts = {}
   mock.calls.forEach(callArgs => {
@@ -206,7 +206,7 @@ describe(`Process contentful data (by name)`, () => {
 
     const createNode = jest.fn()
     const createNodeId = jest.fn(id => id)
-    const getNode = jest.fn(() => undefined) // All nodes are new
+    const getNode = jest.fn(() => undefined) // すべてのノードが新規である
     contentTypeItems.forEach((contentTypeItem, i) => {
       createNodesForContentType({
         contentTypeItem,
@@ -233,31 +233,31 @@ describe(`Process contentful data (by name)`, () => {
 
     expect(nodeTypeCounts).toEqual(
       expect.objectContaining({
-        // 3 Brand Contentful entries
+        // Brand の Contentful エントリーが 3 件
         ContentfulBrand: 6,
         contentfulBrandCompanyDescriptionTextNode: 6,
         contentfulBrandCompanyNameTextNode: 6,
-        // 2 Category Contentful entries
+        // Category の Contentful エントリーが 2 件
         ContentfulCategory: 4,
         contentfulCategoryCategoryDescriptionTextNode: 4,
         contentfulCategoryTitleTextNode: 4,
         ContentfulContentType: contentTypeItems.length,
-        // 1 JSON Test Contentful entry
+        // JSON Test の Contentful エントリーが 1 件
         ContentfulJsonTest: 2,
         contentfulJsonTestJsonStringTestJsonNode: 2,
         contentfulJsonTestJsonTestJsonNode: 2,
-        // 4 Product Contentful entries
+        // Product の Contentful エントリーが 4 件
         ContentfulProduct: 8,
         contentfulProductProductDescriptionTextNode: 8,
         contentfulProductProductNameTextNode: 8,
-        // 1 Remark Test Contentful entry
+        // Remark Test の Contentful エントリーが 1 件
         ContentfulRemarkTest: 2,
         contentfulRemarkTestContentTextNode: 2,
       })
     )
 
-    // Relevant to compare to compare warm and cold situation
-    expect(createNode.mock.calls.length).toBe(69) // "cold build entries" count
+    // ウォームとコールドの状況を比較するうえで意味がある
+    expect(createNode.mock.calls.length).toBe(69) // 「コールドビルドのエントリー」の数
   })
 
   it(`creates nodes for each asset`, () => {
@@ -311,9 +311,9 @@ describe(`Process existing mutated nodes in warm build`, () => {
     const getNode = jest.fn(id => {
       if (doReturn) {
         doReturn = false
-        // Note: the relevant part for this test is that the same digest is returned
-        // so it skips generating the node and any of its children. Actual shape of
-        // returned is not relevant to test so update if anything breaks.
+        // Note: このテストで重要なのは、同じダイジェストが返されるので、ノードと
+        // その子の生成がすべてスキップされるという点である。返される値の実際の形は
+        // テストには関係がないので、何かが壊れた場合は更新すること。
         return {
           id,
           internal: {
@@ -321,7 +321,7 @@ describe(`Process existing mutated nodes in warm build`, () => {
           },
         }
       }
-      // All other nodes are new ("unknown")
+      // ほかのノードはすべて新規（"unknown"）である
       return undefined
     })
     contentTypeItems.forEach((contentTypeItem, i) => {
@@ -350,32 +350,32 @@ describe(`Process existing mutated nodes in warm build`, () => {
 
     expect(nodeTypeCounts).toEqual(
       expect.objectContaining({
-        // 3 Brand Contentful entries
+        // Brand の Contentful エントリーが 3 件
         ContentfulBrand: 6,
         contentfulBrandCompanyDescriptionTextNode: 6,
         contentfulBrandCompanyNameTextNode: 6,
-        // 2 Category Contentful entries
+        // Category の Contentful エントリーが 2 件
         ContentfulCategory: 4,
         contentfulCategoryCategoryDescriptionTextNode: 4,
         contentfulCategoryTitleTextNode: 4,
         ContentfulContentType: contentTypeItems.length,
-        // 1 JSON Test Contentful entry
+        // JSON Test の Contentful エントリーが 1 件
         ContentfulJsonTest: 2,
         contentfulJsonTestJsonStringTestJsonNode: 2,
         contentfulJsonTestJsonTestJsonNode: 2,
-        // 4 Product Contentful entries
+        // Product の Contentful エントリーが 4 件
         ContentfulProduct: 8,
         contentfulProductProductDescriptionTextNode: 8,
         contentfulProductProductNameTextNode: 8,
-        // 1 Remark Test Contentful entry
+        // Remark Test の Contentful エントリーが 1 件
         ContentfulRemarkTest: 2,
         contentfulRemarkTestContentTextNode: 2,
       })
     )
 
-    // Relevant to compare to compare warm and cold situation
-    // This number ought to be the same as the cold build
-    expect(createNode.mock.calls.length).toBe(69) // "warm build where entry was changed" count
+    // ウォームとコールドの状況を比較するうえで意味がある
+    // この数はコールドビルドと同じになるはずである
+    expect(createNode.mock.calls.length).toBe(69) // 「エントリーが変更されたウォームビルド」の数
   })
 })
 
@@ -433,7 +433,7 @@ describe(`Process contentful data (by id)`, () => {
 
     const createNode = jest.fn()
     const createNodeId = jest.fn(id => id)
-    const getNode = jest.fn(() => undefined) // All nodes are new
+    const getNode = jest.fn(() => undefined) // すべてのノードが新規である
     contentTypeItems.forEach((contentTypeItem, i) => {
       createNodesForContentType({
         contentTypeItem,
@@ -459,24 +459,24 @@ describe(`Process contentful data (by id)`, () => {
 
     expect(nodeTypeCounts).toEqual(
       expect.objectContaining({
-        // 3 Brand Contentful entries
+        // Brand の Contentful エントリーが 3 件
         ContentfulSFzTZbSuM8CoEwygeUYes: 6,
         contentfulSFzTZbSuM8CoEwygeUYesCompanyDescriptionTextNode: 6,
         contentfulSFzTZbSuM8CoEwygeUYesCompanyNameTextNode: 6,
-        // 2 Category Contentful entries
+        // Category の Contentful エントリーが 2 件
         Contentful6XwpTaSiiI2Ak2Ww0Oi6Qa: 4,
         contentful6XwpTaSiiI2Ak2Ww0Oi6QaCategoryDescriptionTextNode: 4,
         contentful6XwpTaSiiI2Ak2Ww0Oi6QaTitleTextNode: 4,
         ContentfulContentType: contentTypeItems.length,
-        // 1 JSON Test Contentful entry
+        // JSON Test の Contentful エントリーが 1 件
         ContentfulJsonTest: 2,
         contentfulJsonTestJsonStringTestJsonNode: 2,
         contentfulJsonTestJsonTestJsonNode: 2,
-        // 4 Product Contentful entries
+        // Product の Contentful エントリーが 4 件
         Contentful2PqfXuJwE8QSyKuM0U6W8M: 8,
         contentful2PqfXuJwE8QSyKuM0U6W8MProductDescriptionTextNode: 8,
         contentful2PqfXuJwE8QSyKuM0U6W8MProductNameTextNode: 8,
-        // 1 Remark Test Contentful entry
+        // Remark Test の Contentful エントリーが 1 件
         ContentfulRemarkTest: 2,
         contentfulRemarkTestContentTextNode: 2,
       })

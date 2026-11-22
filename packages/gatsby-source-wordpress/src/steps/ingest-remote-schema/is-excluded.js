@@ -4,7 +4,7 @@ import {
   getTypeSettingsByType,
 } from "~/steps/create-schema-customization/helpers"
 
-// these types do not work in Gatsby because there's no way to reliably invalidate caches or do partial data updates for them
+// これらの型は Gatsby では動かない。キャッシュを確実に無効化する方法も、データを部分的に更新する方法もないためである
 const blockListedTypenameParts = [
   `PluginConnection`,
   `ThemeConnection`,
@@ -61,9 +61,9 @@ const fieldIsExcludedOnParentType = ({ field, parentType }) => {
   )
 
   const fieldIsExcludedOnParentType =
-    // if this field is excluded on either the parent type
+    // このフィールドが親の型で除外されている場合
     parentTypeNameSettings?.excludeFieldNames?.includes(field?.name) ||
-    // or the parent type has a "nodes" field and that type has this field excluded
+    // または、親の型が "nodes" フィールドを持ち、その型でこのフィールドが除外されている場合
     parentTypeNodesFieldTypeNameSettings?.excludeFieldNames?.includes(
       field?.name
     )

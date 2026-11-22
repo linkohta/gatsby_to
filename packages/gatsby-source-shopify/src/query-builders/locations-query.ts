@@ -1,10 +1,10 @@
 import { BulkQuery } from "./bulk-query"
 
 /*
- * TODO - Add 'locations.edges.node.fulfillmentService.callbackUrl'.
- * As of 2021-11-18 this field, when queried against a legacy location
- * will cause an error. We have notified Shopify and will return this field
- * once the issue is resolved.
+ * TODO - 'locations.edges.node.fulfillmentService.callbackUrl' を追加する。
+ * 2021-11-18 の時点では、このフィールドを古い location に対してクエリすると
+ * エラーになる。Shopify には報告済みで、問題が解決したら
+ * このフィールドを戻す。
  */
 export class LocationsQuery extends BulkQuery {
   query(date?: Date): string {

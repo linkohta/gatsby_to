@@ -35,7 +35,7 @@ exports.sourceNodes = async (
     const { payload } = JSON.parse(strip(data))
 
     let importableResources = []
-    let posts = {} // because `posts` needs to be in a scope accessible by `links` below
+    let posts = {} // `posts` は、下の `links` からアクセスできるスコープにある必要があるため
 
     const users = Object.keys(payload.references.User).map(
       key => payload.references.User[key]

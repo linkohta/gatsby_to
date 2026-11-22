@@ -11,15 +11,15 @@ const {
 } = require(`./src/steps/declare-plugin-options-schema`)
 
 /**
- * This script generates ./docs/plugin-options.md from the plugin options schema.
- * ./docs/plugin-options.md should never be edited directly since it's auto-generated. Update ./src/steps/declare-plugin-options-schema.ts instead
+ * このスクリプトは、プラグインオプションのスキーマから ./docs/plugin-options.md を生成する。
+ * ./docs/plugin-options.md は自動生成されるので、直接編集してはならない。代わりに ./src/steps/declare-plugin-options-schema.ts を更新すること
  */
 
-// :( poor children
+// :( children がかわいそう
 const excludeParentsChildren = [`RootQuery`]
 /**
- * Takes the keys from a Joi schema and recursively
- * turns the nested keys into structured markdown documentation
+ * Joi スキーマのキーを受け取り、ネストしたキーを再帰的に
+ * 構造化された markdown のドキュメントに変換する
  *
  * @param {object} keys
  * @param {string} mdString
@@ -138,8 +138,8 @@ function joiKeysToMD({
 }
 
 /**
- * Converts the Joi schema description into markdown
- * and writes it to the filesystem
+ * Joi スキーマの description を markdown に変換し、
+ * ファイルシステムに書き出す
  *
  * @param {object} description
  */

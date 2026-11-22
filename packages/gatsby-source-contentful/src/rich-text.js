@@ -5,12 +5,12 @@ import resolveResponse from "contentful-resolve-response"
 export function renderRichText({ raw, references }, options = {}) {
   const richText = JSON.parse(raw || null)
 
-  // If no references are given, there is no need to resolve them
+  // 参照が渡されていなければ、解決する必要はない
   if (!references || !references.length) {
     return documentToReactComponents(richText, options)
   }
 
-  // Create dummy response so we can use official libraries for resolving the entries
+  // エントリーの解決に公式ライブラリを使えるよう、ダミーのレスポンスを作成する
   const dummyResponse = {
     items: [
       {

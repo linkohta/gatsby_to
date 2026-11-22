@@ -24,9 +24,9 @@ export const touchValidNodes = async () => {
 /**
  * fetchAndApplyNodeUpdates
  *
- * uses query info (types and gql query strings) fetched/generated in
- * onPreBootstrap to ask WordPress for the latest changes, and then
- * apply creates, updates, and deletes to Gatsby nodes
+ * onPreBootstrap で取得または生成したクエリ情報（型と gql のクエリ文字列）を使って
+ * WordPress に最新の変更を問い合わせ、Gatsby のノードに
+ * 作成、更新、削除を適用する
  */
 const fetchAndApplyNodeUpdates = async ({
   since,
@@ -46,7 +46,7 @@ const fetchAndApplyNodeUpdates = async ({
     since = await cache.get(withPluginKey(LAST_COMPLETED_SOURCE_TIME))
   }
 
-  // Check with WPGQL to create, delete, or update cached WP nodes
+  // WPGQL に問い合わせて、キャッシュした WP のノードを作成、削除、更新する
   const { wpActions, didUpdate } = await fetchAndRunWpActions({
     since,
     helpers,

@@ -10,7 +10,7 @@ export const typeDefinitionFilters = [
       }
 
       if (typeDef?.interfaces?.includes(`Node`)) {
-        // used to filter by different node types within a node interface
+        // ノードのインターフェースの中で、ノードタイプごとに絞り込むために使う
         typeDef.fields.nodeType = `String`
       }
 

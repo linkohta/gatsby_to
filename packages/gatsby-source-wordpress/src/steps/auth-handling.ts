@@ -8,11 +8,11 @@ export const hideAuthPluginOptions: Step = async (
   _helpers: GatsbyNodeApiHelpers,
   pluginOptions: IPluginOptions
 ): Promise<void> => {
-  // store auth settings so we can restore them later
+  // 後で復元できるよう、認証の設定を保存する
   storedAuthSettings = pluginOptions.auth
 
-  // remove auth from pluginOptions before we write out browser plugin options module,
-  // so we don't leak into the browser
+  // ブラウザーへ漏れないよう、ブラウザー用のプラグインオプションのモジュールを書き出す前に
+  // pluginOptions から認証情報を取り除く
   delete pluginOptions.auth
 }
 
@@ -21,8 +21,8 @@ export const restoreAuthPluginOptions: Step = async (
   pluginOptions: IPluginOptions
 ): Promise<void> => {
   if (storedAuthSettings) {
-    // if we stored auth settings, restore them now after we've written out browser plugin options module
-    // so engines can use them
+    // 認証の設定を保存していた場合は、ブラウザー用のプラグインオプションのモジュールを書き出した後のここで復元し、
+    // エンジンが使えるようにする
     pluginOptions.auth = storedAuthSettings
   }
 }

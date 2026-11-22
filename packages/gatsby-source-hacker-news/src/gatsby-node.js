@@ -39,7 +39,7 @@ exports.sourceNodes = async ({
 }) => {
   const { createNode } = actions
 
-  // Do the initial fetch
+  // 最初の取得を行う
   console.time(`fetch HN data`)
   console.log(
     `starting to fetch data from the Hacker News GraphQL API. Warning, this can take a long time e.g. 10-20 seconds`
@@ -98,12 +98,12 @@ fragment commentsFragment on HackerNewsItem {
   )
   console.timeEnd(`fetch HN data`)
 
-  // Create top-story nodes.
+  // トップストーリーのノードを作成する。
   result.data.data.hn.topStories.forEach((story, i) => {
     const storyStr = JSON.stringify(story)
 
-    // Ask HN, Polls, etc. don't have urls.
-    // For those that do, HN displays just the bare domain.
+    // Ask HN や投票などには URL がない。
+    // URL があるものについては、HN はドメインだけを表示する。
     let domain
     if (story.url) {
       const parsedUrl = url.parse(story.url)
@@ -135,15 +135,15 @@ fragment commentsFragment on HackerNewsItem {
       order: i + 1,
     }
 
-    // Just store the user id
+    // ユーザー id だけを保存する
     storyNode.by = storyNode.by.id
 
-    // Get content digest of node.
+    // ノードのコンテンツダイジェストを取得する。
     const contentDigest = createContentDigest(storyNode)
     storyNode.internal.contentDigest = contentDigest
     createNode(storyNode)
 
-    // Recursively create comment nodes.
+    // コメントのノードを再帰的に作成する。
     const createCommentNodes = (comments, parent, depth = 0) => {
       comments.forEach((comment, i) => {
         if (!comment) {
@@ -167,7 +167,7 @@ fragment commentsFragment on HackerNewsItem {
         commentNode.by = commentNode.by.id
         const nodeStr = JSON.stringify(commentNode)
 
-        // Get content digest of comment node.
+        // コメントのノードのコンテンツダイジェストを取得する。
         const contentDigest = createContentDigest(nodeStr)
         commentNode.internal.contentDigest = contentDigest
         commentNode.internal.content = nodeStr

@@ -7,14 +7,14 @@ import { needToTouchNodes } from "~/utils/gatsby-features"
 const persistPreviouslyCachedImages: Step = async (): Promise<void> => {
   const { helpers, pluginOptions } = getGatsbyApi()
 
-  // get all existing media item nodes
+  // 既存のメディアアイテムのノードをすべて取得する
   const mediaItemNodes = helpers.getNodesByType(
     `${pluginOptions.schema.typePrefix}MediaItem`
   )
 
   if (needToTouchNodes) {
-    // and if needed touch them so they aren't garbage collected.
-    // we will remove them as needed when receiving DELETE events from WP
+    // 必要であれば、ガベージコレクションされないよう touch する。
+    // WP から DELETE イベントを受け取ったときに、必要に応じて削除する
     mediaItemNodes.forEach(node => helpers.actions.touchNode(node))
   }
 

@@ -21,8 +21,8 @@ const setGatsbyApiToState = (
   )
 
   //
-  // add the plugin options and Gatsby API helpers to our store
-  // to access them more easily
+  // アクセスしやすくするため、プラグインオプションと Gatsby API のヘルパーを
+  // ストアに追加する
   getStore().dispatch.gatsbyApi.setState({
     helpers,
     pluginOptions: filteredPluginOptions,

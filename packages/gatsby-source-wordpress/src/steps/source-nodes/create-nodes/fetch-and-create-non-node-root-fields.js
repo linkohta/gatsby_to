@@ -56,8 +56,8 @@ const fetchAndCreateNonNodeRootFields = async () => {
   )
 
   /**
-   * if we're not lazy fetching media items, we need to fetch them
-   * upfront here
+   * メディアアイテムを遅延取得していない場合は、ここで先に
+   * 取得する必要がある
    */
   if (!pluginOptions.type.MediaItem.lazyNodes && newMediaItemIds.length) {
     getStore().dispatch.logger.createActivityTimer({
@@ -82,8 +82,8 @@ const fetchAndCreateNonNodeRootFields = async () => {
         ]),
       ]
 
-      // save the node id's so we can touch them on the next build
-      // so that we don't have to refetch all nodes
+      // 次回のビルドで touch できるよう、ノードの id を保存する
+      // こうすれば、すべてのノードを取得し直さずに済む
       await setPersistentCache({ key: CREATED_NODE_IDS, value: createdNodeIds })
     }
 

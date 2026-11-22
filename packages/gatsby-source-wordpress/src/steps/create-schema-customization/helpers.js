@@ -50,7 +50,7 @@ const isWpgqlOneThirteenZeroPlus = () => {
 }
 
 /**
- * This function namespaces typenames with a prefix
+ * この関数は、型名に接頭辞を付けて名前空間を分ける
  */
 export const buildTypeName = (name, prefix) => {
   if (!name || typeof name !== `string`) {
@@ -61,19 +61,19 @@ export const buildTypeName = (name, prefix) => {
     prefix = getPluginOptions().schema.typePrefix
   }
 
-  // this is for our namespace type on the root { wp { ...fields } }
+  // これは、ルートにある名前空間用の型 { wp { ...fields } } のためのものである
   if (name === prefix) {
     return name
   }
 
-  // Gatsby makes the same type, so we need to rename it to prevent conflicts
+  // Gatsby も同じ型を作るので、衝突を避けるために名前を変更する必要がある
   if (name === `Filter`) {
     name = `FilterType`
   }
 
   if (
-    // Starting in WPGraphQL 1.13.0, Gatsby and WPGraphQL both generate types ending in these strings for every node type in the schema, so we need to rename types to prevent conflicts.
-    // for users on older versions of WPGraphQL we should try to keep the schema how it was before
+    // WPGraphQL 1.13.0 以降では、Gatsby と WPGraphQL の両方が、スキーマ内のすべてのノードタイプについて、これらの文字列で終わる型を生成する。そのため、衝突を避けるために型の名前を変更する必要がある。
+    // 古いバージョンの WPGraphQL を使っているユーザーについては、スキーマを以前のままに保つようにすべきである
     isWpgqlOneThirteenZeroPlus() &&
     (name.endsWith(`Connection`) ||
       name.endsWith(`Edge`) ||
@@ -90,7 +90,7 @@ export const buildTypeName = (name, prefix) => {
 }
 
 /**
- * Find the first type kind of a Type definition pulled via introspection
+ * イントロスペクションで取得した型定義から、最初の型の kind を探す
  * @param {object} type
  */
 export const findTypeKind = type => {
@@ -147,14 +147,14 @@ export const getTypesThatImplementInterfaceType = type => {
     .filter(
       ({ interfaces }) =>
         interfaces &&
-        // find types that implement this interface type
+        // このインターフェース型を実装している型を探す
         interfaces.find(singleInterface => singleInterface.name === type.name)
     )
     .map(type => typeMap.get(type.name))
     .filter(
       type =>
         type.kind !== `UNION` ||
-        // if this is a union type, make sure the union type has one or more member types, otherwise schema customization will throw an error
+        // ユニオン型の場合は、メンバー型が 1 つ以上あることを確認する。そうでないと、スキーマのカスタマイズでエラーになる
         (!!type.possibleTypes && !!type.possibleTypes.length)
     )
 
@@ -174,14 +174,14 @@ const supportedScalars = [
 ]
 
 export const typeIsABuiltInScalar = type =>
-  // @todo the next function and this one are redundant.
-  // see the next todo on how to fix the issue. If that todo is resolved, these functions will be identical. :(
+  // @todo 次の関数とこの関数は重複している。
+  // この問題の直し方は次の todo を参照。その todo が解決すれば、これらの関数はまったく同じになる。:(
   supportedScalars.includes(findNamedTypeName(type))
 
 export const typeIsASupportedScalar = type => {
   if (findTypeKind(type) !== `SCALAR`) {
-    // @todo returning true here seems wrong since a type that is not a scalar can't be a supported scalar... so there is some other logic elsewhere that is wrong
-    // making this return false causes errors in the schema
+    // @todo ここで true を返すのは誤りに見える。スカラーではない型が対応済みのスカラーであるはずがないためである... つまり、ほかのどこかのロジックが誤っている
+    // ここで false を返すようにすると、スキーマでエラーが起きる
     return true
   }
 
@@ -190,7 +190,7 @@ export const typeIsASupportedScalar = type => {
 
 const typeSettingCache = new Map()
 
-// retrieves plugin settings for the provided type
+// 指定した型のプラグイン設定を取得する
 export const getTypeSettingsByType = type => {
   if (!type) {
     return {}
@@ -208,12 +208,12 @@ export const getTypeSettingsByType = type => {
     return cachedTypeSettings
   }
 
-  // the plugin options object containing every type setting
+  // すべての型の設定を持つ、プラグインオプションのオブジェクト
   const allTypeSettings = getStore().getState().gatsbyApi.pluginOptions.type
 
   const typeSettings = cloneDeep(allTypeSettings[typeName] || {})
 
-  // the type.__all plugin option which is applied to every type setting
+  // すべての型の設定に適用される、プラグインオプションの type.__all
   const __allTypeSetting = cloneDeep(allTypeSettings.__all || {})
 
   if (typeName === `MediaItem`) {
@@ -235,7 +235,7 @@ export const getTypeSettingsByType = type => {
 }
 
 /**
- * This is used to filter the automatically generated type definitions before they're added to the schema customization api.
+ * これは、自動生成された型定義をスキーマカスタマイズの API に追加する前に、フィルターをかけるために使う。
  */
 export const filterTypeDefinition = (
   typeDefinition,
@@ -261,9 +261,9 @@ export const filterTypeDefinition = (
   return typeDefinition
 }
 
-// we should be using graphql-js for this kind of thing, but unfortunately this project didn't use it from the beginning so it would be a huge lift to refactor to use it now. In the future we will be rewriting this plugin using a new Gatsby source plugin toolkit, and at that time we'll use graphql-js.
-// from introspection field types this will return a value like:
-// `String` or `[String]` or `[String!]!` or `[String]!` or `[[String]]` or `[[String]!]!` or `[[String]!]`, etc
+// この種の処理には graphql-js を使うべきだが、残念ながらこのプロジェクトは最初から使っていなかったので、今から使うようにリファクタリングするのは大仕事になる。将来、新しい Gatsby のソースプラグイン用ツールキットでこのプラグインを書き直す予定で、そのときに graphql-js を使う。
+// イントロスペクションのフィールドの型から、これは次のような値を返す:
+// `String`、`[String]`、`[String!]!`、`[String]!`、`[[String]]`、`[[String]!]!`、`[[String]!]` など
 export const introspectionFieldTypeToSDL = fieldType => {
   const openingTagsList = []
   const closingTagsList = []
@@ -303,7 +303,7 @@ export const introspectionFieldTypeToSDL = fieldType => {
 }
 
 /**
- * This is an expensive fn but it doesn't matter because it's only to show a debugging warning message when something is wrong.
+ * これはコストの高い関数だが、問題が起きたときにデバッグ用の警告メッセージを表示するためだけのものなので構わない。
  */
 function mergeDuplicateTypesAndReturnDedupedList(typeDefs) {
   const clonedDefs = cloneDeep(typeDefs)
@@ -332,11 +332,11 @@ function mergeDuplicateTypesAndReturnDedupedList(typeDefs) {
 }
 
 /**
- * Diffs the built types between this build and the last one with the same remote schema hash.
- * This is to catch and add helpful error messages for when an inconsistent schema between builds is inadvertently created due to some bug
+ * 今回のビルドと、同じリモートスキーマのハッシュを持つ前回のビルドとで、組み立てた型の差分を取る。
+ * 何らかのバグによって、ビルド間で一貫しないスキーマが意図せず作られた場合に、それを検出して分かりやすいエラーメッセージを追加するためである
  */
 export async function diffBuiltTypeDefs(typeDefs) {
-  // only diff the schema if the user has opted in
+  // ユーザーが有効にした場合にだけ、スキーマの差分を取る
   if (process.env.WP_DIFF_SCHEMA_CUSTOMIZATION !== `true`) {
     return
   }
@@ -369,7 +369,7 @@ export async function diffBuiltTypeDefs(typeDefs) {
     return
   }
 
-  // type defs are the same as last time, so don't check for missing/inconsistent types
+  // 型定義が前回と同じなので、欠けている型や一貫しない型の確認は行わない
   if (previousTypeDefinitions?.typeDefString === typeDefString) {
     return
   }
@@ -399,7 +399,7 @@ export async function diffBuiltTypeDefs(typeDefs) {
           previousTypeDef,
           typeDef,
           {
-            // diff again to also show unchanged lines
+            // 変更のない行も表示するため、もう一度差分を取る
             full: true,
           }
         )}`

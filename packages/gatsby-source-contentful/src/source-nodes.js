@@ -23,7 +23,7 @@ import { hasFeature } from "gatsby-plugin-utils/has-feature"
 
 const conflictFieldPrefix = `contentful`
 
-// restrictedNodeFields from here https://www.gatsbyjs.com/docs/node-interface/
+// restrictedNodeFields の出典は https://www.gatsbyjs.com/docs/node-interface/
 const restrictedNodeFields = [
   `children`,
   `contentful_id`,
@@ -40,14 +40,14 @@ async function isOnline() {
 }
 
 /***
- * Localization algorithm
+ * ローカライズのアルゴリズム
  *
- * 1. Make list of all resolvable IDs worrying just about the default ids not
- * localized ids
- * 2. Make mapping between ids, again not worrying about localization.
- * 3. When creating entries and assets, make the most localized version
- * possible for each localized node i.e. get the localized field if it exists
- * or the fallback field or the default field.
+ * 1. 解決可能な ID の一覧を作る。ここではデフォルトの id だけを考え、
+ * ローカライズされた id は考えない
+ * 2. id 同士の対応付けを作る。ここでもローカライズは考えない。
+ * 3. エントリーとアセットを作成するときに、ローカライズされた各ノードについて、
+ * できるだけローカライズされた版を作る。つまり、ローカライズされたフィールドがあれば
+ * それを、なければフォールバックのフィールドかデフォルトのフィールドを使う。
  */
 export async function sourceNodes(
   {
@@ -76,7 +76,7 @@ export async function sourceNodes(
 
   const pluginConfig = createPluginConfig(pluginOptions)
 
-  // wrap createNode so we can cache them in memory for faster lookups when finding backreferences
+  // バックリファレンスを探すときの検索を速くするため、createNode を包んでノードをメモリにキャッシュできるようにする
   const createNode = node => {
     addNodeToExistingNodesCache(node)
 
@@ -89,7 +89,7 @@ export async function sourceNodes(
     return originalDeleteNode(node)
   }
 
-  // Array of all existing Contentful nodes
+  // 既存の Contentful ノードすべての配列
   const { existingNodes, memoryNodeCountsBySysType } =
     await getExistingCachedNodes({
       actions,
@@ -97,8 +97,8 @@ export async function sourceNodes(
       pluginConfig,
     })
 
-  // If the user knows they are offline, serve them cached result
-  // For prod builds though always fail if we can't get the latest data
+  // ユーザーがオフラインだと分かっている場合は、キャッシュした結果を返す
+  // ただし本番ビルドでは、最新のデータを取得できなければ必ず失敗させる
   if (
     !(await isOnline()) &&
     process.env.GATSBY_CONTENTFUL_OFFLINE === `true` &&
@@ -131,14 +131,14 @@ export async function sourceNodes(
   const CACHE_FOREIGN_REFERENCE_MAP_STATE = `contentful-foreign-reference-map-state-${sourceId}`
 
   /*
-   * Subsequent calls of Contentfuls sync API return only changed data.
+   * Contentful の同期 API は、2 回目以降の呼び出しでは変更されたデータだけを返す。
    *
-   * In some cases, especially when using rich-text fields, there can be data
-   * missing from referenced entries. This breaks the reference matching.
+   * 場合によっては、特にリッチテキストのフィールドを使っていると、参照先のエントリーの
+   * データが欠けることがある。すると参照の照合が壊れる。
    *
-   * To workround this, we cache the initial sync data and merge it
-   * with all data from subsequent syncs. Afterwards the references get
-   * resolved via the Contentful JS SDK.
+   * これを回避するため、最初の同期のデータをキャッシュし、以降の同期の
+   * すべてのデータとマージする。その後、Contentful JS SDK で
+   * 参照を解決する。
    */
   const syncToken =
     store.getState().status.plugins?.[`gatsby-source-contentful`]?.[
@@ -146,7 +146,7 @@ export async function sourceNodes(
     ]
   const isCachedBuild = !!syncToken
 
-  // Actual fetch of data from Contentful
+  // Contentful からの実際のデータ取得
   const {
     currentSyncData,
     tagItems,
@@ -181,7 +181,7 @@ export async function sourceNodes(
     })
   }
 
-  // Update syncToken
+  // syncToken を更新する
   const nextSyncToken = currentSyncData?.nextSyncToken
 
   actions.setPluginStatus({
@@ -190,7 +190,7 @@ export async function sourceNodes(
 
   fetchActivity.end()
 
-  // Process data fetch results and turn them into GraphQL entities
+  // データ取得の結果を処理し、GraphQL のエンティティに変換する
   const processingActivity = reporter.activityTimer(
     `Contentful: Process data`,
     {
@@ -199,7 +199,7 @@ export async function sourceNodes(
   )
   processingActivity.start()
 
-  // Report existing, new and updated nodes
+  // 既存、新規、更新されたノードを報告する
   const nodeCounts = {
     newEntry: 0,
     newAsset: 0,
@@ -238,8 +238,8 @@ export async function sourceNodes(
   const entryList = buildEntryList({ contentTypeItems, currentSyncData })
   const { assets } = currentSyncData
 
-  // Create map of resolvable ids so we can check links against them while creating
-  // links.
+  // 解決可能な id のマップを作り、リンクを作成するときに照合できるように
+  // する。
   const resolvable = buildResolvableSet({
     existingNodes,
     entryList,
@@ -249,7 +249,7 @@ export async function sourceNodes(
   const previousForeignReferenceMapState = await cache.get(
     CACHE_FOREIGN_REFERENCE_MAP_STATE
   )
-  // Build foreign reference map before starting to insert any nodes
+  // ノードの挿入を始める前に、外部参照のマップを作る
   const foreignReferenceMapState = buildForeignReferenceMap({
     contentTypeItems,
     entryList,
@@ -292,14 +292,14 @@ export async function sourceNodes(
             defaultLocale,
           })
         )
-        // Gather deleted node ids to remove them later on
+        // 後で取り除けるよう、削除されたノードの id を集める
         deletedEntryGatsbyReferenceIds.add(nodeId)
         return getNode(nodeId)
       })
       .filter(node => node)
 
     localizedNodes.forEach(node => {
-      // touchNode first, to populate typeOwners & avoid erroring
+      // typeOwners を埋めてエラーを避けるため、先に touchNode を呼ぶ
       touchNode(node)
       deleteNode(node)
     })
@@ -318,7 +318,7 @@ export async function sourceNodes(
     deletionActivity.end()
   }
 
-  // Update existing entry nodes that weren't updated but that need reverse links added or removed.
+  // 更新されてはいないが、逆方向のリンクの追加または削除が必要な既存のエントリーノードを更新する。
   let existingNodesThatNeedReverseLinksUpdateInDatastore = new Set()
 
   if (isCachedBuild) {
@@ -351,14 +351,14 @@ export async function sourceNodes(
               })
             )
 
-            // Create new reference field when none exists
+            // 参照フィールドがなければ新しく作成する
             if (!n[name]) {
               existingNodesThatNeedReverseLinksUpdateInDatastore.add(n)
               n[name] = [nodeId]
               return
             }
 
-            // Add non existing references to reference field
+            // まだない参照を参照フィールドに追加する
             if (n[name] && !n[name].includes(nodeId)) {
               existingNodesThatNeedReverseLinksUpdateInDatastore.add(n)
               n[name].push(nodeId)
@@ -367,10 +367,10 @@ export async function sourceNodes(
         )
       }
 
-      // Remove references to deleted nodes
+      // 削除されたノードへの参照を取り除く
       if (n.contentful_id && deletedEntryGatsbyReferenceIds.size) {
         Object.keys(n).forEach(name => {
-          // @todo Detect reference fields based on schema. Should be easier to achieve in the upcoming version.
+          // @todo スキーマに基づいて参照フィールドを検出する。次のバージョンでは実現しやすくなるはずである。
           if (!name.endsWith(`___NODE`)) {
             return
           }
@@ -395,13 +395,13 @@ export async function sourceNodes(
     })
   }
 
-  // allow node to gc if it needs to
+  // 必要であれば node が GC できるようにする
   // @ts-ignore
   newOrUpdatedEntries = undefined
   await untilNextEventLoopTick()
 
-  // We need to call `createNode` on nodes we modified reverse links on,
-  // otherwise changes won't actually persist
+  // 逆方向のリンクを変更したノードに対しては `createNode` を呼び出す必要がある。
+  // そうしないと、変更が実際には保存されない
   if (existingNodesThatNeedReverseLinksUpdateInDatastore.size) {
     let existingNodesLoopCount = 0
     for (const node of existingNodesThatNeedReverseLinksUpdateInDatastore) {
@@ -421,9 +421,9 @@ export async function sourceNodes(
 
       const nodeAndDescendants = addChildrenToList(node)
       for (const nodeToUpdateOriginal of nodeAndDescendants) {
-        // We should not mutate original node as Gatsby will still
-        // compare against what's in in-memory weak cache, so we
-        // clone original node to ensure reference identity is not possible
+        // 元のノードは書き換えるべきではない。Gatsby はメモリ上の弱参照キャッシュにあるものと
+        // 比較するためである。そこで元のノードをクローンし、
+        // 参照が同一にならないようにする
         const nodeToUpdate = nodeToUpdateOriginal.__memcache
           ? getNode(nodeToUpdateOriginal.id)
           : nodeToUpdateOriginal
@@ -448,24 +448,24 @@ export async function sourceNodes(
           ...nodeToUpdate,
           internal: {
             ...nodeToUpdate.internal,
-            // We need to remove properties from existing fields
-            // that are reserved and managed by Gatsby (`.internal.owner`, `.fields`).
-            // Gatsby automatically will set `.owner` it back
+            // 既存のフィールドから、Gatsby が予約して管理しているプロパティ
+            // （`.internal.owner`、`.fields`）を取り除く必要がある。
+            // `.owner` は Gatsby が自動的に設定し直す
             owner: undefined,
-            // We add or modify counter postfix to contentDigest
-            // to make sure Gatsby treat this as data update
+            // contentDigest にカウンターの接尾辞を追加または変更し、
+            // Gatsby がこれをデータの更新として扱うようにする
             contentDigest: `${initialContentDigest}${CONTENT_DIGEST_COUNTER_SEPARATOR}${counter}`,
           },
-          // `.fields` need to be created with `createNodeField` action, we can't just re-add them.
-          // Other plugins (or site itself) will have opportunity to re-generate them in `onCreateNode` lifecycle.
-          // Contentful content nodes are not using `createNodeField` so it's safe to delete them.
-          // (Asset nodes DO use `createNodeField` for `localFile` and if we were updating those, then
-          // we would also need to restore that field ourselves after re-creating a node)
-          fields: undefined, // plugin adds node field on asset nodes which don't have reverse links
+          // `.fields` は `createNodeField` アクションで作成する必要があり、単に追加し直すことはできない。
+          // ほかのプラグイン（またはサイト自身）は `onCreateNode` ライフサイクルで再生成できる。
+          // Contentful のコンテンツノードは `createNodeField` を使っていないので、削除しても安全である。
+          // （アセットノードは `localFile` のために `createNodeField` を使っている。もしそれらを更新するなら、
+          // ノードを作り直した後に、そのフィールドもこちらで復元する必要がある）
+          fields: undefined, // プラグインは、逆方向のリンクを持たないアセットノードにノードフィールドを追加する
         }
 
-        // memory cached nodes are mutated during back reference checks
-        // so we need to carry over the changes to the updated node
+        // メモリにキャッシュしたノードはバックリファレンスの確認中に書き換えられるので、
+        // その変更を更新後のノードへ引き継ぐ必要がある
         if (nodeToUpdateOriginal.__memcache) {
           for (const key of Object.keys(nodeToUpdateOriginal)) {
             if (!key.endsWith(`___NODE`)) {
@@ -479,14 +479,14 @@ export async function sourceNodes(
         createNode(newNode)
 
         if (existingNodesLoopCount++ % 2000 === 0) {
-          // dont block the event loop
+          // イベントループをブロックしない
           await untilNextEventLoopTick()
         }
       }
     }
   }
 
-  // allow node to gc if it needs to
+  // 必要であれば node が GC できるようにする
   // @ts-ignore
   existingNodesThatNeedReverseLinksUpdateInDatastore = undefined
   await untilNextEventLoopTick()
@@ -509,8 +509,8 @@ export async function sourceNodes(
       )
     }
 
-    // A contentType can hold lots of entries which create nodes
-    // We wait until all nodes are created and processed until we handle the next one
+    // 1 つの contentType が、ノードを作成するエントリーを大量に持つことがある
+    // すべてのノードが作成されて処理されるのを待ってから、次を処理する
     await createNodesForContentType({
       contentTypeItem,
       restrictedNodeFields,
@@ -529,7 +529,7 @@ export async function sourceNodes(
       unstable_createNodeManifest,
     })
 
-    // allow node to garbage collect these items if it needs to
+    // 必要であれば node がこれらをガベージコレクションできるようにする
     contentTypeItems[i] = undefined
     entryList[i] = undefined
     await untilNextEventLoopTick()
@@ -541,7 +541,7 @@ export async function sourceNodes(
 
   const assetNodes = []
   for (let i = 0; i < assets.length; i++) {
-    // We wait for each asset to be process until handling the next one.
+    // 各アセットの処理が終わるのを待ってから、次を処理する。
     assetNodes.push(
       ...(await createAssetNodes({
         assetItem: assets[i],
@@ -562,7 +562,7 @@ export async function sourceNodes(
 
   await untilNextEventLoopTick()
 
-  // Create tags entities
+  // タグのエンティティを作成する
   if (tagItems.length) {
     reporter.info(`Creating ${tagItems.length} Contentful Tag nodes`)
 
@@ -581,7 +581,7 @@ export async function sourceNodes(
 
   creationActivity.end()
 
-  // Download asset files to local fs
+  // アセットファイルをローカルの fs へダウンロードする
   if (pluginConfig.get(`downloadLocal`)) {
     await downloadContentfulAssets({
       assetNodes,

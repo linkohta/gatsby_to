@@ -19,14 +19,14 @@ const createMockCreateNodeId = () => {
   return createNodeId
 }
 
-// MD5 hash of the file (if the mock below changes this should change)
+// ファイルの MD5 ハッシュ（下のモックを変更したら、これも変わるはずである）
 const fileHash = `8d777f385d3dfec8815d20f7496026dc`
 
-// mtime + inode (if the mock below changes this should change)
+// mtime + inode（下のモックを変更したら、これも変わるはずである）
 const fileFastHash = `123456123456`
 
 function testNode(node, dname, fname, contentDigest) {
-  // Sanitize all filenames
+  // すべてのファイル名をサニタイズする
   Object.keys(node).forEach(key => {
     if (typeof node[key] === `string`) {
       node[key] = node[key].replace(new RegExp(dname, `g`), `<DIR>`)
@@ -46,7 +46,7 @@ function testNode(node, dname, fname, contentDigest) {
     }
   })
 
-  // Note: this snapshot should update if the mock below is changed
+  // Note: 下のモックを変更したら、このスナップショットも更新されるはずである
   expect(node).toMatchInlineSnapshot(`
     Object {
       "absolutePath": "<DIR>/f",
@@ -94,13 +94,13 @@ function testNode(node, dname, fname, contentDigest) {
   `)
 }
 
-// FIXME: This test needs to not use snapshots because of file differences
-// and locations across users and CI systems
+// FIXME: ユーザーや CI システムによってファイルの内容と場所が異なるので、
+// このテストはスナップショットを使わないようにする必要がある
 describe(`create-file-node`, () => {
   beforeEach(() => {
-    // If this breaks, note that the actual values here are not relevant. They just need to be mocked because
-    // otherwise the tests change due to changing timestamps. The returned object should mimic the real fs.stat
-    // Note: async tests should run in serial so this mock should not cause cross test pollution on this thread.
+    // これが壊れた場合に備えて記しておくと、ここでの実際の値には意味がない。モックしないと
+    // タイムスタンプの変化でテスト結果が変わってしまうので、モックしているだけである。返すオブジェクトは実際の fs.stat を模倣すること
+    // Note: 非同期のテストは直列に実行されるはずなので、このモックがこのスレッドでテスト間の汚染を起こすことはないはずである。
     fs.stat = jest.fn().mockResolvedValue(
       Promise.resolve({
         isDirectory() {

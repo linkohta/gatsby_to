@@ -39,7 +39,7 @@ const customizeSchema = async ({ actions, schema, store: gatsbyStore }) => {
     pluginOptions,
   }
 
-  // create Gatsby node types
+  // Gatsby のノードタイプを作成する
   remoteSchema.introspectionData.__schema.types.forEach(type => {
     if (
       fieldOfTypeWasFetched(type) &&
@@ -62,7 +62,7 @@ const customizeSchema = async ({ actions, schema, store: gatsbyStore }) => {
           break
         case `SCALAR`:
           /**
-           * custom scalar types aren't supported.
+           * カスタムスカラー型には対応していない。
            */
           break
       }
@@ -73,10 +73,10 @@ const customizeSchema = async ({ actions, schema, store: gatsbyStore }) => {
     }
   })
 
-  // Create non Gatsby node types by creating a single node
-  // where the typename is the type prefix
-  // The node fields are the non-node root fields of the remote schema
-  // like so: query { prefix { ...fields } }
+  // 型の接頭辞を型名とするノードを 1 つ作ることで、
+  // Gatsby のノードではない型を作成する
+  // ノードのフィールドは、リモートスキーマのノードではないルートフィールドである
+  // 次のようになる: query { prefix { ...fields } }
   const wpType = buildType.objectType({
     ...typeBuilderApi,
     type: {

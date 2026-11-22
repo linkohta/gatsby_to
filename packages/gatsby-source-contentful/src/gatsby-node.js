@@ -47,7 +47,7 @@ export const onPreInit = async (
   { store, reporter, actions },
   pluginOptions
 ) => {
-  // if gatsby-plugin-image is not installed
+  // gatsby-plugin-image がインストールされていない場合
   try {
     await import(`gatsby-plugin-image/graphql-utils`)
   } catch (err) {
@@ -59,7 +59,7 @@ export const onPreInit = async (
     })
   }
 
-  // if gatsby-plugin-image is not configured
+  // gatsby-plugin-image が設定されていない場合
   if (
     !store
       .getState()
@@ -176,7 +176,7 @@ For example, to exclude content types starting with "page" \`contentTypeFilter: 
         )
         .unknown(true)
         .default({}),
-      // default plugins passed by gatsby
+      // gatsby が渡すデフォルトのプラグイン
       plugins: Joi.array(),
     })
     .external(validateContentfulAccess)

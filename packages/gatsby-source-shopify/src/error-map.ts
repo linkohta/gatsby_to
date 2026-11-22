@@ -25,9 +25,9 @@ export const ERROR_MAP: IErrorMap = {
     type: `PLUGIN`,
   },
   /**
-   * If we don't know what it is, we haven't done our due
-   * diligence to handle it explicitly. That means it's our
-   * fault, so THIRD_PARTY indicates us, the plugin authors.
+   * それが何であるか分からないのであれば、明示的に処理するための
+   * 確認をこちらが怠っていたことになる。つまりこちらの落ち度なので、
+   * THIRD_PARTY はプラグインの作者である私たちを指す。
    */
   [errorCodes.unknownSourcingFailure]: {
     text: getErrorText,

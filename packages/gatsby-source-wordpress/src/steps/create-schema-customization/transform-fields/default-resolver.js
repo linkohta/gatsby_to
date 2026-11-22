@@ -26,15 +26,15 @@ export const buildDefaultResolver = transformerApi => (source, _, context) => {
     finalFieldValue = aliasedField
   }
 
-  // the findNamedTypeName helpers was written after this resolver
-  // had been in production for a while.
-  // so we don't know if in all cases it will find the right typename
-  // for this resolver..
-  // So the old way of doing it is above in autoAliasedFieldPropertyName
-  // @todo write comprehesive data resolution integration tests
-  // using many different WPGraphQL extensions
-  // then come back and remove the `return aliasedField` line and
-  // see if this still resolves everything properly
+  // findNamedTypeName ヘルパーは、このリゾルバーがしばらく本番で
+  // 使われた後に書かれた。
+  // そのため、このリゾルバーにとって正しい型名を、すべての場合に
+  // 見つけられるかどうかは分からない。
+  // そこで、従来の方法を上の autoAliasedFieldPropertyName に残している
+  // @todo さまざまな WPGraphQL の拡張を使った、網羅的なデータ解決の
+  // 統合テストを書く
+  // その後ここに戻って `return aliasedField` の行を削除し、
+  // それでもすべてが正しく解決されるかを確認する
   const typeName = findNamedTypeName(field.type)
   const autoAliasedFieldName = `${fieldName}__typename_${typeName}`
 
@@ -48,8 +48,8 @@ export const buildDefaultResolver = transformerApi => (source, _, context) => {
   }
 
   if (finalFieldValue?.__typename) {
-    // in Gatsby V3 this property is used to determine the type of an interface field
-    // instead of the resolveType fn. This means we need to prefix it so that gql doesn't throw errors about missing types.
+    // Gatsby V3 では、インターフェースフィールドの型の判定に、resolveType 関数ではなくこのプロパティが使われる。
+    // そのため、型が見つからないというエラーを gql が投げないよう、接頭辞を付ける必要がある。
     finalFieldValue.__typename = buildTypeName(
       finalFieldValue.__typename,
       prefix
@@ -57,11 +57,11 @@ export const buildDefaultResolver = transformerApi => (source, _, context) => {
   }
 
   const isANodeConnection =
-    // if this field has just an id and typename
+    // このフィールドが id と typename しか持たない場合
     finalFieldValue?.id &&
     finalFieldValue?.__typename &&
     Object.keys(finalFieldValue).length === 2 &&
-    // and it's a Gatsby Node type
+    // かつ、Gatsby のノードタイプである場合
     gatsbyNodeTypes.includes(finalFieldValue.__typename)
 
   if (isANodeConnection) {

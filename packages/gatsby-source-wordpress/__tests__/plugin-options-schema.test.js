@@ -61,7 +61,7 @@ describe(`pluginOptionsSchema`, () => {
           queryDepth: 15,
           circularQueryLimit: 5,
           typePrefix: `Wp`,
-          timeout: 30 * 1000, // 30 seconds
+          timeout: 30 * 1000, // 30 秒
           perPage: 100,
         },
         excludeFieldNames: [],

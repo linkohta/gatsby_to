@@ -56,7 +56,7 @@ const formatPluginOptionsForCLI = (pluginOptions, errors = {}) => {
   const lines = []
   optionKeys.forEach(key => {
     if (key === `plugins`) {
-      // skip plugins field automatically added by gatsby
+      // gatsby が自動的に追加する plugins フィールドはスキップする
       return
     }
 
@@ -75,12 +75,12 @@ const formatPluginOptionsForCLI = (pluginOptions, errors = {}) => {
 }
 
 /**
- * Mask majority of input to not leak any secrets
+ * 秘密情報が漏れないよう、入力の大部分をマスクする
  * @param {string} input
- * @returns {string} masked text
+ * @returns {string} マスクしたテキスト
  */
 const maskText = input => {
-  // show just 25% of string up to 4 characters
+  // 文字列の 25% だけを、最大 4 文字まで表示する
   const hiddenCharactersLength =
     input.length - Math.min(4, Math.floor(input.length * 0.25))
 

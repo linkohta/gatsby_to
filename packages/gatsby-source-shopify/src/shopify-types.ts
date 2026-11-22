@@ -1,17 +1,17 @@
 /*
- * The ProductVariantPricePair object is different than other objects
- * from Shopify because it is an object but doesn't include an id field
- * and for that reason it must be attached directly to the object as opposed
- * to the rest of the objects which are referenced using @link directives.
+ * ProductVariantPricePair オブジェクトは、Shopify のほかのオブジェクトとは異なる。
+ * オブジェクトではあるが id フィールドを持たないためである。
+ * そのため、@link ディレクティブで参照するほかのオブジェクトとは違い、
+ * オブジェクトに直接付ける必要がある。
  */
 
 /*
- * key: The name of the reference field of the node
- * coupled: Whether the node is coupled to another node or top-level
- * optionalKey: The key if the node is optionally included in the plugin options
- * imageFields: An array of fields containing image objects
- * referenceFields: An array defining every field referencing other nodes
- * coupledNodeFields: An array of reference field keys that will be invalidated if that object is
+ * key: ノードの参照フィールドの名前
+ * coupled: ノードがほかのノードに結び付いているか、トップレベルか
+ * optionalKey: ノードがプラグインオプションで任意に含められる場合のキー
+ * imageFields: 画像オブジェクトを持つフィールドの配列
+ * referenceFields: ほかのノードを参照するすべてのフィールドを定義する配列
+ * coupledNodeFields: そのオブジェクトが無効化されたときに無効化される、参照フィールドのキーの配列
  */
 
 // eslint-disable @typescript-eslint/naming-convention

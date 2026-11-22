@@ -17,17 +17,17 @@ import { findNamedTypeName } from "../../create-schema-customization/helpers"
 
 const recursivelyAliasFragments = field =>
   field.inlineFragments.map(fragment => {
-    // for each of this inlineFragments fields
+    // この inlineFragments の各フィールドについて
     fragment.fields = fragment.fields.map(fragmentField => {
       if (typeof fragmentField === `string`) {
         return fragmentField
       }
 
-      // compare it against each field of each other fragment
+      // ほかの各フラグメントの各フィールドと比較する
       let updatedFragmentField = fragmentField
 
       field.inlineFragments.forEach(possiblyConflictingFragment => {
-        // don't compare this fragment against itself
+        // このフラグメントを自分自身とは比較しない
         if (possiblyConflictingFragment.name === fragment.name) {
           return
         }
@@ -44,8 +44,8 @@ const recursivelyAliasFragments = field =>
             possiblyConflictingField?.fieldType?.name !==
             fragmentField?.fieldType?.name
 
-          // if the fields have the same name but a different type kind
-          // alias them
+          // フィールドの名前が同じで型の kind が異なる場合は、
+          // エイリアスを付ける
           if (
             fieldNamesMatch &&
             (fieldTypeKindsDontMatch || fieldTypeNamesDontMatch)
@@ -61,8 +61,8 @@ const recursivelyAliasFragments = field =>
           }
         })
       })
-      // if the fields have the same name but a different type AND the field has sub fields, compare those sub fields against any fragment fields subfields where the field name matches
-      // if any subfields have conflicting types, alias them
+      // フィールドの名前が同じで型が異なり、かつサブフィールドを持つ場合は、フィールド名が一致するフラグメントのフィールドのサブフィールドと、それらのサブフィールドを比較する
+      // サブフィールドの型が衝突していれば、エイリアスを付ける
 
       if (updatedFragmentField.inlineFragments) {
         updatedFragmentField.inlineFragments =
@@ -76,8 +76,8 @@ const recursivelyAliasFragments = field =>
   })
 
 const aliasConflictingFieldFields = field => {
-  // we only have conflicting fields in inlineFragments
-  // if there are no inlineFragments, do nothing
+  // フィールドが衝突するのは inlineFragments の中だけである
+  // inlineFragments がなければ何もしない
   if (!field.inlineFragments) {
     return field
   }
@@ -107,11 +107,11 @@ const aliasConflictingFragmentFields = ({ fragments }) => {
 /**
  * generateNodeQueriesFromIngestibleFields
  *
- * Takes in data from an introspection query and
- * processes it to build GraphQL query strings/info
+ * イントロスペクションクエリのデータを受け取り、
+ * それを処理して GraphQL のクエリ文字列と情報を組み立てる
  *
  * @param {object} introspectionData
- * @returns {Object} GraphQL query info including gql query strings
+ * @returns {Object} gql のクエリ文字列を含む GraphQL のクエリ情報
  */
 const generateNodeQueriesFromIngestibleFields = async () => {
   const {
@@ -142,13 +142,13 @@ const generateNodeQueriesFromIngestibleFields = async () => {
       continue
     }
 
-    // nested fields
+    // ネストしたフィールド
     const fieldFields = typeMap.get(type.name).fields
 
-    // a nested field containing a list of nodes
+    // ノードのリストを持つ、ネストしたフィールド
     const nodesField = fieldFields.find(nodeListFilter)
 
-    // the type of this query
+    // このクエリの型
     const nodesType = typeMap.get(findNamedTypeName(nodesField.type))
 
     if (!nodesType) {
@@ -174,7 +174,7 @@ const generateNodeQueriesFromIngestibleFields = async () => {
     )
 
     if (!singleNodeRootFieldInfo) {
-      // @todo handle cases where there is a nodelist field but no individual field. we can't do data updates or preview on this type.
+      // @todo ノードリストのフィールドはあるが個別のフィールドがない場合に対応する。この型ではデータの更新もプレビューもできない。
       reporter.warn(
         formatLogMessage(
           `Unable to find a single Node query for ${nodesType.name}\n\tThis type will not be available in Gatsby.\n`
@@ -194,7 +194,7 @@ const generateNodeQueriesFromIngestibleFields = async () => {
       mainType: type,
     })
 
-    // we need this for node interface types on the WPGQL side
+    // WPGQL 側のノードのインターフェース型のために必要である
     transformedFields.push(`__typename`)
 
     let transformedInlineFragments
@@ -206,13 +206,13 @@ const generateNodeQueriesFromIngestibleFields = async () => {
         parentType: nodesType,
         mainType: nodesType,
         debug: true,
-        // normally we only want the id for gatsby node fields
-        // but in this case we're at the top level and need to query
-        // these fields
+        // 通常、gatsby のノードフィールドについては id だけがあればよい
+        // しかしここではトップレベルにいるので、これらのフィールドを
+        // クエリする必要がある
         buildGatsbyNodeFields: true,
       })
 
-      // alias conflicting inline fragment fields
+      // 衝突するインラインフラグメントのフィールドにエイリアスを付ける
       transformedInlineFragments = transformedInlineFragments.map(
         ({ fields, ...inlineFragment }) => {
           return {
@@ -225,7 +225,7 @@ const generateNodeQueriesFromIngestibleFields = async () => {
       )
     }
 
-    // mutates the fragments..
+    // fragments を書き換える..
     aliasConflictingFragmentFields({ fragments })
 
     const aliasedTransformedFields = aliasConflictingFields({
@@ -315,7 +315,7 @@ const generateNodeQueriesFromIngestibleFields = async () => {
             `Query debug mode. Writing node list query for the ${nodesType.name} node type to the system clipboard and exiting\n\n`
           )
         )
-        // clipboardy is ESM-only package
+        // clipboardy は ESM 専用のパッケージである
         const { default: clipboardy } = await import(`clipboardy`)
         await clipboardy.write(
           prettier.format(nodeListQueries[0], { parser: `graphql` })
@@ -334,9 +334,9 @@ const generateNodeQueriesFromIngestibleFields = async () => {
       }
     }
 
-    // build a query info object containing gql query strings for fetching
-    // node lists or single nodes, as well as type info and plugin
-    // settings for this type
+    // ノードのリストまたは単一のノードを取得するための gql のクエリ文字列と、
+    // この型の型情報およびプラグイン設定を持つ、
+    // クエリ情報のオブジェクトを組み立てる
     nodeQueries[name] = {
       typeInfo: {
         singularName: singleFieldName,

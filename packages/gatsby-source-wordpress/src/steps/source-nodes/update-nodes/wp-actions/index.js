@@ -12,10 +12,10 @@ import { withPluginKey } from "~/store"
 /**
  * getWpActions
  *
- * pull the latest changes from WP and determine which of those changes
- * require updates in Gatsby, then return valid changes
- * An example of a non-valid change would be a post that was created
- * and then immediately deleted.
+ * WP から最新の変更を取得し、そのうちどの変更が Gatsby 側の更新を
+ * 必要とするかを判定して、有効な変更を返す
+ * 有効でない変更の例は、作成された直後に
+ * 削除された投稿である。
  */
 export const getWpActions = async ({
   variables,
@@ -25,7 +25,7 @@ export const getWpActions = async ({
 }) => {
   const sourceTime = Date.now()
 
-  // @todo add pagination in case there are more than 100 actions since the last build
+  // @todo 前回のビルド以降のアクションが 100 件を超える場合に備え、ページネーションを追加する
   const actionMonitorActions = await paginatedWpNodeFetch({
     contentTypePlural: `actionMonitorActions`,
     query: actionMonitorQuery,
@@ -46,8 +46,8 @@ export const getWpActions = async ({
 }
 
 /**
- * Acts on changes in WordPress to call functions that sync Gatsby with
- * the latest WP changes
+ * WordPress での変更に応じて、Gatsby を WP の最新の変更と
+ * 同期させる関数を呼び出す
  */
 export const handleWpActions = async api => {
   const { cachedNodeIds, helpers } = api
@@ -75,8 +75,8 @@ export const handleWpActions = async api => {
 /**
  * fetchAndRunWpActions
  *
- * fetches a list of latest changes in WordPress
- * and then acts on those changes
+ * WordPress の最新の変更の一覧を取得し、
+ * その変更に応じて処理を行う
  */
 export const fetchAndRunWpActions = async ({
   helpers,
@@ -85,7 +85,7 @@ export const fetchAndRunWpActions = async ({
   throwFetchErrors = false,
   throwGqlErrors = false,
 }) => {
-  // check for new, edited, or deleted posts in WP "Action Monitor"
+  // WP の "Action Monitor" で、新規、編集、削除された投稿があるかを確認する
   const wpActions = await getWpActions({
     variables: {
       since,
@@ -99,7 +99,7 @@ export const fetchAndRunWpActions = async ({
 
   if (didUpdate) {
     for (const wpAction of wpActions) {
-      // Create, update, and delete nodes
+      // ノードを作成、更新、削除する
       await handleWpActions({
         helpers,
         pluginOptions,

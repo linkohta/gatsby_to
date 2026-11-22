@@ -39,11 +39,11 @@ test(
 
     const { pluginOptions } = getStore().getState().gatsbyApi
 
-    // our top level options override preset options
+    // トップレベルのオプションがプリセットのオプションを上書きする
     expect(pluginOptions.type.ExistingType.limit).toBe(3)
     expect(pluginOptions.type.FakeType.exclude).toBe(true)
 
-    // this option wasn't defined at the top level but is part of the preset
+    // このオプションはトップレベルでは定義されていないが、プリセットに含まれている
     expect(pluginOptions.type.FakeType.limit).toBe(1)
   })
 )

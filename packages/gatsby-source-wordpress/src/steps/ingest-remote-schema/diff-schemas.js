@@ -85,11 +85,11 @@ Please consider addressing this issue by changing your WordPress settings or plu
 
   const schemaWasChanged = schemaMd5 !== cachedSchemaMd5
 
-  // if the schema was changed and we had a cached schema
-  // we need to re-check to see if all plugin requirements are met
-  // this is also run as a step in gatsby-node.js but is skipped
-  // during refreshes. If the schema changes and this is a refresh
-  // we do want to re-check to make sure everything's good.
+  // スキーマが変更され、かつキャッシュしたスキーマがあった場合は、
+  // プラグインの要件がすべて満たされているかを再確認する必要がある
+  // これは gatsby-node.js のステップとしても実行されるが、リフレッシュ中は
+  // スキップされる。スキーマが変更され、かつリフレッシュの場合は、
+  // 問題がないことを確かめるために再確認したい。
   if (
     schemaWasChanged &&
     cachedSchemaMd5 &&
@@ -156,8 +156,8 @@ Please consider addressing this issue by changing your WordPress settings or plu
     )
   }
 
-  // record wether the schema changed so other logic can beware
-  // as well as the wpUrl because we need this sometimes :p
+  // ほかのロジックが把握できるよう、スキーマが変更されたかどうかを記録する
+  // wpUrl も、必要になることがあるので記録する :p
   getStore().dispatch.remoteSchema.setState({
     schemaWasChanged,
     wpUrl,

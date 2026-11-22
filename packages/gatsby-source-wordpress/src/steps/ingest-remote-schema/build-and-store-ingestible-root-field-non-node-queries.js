@@ -12,7 +12,7 @@ const buildNonNodeQueries = async () => {
 
   const fragments = {}
 
-  // recursively transform fields
+  // フィールドを再帰的に変換する
   const transformedFields = recursivelyTransformFields({
     fields: nonNodeRootFields,
     parentType: {

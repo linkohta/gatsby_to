@@ -1,5 +1,5 @@
-// this doesn't indicate which versions actually work,
-// it indicates which versions we will actually support AND which versions work.
+// これは実際に動作するバージョンを示すものではなく、
+// こちらがサポートし、かつ動作するバージョンを示している。
 const supportedWpPluginVersions = {
   WPGraphQL: {
     version: `>=1.1.2 <3.0.0`,

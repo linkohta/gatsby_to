@@ -11,9 +11,9 @@ import {
 } from "~/steps/create-schema-customization/helpers"
 import { processNode } from "./process-node"
 
-// @todo concurrency is currently set so low because side effects can overwhelm
-// the remote server. A queue for the entire source plugin should be created so that
-// everything can share a queue and we can speed some of these things up
+// @todo 現在、同時実行数をかなり低く設定している。副作用でリモートサーバーに
+// 負荷がかかりすぎるためである。ソースプラグイン全体で 1 つのキューを作り、
+// すべてが共有するようにすれば、こうした処理の一部を速くできる
 const createNodesQueue = new PQueue({
   concurrency: 2,
 })
@@ -36,8 +36,8 @@ export const createNodeWithSideEffects =
     const { actions, createContentDigest } = helpers
 
     if (node.link) {
-      // @todo is this still necessary? I don't think it is but double check
-      // create a pathname for the node using the WP permalink
+      // @todo これはまだ必要か。不要だと思うが、念のため確認すること
+      // WP のパーマリンクを使って、ノードの pathname を作成する
       node.path = urlToPath(node.link)
     }
 
@@ -123,10 +123,10 @@ export const createGatsbyNodesFromWPGQLContentNodes = async ({
 
   const { reporter } = helpers
 
-  // wp supports these file extensions
+  // wp は次のファイル拡張子に対応している
   // jpeg|jpg|png|gif|ico|pdf|doc|docx|ppt|pptx|pps|ppsx|odt|xls|psd|mp3|m4a|ogg|wav|mp4|m4v|mov|wmv|avi|mpg|ogv|3gp|3g2|svg|bmp|tif|tiff|asf|asx|wm|wmx|divx|flv|qt|mpe|webm|mkv|txt|asc|c|cc|h|csv|tsv|ics|rtx|css|htm|html|m4b|ra|ram|mid|midi|wax|mka|rtf|js|swf|class|tar|zip|gz|gzip|rar|7z|exe|pot|wri|xla|xlt|xlw|mdb|mpp|docm|dotx|dotm|xlsm|xlsb|xltx|xltm|xlam|pptm|ppsm|potx|potm|ppam|sldx|sldm|onetoc|onetoc2|onetmp|onepkg|odp|ods|odg|odc|odb|odf|wp|wpd|key|numbers|pages
 
-  // gatsby-image supports these file types
+  // gatsby-image は次のファイルの種類に対応している
   // const imgSrcRemoteFileRegex = /<img.*?src=\\"(.*?jpeg|jpg|png|webp|tif|tiff$)\\"[^>]+>/gim
 
   getStore().dispatch.logger.createActivityTimer({
@@ -162,7 +162,7 @@ export const createGatsbyNodesFromWPGQLContentNodes = async ({
   const referencedMediaItemNodeIdsArray = [...referencedMediaItemNodeIds]
 
   /**
-   * if we're not excluding media items or we're lazy fetching media items (before Gatsby v4), we need to fetch media item nodes upfront here
+   * メディアアイテムを除外していない場合、または（Gatsby v4 より前で）メディアアイテムを遅延取得している場合は、ここでメディアアイテムのノードを先に取得する必要がある
    */
   if (
     !pluginOptions.type.MediaItem.exclude &&

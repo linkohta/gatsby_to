@@ -246,8 +246,8 @@ describe(`gatsby-source-drupal`, () => {
       `https://files.s3.eu-central-1.amazonaws.com/2020-05/third-image.png`,
       `/sites/default/files/forth-image.png`,
     ].map(fileUrl => new URL(fileUrl, baseUrl).href)
-    // first call without basicAuth (no fileSystem defined)
-    // (the first call is actually the 5th because sourceNodes was ran at first with no basicAuth)
+    // basicAuth なしの最初の呼び出し（fileSystem の定義なし）
+    // （最初に sourceNodes を basicAuth なしで実行しているので、最初の呼び出しは実際には 5 回目である）
     expect(createRemoteFileNode).toHaveBeenNthCalledWith(
       6,
       expect.objectContaining({
@@ -255,7 +255,7 @@ describe(`gatsby-source-drupal`, () => {
         auth: {},
       })
     )
-    // 2nd call with basicAuth (public: fileSystem defined)
+    // basicAuth ありの 2 回目の呼び出し（public: fileSystem の定義あり）
     expect(createRemoteFileNode).toHaveBeenNthCalledWith(
       7,
       expect.objectContaining({
@@ -266,7 +266,7 @@ describe(`gatsby-source-drupal`, () => {
         },
       })
     )
-    // 3rd call without basicAuth (s3: fileSystem defined)
+    // basicAuth なしの 3 回目の呼び出し（s3: fileSystem の定義あり）
     expect(createRemoteFileNode).toHaveBeenNthCalledWith(
       8,
       expect.objectContaining({
@@ -274,7 +274,7 @@ describe(`gatsby-source-drupal`, () => {
         auth: {},
       })
     )
-    // 4th call with basicAuth (private: fileSystem defined)
+    // basicAuth ありの 4 回目の呼び出し（private: fileSystem の定義あり）
     expect(createRemoteFileNode).toHaveBeenNthCalledWith(
       9,
       expect.objectContaining({
@@ -361,26 +361,26 @@ describe(`gatsby-source-drupal`, () => {
         })
 
         it(`Relationships`, () => {
-          // removed `field_main_image`, changed `field_tags`
+          // `field_main_image` を削除し、`field_tags` を変更した
           expect(nodes[createNodeId(`und.article-3`)].relationships).toEqual({
             field_tags___NODE: [createNodeId(`und.tag-2`)],
           })
         })
 
         it(`Back references`, () => {
-          // removed `field_main_image`, `file-1` no longer has back reference to `article-3`
+          // `field_main_image` を削除したので、`file-1` は `article-3` へのバックリファレンスを持たなくなった
           expect(
             nodes[createNodeId(`und.file-1`)].relationships[
               `node__article___NODE`
             ]
           ).not.toContain(createNodeId(`und.article-3`))
-          // changed `field_tags`, `tag-1` no longer has back reference to `article-3`
+          // `field_tags` を変更したので、`tag-1` は `article-3` へのバックリファレンスを持たなくなった
           expect(
             nodes[createNodeId(`und.tag-1`)].relationships[
               `node__article___NODE`
             ]
           ).not.toContain(createNodeId(`und.article-3`))
-          // changed `field_tags`, `tag-2` now has back reference to `article-3`
+          // `field_tags` を変更したので、`tag-2` は `article-3` へのバックリファレンスを持つようになった
           expect(
             nodes[createNodeId(`und.tag-2`)].relationships[
               `node__article___NODE`
@@ -444,7 +444,7 @@ describe(`gatsby-source-drupal`, () => {
   })
 
   it(`Control disallowed link types`, async () => {
-    // Reset nodes and test new disallowed link type.
+    // ノードをリセットし、新しく許可しないリンクタイプをテストする。
     Object.keys(nodes).forEach(key => delete nodes[key])
     const disallowedLinkTypes = [`self`, `describedby`, `taxonomy_term--tags`]
     await sourceNodes(args, { baseUrl, disallowedLinkTypes })
@@ -491,7 +491,7 @@ describe(`gatsby-source-drupal`, () => {
   })
 
   it(`Verify JSON:API includes relationships`, async () => {
-    // Reset nodes and test includes relationships.
+    // ノードをリセットし、includes のリレーションシップをテストする。
     Object.keys(nodes).forEach(key => delete nodes[key])
     const disallowedLinkTypes = [`self`, `describedby`, `taxonomy_term--tags`]
     const entityReferenceRevisions = [`paragraph`]
@@ -532,7 +532,7 @@ describe(`gatsby-source-drupal`, () => {
 
   describe(`supports JSON:API extras meta.count to parallelize fetches`, () => {
     it(`for non-translated content`, async () => {
-      // Reset nodes and test includes relationships.
+      // ノードをリセットし、includes のリレーションシップをテストする。
       Object.keys(nodes).forEach(key => delete nodes[key])
       const apiBase = `jsonapi-meta.count`
       await sourceNodes(args, {
@@ -543,7 +543,7 @@ describe(`gatsby-source-drupal`, () => {
     })
 
     it(`for translated content`, async () => {
-      // Reset nodes and test includes relationships.
+      // ノードをリセットし、includes のリレーションシップをテストする。
       Object.keys(nodes).forEach(key => delete nodes[key])
       const apiBase = `jsonapi-meta.count-i18n`
       const options = {
@@ -562,7 +562,7 @@ describe(`gatsby-source-drupal`, () => {
           nonTranslatableEntities: [],
         },
       }
-      // Call onPreBootstrap to set options
+      // オプションを設定するために onPreBootstrap を呼び出す
       await onPreBootstrap(args, options)
       await sourceNodes(args, options)
       expect(Object.keys(nodes).length).toEqual(4)
@@ -574,7 +574,7 @@ describe(`gatsby-source-drupal`, () => {
 
   describe(`Paragraph fields`, () => {
     it(`creates the initial paragraph entity correctly`, async () => {
-      // Reset nodes.
+      // ノードをリセットする。
       Object.keys(nodes).forEach(key => delete nodes[key])
       const nodesToUpdate = require(`./fixtures/paragraph-v1.json`)
       for (const nodeToUpdate of nodesToUpdate) {
@@ -592,7 +592,7 @@ describe(`gatsby-source-drupal`, () => {
       ).toEqual(`alt text`)
     })
     it(`updates the referenced entities correctly`, async () => {
-      // Reset nodes.
+      // ノードをリセットする。
       Object.keys(nodes).forEach(key => delete nodes[key])
       const nodesToUpdate = require(`./fixtures/paragraph-v2.json`)
       for (const nodeToUpdate of nodesToUpdate) {
@@ -618,7 +618,7 @@ describe(`gatsby-source-drupal`, () => {
     })
 
     it(`should generate required Image CDN node data`, async () => {
-      // Reset nodes and test includes relationships.
+      // ノードをリセットし、includes のリレーションシップをテストする。
       Object.keys(nodes).forEach(key => delete nodes[key])
 
       const options = {
@@ -626,7 +626,7 @@ describe(`gatsby-source-drupal`, () => {
         skipFileDownloads: true,
       }
 
-      // Call onPreBootstrap to set options
+      // オプションを設定するために onPreBootstrap を呼び出す
       await onPreBootstrap(args, options)
       await sourceNodes(args, options)
 
@@ -642,7 +642,7 @@ describe(`gatsby-source-drupal`, () => {
     })
 
     it(`should generate Image CDN node data when mimetype is on "mimetype" field`, async () => {
-      // Reset nodes and test includes relationships.
+      // ノードをリセットし、includes のリレーションシップをテストする。
       Object.keys(nodes).forEach(key => delete nodes[key])
 
       const options = {
@@ -650,7 +650,7 @@ describe(`gatsby-source-drupal`, () => {
         skipFileDownloads: true,
       }
 
-      // Call onPreBootstrap to set options
+      // オプションを設定するために onPreBootstrap を呼び出す
       await onPreBootstrap(args, options)
       await sourceNodes(args, options)
 
@@ -666,7 +666,7 @@ describe(`gatsby-source-drupal`, () => {
     })
 
     it(`should not generate required Image CDN node data when imageCDN option is set to false`, async () => {
-      // Reset nodes and test includes relationships.
+      // ノードをリセットし、includes のリレーションシップをテストする。
       Object.keys(nodes).forEach(key => delete nodes[key])
 
       const options = {
@@ -675,13 +675,13 @@ describe(`gatsby-source-drupal`, () => {
         imageCDN: false,
       }
 
-      // Call onPreBootstrap to set options
+      // オプションを設定するために onPreBootstrap を呼び出す
       await onPreBootstrap(args, options)
       await sourceNodes(args, options)
 
       const fileNode = nodes[createNodeId(`und.file-1`)]
 
-      // imageCDN: true fetches the width/height
+      // imageCDN: true の場合は width と height を取得する
       expect(fileNode.width).not.toBeDefined()
       expect(fileNode.height).not.toBeDefined()
       expect(probeImageSize).not.toHaveBeenCalled()
@@ -691,7 +691,7 @@ describe(`gatsby-source-drupal`, () => {
   describe(`Fastbuilds sync`, () => {
     describe(`Before sync with expired timestamp`, () => {
       beforeAll(async () => {
-        // Reset nodes and test Fastbuilds sync.
+        // ノードをリセットし、Fastbuilds の同期をテストする。
         Object.keys(nodes).forEach(key => delete nodes[key])
 
         const fastBuilds = true
@@ -734,7 +734,7 @@ describe(`gatsby-source-drupal`, () => {
       beforeAll(async () => {
         const fastBuilds = true
 
-        // Mock the lastFetched timestamp to a value.
+        // lastFetched のタイムスタンプを、ある値にモックする。
         args.store.getState.mockReturnValue({
           status: {
             plugins: {
@@ -754,7 +754,7 @@ describe(`gatsby-source-drupal`, () => {
       })
 
       it(`Relationships`, () => {
-        // removed `field_main_image`, changed `field_tags`
+        // `field_main_image` を削除し、`field_tags` を変更した
         expect(nodes[createNodeId(`und.article-3`)].relationships).toEqual({
           field_tags___NODE: [createNodeId(`und.tag-2`)],
         })
@@ -782,21 +782,21 @@ describe(`gatsby-source-drupal`, () => {
       })
 
       it(`Back references`, () => {
-        // removed `field_main_image`, `file-1` no longer has back reference to `article-3`
+        // `field_main_image` を削除したので、`file-1` は `article-3` へのバックリファレンスを持たなくなった
         expect(
           nodes[createNodeId(`und.file-1`)].relationships[
             `node__article___NODE`
           ]
         ).not.toContain(createNodeId(`und.article-3`))
-        // changed `field_tags`, `tag-1` no longer has back reference to `article-3`
+        // `field_tags` を変更したので、`tag-1` は `article-3` へのバックリファレンスを持たなくなった
         expect(
           nodes[createNodeId(`und.tag-1`)].relationships[`node__article___NODE`]
         ).not.toContain(createNodeId(`und.article-3`))
-        // changed `field_tags`, `tag-2` now has back reference to `article-3`
+        // `field_tags` を変更したので、`tag-2` は `article-3` へのバックリファレンスを持つようになった
         expect(
           nodes[createNodeId(`und.tag-2`)].relationships[`node__article___NODE`]
         ).toContain(createNodeId(`und.article-3`))
-        // Created a new node article-9 with reference to tag-2
+        // tag-2 への参照を持つ新しいノード article-9 を作成した
         expect(
           nodes[createNodeId(`und.tag-2`)].relationships[`node__article___NODE`]
         ).toContain(createNodeId(`und.article-9`))
@@ -898,7 +898,7 @@ describe(`gatsby-source-drupal`, () => {
 
         try {
           const fastBuilds = true
-          // Mock the lastFetched timestamp to an invalid value.
+          // lastFetched のタイムスタンプを、無効な値にモックする。
           args.store.getState.mockReturnValue({
             status: {
               plugins: {

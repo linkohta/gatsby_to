@@ -1,5 +1,5 @@
 // @ts-check
-// This is more an integration test than it is a unit test. We try to mock as little as we can
+// これはユニットテストというより統合テストである。モックはできるだけ少なくしている
 import _ from "lodash"
 import {
   createSchemaCustomization,
@@ -70,7 +70,7 @@ describe(`gatsby-node`, () => {
       }
     }),
     createNode: jest.fn(async node => {
-      // similar checks as gatsby does
+      // gatsby が行うのと同様の確認
       if (!_.isPlainObject(node)) {
         throw new Error(
           `The node passed to the "createNode" action creator must be an object`
@@ -83,14 +83,14 @@ describe(`gatsby-node`, () => {
         )
       }
 
-      // recursively delete children of node if it existed already
+      // ノードがすでに存在していた場合は、その子を再帰的に削除する
       deleteDescendants(currentNodeMap.get(node.id))
 
       node.internal.owner = `gatsby-source-contentful`
       currentNodeMap.set(node.id, node)
     }),
     deleteNode: jest.fn(node => {
-      // recursively delete children of deleted node same as gatsby
+      // gatsby と同じように、削除されたノードの子を再帰的に削除する
       deleteDescendants(node)
 
       currentNodeMap.delete(node.id)
@@ -138,9 +138,9 @@ describe(`gatsby-node`, () => {
   const createNodeId = jest.fn(value => value)
   let currentNodeMap
 
-  // returning clones of nodes to test if we are updating nodes correctly
-  // as it's not enough to mutate a node, we need to call an update function
-  // to actually update datastore
+  // ノードを正しく更新しているかをテストするため、ノードのクローンを返す
+  // ノードを書き換えるだけでは足りず、データストアを実際に更新するには
+  // 更新用の関数を呼び出す必要があるためである
   const getNodes = () => Array.from(currentNodeMap.values()).map(_.cloneDeep)
   const getNode = id => _.cloneDeep(currentNodeMap.get(id))
 
@@ -284,7 +284,7 @@ describe(`gatsby-node`, () => {
         nodeMap.set(nodeId, matchedObject)
       })
 
-      // update all matchedObjets with our backreferences
+      // バックリファレンスを使って matchedObjets をすべて更新する
       for (const [nodeId, value] of references) {
         const matchedObject = {
           ...nodeMap.get(nodeId),
@@ -294,7 +294,7 @@ describe(`gatsby-node`, () => {
         nodeMap.set(nodeId, matchedObject)
       }
 
-      // match all entry nodes
+      // すべてのエントリーノードと照合する
       for (const [nodeId, matchedObject] of nodeMap) {
         expect(getNode(nodeId)).toMatchObject(matchedObject)
       }
@@ -316,10 +316,10 @@ describe(`gatsby-node`, () => {
           })
         )
 
-        // check if all deleted nodes are gone
+        // 削除されたノードがすべてなくなっているかを確認する
         expect(getNode(nodeId)).toBeUndefined()
 
-        // check if all references got removed references should be removed
+        // 参照がすべて取り除かれているかを確認する。参照は取り除かれているはずである
         for (const value of currentNodeMap.values()) {
           Object.keys(value).forEach(field => {
             if (field.endsWith(`___NODE`)) {
@@ -345,7 +345,7 @@ describe(`gatsby-node`, () => {
           })
         )
 
-        // check if asset exists
+        // アセットが存在するかを確認する
         expect(getNode(assetId)).toBeDefined()
       })
     })
@@ -380,7 +380,7 @@ describe(`gatsby-node`, () => {
           return
         }
 
-        // check if asset exists
+        // アセットが存在するかを確認する
         expect(getNode(assetId)).toMatchObject({
           title: getFieldValue(
             asset.fields.title,
@@ -418,7 +418,7 @@ describe(`gatsby-node`, () => {
           })
         )
 
-        // check if asset got removed
+        // アセットが削除されたかを確認する
         expect(getNode(assetId)).toBeUndefined()
       })
     })
@@ -484,7 +484,7 @@ describe(`gatsby-node`, () => {
           return jest.requireActual(`gatsby-plugin-image/graphql-utils`)
         }
 
-        // only throw once
+        // 例外を投げるのは 1 回だけ
         hasImported = true
         throw new Error(`not installed`)
       })
@@ -566,7 +566,7 @@ describe(`gatsby-node`, () => {
       ]
     `)
 
-    // Stores sync token and raw/unparsed data to the cache
+    // 同期トークンと、未加工（未解析）のデータをキャッシュに保存する
     expect(actions.setPluginStatus).toHaveBeenCalledWith({
       [`contentful-sync-token-testSpaceId-master`]:
         startersBlogFixture.initialSync().currentSyncData.nextSyncToken,
@@ -685,15 +685,15 @@ describe(`gatsby-node`, () => {
       })
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
-    // check if blog posts do not exists
+    // ブログ記事が存在しないことを確認する
     createdBlogEntryIds.forEach(entryId => {
       expect(getNode(entryId)).toBeUndefined()
     })
 
-    // add new blog post
+    // 新しいブログ記事を追加する
     reporter.info.mockClear()
     await simulateGatsbyBuild()
 
@@ -772,17 +772,17 @@ describe(`gatsby-node`, () => {
       })
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
-    // create blog post
+    // ブログ記事を作成する
     await simulateGatsbyBuild()
 
     updatedBlogEntryIds.forEach(blogEntryId => {
       expect(getNode(blogEntryId).title).toBe(`Integration tests`)
     })
 
-    // updated blog post
+    // 更新されたブログ記事
     reporter.info.mockClear()
     await simulateGatsbyBuild()
 
@@ -862,7 +862,7 @@ describe(`gatsby-node`, () => {
       })
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
     for (const author of getNodes().filter(
@@ -882,11 +882,11 @@ describe(`gatsby-node`, () => {
       )
     }
 
-    // create blog post
+    // ブログ記事を作成する
     await simulateGatsbyBuild()
 
     const authorIds = []
-    // check if blog post exists
+    // ブログ記事が存在するかを確認する
     removedBlogEntryIds.forEach(entryId => {
       const blogEntry = getNode(entryId)
       authorIds.push(blogEntry[`author___NODE`])
@@ -910,7 +910,7 @@ describe(`gatsby-node`, () => {
       )
     }
 
-    // remove blog post
+    // ブログ記事を削除する
     reporter.info.mockClear()
     await simulateGatsbyBuild()
 
@@ -949,7 +949,7 @@ describe(`gatsby-node`, () => {
       )
     }
 
-    // check if references are gone
+    // 参照がなくなっているかを確認する
     authorIds.forEach(authorId => {
       expect(getNode(authorId)[`blog post___NODE`]).toEqual(
         expect.not.arrayContaining(deletedEntryIds)
@@ -1010,24 +1010,24 @@ describe(`gatsby-node`, () => {
       })
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
-    // create blog post
+    // ブログ記事を作成する
     await simulateGatsbyBuild()
 
-    // check if blog post exists
+    // ブログ記事が存在するかを確認する
     removedAssetEntryIds.forEach(assetId => {
       expect(getNode(assetId)).not.toBeUndefined()
     })
 
-    // check if assets exists
+    // アセットが存在するかを確認する
     testIfAssetsExists(
       startersBlogFixture.removeAsset().currentSyncData.deletedAssets,
       locales
     )
 
-    // remove asset
+    // アセットを削除する
     reporter.info.mockClear()
     await simulateGatsbyBuild()
 
@@ -1081,7 +1081,7 @@ describe(`gatsby-node`, () => {
     // @ts-ignore
     fetchContentTypes.mockImplementationOnce(richTextFixture.contentTypeItems)
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
     const initNodes = getNodes()
@@ -1108,7 +1108,7 @@ describe(`gatsby-node`, () => {
       unpublishedFieldDelivery.contentTypeItems
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
     testIfContentTypesExists(unpublishedFieldDelivery.contentTypeItems())
@@ -1174,7 +1174,7 @@ describe(`gatsby-node`, () => {
       unpublishedFieldPreview.contentTypeItems
     )
 
-    // initial sync
+    // 最初の同期
     await simulateGatsbyBuild()
 
     testIfContentTypesExists(unpublishedFieldPreview.contentTypeItems())
@@ -1456,11 +1456,11 @@ describe(`gatsby-node`, () => {
     expect(blogPostNodes.length).toEqual(1)
     expect(blogCategoryNodes.length).toEqual(1)
     expect(blogCategoryChildNodes.length).toEqual(1)
-    // no backref yet
+    // バックリファレンスはまだない
     expect(blogCategoryNodes[0][`blog post___NODE`]).toBeUndefined()
     expect(blogCategoryNodes[0][`title`]).toEqual(`CMS`)
 
-    // `body` field on child node is concrete value and not a link
+    // 子ノードの `body` フィールドは具体的な値であり、リンクではない
     expect(blogCategoryChildNodes[0][`body`]).toEqual(`cms`)
     expect(blogCategoryChildNodes[0][`body___NODE`]).toBeUndefined()
 
@@ -1479,13 +1479,13 @@ describe(`gatsby-node`, () => {
     expect(blogPostNodes.length).toEqual(1)
     expect(blogCategoryNodes.length).toEqual(1)
     expect(blogCategoryChildNodes.length).toEqual(1)
-    // backref was added when entries were linked
+    // エントリーがリンクされたときにバックリファレンスが追加された
     expect(blogCategoryNodes[0][`blog post___NODE`]).toEqual([
       blogPostNodes[0].id,
     ])
     expect(blogCategoryNodes[0][`title`]).toEqual(`CMS`)
 
-    // `body` field on child node is concrete value and not a link
+    // 子ノードの `body` フィールドは具体的な値であり、リンクではない
     expect(blogCategoryChildNodes[0][`body`]).toEqual(`cms`)
     expect(blogCategoryChildNodes[0][`body___NODE`]).toBeUndefined()
   })

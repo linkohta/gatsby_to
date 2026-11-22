@@ -19,7 +19,7 @@ const {
 const cacheId = url => withPluginKey(`create-remote-file-node-${url}`)
 
 let bar
-// Keep track of the total number of jobs we push in the queue
+// キューに追加したジョブの総数を記録する
 let totalJobs = 0
 
 /********************
@@ -46,7 +46,7 @@ let totalJobs = 0
 /**
  * @typedef {CreateRemoteFileNodePayload}
  * @typedef {Object}
- * @description Create Remote File Node Payload
+ * @description リモートファイルのノードを作成するためのペイロード
  *
  * @param  {String} options.url
  * @param  {GatsbyCache} options.cache
@@ -72,10 +72,10 @@ const CONNECTION_TIMEOUT = process.env.GATSBY_CONNECTION_TIMEOUT
  ********************/
 
 /**
- * Queue
- * Use the task's url as the id
- * When pushing a task with a similar id, prefer the original task
- * as it's already in the processing cache
+ * キュー
+ * タスクの URL を id として使う
+ * 同じ id のタスクを追加するときは、元のタスクを優先する
+ * すでに処理中のキャッシュに入っているためである
  */
 
 let queue = null
@@ -87,7 +87,7 @@ const getQueue = limit => {
       merge: (old, _, cb) => cb(old),
       concurrent: limit || 100,
     })
-    // when the queue is empty we stop the progressbar
+    // キューが空になったらプログレスバーを止める
     queue.on(`drain`, async () => {
       if (awaitingCreateRemoteFileNodePromise) {
         return
@@ -98,9 +98,9 @@ const getQueue = limit => {
       awaitingCreateRemoteFileNodePromise = false
 
       if (bar) {
-        // this is to give us a little time to wait and see if there
-        // will be more jobs added with a break between
-        // sometimes the queue empties but then is recreated within 2 secs
+        // 少し間を置いて、さらにジョブが追加されるかどうかを
+        // しばらく待つためのものである
+        // キューが空になっても、2 秒以内に作り直されることがある
         doneQueueTimeout = setTimeout(() => {
           bar.done()
           totalJobs = 0
@@ -124,7 +124,7 @@ let awaitingCreateRemoteFileNodePromise
 /**
  * pushToQueue
  * --
- * Handle tasks that are pushed in to the Queue
+ * キューに追加されたタスクを処理する
  *
  *
  * @param  {CreateRemoteFileNodePayload}          task
@@ -147,25 +147,25 @@ async function pushToQueue(task, cb) {
 /**
  * requestRemoteNode
  * --
- * Download the requested file
+ * 要求されたファイルをダウンロードする
  *
  * @param  {String}   url
  * @param  {Headers}  headers
  * @param  {String}   tmpFilename
  * @param  {Object}   httpOpts
  * @param  {number}   attempt
- * @return {Promise<Object>}  Resolves with the [http Result Object]{@link https://nodejs.org/api/http.html#http_class_http_serverresponse}
+ * @return {Promise<Object>}  [http Result Object]{@link https://nodejs.org/api/http.html#http_class_http_serverresponse} で解決される
  */
 const requestRemoteNode = (url, headers, tmpFilename, httpOpts, attempt = 1) =>
   new Promise((resolve, reject) => {
     let timeout
 
-    // Called if we stall without receiving any data
+    // データを何も受信しないまま止まった場合に呼ばれる
     const handleTimeout = async () => {
       fsWriteStream.close()
       fs.removeSync(tmpFilename)
       if (attempt < STALL_RETRY_LIMIT) {
-        // Retry by calling ourself recursively
+        // 自分自身を再帰的に呼び出してリトライする
         resolve(
           requestRemoteNode(url, headers, tmpFilename, httpOpts, attempt + 1)
         )
@@ -196,7 +196,7 @@ const requestRemoteNode = (url, headers, tmpFilename, httpOpts, attempt = 1) =>
     const fsWriteStream = fs.createWriteStream(tmpFilename)
     responseStream.pipe(fsWriteStream)
 
-    // If there's a 400/500 response or other error.
+    // 400/500 のレスポンスやその他のエラーがあった場合。
     responseStream.on(`error`, error => {
       if (timeout) {
         clearTimeout(timeout)
@@ -234,10 +234,10 @@ const requestRemoteNode = (url, headers, tmpFilename, httpOpts, attempt = 1) =>
 /**
  * processRemoteNode
  * --
- * Request the remote file and return the fileNode
+ * リモートファイルをリクエストし、fileNode を返す
  *
  * @param {CreateRemoteFileNodePayload} options
- * @return {Promise<Object>} Resolves with the fileNode
+ * @return {Promise<Object>} fileNode で解決される
  */
 async function processRemoteNode({
   url,
@@ -251,8 +251,8 @@ async function processRemoteNode({
   name,
 }) {
   const pluginCacheDir = cache.directory
-  // See if there's response headers for this url
-  // from a previous request.
+  // この URL について、以前のリクエストのレスポンスヘッダーが
+  // あるかを調べる。
   const cachedHeaders = await cache.get(cacheId(url))
 
   const headers = { ...httpHeaders }
@@ -260,8 +260,8 @@ async function processRemoteNode({
     headers[`If-None-Match`] = cachedHeaders.etag
   }
 
-  // Add htaccess authentication if passed in. This isn't particularly
-  // extensible. We should define a proper API that we validate.
+  // htaccess 認証が渡されていれば追加する。これは拡張性があまり
+  // 高くない。検証付きの適切な API を定義すべきである。
   const httpOpts = {}
   if (auth?.htaccess_pass && auth?.htaccess_user) {
     headers[`Authorization`] = `Basic ${b64e(
@@ -269,7 +269,7 @@ async function processRemoteNode({
     )}`
   }
 
-  // Create the temp and permanent file names for the url.
+  // この URL に対応する一時ファイル名と永続ファイル名を作成する。
   const digest = createContentDigest(url)
   if (!name) {
     name = getRemoteFileName(url)
@@ -280,15 +280,15 @@ async function processRemoteNode({
 
   const tmpFilename = createFilePath(pluginCacheDir, `tmp-${digest}`, ext)
 
-  // Fetch the file.
+  // ファイルを取得する。
   const response = await requestRemoteNode(url, headers, tmpFilename, httpOpts)
 
   if (response.statusCode == 200) {
-    // Save the response headers for future requests.
+    // 今後のリクエストのためにレスポンスヘッダーを保存する。
     await cache.set(cacheId(url), response.headers)
   }
 
-  // If the user did not provide an extension and we couldn't get one from remote file, try and guess one
+  // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、推測を試みる
   if (ext === ``) {
     const buffer = readChunk.sync(tmpFilename, 0, fileType.minimumBytes)
     const filetype = fileType(buffer)
@@ -303,10 +303,10 @@ async function processRemoteNode({
     ext
   )
 
-  // If the status code is 200, move the piped temp file to the real name.
+  // ステータスコードが 200 であれば、パイプで書き出した一時ファイルを本来の名前へ移動する。
   if (response.statusCode === 200) {
     await fs.move(tmpFilename, filename, { overwrite: true })
-    // Else if 304, remove the empty response.
+    // 304 であれば、空のレスポンスを削除する。
   } else {
     processingCache[url] = null
     totalJobs -= 1
@@ -316,30 +316,30 @@ async function processRemoteNode({
     await fs.remove(tmpFilename)
   }
 
-  // Create the file node.
+  // ファイルノードを作成する。
   const fileNode = await createFileNode(filename, createNodeId, {})
   fileNode.internal.description = `File "${url}"`
   fileNode.url = url
   fileNode.parent = parentNodeId
-  // Override the default plugin as gatsby-source-filesystem needs to
-  // be the owner of File nodes or there'll be conflicts if any other
-  // File nodes are created through normal usages of
-  // gatsby-source-filesystem.
+  // デフォルトのプラグインを上書きする。gatsby-source-filesystem が
+  // File ノードの所有者でなければ、gatsby-source-filesystem の通常の使い方で
+  // ほかの File ノードが作成されたときに
+  // 衝突するためである。
   await createNode(fileNode, { name: `gatsby-source-filesystem` })
 
   return fileNode
 }
 
 /**
- * Index of promises resolving to File node from remote url
+ * リモートの URL から File ノードへ解決される Promise の索引
  */
 const processingCache = {}
 /**
  * pushTask
  * --
- * pushes a task in to the Queue and the processing cache
+ * タスクをキューと処理中のキャッシュに入れる
  *
- * Promisfy a task in queue
+ * キュー内のタスクを Promise 化する
  * @param {CreateRemoteFileNodePayload} task
  * @return {Promise<Object>}
  */
@@ -363,12 +363,12 @@ const pushTask = task =>
  * createRemoteFileNode
  * --
  *
- * Download a remote file
- * First checks cache to ensure duplicate requests aren't processed
- * Then pushes to a queue
+ * リモートファイルをダウンロードする
+ * 重複するリクエストを処理しないよう、最初にキャッシュを確認する
+ * その後、キューに追加する
  *
  * @param {CreateRemoteFileNodePayload} options
- * @return {Promise<Object>}                  Returns the created node
+ * @return {Promise<Object>}                  作成したノードを返す
  */
 module.exports = ({
   url,
@@ -386,22 +386,22 @@ module.exports = ({
 }) => {
   const limit = pluginOptions?.type?.MediaItem?.localFile?.requestConcurrency
   if (doneQueueTimeout) {
-    // this is to give the bar a little time to wait when there are pauses
-    // between file downloads.
+    // ファイルのダウンロードの合間に間が空いたときに、プログレスバーが
+    // 少し待てるようにするためのものである。
     clearTimeout(doneQueueTimeout)
   }
 
-  // if the url isn't already encoded
-  // so decoding it doesn't do anything
+  // URL がまだエンコードされていない場合
+  // （デコードしても何も変わらない場合）
   if (decodeURI(url) === url) {
-    // encode the uri
-    // this accounts for special characters in filenames
+    // URI をエンコードする
+    // ファイル名に含まれる特殊文字に対応するためである
     url = encodeURI(url)
   }
 
-  // validation of the input
-  // without this it's notoriously easy to pass in the wrong `createNodeId`
-  // see gatsbyjs/gatsby#6643
+  // 入力の検証
+  // これがないと、誤った `createNodeId` を渡してしまうことが非常に多い
+  // gatsbyjs/gatsby#6643 を参照
   if (typeof createNodeId !== `function`) {
     throw new Error(
       `createNodeId must be a function, was ${typeof createNodeId}`
@@ -411,7 +411,7 @@ module.exports = ({
     throw new Error(`createNode must be a function, was ${typeof createNode}`)
   }
   if (typeof getCache === `function`) {
-    // use cache of this plugin and not cache of function caller
+    // 関数の呼び出し元のキャッシュではなく、このプラグインのキャッシュを使う
     cache = getCache(`gatsby-source-filesystem`)
   }
   if (typeof cache !== `object`) {
@@ -420,8 +420,8 @@ module.exports = ({
     )
   }
 
-  // Check if we already requested node for this remote file
-  // and return stored promise if we did.
+  // このリモートファイルのノードをすでにリクエストしたかを確認し、
+  // していれば保存済みの Promise を返す。
   if (processingCache[url]) {
     return processingCache[url]
   }

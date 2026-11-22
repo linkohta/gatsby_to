@@ -16,13 +16,13 @@ interface INodeFilter {
 }
 
 /**
- * Grabs an array of filter functions from the redux store,
- * orders them by priority, and then runs each in order over the
- * passed in data. The modified data is then returned
+ * redux ストアからフィルター関数の配列を取得し、
+ * 優先度順に並べ替えて、渡されたデータに対して順番に実行する。
+ * 変更後のデータを返す
  *
- * @param {string} name The name of the filter to apply
- * @param {object} context Any additional data to pass to the filter functions that are applied
- * @param {object} data The initial data to be filtered
+ * @param {string} name 適用するフィルターの名前
+ * @param {object} context 適用するフィルター関数に渡す追加のデータ
+ * @param {object} data フィルターをかける元のデータ
  */
 export const applyNodeFilter = async ({
   name,
@@ -50,12 +50,12 @@ export const applyNodeFilter = async ({
 }
 
 /**
- * This function adds a filter to the internal redux store of filters
- * To be applied via applyNodeFilter above
+ * この関数は、フィルターを保持する内部の redux ストアにフィルターを追加する
+ * 追加したフィルターは、上の applyNodeFilter で適用される
  *
- * @param {string} name The name of the filter
- * @param {function} filter The function to run when applying this filter
- * @param {integer} priority The priority for this filter to run in. lower means earlier execution
+ * @param {string} name フィルターの名前
+ * @param {function} filter このフィルターを適用するときに実行する関数
+ * @param {integer} priority このフィルターを実行する優先度。小さいほど先に実行される
  */
 export const addNodeFilter = ({
   name,

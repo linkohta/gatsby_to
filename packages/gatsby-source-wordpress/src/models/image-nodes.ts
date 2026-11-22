@@ -19,8 +19,8 @@ const imageNodes = createModel<IRootModel>()({
 
     pushNodeMeta(state, { id, sourceUrl, modifiedGmt }) {
       const nodeUrl = stripImageSizesFromUrl(sourceUrl)
-      // don't overwrite the lookup table in case we have multiple
-      // sized urls for the same image
+      // 同じ画像に対してサイズ違いの URL が複数ある場合に備え、
+      // ルックアップテーブルを上書きしない
       if (!state.nodeMetaByUrl[nodeUrl]) {
         state.nodeMetaByUrl[nodeUrl] = {
           id,

@@ -29,7 +29,7 @@ export const createStore = (): Store =>
   })
 
 /**
- * Wraps the API hook with the async local storage context
+ * API フックを async local storage のコンテキストで包む
  */
 
 export const wrapApiHook =

@@ -18,7 +18,7 @@ const cacheId = hash => `create-file-node-from-buffer-${hash}`
 /**
  * @typedef {CreateFileNodeFromBufferPayload}
  * @typedef {Object}
- * @description Create File Node From Buffer Payload
+ * @description バッファーからファイルノードを作成するためのペイロード
  *
  * @param  {Buffer} options.buffer
  * @param  {String} options.hash
@@ -30,7 +30,7 @@ const cacheId = hash => `create-file-node-from-buffer-${hash}`
 /**
  * writeBuffer
  * --
- * Write the contents of `buffer` to `filename`
+ * `buffer` の内容を `filename` に書き出す
  *
  *
  * @param {String} filename
@@ -45,10 +45,10 @@ const writeBuffer = (filename, buffer) =>
 /**
  * processBufferNode
  * --
- * Write the buffer contents out to disk and return the fileNode
+ * バッファーの内容をディスクに書き出し、fileNode を返す
  *
  * @param {CreateFileNodeFromBufferPayload} options
- * @return {Promise<Object>} Resolves with the fileNode
+ * @return {Promise<Object>} fileNode で解決される
  */
 async function processBufferNode({
   buffer,
@@ -62,12 +62,12 @@ async function processBufferNode({
 }) {
   const pluginCacheDir = cache.directory
 
-  // See if there's a cache file for this buffer's contents from
-  // a previous run
+  // このバッファーの内容に対応する、以前の実行のキャッシュファイルが
+  // あるかを調べる
   let filename = await cache.get(cacheId(hash))
   if (!filename) {
-    // If the user did not provide an extension and we couldn't get
-    // one from remote file, try and guess one
+    // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、
+    // 推測を試みる
     if (typeof ext === `undefined`) {
       const filetype = await fileType.fromBuffer(buffer)
       ext = filetype ? `.${filetype.ext}` : `.bin`
@@ -75,29 +75,29 @@ async function processBufferNode({
     filename = createFilePath(path.join(pluginCacheDir, hash), name, ext)
     await fs.ensureDir(path.dirname(filename))
 
-    // Cache the buffer contents
+    // バッファーの内容をキャッシュする
     await writeBuffer(filename, buffer)
 
-    // Save the cache file path for future use
+    // 今後のためにキャッシュファイルのパスを保存する
     await cache.set(cacheId(hash), filename)
   }
 
-  // Create the file node.
+  // ファイルノードを作成する。
   const fileNode = await createFileNode(filename, createNodeId, {})
   fileNode.internal.description = `File "Buffer<${hash}>"`
   fileNode.hash = hash
   fileNode.parent = parentNodeId
-  // Override the default plugin as gatsby-source-filesystem needs to
-  // be the owner of File nodes or there'll be conflicts if any other
-  // File nodes are created through normal usages of
-  // gatsby-source-filesystem.
+  // デフォルトのプラグインを上書きする。gatsby-source-filesystem が
+  // File ノードの所有者でなければ、gatsby-source-filesystem の通常の使い方で
+  // ほかの File ノードが作成されたときに
+  // 衝突するためである。
   await createNode(fileNode, { name: `gatsby-source-filesystem` })
 
   return fileNode
 }
 
 /**
- * Index of promises resolving to File node from buffer cache
+ * バッファーのキャッシュから File ノードへ解決される Promise の索引
  */
 const processingCache = {}
 
@@ -109,11 +109,11 @@ const processingCache = {}
  * createFileNodeFromBuffer
  * --
  *
- * Cache a buffer's contents to disk
- * First checks cache to ensure duplicate buffers aren't processed
+ * バッファーの内容をディスクにキャッシュする
+ * 重複するバッファーを処理しないよう、最初にキャッシュを確認する
  *
  * @param {CreateFileNodeFromBufferPayload} options
- * @return {Promise<Object>}                  Returns the created node
+ * @return {Promise<Object>}                  作成したノードを返す
  */
 module.exports = ({
   buffer,
@@ -126,9 +126,9 @@ module.exports = ({
   ext,
   name,
 }) => {
-  // validation of the input
-  // without this it's notoriously easy to pass in the wrong `createNodeId`
-  // see gatsbyjs/gatsby#6643
+  // 入力の検証
+  // これがないと、誤った `createNodeId` を渡してしまうことが非常に多い
+  // gatsbyjs/gatsby#6643 を参照
   if (typeof createNodeId !== `function`) {
     throw new Error(
       `createNodeId must be a function, was ${typeof createNodeId}`
@@ -138,7 +138,7 @@ module.exports = ({
     throw new Error(`createNode must be a function, was ${typeof createNode}`)
   }
   if (typeof getCache === `function`) {
-    // use cache of this plugin and not cache of function caller
+    // 関数の呼び出し元のキャッシュではなく、このプラグインのキャッシュを使う
     cache = getCache(`gatsby-source-filesystem`)
   }
   if (typeof cache !== `object`) {
@@ -159,8 +159,8 @@ module.exports = ({
     name = hash
   }
 
-  // Check if we already requested node for this remote file
-  // and return stored promise if we did.
+  // このリモートファイルのノードをすでにリクエストしたかを確認し、
+  // していれば保存済みの Promise を返す。
   if (processingCache[hash]) {
     return processingCache[hash]
   }

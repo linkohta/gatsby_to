@@ -1,5 +1,5 @@
 /**
- * This file is intentionally not TS so it can be run in a yarn script without being transpiled.
+ * このファイルは、トランスパイルなしで yarn スクリプトから実行できるよう、意図的に TS にしていない。
  */
 const prettier = require(`prettier`)
 
@@ -895,9 +895,9 @@ When using this option, be sure to gitignore the wordpress-cache directory in th
           `),
       }),
   }).meta({
-    // This is used in generating docs from this schema
-    // so that we can prevent generating all options
-    // nested inside themselves
+    // これは、このスキーマからドキュメントを生成するときに使う
+    // すべてのオプションが自分自身の中にネストして
+    // 生成されるのを防ぐためである
     portableOptions: true,
   })
 

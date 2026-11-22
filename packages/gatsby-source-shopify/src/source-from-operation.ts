@@ -95,8 +95,8 @@ export function makeSourceFromOperation(
         if (e.node.status === `CANCELED`) {
           if (isPriorityBuild(pluginOptions)) {
             /**
-             * There are at least two production sites for this Shopify
-             * store trying to run an operation at the same time.
+             * この Shopify ストアに対して、少なくとも 2 つの本番サイトが
+             * 同時にオペレーションを実行しようとしている。
              */
             reporter.panic({
               id: errorCodes.apiConflict,
@@ -104,7 +104,7 @@ export function makeSourceFromOperation(
               context: {},
             })
           } else {
-            // A prod build canceled me, wait and try again
+            // 本番ビルドにキャンセルされたので、待ってからやり直す
             operationTimer.setStatus(
               `This operation has been canceled by a higher priority build. It will retry shortly.`
             )

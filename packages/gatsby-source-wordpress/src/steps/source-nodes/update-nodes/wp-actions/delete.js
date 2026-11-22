@@ -20,7 +20,7 @@ const wpActionDELETE = async ({ helpers, wpAction }) => {
       ? await getPersistentCache({ key: CREATED_NODE_IDS })
       : null
 
-    // get the node ID from the WPGQL id
+    // WPGQL の id からノード ID を取得する
     const nodeId = wpAction.referencedNodeGlobalRelayID
 
     const node = await getNode(nodeId)
@@ -81,7 +81,7 @@ const wpActionDELETE = async ({ helpers, wpAction }) => {
     }
 
     if (needToTouchNodes) {
-      // Remove this from cached node id's so we don't try to touch it
+      // touch しようとしないよう、キャッシュしたノード id からこれを取り除く
       const validNodeIds = cachedNodeIds.filter(cachedId => cachedId !== nodeId)
 
       await setPersistentCache({ key: CREATED_NODE_IDS, value: validNodeIds })

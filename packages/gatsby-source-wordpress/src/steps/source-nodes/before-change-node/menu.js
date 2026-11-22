@@ -21,7 +21,7 @@ const deleteMenuNodeChildMenuItems = node => {
 
 export const menuBeforeChangeNode = async api => {
   if (api.remoteNode && api.actionType === `DELETE`) {
-    // delete child menu items
+    // 子メニュー項目を削除する
     return deleteMenuNodeChildMenuItems(api.remoteNode)
   }
 

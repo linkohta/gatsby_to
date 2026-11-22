@@ -10,20 +10,20 @@ import { cacheFetchedTypes } from "./cache-fetched-types"
 import { writeQueriesToDisk } from "./write-queries-to-disk"
 import { withPluginKey } from "~/store"
 /**
- * This fn is called during schema customization.
- * It pulls in the remote WPGraphQL schema, caches it,
- * then builds queries and stores a transformed object
- * later used in schema customization.
+ * この関数は、スキーマのカスタマイズ中に呼ばれる。
+ * リモートの WPGraphQL スキーマを取り込んでキャッシュし、
+ * クエリを組み立てて、後でスキーマのカスタマイズに使う
+ * 変換済みのオブジェクトを保存する。
  *
- * This fn must run in all PQR workers.
+ * この関数は、すべての PQR ワーカーで実行しなければならない。
  */
 const ingestRemoteSchema = async (helpers, pluginOptions) => {
   if (process.env.NODE_ENV === `development`) {
-    // running this code block in production is problematic for PQR
-    // since this fn will run once for each worker and we need the result in each
-    // we'll return early in most workers when it checks the cache here
-    // Since PQR doesn't run in development and this code block was only meant for dev
-    // it should be ok to wrap it in this if statement
+    // このコードブロックを本番で実行すると、PQR では問題になる
+    // この関数はワーカーごとに 1 回実行され、それぞれで結果が必要になるためである
+    // ほとんどのワーカーでは、ここでキャッシュを確認した時点で早期に return する
+    // PQR は開発時には動かず、このコードブロックは開発時専用のものだったので、
+    // この if 文で包んでも問題ないはずである
     const schemaTimeKey = withPluginKey(`lastIngestRemoteSchemaTime`)
     const lastIngestRemoteSchemaTime = await helpers.cache.get(schemaTimeKey)
 
@@ -31,8 +31,8 @@ const ingestRemoteSchema = async (helpers, pluginOptions) => {
       Date.now() - lastIngestRemoteSchemaTime <= 10000
 
     if (lastIngestRemoteSchemaTime && ingestedSchemaInLastTenSeconds) {
-      // only allow this to run once every ten seconds
-      // this prevents thrashing when many webhooks are received at once
+      // これを実行できるのは 10 秒に 1 回だけにする
+      // 多数の webhook を一度に受け取ったときの空回りを防ぐためである
       return
     }
 

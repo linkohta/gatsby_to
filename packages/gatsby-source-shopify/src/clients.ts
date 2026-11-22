@@ -3,8 +3,8 @@ import { HttpError } from "./errors"
 
 const MAX_BACKOFF_MILLISECONDS = 60000
 
-// TODO Update logic for handling errors (500 specifically) and update the
-// "hacky" code in createRestClient
+// TODO エラー（特に 500）を処理するロジックを更新し、createRestClient の
+// 「強引な」コードも更新する
 
 export function createGraphqlClient(
   options: IShopifyPluginOptions
@@ -58,20 +58,20 @@ export function createRestClient(options: IShopifyPluginOptions): IRestClient {
     retries = 3
   ): Promise<Response> {
     /**
-     * This is kind of a hack, but...
+     * これはややハック的だが...
      *
-     * We do this because although callers will use a relative path,
-     * some responses might have pagination links that get fed back
-     * to shopifyFetch to retrieve the next page. Those links are
-     * absolute URLs so we account for both, but not in a very robust
-     * fashion.
+     * こうしているのは、呼び出し元は相対パスを使う一方で、
+     * レスポンスによってはページネーションのリンクが含まれ、次のページを
+     * 取得するためにそれが shopifyFetch へ戻されることがあるためである。そのリンクは
+     * 絶対 URL なので両方に対応しているが、あまり堅牢な方法では
+     * ない。
      */
     const url = path.includes(options.storeUrl) ? path : `${baseUrl}${path}`
 
     const resp = await fetch(url, fetchOptions)
 
     if (!resp.ok && retries > 0 && resp.status === 429) {
-      // rate limit
+      // レート制限
       const retryAfter = parseFloat(resp.headers.get(`Retry-After`) || ``)
       await new Promise(resolve => setTimeout(resolve, retryAfter))
       return shopifyFetch(path, fetchOptions, retries - 1)

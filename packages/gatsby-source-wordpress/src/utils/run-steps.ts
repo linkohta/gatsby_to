@@ -52,7 +52,7 @@ const runSteps = async (
         apiName ? `${apiName}.` : ``
       }${step.name} build step.`
 
-      // on errors, invoke any preview callbacks to send news of this error back to the WP Preview window.
+      // エラー時には、プレビューのコールバックがあれば呼び出し、このエラーを WP のプレビューウィンドウへ伝える。
       await invokeAndCleanupLeftoverPreviewCallbacks({
         status: `GATSBY_PREVIEW_PROCESS_ERROR`,
         context: sharedError,
@@ -74,7 +74,7 @@ const runSteps = async (
 }
 
 /**
- * Takes in a pipe delimited string of Gatsby Node API names and returns the first supported API name as a string
+ * パイプ区切りの Gatsby Node API 名の文字列を受け取り、サポートされている最初の API 名を文字列で返す
  *
  * Example input: "onPluginInit|unstable_onPluginInit"
  * Example output: "onPluginInit"

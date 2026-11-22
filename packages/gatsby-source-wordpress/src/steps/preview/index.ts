@@ -30,8 +30,8 @@ const inPreviewRunner =
   process.env.RUNNER_TYPE === `INCREMENTAL_PREVIEWS` ||
   !!process.env.IS_GATSBY_PREVIEW
 
-// this is a function simply because many places in the code expect it to be.
-// it used to call getStore().getState() and check for some state to determine preview mode
+// これが関数になっているのは、コードの多くの箇所がそれを前提にしているからにすぎない。
+// 以前は getStore().getState() を呼び出し、何らかの状態を確認してプレビューモードを判定していた
 export const inPreviewMode = (): boolean => inDevelopPreview || inPreviewRunner
 
 export type PreviewStatusUnion =
@@ -76,8 +76,8 @@ const getPreviewQueue = (): PQueue => {
   return previewQueue
 }
 
-// This checks wether or not we're already currently processing a preview
-// for the passed preview id.
+// 渡されたプレビュー id のプレビューを、すでに処理中であるかどうかを
+// 確認する。
 const previewForIdIsAlreadyBeingProcessed = (id: string): boolean => {
   if (!id) {
     return false
@@ -92,11 +92,11 @@ const previewForIdIsAlreadyBeingProcessed = (id: string): boolean => {
 }
 
 /**
- * For previews of draft posts, gatsby develop will throw a bunch of 404 errors
- * while WPGatsby is trying to read page-data.json
- * So we can write a dummy page-data.json if one doesn't exist.
- * that way there will be no 404's and Gatsby will overwrite our dummy file when it
- * needs to.
+ * 下書きの投稿のプレビューでは、WPGatsby が page-data.json を読もうとしているあいだに、
+ * gatsby develop が 404 エラーを大量に出す
+ * そこで、page-data.json が存在しなければダミーを書き出す。
+ * こうすれば 404 は出なくなり、Gatsby は必要になったときにダミーのファイルを
+ * 上書きする。
  */
 const writeDummyPageDataJsonIfNeeded = async ({
   previewData,
@@ -158,9 +158,9 @@ const createPreviewStatusCallback =
     error,
   }: IOnPreviewStatusInput): Promise<void> => {
     if (status === `PREVIEW_SUCCESS`) {
-      // we might need to write a dummy page-data.json so that
-      // Gatsby doesn't throw 404 errors when WPGatsby tries to read this file
-      // that maybe doesn't exist yet
+      // まだ存在しないかもしれない page-data.json を WPGatsby が読もうとしたときに
+      // Gatsby が 404 エラーを出さないよう、ダミーの page-data.json を
+      // 書き出す必要があるかもしれない
       await writeDummyPageDataJsonIfNeeded({ previewData, pageNode })
     }
 
@@ -185,7 +185,7 @@ const createPreviewStatusCallback =
           modified: passedNode?.modified,
           pagePath: pageNode?.path,
           parentDatabaseId:
-            previewData.parentDatabaseId || previewData.previewDatabaseId, // if the parentDatabaseId is 0 we want to use the previewDatabaseId
+            previewData.parentDatabaseId || previewData.previewDatabaseId, // parentDatabaseId が 0 の場合は previewDatabaseId を使いたい
           status,
           statusContext,
         },
@@ -214,12 +214,12 @@ const createPreviewStatusCallback =
   }
 
 /**
- * This is called and passed the result from the ActionMonitor.previewData object along with a JWT token
- * It sources a single preview and creates the callback that's invoked to send preview status back to WPGatsby.
- * When the preview status is sent back to Gatsby, the preview action that this
- * logic is processing is deleted in the WP instance. That's why we call
- * previewForIdIsAlreadyBeingProcessed to see if another preview webhook
- * already started processing for this action
+ * これは、ActionMonitor.previewData オブジェクトの結果と JWT トークンを渡されて呼び出される
+ * 1 件のプレビューをソーシングし、プレビューの状態を WPGatsby へ送り返すために呼び出されるコールバックを作成する。
+ * プレビューの状態が Gatsby へ送り返されると、このロジックが処理している
+ * プレビューのアクションは WP のインスタンスから削除される。そのため、
+ * previewForIdIsAlreadyBeingProcessed を呼び出して、別のプレビューの webhook が
+ * このアクションの処理をすでに始めていないかを確認している
  */
 export const sourcePreview = async ({
   previewData,
@@ -272,8 +272,8 @@ export const sourcePreview = async ({
     reporter,
   })
 
-  // this callback will be invoked when the page is created/updated for this node
-  // then it'll send a mutation to WPGraphQL so that WP knows the preview is ready
+  // このコールバックは、このノードのページが作成または更新されたときに呼び出される
+  // その後、WPGraphQL にミューテーションを送り、プレビューの準備ができたことを WP に伝える
   getStore().dispatch.previewStore.subscribeToPagesCreatedFromNodeById({
     nodeId: previewData.id,
     modified: previewData.modified,
@@ -302,9 +302,9 @@ export const sourcePreview = async ({
 }
 
 /**
- * This is called when the /__refresh endpoint is posted to from WP previews.
- * It should only ever run in Preview mode, which is process.env.ENABLE_GATSBY_REFRESH_ENDPOINT = true
- * It first sources all pending preview actions, then calls sourcePreview() for each of them.
+ * これは、WP のプレビューから /__refresh エンドポイントへ POST されたときに呼び出される。
+ * 実行されるのはプレビューモード、つまり process.env.ENABLE_GATSBY_REFRESH_ENDPOINT = true のときだけのはずである
+ * まず保留中のプレビューのアクションをすべてソーシングし、それぞれについて sourcePreview() を呼び出す。
  */
 export const sourcePreviews = async (helpers: GatsbyHelpers): Promise<void> => {
   const { webhookBody, reporter, actions } = helpers
@@ -313,10 +313,10 @@ export const sourcePreviews = async (helpers: GatsbyHelpers): Promise<void> => {
     url,
   } = getPluginOptions()
 
-  // some versions of WPGatsby don't send a remoteUrl on every webhook.
-  // if we check this for every webhookBody errors will occur!
+  // WPGatsby のバージョンによっては、すべての webhook で remoteUrl を送るわけではない。
+  // すべての webhookBody でこれを確認するとエラーになる
   if (webhookBody.remoteUrl) {
-    // check if we're receiving preview data fromt the right WP backend
+    // プレビューのデータを正しい WP のバックエンドから受け取っているかを確認する
     const { hostname: settingsHostname } = urlUtil.parse(url)
     const { hostname: remoteHostname } = urlUtil.parse(webhookBody.remoteUrl)
 
@@ -380,8 +380,8 @@ export const sourcePreviews = async (helpers: GatsbyHelpers): Promise<void> => {
             status: PRIVATE
             orderby: { field: MODIFIED, order: DESC }
             sinceTimestamp: ${
-              // only source previews made in the last 60 minutes
-              // We delete every preview action we process so this accounts for very long cold builds between previews.
+              // 過去 60 分以内に作られたプレビューだけをソーシングする
+              // 処理したプレビューのアクションはすべて削除しているので、これはプレビュー間の非常に長いコールドビルドを考慮したものである。
               Date.now() - 1000 * 60 * 60
             }
           }
@@ -440,7 +440,7 @@ export const sourcePreviews = async (helpers: GatsbyHelpers): Promise<void> => {
 
   await Promise.all([queue.onEmpty(), queue.onIdle()])
 
-  // clean up leftover callbacks at the end to clean up anything we didn't catch elsewhere
+  // ほかで処理しきれなかったものを片付けるため、最後に残りのコールバックを整理する
   await invokeAndCleanupLeftoverPreviewCallbacks({
     status: `GATSBY_PREVIEW_PROCESS_ERROR`,
     context: `Starting sourcePreviews`,

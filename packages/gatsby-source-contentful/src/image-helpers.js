@@ -1,14 +1,14 @@
 // @ts-check
 import { URLSearchParams } from "url"
 
-// Maximum value for size parameters in Contentful Image API
+// Contentful Image API のサイズパラメーターの最大値
 // @see https://www.contentful.com/developers/docs/references/images-api/#/reference/resizing-&-cropping/specify-width-&-height
 export const CONTENTFUL_IMAGE_MAX_SIZE = 4000
 
-// Supported Image Formats by the Contentful Image API (https://www.contentful.com/developers/docs/references/images-api/#/reference/changing-formats/image-format)
+// Contentful Image API が対応している画像フォーマット (https://www.contentful.com/developers/docs/references/images-api/#/reference/changing-formats/image-format)
 export const validImageFormats = new Set([`jpg`, `png`, `webp`, `gif`, `avif`])
 
-// Determine the proper file extension based on mime type
+// MIME タイプから適切なファイル拡張子を決める
 export const mimeTypeExtensions = new Map([
   [`image/jpeg`, `.jpg`],
   [`image/jpg`, `.jpg`],
@@ -18,14 +18,14 @@ export const mimeTypeExtensions = new Map([
   [`image/avif`, `.avif`],
 ])
 
-// Check if Contentful asset is actually an image
+// Contentful のアセットが実際に画像かどうかを確認する
 export function isImage(image) {
   return mimeTypeExtensions.has(image?.file?.contentType)
 }
 
-// Create a Contentful Image API url
+// Contentful Image API の URL を作成する
 export function createUrl(imgUrl, options = {}) {
-  // If radius is -1, we need to pass `max` to the API
+  // radius が -1 の場合は、API に `max` を渡す必要がある
   const cornerRadius =
     options.cornerRadius === -1 ? `max` : options.cornerRadius
 
@@ -33,7 +33,7 @@ export function createUrl(imgUrl, options = {}) {
     delete options.toFormat
   }
 
-  // Convert to Contentful names and filter out undefined/null values.
+  // Contentful の名前に変換し、undefined/null の値を取り除く。
   const urlArgs = {
     w: options.width || undefined,
     h: options.height || undefined,

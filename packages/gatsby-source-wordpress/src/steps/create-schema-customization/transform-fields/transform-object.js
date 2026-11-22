@@ -70,8 +70,8 @@ export const buildGatsbyNodeObjectResolver =
     const queryInfo = getQueryInfoByTypeName(field.type.name)
 
     if (!queryInfo) {
-      // if we don't have query info for a type
-      // it probably means this type is excluded in plugin options
+      // 型のクエリ情報がない場合は、
+      // おそらくその型がプラグインオプションで除外されている
       return null
     }
 
@@ -80,18 +80,18 @@ export const buildGatsbyNodeObjectResolver =
       queryInfo.settings.lazyNodes
 
     if (
-      // only fetch/create nodes in resolvers for media items when they have lazyNodes enabled
+      // メディアアイテムについては、lazyNodes が有効な場合にだけ、リゾルバーでノードを取得して作成する
       (!isLazyMediaItem &&
-        // but if we're in preview mode we want to lazy fetch nodes
-        // because if nodes are limited we still want to lazy fetch connections
+        // ただしプレビューモードでは、ノードを遅延取得したい
+        // ノードが制限されていても、コネクションは遅延取得したいためである
         !inPreviewMode()) ||
-      // lazyNodes option isn't supported in Gatsby v4+
+      // lazyNodes オプションは Gatsby v4 以降では使えない
       usingGatsbyV4OrGreater
     ) {
       return null
     }
 
-    // if this node doesn't exist, fetch it and create a node
+    // このノードが存在しなければ、取得してノードを作成する
     const { node } = await fetchAndCreateSingleNode({
       id: nodeField.id,
       actionType: `CREATE`,

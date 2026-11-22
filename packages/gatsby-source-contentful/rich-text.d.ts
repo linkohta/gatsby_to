@@ -3,7 +3,7 @@ import { Options } from "@contentful/rich-text-react-renderer"
 
 interface ContentfulRichTextGatsbyReference {
   /**
-   * Either ContentfulAsset for assets or ContentfulYourContentTypeName for content types
+   * アセットの場合は ContentfulAsset、コンテンツタイプの場合は ContentfulYourContentTypeName
    */
   __typename: string
   contentful_id: string

@@ -28,9 +28,9 @@ import { getStore } from "~/store"
 import { store as gatsbyStore } from "gatsby/dist/redux"
 
 /**
- * Takes in a MediaItem node from WPGraphQL as well as Gatsby plugin options and returns the correct placeholder URL for GatsbyImage
+ * WPGraphQL の MediaItem ノードと Gatsby のプラグインオプションを受け取り、GatsbyImage 用の正しいプレースホルダーの URL を返す
  *
- * The user must set the placeholderSizeName plugin option, or otherwise create an image size in WP where the name is `gatsby-image-placeholder`
+ * ユーザーはプラグインオプションの placeholderSizeName を設定するか、WP で `gatsby-image-placeholder` という名前の画像サイズを作成しなければならない
  */
 export function getPlaceholderUrlFromMediaItemNode(node, pluginOptions) {
   let placeholderSizeByWidth
@@ -54,17 +54,17 @@ export function getPlaceholderUrlFromMediaItemNode(node, pluginOptions) {
 }
 
 const findReferencedImageNodeIds = ({ nodeString, pluginOptions, node }) => {
-  // if the lazyNodes plugin option is set we don't need to find
-  // image node id's because those nodes will be fetched lazily in resolvers.
+  // プラグインオプションの lazyNodes が設定されている場合は、画像ノードの id を
+  // 探す必要はない。それらのノードはリゾルバーで遅延取得されるためである。
   if (
     pluginOptions.type.MediaItem.lazyNodes &&
-    // but not in Gatsby v4+ because lazyNodes is no longer supported
+    // ただし Gatsby v4 以降は別である。lazyNodes が使えなくなったためである
     !usingGatsbyV4OrGreater
   ) {
     return []
   }
 
-  // get an array of all referenced media file ID's
+  // 参照されているすべてのメディアファイルの ID の配列を取得する
   const matchedIds = execall(
     /"__typename":"MediaItem","id":"([^"]*)"/gm,
     nodeString
@@ -76,7 +76,7 @@ const findReferencedImageNodeIds = ({ nodeString, pluginOptions, node }) => {
 }
 
 const getCheerioImgDbId = cheerioImg => {
-  // try to get the db id from data attributes
+  // data 属性から db の id を取得してみる
   const dataAttributeId =
     cheerioImg.attribs[`data-id`] || cheerioImg.attribs[`data-image-id`]
 
@@ -88,7 +88,7 @@ const getCheerioImgDbId = cheerioImg => {
     return null
   }
 
-  // try to get the db id from the wp-image-id classname
+  // クラス名 wp-image-id から db の id を取得してみる
   const wpImageClass = cheerioImg.attribs.class
     .split(` `)
     .find(className => className.includes(`wp-image-`))
@@ -107,7 +107,7 @@ const getCheerioImgDbId = cheerioImg => {
   return null
 }
 
-// media items are of the "post" type
+// メディアアイテムは "post" タイプである
 const dbIdToMediaItemRelayId = dbId => (dbId ? b64e(`post:${dbId}`) : null)
 
 const getCheerioImgRelayId = cheerioImg =>
@@ -129,22 +129,22 @@ const pickNodeBySourceUrlOrCheerioImg = ({
   mediaItemNodes,
 }) => {
   const possibleHtmlSrcs = [
-    // try to match the media item source url by original html src
+    // 元の html の src から、メディアアイテムのソース URL との一致を試みる
     url,
-    // or by the src minus any image sizes string
+    // または、画像サイズの文字列を取り除いた src で試みる
     stripImageSizesFromUrl(url),
   ]
 
   let imageNode = mediaItemNodes.find(
     mediaItemNode =>
-      // either find our node by the source url
+      // ソース URL でノードを探すか
       possibleHtmlSrcs.includes(mediaItemNode.sourceUrl) ||
       possibleHtmlSrcs.includes(
-        // try to match without -scaled in the sourceUrl as well
-        // since WP adds -scaled to image urls if they were too large
-        // at upload time but image urls in html don't have this requirement.
-        // the sourceUrl may have -scaled in it but the full size image is still
-        // stored on the server (just not in the db)
+        // sourceUrl から -scaled を除いたものでも一致を試みる
+        // WP は、アップロード時に大きすぎた画像の URL に -scaled を付けるが、
+        // html 内の画像の URL にはその制約がないためである。
+        // sourceUrl に -scaled が含まれていても、フルサイズの画像は
+        // サーバーに保存されたままである（db にはない）
         (mediaItemNode.sourceUrl || mediaItemNode.mediaItemUrl)?.replace(
           `-scaled`,
           ``
@@ -169,7 +169,7 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
   helpers,
   wpUrl,
 }) => {
-  // get all the image nodes we've cached from elsewhere
+  // ほかの場所でキャッシュした画像ノードをすべて取得する
   const { nodeMetaByUrl } = getStore().getState().imageNodes
 
   const previouslyCachedNodesByUrl = (
@@ -205,7 +205,7 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
   ).filter(Boolean)
 
   const mediaItemUrls = cheerioImages
-    // filter out nodes we already have
+    // すでに持っているノードを除外する
     .filter(({ cheerioImg }) => {
       const url = ensureSrcHasHostname({ wpUrl, src: cheerioImg.attribs.src })
 
@@ -216,7 +216,7 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
 
       return !existingNode
     })
-    // get remaining urls
+    // 残りの URL を取得する
     .map(({ cheerioImg }) => {
       const src = ensureSrcHasHostname({
         src: cheerioImg.attribs.src,
@@ -226,16 +226,16 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
       return src
     })
 
-  // build a query to fetch all media items that we don't already have
+  // まだ持っていないメディアアイテムをすべて取得するクエリを組み立てる
   const mediaItemNodesBySourceUrl =
     await fetchReferencedMediaItemsAndCreateNodes({
       mediaItemUrls,
     })
-  // images that have been edited from the media library that were previously
-  // uploaded to a post/page will have a different sourceUrl so they can't be fetched by it
-  // in many cases we have data-id or data-image-id as attributes on the img
-  // we can try to use those to fetch media item nodes as well
-  // this will keep us from missing nodes
+  // 投稿や固定ページにアップロードした後でメディアライブラリから編集された画像は、
+  // sourceUrl が変わるので、sourceUrl では取得できない
+  // 多くの場合、img には data-id または data-image-id が属性として付いている
+  // それらを使ってメディアアイテムのノードを取得することもできる
+  // こうすることで、ノードの取りこぼしを防げる
   const mediaItemDbIds = cheerioImages
     .map(({ cheerioImg }) => getCheerioImgDbId(cheerioImg))
     .filter(Boolean)
@@ -243,7 +243,7 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
   const mediaItemRelayIds = mediaItemDbIds
     .map(dbId => dbIdToMediaItemRelayId(dbId))
     .filter(
-      // filter out any media item ids we already fetched
+      // すでに取得したメディアアイテムの id を除外する
       relayId =>
         ![...mediaItemNodesBySourceUrl, ...previouslyCachedNodesByUrl].find(
           ({ id } = {}) => id === relayId
@@ -274,7 +274,7 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
     cacheCreatedFileNodeBySrc({ node: imageNode, src: htmlImgSrc })
 
     if (imageNode) {
-      // match is the html string of the img tag
+      // match は img タグの html 文字列である
       htmlMatchesToMediaItemNodesMap.set(match, { imageNode, cheerioImg })
     }
   }
@@ -285,25 +285,25 @@ const fetchNodeHtmlImageMediaItemNodes = async ({
 const getCheerioElementFromMatch =
   wpUrl =>
   ({ match, tag = `img` }) => {
-    // unescape quotes
+    // 引用符のエスケープを解除する
     const parsedMatch = JSON.parse(`"${match}"`)
 
-    // load our matching img tag into cheerio
+    // 一致した img タグを cheerio に読み込む
     const $ = cheerio.load(parsedMatch, {
       xml: {
-        // make sure it's not wrapped in <body></body>
+        // <body></body> で包まれないようにする
         withDomLvl1: false,
-        // no need to normalize whitespace, we're dealing with a single element here
+        // ここで扱うのは 1 つの要素だけなので、空白を正規化する必要はない
         normalizeWhitespace: false,
         xmlMode: true,
-        // entity decoding isn't our job here, that will be the responsibility of WPGQL
-        // or of the source plugin elsewhere.
+        // エンティティのデコードはここでの役割ではない。WPGQL か、
+        // ソースプラグインの別の箇所が担当する。
         decodeEntities: false,
       },
     })
 
-    // there's only ever one element due to our match matching a single tag
-    // $(tag) isn't an array, it's an object with a key of 0
+    // match は 1 つのタグにしか一致しないので、要素は常に 1 つだけである
+    // $(tag) は配列ではなく、キー 0 を持つオブジェクトである
     const cheerioElement = $(tag)[0]
 
     if (cheerioElement?.attribs?.src?.startsWith(`/wp-content`)) {
@@ -313,8 +313,8 @@ const getCheerioElementFromMatch =
     return {
       match,
       cheerioElement,
-      // @todo this is from when this function was just used for images
-      // remove this by refactoring
+      // @todo これは、この関数が画像にしか使われていなかったころの名残である
+      // リファクタリングして取り除く
       cheerioImg: cheerioElement,
     }
   }
@@ -420,7 +420,7 @@ const copyFileToStaticAndReturnUrlPath = async (fileNode, helpers) => {
 
 const cacheCreatedFileNodeBySrc = ({ node, src }) => {
   if (node) {
-    // save any fetched media items in our global media item cache
+    // 取得したメディアアイテムを、グローバルのメディアアイテムのキャッシュに保存する
     getStore().dispatch.imageNodes.pushNodeMeta({
       sourceUrl: src,
       id: node.id,
@@ -434,11 +434,11 @@ const imgSrcRemoteFileRegex =
 
 export const getImgSrcRemoteFileMatchesFromNodeString = nodeString =>
   execall(imgSrcRemoteFileRegex, nodeString).filter(({ subMatches }) => {
-    // if our match is json encoded, that means it's inside a JSON
-    // encoded string field.
+    // match が JSON エンコードされている場合は、JSON エンコードされた
+    // 文字列フィールドの中にあることを意味する。
     const isInJSON = subMatches[0].includes(`\\/\\/`)
 
-    // we shouldn't process encoded JSON, so skip this match if it's JSON
+    // エンコードされた JSON は処理すべきではないので、JSON であればこの match をスキップする
     return !isInJSON
   })
 
@@ -446,9 +446,9 @@ export const getImgTagMatches = ({ nodeString }) =>
   execall(
     /<img([\w\W]+?)[\/]?>/gim,
     nodeString
-      // we don't want to match images inside pre
+      // pre の中の画像には一致させたくない
       .replace(/<pre([\w\W]+?)[\/]?>(?:(?!<\/pre>).)+(<\/pre>)/gim, ``)
-      // and code tags, so temporarily remove those tags and everything inside them
+      // code タグの中も同様なので、これらのタグとその中身をすべて一時的に取り除く
       .replace(/<code([\w\W]+?)[\/]?>(?:(?!<\/code>).)+(<\/code>)/gim, ``)
   )
 
@@ -459,7 +459,7 @@ export const replaceNodeHtmlImages = async ({
   wpUrl,
   pluginOptions,
 }) => {
-  // this prevents fetching inline html images
+  // これにより、html にインラインで埋め込まれた画像を取得しないようにする
   if (
     !pluginOptions?.html?.useGatsbyImage ||
     pluginOptions?.type?.MediaItem?.exclude
@@ -487,7 +487,7 @@ export const replaceNodeHtmlImages = async ({
         wpUrl,
       })
 
-    // generate gatsby images for each cheerioImage
+    // cheerioImage ごとに gatsby の画像を生成する
     const htmlMatchesWithImageResizes = await Promise.all(
       imgTagMatches.map(async ({ match }) => {
         const matchInfo = htmlMatchesToMediaItemNodesMap.get(match)
@@ -505,11 +505,11 @@ export const replaceNodeHtmlImages = async ({
         }
 
         const fileNode =
-          // if we couldn't get a MediaItem node for this image in WPGQL
+          // WPGQL でこの画像の MediaItem ノードを取得できなかった場合
           !isMediaItemNode
-            ? // this will already be a file node
+            ? // これはすでにファイルノードである
               imageNode
-            : // otherwise grab the file node
+            : // そうでなければファイルノードを取得する
               helpers.getNode(imageNode?.localFile?.id)
 
         const extension = imageNode?.mimeType?.replace(
@@ -523,15 +523,15 @@ export const replaceNodeHtmlImages = async ({
           ? imageNode?.mediaDetails?.width
           : null
 
-        // if a max width can't be inferred from html, this value will be passed to Sharp
+        // html から最大幅を推定できない場合は、この値が Sharp に渡される
         let fallbackImageMaxWidth = pluginOptions?.html?.fallbackImageMaxWidth
 
         if (
-          // if the image is smaller than the fallback max width,
-          // the images width will be used instead if we have a media item node
+          // 画像がフォールバックの最大幅より小さい場合、
+          // メディアアイテムのノードがあれば、代わりに画像の幅が使われる
           fallbackImageMaxWidth > mediaItemNodeWidth &&
-          // of course that means we have to have a media item node
-          // and a media item node max width
+          // もちろん、そのためにはメディアアイテムのノードと、
+          // メディアアイテムのノードの最大幅が必要である
           mediaItemNodeWidth &&
           typeof mediaItemNodeWidth === `number` &&
           mediaItemNodeWidth > 0
@@ -540,27 +540,27 @@ export const replaceNodeHtmlImages = async ({
         }
 
         let maxWidth =
-          // if we inferred a maxwidth from html
+          // html から最大幅を推定できた場合
           (imgTagMaxWidth &&
-          // and we have a media item node to know it's full size max width
+          // かつ、フルサイズの最大幅が分かるメディアアイテムのノードがある場合
           mediaItemNodeWidth &&
-          // and this isn't an svg which has no maximum width
+          // かつ、最大幅を持たない svg ではない場合
           extension !== `svg` &&
-          // and the media item node max width is smaller than what we inferred
-          // from html
+          // かつ、メディアアイテムのノードの最大幅が、html から推定した値より
+          // 小さい場合
           mediaItemNodeWidth < imgTagMaxWidth
-            ? // use the media item node width
+            ? // メディアアイテムのノードの幅を使う
               mediaItemNodeWidth
-            : // otherwise use the width inferred from html
+            : // そうでなければ、html から推定した幅を使う
               imgTagMaxWidth) ??
-          // if we don't have a media item node and we inferred no width
-          // from html, then use the fallback max width from plugin options
+          // メディアアイテムのノードがなく、html からも幅を推定できなかった場合は、
+          // プラグインオプションのフォールバックの最大幅を使う
           fallbackImageMaxWidth
 
         const configuredMaxWidth = pluginOptions?.html?.imageMaxWidth
 
-        // if the configured html.maxWidth property is less than the result, then
-        // override the resulting width
+        // 設定された html.maxWidth プロパティが結果より小さい場合は、
+        // 結果の幅を上書きする
         if (configuredMaxWidth && configuredMaxWidth < maxWidth) {
           maxWidth = configuredMaxWidth
         }
@@ -652,7 +652,7 @@ export const replaceNodeHtmlImages = async ({
       })
     )
 
-    // find/replace mutate nodeString to replace matched images with rendered gatsby images
+    // nodeString を検索して置き換え、一致した画像を、描画済みの gatsby の画像に置き換える
     let replaceIndex = 0
     for (const matchResize of htmlMatchesWithImageResizes) {
       if (!matchResize) {
@@ -662,7 +662,7 @@ export const replaceNodeHtmlImages = async ({
       const { match, imageResize, cheerioImg, publicUrl } = matchResize
 
       let ReactGatsbyImage
-      // used to create hydration data for images
+      // 画像のハイドレーション用データを作るために使う
       let gatsbyImageHydrationData = null
       if (
         imageResize &&
@@ -670,7 +670,7 @@ export const replaceNodeHtmlImages = async ({
       ) {
         gatsbyImageHydrationData = {
           image: imageResize,
-          // Wordpress tells users to leave "alt" empty if image is decorative. But it returns undefined, not ``
+          // Wordpress は、装飾目的の画像では "alt" を空にするようユーザーに案内している。しかし返ってくるのは `` ではなく undefined である
           alt: cheerioImg?.attribs?.alt ?? ``,
           className: `${
             cheerioImg?.attribs?.class || ``
@@ -687,7 +687,7 @@ export const replaceNodeHtmlImages = async ({
           `img`,
           {
             src: publicUrl,
-            // Wordpress tells users to leave "alt" empty if image is decorative. But it returns undefined, not ``
+            // Wordpress は、装飾目的の画像では "alt" を空にするようユーザーに案内している。しかし返ってくるのは `` ではなく undefined である
             alt: cheerioImg?.attribs?.alt ?? ``,
             className: `${
               cheerioImg?.attribs?.class || ``
@@ -701,14 +701,14 @@ export const replaceNodeHtmlImages = async ({
         let gatsbyImageStringRaw =
           ReactDOMServer.renderToString(ReactGatsbyImage)
 
-        // gatsby-plugin-image needs hydration data to work on navigations - we add the hydration data to the DOM to use it in gatsby-browser.ts
+        // gatsby-plugin-image がナビゲーション時に動くには、ハイドレーション用データが必要である。gatsby-browser.ts で使えるよう、そのデータを DOM に追加する
         if (gatsbyImageHydrationData) {
           gatsbyImageStringRaw += `<script type="application/json" data-wp-inline-image-hydration="${replaceIndex}">${JSON.stringify(
             gatsbyImageHydrationData
           )}</script>`
         }
-        // need to remove the JSON stringify quotes around our image since we're
-        // threading this JSON string back into a larger JSON object string
+        // この JSON 文字列を、より大きな JSON オブジェクトの文字列の中へ戻すので、
+        // 画像を囲む JSON stringify の引用符を取り除く必要がある
         const gatsbyImageStringJSON = JSON.stringify(gatsbyImageStringRaw)
         const gatsbyImageString = gatsbyImageStringJSON.substring(
           1,
@@ -738,18 +738,18 @@ const replaceFileLinks = async ({
   }
 
   if (node.__typename === `MediaItem`) {
-    // we don't want to replace file links on MediaItem nodes because they're processed specially from other node types.
-    // if we replace file links here then we wont be able to properly fetch the localFile node
+    // MediaItem ノードのファイルリンクは置き換えない。ほかのノードタイプとは別の特別な処理をしているためである。
+    // ここでファイルリンクを置き換えると、localFile ノードを正しく取得できなくなる
     return nodeString
   }
 
   const hrefMatches = [
-    // match url pathnames in html fields, for ex /wp-content/uploads/2019/01/image.jpg
+    // html フィールド内の URL の pathname に一致させる。例: /wp-content/uploads/2019/01/image.jpg
     ...(execall(
       /(\\"|\\'|\()([^'"()]*)(\/wp-content\/uploads\/[^'">()]+)(\\"|\\'|>|\))/gm,
       nodeString
     ) || []),
-    // match full urls in json fields, for ex https://example.com/wp-content/uploads/2019/01/image.jpg
+    // json フィールド内の完全な URL に一致させる。例: https://example.com/wp-content/uploads/2019/01/image.jpg
     ...(execall(
       new RegExp(
         `(\\"|\\'|\\()([^'"()]*)(${wpUrl}\/wp-content\/uploads\/[^'">()]+)(\\"|\\'|>|\\))`,
@@ -852,7 +852,7 @@ export const getWpLinkRegex = wpUrl =>
     `gim`
   )
 
-// replaces any url which is a front-end WP url with a relative path
+// WP のフロントエンドの URL を、相対パスに置き換える
 const replaceNodeHtmlLinks = ({ wpUrl, nodeString, node }) => {
   const wpLinkRegex = getWpLinkRegex(wpUrl)
   const linkMatches = execall(wpLinkRegex, nodeString)
@@ -861,15 +861,15 @@ const replaceNodeHtmlLinks = ({ wpUrl, nodeString, node }) => {
     linkMatches.forEach(({ match, subMatches: [path] }) => {
       if (path) {
         try {
-          // remove \, " and ' characters from match
+          // match から \、"、' の文字を取り除く
           const normalizedMatch = match
             .replace(/['"\\]/g, ``)
-            // ensure that query params are properly quoted
+            // クエリパラメーターが正しく引用符で囲まれるようにする
             .replace(/\?/, `\\?`)
 
           const normalizedPath = path.replace(/\\/g, ``)
 
-          // replace normalized match with relative path
+          // 正規化した match を相対パスに置き換える
           const thisMatchRegex = new RegExp(
             normalizedMatch + `(?!/?wp-content|/?wp-admin|/?wp-includes)`,
             `g`
@@ -891,7 +891,7 @@ const replaceNodeHtmlLinks = ({ wpUrl, nodeString, node }) => {
   return nodeString
 }
 
-// replaces specific string or regex with a given string from the plugin options config
+// 特定の文字列または正規表現を、プラグインオプションの設定で指定された文字列に置き換える
 export const searchAndReplaceNodeStrings = ({
   nodeString,
   node,
@@ -961,19 +961,19 @@ const processNode = async ({
 }) => {
   const nodeString = stringify(node)
 
-  // find referenced node ids
-  // here we're searching for node id strings in our node
-  // we use this to download only the media items
-  // that are being used in posts
-  // this is important for downloading images nodes that are connected somewhere
-  // on a node field
+  // 参照されているノードの id を探す
+  // ここでは、ノードの中にあるノード id の文字列を検索している
+  // これを使って、投稿で使われているメディアアイテムだけを
+  // ダウンロードする
+  // これは、ノードのフィールドのどこかでつながっている画像ノードを
+  // ダウンロードするうえで重要である
   const nodeMediaItemIdReferences = findReferencedImageNodeIds({
     nodeString,
     pluginOptions,
     node,
   })
 
-  // push them to our store of referenced id's
+  // 参照されている id のストアに追加する
   if (nodeMediaItemIdReferences?.length && referencedMediaItemNodeIds) {
     nodeMediaItemIdReferences.forEach(id => referencedMediaItemNodeIds.add(id))
   }
@@ -987,7 +987,7 @@ const processNode = async ({
   })
 
   const processedNode =
-    // only parse if the nodeString has changed
+    // nodeString が変わった場合にだけ解析する
     processedNodeString !== nodeString ? JSON.parse(processedNodeString) : node
 
   return {

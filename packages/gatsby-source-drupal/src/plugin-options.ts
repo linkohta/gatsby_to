@@ -6,7 +6,7 @@ type RenamedLangCode = {
 }
 
 type Options = {
-  // TODO: type all options
+  // TODO: すべてのオプションに型を付ける
   [key: string]: any
 } & {
   languageConfig?: {
@@ -21,18 +21,18 @@ type Options = {
 
 const mutateOptions = (options: Options) => {
   if (options?.languageConfig?.enabledLanguages?.length) {
-    // Support renamed language codes in Drupal
+    // Drupal で名前を変更した言語コードに対応する
     options.languageConfig.enabledLanguages.forEach(lang => {
       if (typeof lang === `object`) {
-        // move the as langcode of the complex code to the enabled languages array
+        // 複合コードの as の langcode を、有効な言語の配列へ移す
         options!.languageConfig!.enabledLanguages!.push(lang.as)
-        // then move the complex lang-code to a different array
+        // 次に、複合の言語コードを別の配列へ移す
         options!.languageConfig!.renamedEnabledLanguages ||= []
         options!.languageConfig!.renamedEnabledLanguages.push(lang)
       }
     })
 
-    // since we moved all the object enabled languages to a new array, we can remove them from enabledLanguages
+    // オブジェクト形式の有効な言語はすべて新しい配列へ移したので、enabledLanguages から取り除ける
     options.languageConfig.enabledLanguages =
       options.languageConfig.enabledLanguages.filter(
         lang => typeof lang === `string`

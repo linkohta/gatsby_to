@@ -9,8 +9,8 @@ describe(`gatsby-source-faker`, () => {
     schema: {
       name: [`firstName`, `lastName`],
     },
-    count: 3, // how many fake objects you need
-    type: `NameData`, // Name of the graphql query node
+    count: 3, // 必要なフェイクオブジェクトの数
+    type: `NameData`, // graphql のクエリノードの名前
   }
 
   beforeEach(() => {

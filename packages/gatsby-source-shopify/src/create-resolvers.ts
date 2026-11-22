@@ -20,16 +20,16 @@ export function createResolvers(
       [`${typePrefix}ShopifyImage`]: {
         gatsbyImageData: {
           ...getGatsbyImageFieldConfig(makeResolveGatsbyImageData(cache)),
-          type: `JSON`, // Because gatsbyImageData will be undefined for GIFs it must be optional
+          type: `JSON`, // GIF では gatsbyImageData が undefined になるので、省略可能でなければならない
         },
       },
     })
   }
 
-  // Attach the metafield resolver to all types with a metafields field
+  // metafields フィールドを持つすべての型に、metafield のリゾルバーを付ける
   for (const [type, value] of Object.entries(shopifyTypes)) {
     if (value.coupledNodeFields?.includes(`metafields___NODE`)) {
-      // Only include the resolver if the type is included in the build
+      // その型がビルドに含まれている場合にだけ、リゾルバーを含める
       if (!value.optionalKey || connections.includes(value.optionalKey)) {
         createResolvers({
           [`${typePrefix}Shopify${type}`]: {

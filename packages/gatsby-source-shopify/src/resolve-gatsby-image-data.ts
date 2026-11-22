@@ -27,7 +27,7 @@ async function getImageBase64({
   directory: string
   imageId: string
 }): Promise<string> {
-  // Downloads file to the site cache and returns the file path for the given image (this is a path on the host system, not a URL)
+  // ファイルをサイトのキャッシュへダウンロードし、指定した画像のファイルパスを返す（URL ではなく、ホストシステム上のパスである）
   const filePath = await fetchRemoteFile({
     url: imageAddress,
     directory,
@@ -38,7 +38,7 @@ async function getImageBase64({
 }
 
 /**
- * Download and generate a low-resolution placeholder
+ * 低解像度のプレースホルダーをダウンロードして生成する
  *
  * @param lowResImageFile
  */
@@ -55,7 +55,7 @@ export function makeResolveGatsbyImageData(cache: GatsbyCache) {
       ...remainingOptions
     }: IGatsbyImageFieldArgs
   ): Promise<IGatsbyImageData | null> {
-    // Sharp cannot optimize GIFs so we must return null in that case
+    // Sharp は GIF を最適化できないので、その場合は null を返さなければならない
     const ext = parseImageExtension(image.originalSrc)
     if (ext === `gif`) return null
 
@@ -89,7 +89,7 @@ export function makeResolveGatsbyImageData(cache: GatsbyCache) {
     }
 
     if (remainingOptions && remainingOptions.placeholder === `blurred`) {
-      // This function returns the URL for a 20px-wide image, to use as a blurred placeholder
+      // この関数は、ぼかしたプレースホルダーとして使う、幅 20px の画像の URL を返す
       const lowResImageURL = getLowResolutionImageURL({
         ...remainingOptions,
         formats,

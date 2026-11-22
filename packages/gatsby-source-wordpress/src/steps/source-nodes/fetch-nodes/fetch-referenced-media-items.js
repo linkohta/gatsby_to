@@ -49,7 +49,7 @@ const pushPromiseOntoRetryQueue = ({
     const timesRetried = previouslyRetriedPromises[retryKey] || 0
 
     if (timesRetried >= 2) {
-      // if we've retried this more than once, pause for a sec.
+      // これを 2 回以上リトライしている場合は、少し待つ。
       await new Promise(resolve =>
         setTimeout(() => resolve(), timesRetried * 500)
       )
@@ -67,12 +67,12 @@ const pushPromiseOntoRetryQueue = ({
         timesRetried,
       })
     } catch (error) {
-      // Errors that should exit are handled one level down
-      // in createLocalFileNode
+      // 終了すべきエラーは、1 階層下の createLocalFileNode で
+      // 処理される
       //
-      // if we haven't reqeued this before,
-      // add it to the end of the queue to
-      // try once more later
+      // これをまだキューに入れ直していなければ、
+      // 後でもう一度試せるよう、
+      // キューの末尾に追加する
       if (timesRetried < 5) {
         if (timesRetried > 1) {
           helpers.reporter.info(
@@ -99,8 +99,8 @@ const pushPromiseOntoRetryQueue = ({
         helpers.reporter.info(
           `\n\nalready re-queued ${retryKey} 5 times :( sorry.\nTry lowering process.env.GATSBY_CONCURRENT_DOWNLOAD.\nIt's currently set to ${process.env.GATSBY_CONCURRENT_DOWNLOAD}\n\n`
         )
-        // we already tried this earlier in the queue
-        // no choice but to give up :(
+        // これはキューの中ですでに試している
+        // あきらめるしかない :(
         helpers.reporter.panic(error)
       }
     }
@@ -280,15 +280,15 @@ const createScaledImageUrl = url => {
   return scaledUrl
 }
 
-// takes an array of image urls and returns them + additional urls if
-// any of the provided image urls contain what appears to be an image resize signifier
-// for ex https://site.com/wp-content/uploads/01/your-image-500x1000.jpeg
-// that will add https://site.com/wp-content/uploads/01/your-image.jpeg to the array
-// this is necessary because we can only get image nodes by the full source url.
-// simply removing image resize signifiers from all urls would be a mistake since
-// someone could upload a full-size image that contains that pattern - so the full
-// size url would have 500x1000 in it, and removing it would make it so we can never
-// fetch this image node.
+// 画像の URL の配列を受け取り、渡された URL の中に画像のリサイズを示すと思われる
+// 記号が含まれていれば、追加の URL を加えて返す
+// たとえば https://site.com/wp-content/uploads/01/your-image-500x1000.jpeg であれば、
+// https://site.com/wp-content/uploads/01/your-image.jpeg を配列に追加する
+// これが必要なのは、画像ノードを完全なソース URL でしか取得できないためである。
+// すべての URL からリサイズの記号を単純に取り除くのは誤りである。
+// そのパターンを含むフルサイズの画像がアップロードされることもあり、その場合は
+// フルサイズの URL に 500x1000 が含まれるので、取り除くとその画像ノードを
+// 二度と取得できなくなる。
 const processAndDedupeImageUrls = urls =>
   uniq(
     urls.reduce((accumulator, url) => {
@@ -297,7 +297,7 @@ const processAndDedupeImageUrls = urls =>
 
       const strippedUrl = stripImageSizesFromUrl(url)
 
-      // if the url had no image sizes, don't do anything special
+      // URL に画像サイズが含まれていなければ、特別なことは何もしない
       if (strippedUrl === url) {
         return accumulator
       }
@@ -327,12 +327,12 @@ export const fetchMediaItemsBySourceUrl = async ({
       (accumulator, url) => {
         const { id } = getFileNodeMetaBySourceUrl(url) || {}
 
-        // if we have a cached image and we haven't already recorded this cached image
+        // キャッシュした画像があり、そのキャッシュした画像をまだ記録していない場合
         if (id && !accumulator.cachedMediaItemNodeIds.includes(id)) {
-          // save it
+          // 保存する
           accumulator.cachedMediaItemNodeIds.push(id)
         } else if (!id) {
-          // otherwise we need to fetch this media item by url
+          // そうでなければ、このメディアアイテムを URL で取得する必要がある
           accumulator.uncachedMediaItemUrls.push(url)
         }
 
@@ -341,7 +341,7 @@ export const fetchMediaItemsBySourceUrl = async ({
       { cachedMediaItemNodeIds: [], uncachedMediaItemUrls: [] }
     )
 
-  // take our previously cached id's and get nodes for them
+  // 以前にキャッシュした id から、それらのノードを取得する
   const previouslyCachedMediaItemNodes = await Promise.all(
     cachedMediaItemNodeIds.map(async nodeId => {
       const node = await helpers.getNode(nodeId)
@@ -359,22 +359,22 @@ export const fetchMediaItemsBySourceUrl = async ({
     schema: { perPage },
   } = getPluginOptions()
 
-  // chunk up all our uncached media items
+  // キャッシュしていないメディアアイテムを、すべてチャンクに分ける
   const mediaItemUrlsPages = chunk(uncachedMediaItemUrls, perPage)
 
-  // since we're using an async queue, we need a way to know when it's finished
-  // we pass this resolve function into the queue function so it can let us
-  // know when it's finished
+  // 非同期のキューを使っているので、完了を知る手段が必要である
+  // この resolve 関数をキューの関数に渡し、完了したときに
+  // 知らせてもらう
 
-  // we have no media items to fetch,
-  // so we need to resolve this promise
-  // otherwise it will never resolve below.
+  // 取得するメディアアイテムがないので、
+  // この Promise を解決する必要がある
+  // そうしないと、下で解決されないままになる。
   if (!mediaItemUrlsPages.length) {
     return Promise.resolve(previouslyCachedMediaItemNodes)
   }
 
   const allPromises = []
-  // for all the images we don't have cached, loop through and get them all
+  // キャッシュしていないすべての画像について、順に処理してすべて取得する
   for (const [index, sourceUrls] of mediaItemUrlsPages.entries()) {
     const curPromise = new Promise(resolve => {
       pushPromiseOntoRetryQueue({
@@ -415,14 +415,14 @@ export const fetchMediaItemsBySourceUrl = async ({
             errorContext: `Error occurred while fetching "MediaItem" nodes in inline html.`,
           })
 
-          // since we're getting each media item on it's single node root field
-          // we just needs the values of each property in the response
-          // anything that returns null is because we tried to get the source url
-          // plus the source url minus resize patterns. So there will be nulls
-          // since only the full source url will return data
+          // 各メディアアイテムを、単一ノード用のルートフィールドで取得しているので、
+          // 必要なのはレスポンスの各プロパティの値だけである
+          // null が返るものは、ソース URL と、ソース URL からリサイズのパターンを除いたものの
+          // 両方を取得しようとした結果である。データを返すのは完全なソース URL だけなので、
+          // null が含まれることになる
           const thisPagesNodes = Object.values(data).filter(Boolean)
 
-          // take the WPGraphQL nodes we received and create Gatsby nodes out of them
+          // 受け取った WPGraphQL のノードから Gatsby のノードを作成する
           const nodes = await Promise.all(
             thisPagesNodes.map(node =>
               createMediaItemNode({
@@ -441,7 +441,7 @@ export const fetchMediaItemsBySourceUrl = async ({
               return
             }
 
-            // this is how we're caching nodes we've previously fetched.
+            // 以前に取得したノードは、このようにしてキャッシュしている。
             getStore().dispatch.imageNodes.pushNodeMeta({
               id: node.localFile.id,
               sourceUrl: sourceUrls[index],
@@ -500,10 +500,10 @@ export const fetchMediaItemsById = async ({
           relayIds.join()
         )}`,
         retryPromise: async () => {
-          // relay id's are base64 encoded from strings like attachment:89381
-          // where 89381 is the id we want for our query
-          // so we split on the : and get the last item in the array, which is the id
-          // once we can get a list of media items by relay id's, we can remove atob
+          // relay の id は、attachment:89381 のような文字列を base64 でエンコードしたものである
+          // 89381 がクエリに必要な id である
+          // そこで : で分割し、配列の最後の要素である id を取得する
+          // relay の id でメディアアイテムの一覧を取得できるようになれば、atob は取り除ける
           const ids = relayIds.map(id => atob(id).split(`:`).slice(-1)[0])
 
           const query = `
@@ -526,7 +526,7 @@ export const fetchMediaItemsById = async ({
             helpers,
             settings,
             in: ids,
-            // this allows us to retry-on-end-of-queue
+            // これにより、キューの末尾でのリトライができる
             throwFetchErrors: true,
           })
 
@@ -566,7 +566,7 @@ export default async function fetchReferencedMediaItemsAndCreateNodes({
   const queryInfo = state.remoteSchema.nodeQueries.mediaItems
   const { helpers, pluginOptions } = state.gatsbyApi
 
-  // don't fetch media items if they are excluded via pluginOptions
+  // pluginOptions で除外されている場合は、メディアアイテムを取得しない
   if (pluginOptions.type?.MediaItem?.exclude) {
     return []
   }
