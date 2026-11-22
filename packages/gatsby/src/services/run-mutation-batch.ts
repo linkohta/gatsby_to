@@ -1,7 +1,7 @@
 import { IWaitingContext } from "../state-machines/waiting/types"
 import { callRealApi } from "../utils/call-deferred-api"
 
-// Consume the entire batch and run actions
+// バッチ全体を消費して、アクションを実行する
 export const runMutationBatch = async ({
   runningBatch = [],
   store,

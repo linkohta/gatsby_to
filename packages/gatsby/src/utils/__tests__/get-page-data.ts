@@ -96,7 +96,7 @@ describe(`get-page-data-util`, () => {
         path: `/foo`,
         componentPath: `/foo.js`,
         component: `/foo.js`,
-        mode: `SSG`, // TODO: need to test other modes in non-build environment
+        mode: `SSG`, // TODO: ビルド以外の環境で、他のモードもテストする必要がある
       },
     }
 
@@ -116,7 +116,7 @@ describe(`get-page-data-util`, () => {
   })
 
   it(`Resolves immediately if query result is up to date`, async () => {
-    // query did already run before
+    // クエリは以前にすでに実行されている
     createPage(Pages.foo)
     startPageQuery(Pages.foo)
     finishQuery(Pages.foo, queryResultContent)
@@ -200,7 +200,7 @@ describe(`get-page-data-util`, () => {
 
       jest.runOnlyPendingTimers()
 
-      // we don't resolve in first timeout and we set timeout for second one
+      // 最初のタイムアウトでは解決せず、2 番目のタイムアウトを設定する
       expect(setTimeout).toHaveBeenCalledTimes(2)
       expect(setTimeout).toHaveBeenNthCalledWith(
         1,
@@ -217,10 +217,10 @@ describe(`get-page-data-util`, () => {
 
       await flushPageData()
 
-      // we cancel second timeout
+      // 2 番目のタイムアウトをキャンセルする
       expect(clearTimeout).toHaveBeenCalledTimes(1)
 
-      // and result are correct
+      // そして結果は正しい
       expect(await resultPromise).toEqual(pageDataContent)
     })
 
@@ -251,14 +251,14 @@ describe(`get-page-data-util`, () => {
         RETRY_INTERVAL
       )
 
-      // we didn't get fresh results, but we resolved to stale ones
+      // 新しい結果は得られなかったが、古い結果で解決した
       expect(await resultPromise).toEqual(pageDataStaleContent)
     })
   })
 
   describe(`handles page deletion in the middle of execution gracefully`, () => {
     describe.each([
-      // both variants should report that page was deleted
+      // どちらのバリエーションも、ページが削除されたことを報告するはずである
       [
         `Doesn't have stale page-data file for a page`,
         { hasPreviousResults: false },
@@ -349,10 +349,10 @@ describe(`get-page-data-util`, () => {
 
       const resultPromise = getPageData(Pages.foo.path)
 
-      // mark query as dirty
+      // クエリにダーティの印を付ける
       createPage(Pages.foo, true)
 
-      // this would cause callback in
+      // これにより、コールバックが呼ばれる
       await flushPageData()
 
       startPageQuery(Pages.foo)

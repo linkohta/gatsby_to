@@ -51,8 +51,8 @@ const commonPages = [
   },
   {
     path: `/app/p1/page2/`,
-    // this is very similar to `/app/:p1/page`, point of adding 2 of those is to make sure order of pages in state
-    // doesn't impact deterministic page selection
+    // これは `/app/:p1/page` によく似ている。この 2 つを追加する目的は、状態の中のページの順序が
+    // 決定的なページの選択に影響しないことを確認することである
     matchPath: `/app/:p1/page2`,
   },
   `/app/static/`,
@@ -192,7 +192,7 @@ describe(`findPageByPath`, () => {
   describe(`No page found`, () => {
     const stateWithBoth404Pages = generatePagesState([
       ...commonPages,
-      // for fallbacks
+      // フォールバック用
       `/dev-404-page/`,
       `/404.html`,
     ])
@@ -210,7 +210,7 @@ describe(`findPageByPath`, () => {
     it(`Will return 404 page if requested not found (will fallback to /404.html)`, () => {
       const stateWith404HtmlPage = generatePagesState([
         ...commonPages,
-        // for fallbacks (no /dev-404-page/)
+        // フォールバック用（/dev-404-page/ なし）
         `/404.html`,
       ])
 

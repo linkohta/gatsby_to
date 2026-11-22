@@ -12,7 +12,7 @@ jest.mock(`gatsby-core-utils`, () => {
 describe(`satisfies semver`, () => {
   it(`returns false if a module doesn't exist`, () => {
     const semverConstraints = {
-      // Because of this, this flag will never show up
+      // このため、このフラグは決して表示されない
       "gatsby-plugin-sharpy": `>=2.10.0`,
     }
     expect(satisfiesSemvers(semverConstraints)).toBeFalsy()
@@ -102,7 +102,7 @@ describe(`handle flags`, () => {
       umbrellaIssue: `test`,
       testFitness: (flag): fitnessEnum => {
         const semver = {
-          // Because of this, this flag will never show up
+          // このため、このフラグは決して表示されない
           lodash: `<=3.9`,
         }
         if (satisfiesSemvers(semver)) {
@@ -122,7 +122,7 @@ describe(`handle flags`, () => {
       experimental: false,
       testFitness: (flag): fitnessEnum => {
         const semver = {
-          // Because of this, this flag will never show up
+          // このため、このフラグは決して表示されない
           lodash: `>=4.9`,
         }
         if (satisfiesSemvers(semver)) {
@@ -209,7 +209,7 @@ describe(`handle flags`, () => {
   })
 
   it(`opts in sites to a flag if their site is selected for partial release`, () => {
-    // Nothing is enabled in their config.
+    // config では何も有効にされていない。
     const response = handleFlags(activeFlags, {}, `develop`)
     expect(response).toMatchSnapshot()
   })
@@ -237,7 +237,7 @@ describe(`handle flags`, () => {
       `develop`
     )
 
-    // it currently just silently disables it
+    // 現状では、黙って無効にするだけである
     expect(response).toMatchInlineSnapshot(`
       Object {
         "enabledConfigFlags": Array [],
@@ -260,7 +260,7 @@ describe(`handle flags`, () => {
           umbrellaIssue: `test`,
           telemetryId: `test`,
           experimental: false,
-          // this will always OPT IN
+          // これは常に OPT IN になる
           testFitness: (): fitnessEnum => `OPT_IN`,
         },
       ]),
@@ -299,7 +299,7 @@ describe(`handle flags`, () => {
             umbrellaIssue: `test`,
             telemetryId: `test`,
             experimental: false,
-            // this will always LOCKED IN
+            // これは常に LOCKED IN になる
             testFitness: (): fitnessEnum => `LOCKED_IN`,
           },
         ],
@@ -324,12 +324,12 @@ describe(`handle flags`, () => {
             umbrellaIssue: `test`,
             telemetryId: `test`,
             experimental: false,
-            // this will always LOCKED IN
+            // これは常に LOCKED IN になる
             testFitness: (): fitnessEnum => `LOCKED_IN`,
           },
         ],
         {
-          // this has no effect, but we want to show to user that
+          // これは何の効果もないが、そのことをユーザーに示したい
           ALWAYS_LOCKED_IN_SET_IN_CONFIG: true,
         },
         `develop`
@@ -357,7 +357,7 @@ describe(`handle flags`, () => {
             umbrellaIssue: `test`,
             telemetryId: `test`,
             experimental: false,
-            // this will always LOCKED IN
+            // これは常に LOCKED IN になる
             testFitness: (): fitnessEnum => `LOCKED_IN`,
           },
           {
@@ -372,7 +372,7 @@ describe(`handle flags`, () => {
           },
         ],
         {
-          // this has no effect, but we want to show to user that
+          // これは何の効果もないが、そのことをユーザーに示したい
           SOME_FLAG: true,
         },
         `build`
@@ -412,7 +412,7 @@ describe(`handle flags`, () => {
             umbrellaIssue: `test`,
             telemetryId: `test`,
             experimental: false,
-            // this will always LOCKED IN
+            // これは常に LOCKED IN になる
             testFitness: (): fitnessEnum => `LOCKED_IN`,
           },
           {
@@ -423,7 +423,7 @@ describe(`handle flags`, () => {
             umbrellaIssue: `test`,
             telemetryId: `test`,
             experimental: false,
-            // this will always LOCKED IN
+            // これは常に LOCKED IN になる
             testFitness: (): fitnessEnum => `LOCKED_IN`,
           },
         ]),
@@ -432,17 +432,17 @@ describe(`handle flags`, () => {
           DEV_SSR: true,
           PARTIAL_RELEASE: false,
           PARTIAL_RELEASE_ONLY_NEW_LODASH: false,
-          // this has no effect, but we want to show to user that
+          // これは何の効果もないが、そのことをユーザーに示したい
           ALWAYS_LOCKED_IN_SET_IN_CONFIG: true,
         },
         `develop`
       )
 
-      // this is enabled, but because it's not configurable anymore and user doesn't set it explicitly in config - there is no point in printing information about it
+      // これは有効だが、もう設定できず、ユーザーも config で明示的に設定していないので、これについての情報を出力する意味はない
       expect(response.enabledConfigFlags).toContainEqual(
         expect.objectContaining({ name: `ALWAYS_LOCKED_IN` })
       )
-      // this is enabled, but because it's not configurable anymore and user sets it in config - we want to mention that this config flag has no effect anymore
+      // これは有効だが、もう設定できないのにユーザーが config で設定しているので、この config のフラグにはもう効果がないことを伝えたい
       expect(response.enabledConfigFlags).toContainEqual(
         expect.objectContaining({ name: `ALWAYS_LOCKED_IN_SET_IN_CONFIG` })
       )

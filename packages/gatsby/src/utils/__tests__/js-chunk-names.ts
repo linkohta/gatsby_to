@@ -74,7 +74,7 @@ describe(`js-chunk-names`, () => {
       expect(shortenedChunkName).toMatchInlineSnapshot(
         `"component---src-components-page-tsx-content-file-path-src-pages-about-md"`
       )
-      // ensure we don't leak absolute path to where site is located in fs
+      // サイトがファイルシステム上のどこにあるかを示す絶対パスが漏れないことを確認する
       expect(shortenedChunkName).not.toMatch(`private`)
     })
 
@@ -86,7 +86,7 @@ describe(`js-chunk-names`, () => {
       expect(shortenedChunkName).toMatchInlineSnapshot(
         `"component---src-components-page-tsx-content-file-path-src-pages-about-md-foo-bar"`
       )
-      // ensure we don't leak absolute path to where site is located in fs
+      // サイトがファイルシステム上のどこにあるかを示す絶対パスが漏れないことを確認する
       expect(shortenedChunkName).not.toMatch(`private`)
     })
   })

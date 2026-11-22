@@ -95,8 +95,8 @@ describe(`api-runner-node`, () => {
     await apiRunnerNode(`testAPIHook`)
 
     expect(start).toBeCalledTimes(6)
-    // we called end same amount of times we called start, even tho plugins
-    // didn't call end/done themselves
+    // プラグイン自身が end/done を呼ばなくても、start を呼んだのと
+    // 同じ回数だけ end を呼んでいる
     expect(end).toBeCalledTimes(6)
   })
 
@@ -130,7 +130,7 @@ describe(`api-runner-node`, () => {
       },
     })
 
-    // Make sure getCache is called on other APIs:
+    // 他の API でも getCache が呼ばれることを確認する:
     await apiRunnerNode(`otherTestApi`)
     expect(getCache).toHaveBeenCalled()
   })

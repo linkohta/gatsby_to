@@ -19,7 +19,7 @@ jest.mock(`fs-extra`, () => {
   }
 })
 
-// we mock it to make tests faster
+// テストを速くするためにモックする
 jest.mock(`gatsby-cli/lib/reporter`, () => {
   return {}
 })
@@ -105,7 +105,7 @@ describe(`websocket-manager`, () => {
   }
 
   /**
-   * This is helper waiting for disconnect to be handled by server as well
+   * これは、サーバー側でも切断が処理されるのを待つヘルパーである
    */
   async function disconnectClientSocket(
     clientSocket: typeof io.Socket
@@ -230,7 +230,7 @@ describe(`websocket-manager`, () => {
         clientSocket.emit(`registerPath`, `/`)
         await activePathAdjustedPromise
 
-        // disconnect remaining session (mostly to make sure other tests are not affected)
+        // 残りのセッションを切断する（主に、他のテストに影響しないようにするため）
         activePathAdjustedPromise = waitUntil(done => {
           if (websocketManager.activePaths.size === 0) {
             expect(websocketManager.activePaths).toEqual(new Set())
@@ -267,7 +267,7 @@ describe(`websocket-manager`, () => {
         await activePathAdjustedPromise
 
         activePathAdjustedPromise = waitUntil(done => {
-          // we should have 2 sessions looking at single page
+          // 1 つのページを見ているセッションが 2 つあるはずである
           if (websocketManager.activePaths.size === 1) {
             expect(Array.from(websocketManager.activePaths).sort()).toEqual([
               `/blog/`,
@@ -280,16 +280,16 @@ describe(`websocket-manager`, () => {
         clientSocket1.emit(`registerPath`, `/blog/`)
         await activePathAdjustedPromise
 
-        // we should have 2 sessions looking at single page, let's disconnect one
-        // and make sure that page is still considered active
+        // 1 つのページを見ているセッションが 2 つあるはずである。一方を切断して、
+        // そのページが引き続きアクティブと見なされることを確認する
         await disconnectClientSocket(clientSocket2)
 
         expect(websocketManager.activePaths).toEqual(new Set([`/blog/`]))
 
-        // change active path and make sure activePath is tracking that correctly
-        // and doesn't keep old one
+        // アクティブなパスを変更し、activePath がそれを正しく追跡していて、
+        // 古いパスを保持していないことを確認する
         activePathAdjustedPromise = waitUntil(done => {
-          // we should have 2 sessions looking at single page
+          // 1 つのページを見ているセッションが 2 つあるはずである
           if (websocketManager.activePaths.has(`/`)) {
             expect(websocketManager.activePaths).toEqual(new Set([`/`]))
             done()
@@ -297,7 +297,7 @@ describe(`websocket-manager`, () => {
         })
         clientSocket1.emit(`registerPath`, `/`)
 
-        // disconnect remaining session (mostly to make sure other tests are not affected)
+        // 残りのセッションを切断する（主に、他のテストに影響しないようにするため）
         await disconnectClientSocket(clientSocket1)
       },
       TEST_TIMEOUT
@@ -546,7 +546,7 @@ describe(`websocket-manager`, () => {
 
           await receivedDataOnClientPromise
 
-          // disconnect remaining session (mostly to make sure other tests are not affected)
+          // 残りのセッションを切断する（主に、他のテストに影響しないようにするため）
           await disconnectClientSocket(clientSocket)
         },
         TEST_TIMEOUT
@@ -587,7 +587,7 @@ describe(`websocket-manager`, () => {
 
           await receivedDataOnClientPromise
 
-          // disconnect remaining session (mostly to make sure other tests are not affected)
+          // 残りのセッションを切断する（主に、他のテストに影響しないようにするため）
           await disconnectClientSocket(clientSocket)
         },
         TEST_TIMEOUT
@@ -637,7 +637,7 @@ describe(`websocket-manager`, () => {
       }
 
       clientSocket.on(`message`, handler)
-      // we don't emit error here, instead rely on error we emitted in previous test
+      // ここではエラーを発行せず、前のテストで発行したエラーに頼る
     })
 
     itAsyncDone(

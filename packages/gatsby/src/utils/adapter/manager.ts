@@ -65,12 +65,12 @@ async function setAdapter({
   })
 
   if (instance) {
-    // if adapter reports that it doesn't support certain features, we need to fail the build
-    // to avoid broken deploys
+    // アダプターが特定の機能に対応していないと報告した場合は、壊れたデプロイを
+    // 避けるために、ビルドを失敗させる必要がある
 
     const incompatibleFeatures: Array<string> = []
 
-    // pathPrefix support
+    // pathPrefix への対応
     if (
       configFromAdapter?.supports?.pathPrefix === false &&
       store.getState().program.prefixPaths &&
@@ -79,7 +79,7 @@ async function setAdapter({
       incompatibleFeatures.push(`pathPrefix is not supported.`)
     }
 
-    // trailingSlash support
+    // trailingSlash への対応
     if (configFromAdapter?.supports?.trailingSlash) {
       const { trailingSlash } = store.getState().config
 
@@ -126,7 +126,7 @@ export async function initAdapterManager(): Promise<IAdapterManager> {
   const config = store.getState().config
   const { adapter: adapterFromGatsbyConfig, trailingSlash, pathPrefix } = config
 
-  // If the user specified an adapter inside their gatsby-config, use that instead of trying to figure out an adapter for the current environment
+  // ユーザーが gatsby-config の中でアダプターを指定している場合は、現在の環境に合うアダプターを探す代わりに、それを使う
   if (adapterFromGatsbyConfig) {
     adapter = adapterFromGatsbyConfig
 
@@ -134,7 +134,7 @@ export async function initAdapterManager(): Promise<IAdapterManager> {
   } else {
     const adapterInit = await getAdapterInit()
 
-    // If we don't have adapter, use no-op adapter manager
+    // アダプターがない場合は、何もしないアダプターマネージャーを使う
     if (!adapterInit) {
       const manager = noOpAdapterManager()
 
@@ -160,14 +160,14 @@ export async function initAdapterManager(): Promise<IAdapterManager> {
         reporter,
       })
       if (result === false) {
-        // if adapter reports `false`, we can skip trying to re-hydrate state
+        // アダプターが `false` を報告した場合は、状態の復元を試みるのをスキップできる
         return
       }
 
       const cachedState = readState()
 
-      // readState() returns empty object if there is no cached state or it's corrupted etc
-      // so we want to avoid dispatching RESTORE_CACHE action in that case
+      // readState() は、キャッシュされた状態がない場合や壊れている場合などに、空のオブジェクトを返す
+      // そのため、その場合は RESTORE_CACHE アクションを dispatch しないようにしたい
       if (Object.keys(cachedState).length > 0) {
         store.dispatch({
           type: `RESTORE_CACHE`,
@@ -187,13 +187,13 @@ export async function initAdapterManager(): Promise<IAdapterManager> {
         return
       }
 
-      // handle lmdb file
+      // lmdb ファイルを処理する
       const mdbInPublicPath = `public/${getLmdbOnCdnPath()}`
       if (!shouldBundleDatastore()) {
         const mdbPath = getDefaultDbPath() + `/data.mdb`
         copy(mdbPath, mdbInPublicPath)
       } else {
-        // ensure public dir doesn't have lmdb file
+        // public ディレクトリに lmdb ファイルがないようにする
         if (await pathExists(mdbInPublicPath)) {
           await unlink(mdbInPublicPath)
         }
@@ -244,7 +244,7 @@ export async function initAdapterManager(): Promise<IAdapterManager> {
           return _imageCdnAllowedUrls
         },
         reporter,
-        // Our internal Gatsby config allows this to be undefined but for the adapter we should always pass through the default values and correctly show this in the TypeScript types
+        // Gatsby の内部の config ではこれが undefined でもよいが、アダプターには常にデフォルト値を渡し、TypeScript の型でもそれを正しく示すべきである
         trailingSlash: trailingSlash as TrailingSlash,
         pathPrefix: pathPrefix as string,
       }
@@ -353,7 +353,7 @@ function getRoutesManifest(): {
     }).map(filePath => slash(filePath))
   )
 
-  // TODO: This could be a "addSortedRoute" function that would add route to the list in sorted order. TBD if necessary performance-wise
+  // TODO: これは、ソートされた順序を保ってルートを一覧に追加する "addSortedRoute" 関数にできるかもしれない。パフォーマンス上必要かどうかは未定
   function addRoute(route: Route): void {
     if (
       !(route.path.startsWith(`https://`) || route.path.startsWith(`http://`))
@@ -367,7 +367,7 @@ function getRoutesManifest(): {
       }
     }
 
-    // Apply trailing slash behavior unless it's a redirect. Redirects should always be exact matches
+    // リダイレクトでない限り、末尾のスラッシュの動作を適用する。リダイレクトは常に完全一致であるべきである
     if (route.type !== `redirect`) {
       route.path = applyTrailingSlashOption(
         route.path,
@@ -418,7 +418,7 @@ function getRoutesManifest(): {
     }
   }
 
-  // routes - pages - static (SSG) or function (DSG/SSR)
+  // ルート - ページ - 静的（SSG）または関数（DSG/SSR）
   for (const page of state.pages.values()) {
     const htmlRoutePath = slash(getRoutePathFromPage(page))
     const pageDataRoutePath = slash(generatePageDataPath(``, htmlRoutePath))
@@ -461,7 +461,7 @@ function getRoutesManifest(): {
     }
   }
 
-  // static query json assets
+  // 静的クエリの json アセット
   for (const staticQueryComponent of state.staticQueryComponents.values()) {
     const staticQueryResultPath = getStaticQueryPath(staticQueryComponent.hash)
     addStaticRoute({
@@ -481,7 +481,7 @@ function getRoutesManifest(): {
     })
   }
 
-  // webpack assets
+  // webpack のアセット
   if (!webpackAssets) {
     reporter.panic({
       id: `12200`,
@@ -552,7 +552,7 @@ function getRoutesManifest(): {
     addSliceHtmlRoute(name, hasChildren)
   }
 
-  // redirect routes
+  // リダイレクトのルート
   for (const redirect of state.redirects.values()) {
     const {
       fromPath,
@@ -579,7 +579,7 @@ function getRoutesManifest(): {
     })
   }
 
-  // function routes
+  // 関数のルート
   for (const functionInfo of state.functions.values()) {
     addRoute({
       path: `/api/${getRoutePathFromFunction(functionInfo)}`,
@@ -589,11 +589,11 @@ function getRoutesManifest(): {
   }
 
   for (const fileAsset of fileAssets) {
-    // try to classify remaining assets
+    // 残りのアセットの分類を試みる
     let headers: IHeader["headers"] | undefined = undefined
 
     if (fileAsset.startsWith(`~partytown`)) {
-      // no hashes, must revalidate
+      // ハッシュがないので、再検証が必要である
       headers = MUST_REVALIDATE_HEADERS
     } else if (
       fileAsset.startsWith(`_gatsby/image`) ||
@@ -615,17 +615,17 @@ function getRoutesManifest(): {
 
   const sortedRoutes = routes
     .sort((a, b) => {
-      // The higher the score, the higher the specificity of our path
+      // スコアが高いほど、パスの具体性が高い
       const order = b.score - a.score
       if (order !== 0) {
         return order
       }
 
-      // if specificity is the same we do lexigraphic comparison of path to ensure
-      // deterministic order regardless of order pages where created
+      // 具体性が同じ場合は、ページが作成された順序にかかわらず決定的な順序に
+      // なるように、パスを辞書順で比較する
       return a.path.localeCompare(b.path)
     })
-    // The score should be internal only, so we remove it from the final manifest
+    // スコアは内部専用であるべきなので、最終的なマニフェストからは取り除く
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .map(({ score, ...rest }): Route => {
       return { ...rest }

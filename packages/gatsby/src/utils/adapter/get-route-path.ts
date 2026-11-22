@@ -7,7 +7,7 @@ function maybeDropNamedPartOfWildcard(
     return path
   }
 
-  // Replaces `/foo/*bar` with `/foo/*`
+  // `/foo/*bar` を `/foo/*` に置き換える
   return path.replace(/\*.+$/, `*`)
 }
 

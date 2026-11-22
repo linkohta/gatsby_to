@@ -130,7 +130,7 @@ describe(`query-running state machine`, () => {
       }> => {
         waitForExecutionOfCalcDirtyQueries.resolve()
 
-        // allow test to execute some code before resuming service
+        // サービスを再開する前に、テストがコードを実行できるようにする
 
         await deferred.promise
 
@@ -158,8 +158,8 @@ describe(`query-running state machine`, () => {
 
     await waitForExecutionOfCalcDirtyQueries.promise
 
-    // we are in middle of execution of calcDirtyQueries service
-    // let's dispatch QUERY_RUN_REQUESTED for page /foo/
+    // calcDirtyQueries サービスの実行の途中である
+    // ページ /foo/ に対して QUERY_RUN_REQUESTED を dispatch する
     service.send({
       type: `QUERY_RUN_REQUESTED`,
       payload: {
@@ -169,12 +169,12 @@ describe(`query-running state machine`, () => {
 
     deferred.resolve()
 
-    // let state machine reach final state
+    // ステートマシンを最終状態まで進める
     await finished(service)
 
-    // let's make sure that we called calculateDirtyQueries service
-    // with every page that was requested, even if page was requested
-    // while we were executing calcDirtyQueries service
+    // calcDirtyQueries サービスの実行中にリクエストされたページも含めて、
+    // リクエストされたすべてのページを渡して calculateDirtyQueries サービスが
+    // 呼ばれたことを確認する
     expect(services.calculateDirtyQueries).toHaveBeenCalledWith(
       expect.objectContaining({
         currentlyHandledPendingQueryRuns: expect.toHaveInSet(`/`),

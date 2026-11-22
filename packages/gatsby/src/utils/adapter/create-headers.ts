@@ -7,7 +7,7 @@ interface IHeaderWithScore extends IHeader {
   score: number
 }
 
-// We don't care if the path has a trailing slash or not, but to be able to compare stuff we need to normalize it
+// パスの末尾にスラッシュがあるかどうかは問わないが、比較できるようにするために正規化する必要がある
 const normalizePath = (input: string): string =>
   input.endsWith(`/`) ? input : `${input}/`
 
@@ -23,14 +23,14 @@ export const createHeadersMatcher = (
     return path
   }
 
-  // Split the incoming user headers into two buckets:
-  // - dynamicHeaders: Headers with dynamic paths (e.g. /* or /:tests)
-  // - staticHeaders: Headers with fully static paths (e.g. /static/)
-  // Also add a score using the rankRoute function to each header
+  // ユーザーから渡されたヘッダーを 2 つのグループに分ける:
+  // - dynamicHeaders: 動的なパスを持つヘッダー（例: /* や /:tests）
+  // - staticHeaders: 完全に静的なパスを持つヘッダー（例: /static/）
+  // あわせて、rankRoute 関数を使ってそれぞれのヘッダーにスコアを付ける
   let dynamicHeaders: Array<IHeaderWithScore> = []
   const staticHeaders: Map<string, IHeader> = new Map()
 
-  // If no custom headers are defined by the user in the gatsby-config, we can return only the default headers
+  // ユーザーが gatsby-config で独自のヘッダーを定義していない場合は、デフォルトのヘッダーだけを返せばよい
   if (!headers || headers.length === 0) {
     return (_path: string, defaultHeaders: Headers) => defaultHeaders
   }
@@ -38,7 +38,7 @@ export const createHeadersMatcher = (
   for (const header of headers) {
     const source = stripPathPrefix(header.source)
     if (source.includes(`:`) || source.includes(`*`)) {
-      // rankRoute is the internal function that also "match" uses
+      // rankRoute は、"match" も使っている内部関数である
       const score = rankRoute(source)
 
       dynamicHeaders.push({
@@ -54,8 +54,8 @@ export const createHeadersMatcher = (
     }
   }
 
-  // Sort the dynamic headers by score, moving the ones with the highest specificity to the end of the array
-  // If the score is the same, do a lexigraphic comparison of the source
+  // 動的なヘッダーをスコアでソートし、最も具体的なものを配列の末尾へ移す
+  // スコアが同じ場合は、source を辞書順で比較する
   dynamicHeaders = dynamicHeaders.sort((a, b) => {
     const order = a.score - b.score
     if (order !== 0) {
@@ -67,16 +67,16 @@ export const createHeadersMatcher = (
   return (path: string, defaultHeaders: Headers): Headers => {
     path = stripPathPrefix(path)
 
-    // Create a map of headers for the given path
-    // The key will be the header key. Since a key may only appear once in a map, the last header with the same key will win
+    // 指定されたパスのヘッダーのマップを作成する
+    // キーはヘッダーのキーになる。マップではキーは一度しか現れないので、同じキーを持つヘッダーのうち最後のものが優先される
     const uniqueHeaders: Map<string, string> = new Map()
 
-    // 1. Add default headers
+    // 1. デフォルトのヘッダーを追加する
     for (const h of defaultHeaders) {
       uniqueHeaders.set(h.key, h.value)
     }
 
-    // 2. Add dynamic headers that match the current path
+    // 2. 現在のパスに一致する動的なヘッダーを追加する
     for (const d of dynamicHeaders) {
       if (match(d.source, path)) {
         for (const h of d.headers) {
@@ -87,14 +87,14 @@ export const createHeadersMatcher = (
 
     const staticEntry = staticHeaders.get(normalizePath(path))
 
-    // 3. Add static headers that match the current path
+    // 3. 現在のパスに一致する静的なヘッダーを追加する
     if (staticEntry) {
       for (const h of staticEntry.headers) {
         uniqueHeaders.set(h.key, h.value)
       }
     }
 
-    // Convert the map back to an array of objects
+    // マップをオブジェクトの配列に戻す
     return Array.from(uniqueHeaders.entries()).map(([key, value]) => {
       return {
         key,

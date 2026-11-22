@@ -21,8 +21,8 @@ import {
 } from "../../utils/graphql-typegen/file-writes"
 import { writeTypeScriptTypes } from "../../utils/graphql-typegen/ts-codegen"
 /**
- * Handler for when we're inside handlers that should be able to mutate nodes
- * Instead of queueing, we call it right away
+ * ノードを変更できるべきハンドラーの中にいる場合のハンドラー
+ * キューに入れずに、すぐに呼び出す
  */
 export const callApi: ActionFunction<IBuildContext, AnyEventObject> = (
   { store },
@@ -30,12 +30,12 @@ export const callApi: ActionFunction<IBuildContext, AnyEventObject> = (
 ) => callRealApi(event.payload, store)
 
 /**
- * Event handler used in all states where we're not ready to process node
- * mutations. Instead we add it to a batch to process when we're next idle
+ * ノードの変更を処理する準備ができていないすべての状態で使うイベント
+ * ハンドラー。処理する代わりにバッチに追加し、次にアイドルになったときに処理する
  */
 export const addNodeMutation = assign<IBuildContext, AnyEventObject>({
   nodeMutationBatch: ({ nodeMutationBatch = [] }, { payload }) => {
-    // It's not pretty, but it's much quicker than concat
+    // きれいではないが、concat よりずっと速い
     nodeMutationBatch.push(payload)
     return nodeMutationBatch
   },
@@ -115,7 +115,7 @@ export const assignServiceResult = assign<IBuildContext, DoneEventObject>(
 )
 
 /**
- * This spawns the service that listens to the `emitter` for various mutation events
+ * さまざまな変更イベントを `emitter` で監視するサービスを起動する
  */
 export const spawnMutationListener = assign<IBuildContext>({
   // @ts-ignore - TODO: Fixing this seems more involved: https://xstate.js.org/docs/guides/typescript.html#troubleshooting & https://github.com/statelyai/xstate/issues/2664
