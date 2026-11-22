@@ -3,12 +3,12 @@ import { hasFeature } from "gatsby-plugin-utils/index"
 import { getDataStore } from "gatsby/dist/datastore"
 import { untilNextEventLoopTick } from "./utils"
 
-// Array of all existing Contentful nodes. Make it global and incrementally update it because it's hella slow to recreate this on every data update for large sites.
+// 既存の Contentful ノードすべての配列。大規模なサイトではデータ更新のたびに作り直すと非常に遅いので、グローバルにして差分で更新する。
 export const existingNodes = new Map()
 
 let allNodesLoopCount = 0
 
-// "is" === object so it can be overridden by tests
+// "is" === object。テストで上書きできるようにするため
 export const is = {
   firstSourceNodesCallOfCurrentNodeProcess: true,
 }
@@ -48,7 +48,7 @@ export async function getExistingCachedNodes({
           touchNode(node)
 
           if (node?.fields?.includes(`localFile`)) {
-            // Prevent GraphQL type inference from crashing on this property
+            // GraphQL の型推論がこのプロパティでクラッシュしないようにする
             const fullNode = getNode(node.id)
             const localFileNode = getNode(fullNode.fields.localFile)
             touchNode(localFileNode)
@@ -56,14 +56,14 @@ export async function getExistingCachedNodes({
         }
 
         if (++allNodesLoopCount % 5000 === 0) {
-          // dont block the event loop
+          // イベントループをブロックしない
           await untilNextEventLoopTick()
         }
 
         addNodeToExistingNodesCache(node)
       }
 
-      // dont block the event loop
+      // イベントループをブロックしない
       await untilNextEventLoopTick()
     }
   }
@@ -81,7 +81,7 @@ const memoryNodeCountsBySysType = {
   Entry: 0,
 }
 
-// store only the fields we need to compare to reduce memory usage. if a node is updated we'll use getNode to grab the whole node before updating it
+// メモリ使用量を減らすため、比較に必要なフィールドだけを保存する。ノードが更新される場合は、更新の前に getNode でノード全体を取得する
 export function addNodeToExistingNodesCache(node) {
   if (node.internal.type === `ContentfulTag`) {
     return

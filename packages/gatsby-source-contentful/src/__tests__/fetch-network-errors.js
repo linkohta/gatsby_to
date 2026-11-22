@@ -50,13 +50,13 @@ describe(`fetch-retry`, () => {
 
   test(`request retries when network timeout happens`, async () => {
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .reply(200, { items: [] })
-      // Locales
+      // ロケール
       .get(`/spaces/${options.spaceId}/environments/master/locales`)
       .reply(200, { items: [{ code: `en`, default: true }] })
-      // Sync
+      // 同期
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )
@@ -74,17 +74,17 @@ describe(`fetch-retry`, () => {
   })
 
   test(`request should fail after to many retries`, async () => {
-    // Due to the retries, this can take up to 10 seconds
+    // リトライがあるため、最大で 10 秒かかることがある
     jest.setTimeout(10000)
 
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .reply(200, { items: [] })
-      // Locales
+      // ロケール
       .get(`/spaces/${options.spaceId}/environments/master/locales`)
       .reply(200, { items: [{ code: `en`, default: true }] })
-      // Sync
+      // 同期
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )
@@ -122,7 +122,7 @@ describe(`fetch-retry`, () => {
 describe(`fetch-network-errors`, () => {
   test(`catches plain network error`, async () => {
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .replyWithError({ code: `ECONNRESET` })
     try {
@@ -149,7 +149,7 @@ describe(`fetch-network-errors`, () => {
 
   test(`catches error with response object`, async () => {
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .reply(429, {
         sys: {

@@ -62,7 +62,7 @@ jest.mock(`../plugin-options`, () => {
   }
 })
 
-// jest so test output is not filled with contentful plugin logs
+// テストの出力が contentful プラグインのログで埋まらないようにする
 // @ts-ignore
 global.console = { log: jest.fn(), time: jest.fn(), timeEnd: jest.fn() }
 

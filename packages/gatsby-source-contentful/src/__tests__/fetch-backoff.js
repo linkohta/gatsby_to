@@ -52,13 +52,13 @@ describe(`fetch-backoff`, () => {
   test(`backoffs page limit when limit is reached`, async () => {
     jest.setTimeout(30000)
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .reply(200, { items: [] })
-      // Locales
+      // ロケール
       .get(`/spaces/${options.spaceId}/environments/master/locales`)
       .reply(200, { items: [{ code: `en`, default: true }] })
-      // Sync with 1000 (to much)
+      // 1000 件で同期（多すぎる）
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )
@@ -68,7 +68,7 @@ describe(`fetch-backoff`, () => {
         message: `Response size too big. Maximum allowed response size: 512000B.`,
         requestId: `12345`,
       })
-      // Sync with 666 (still to much)
+      // 666 件で同期（まだ多すぎる）
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=666`
       )
@@ -78,7 +78,7 @@ describe(`fetch-backoff`, () => {
         message: `Response size too big. Maximum allowed response size: 512000B.`,
         requestId: `12345`,
       })
-      // Sync with 444
+      // 444 件で同期
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=444`
       )
@@ -109,13 +109,13 @@ describe(`fetch-backoff`, () => {
   test(`does not backoff page limit when limit is not reached`, async () => {
     jest.setTimeout(30000)
     const scope = nock(baseURI)
-      // Space
+      // スペース
       .get(`/spaces/${options.spaceId}/`)
       .reply(200, { items: [] })
-      // Locales
+      // ロケール
       .get(`/spaces/${options.spaceId}/environments/master/locales`)
       .reply(200, { items: [{ code: `en`, default: true }] })
-      // Sync with 1000 (no limit exceeded)
+      // 1000 件で同期（上限を超えない）
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )

@@ -10,24 +10,24 @@ import {
   CONTENTFUL_IMAGE_MAX_SIZE,
 } from "./image-helpers"
 
-// Promises that rejected should stay in this map. Otherwise remove promise and put their data in resolvedBase64Cache
+// reject された Promise はこのマップに残す。それ以外は Promise を取り除き、そのデータを resolvedBase64Cache に入れる
 const inFlightBase64Cache = new Map()
-// This cache contains the resolved base64 fetches. This prevents async calls for promises that have resolved.
-// The images are based on urls with w=20 and should be relatively small (<2kb) but it does stick around in memory
+// このキャッシュには、解決済みの base64 の取得結果が入る。解決済みの Promise に対する非同期呼び出しを防ぐためである。
+// 画像は w=20 の URL に基づくもので比較的小さい（2kb 未満）はずだが、メモリには残り続ける
 const resolvedBase64Cache = new Map()
 
-// Note: this may return a Promise<body>, body (sync), or null
+// Note: これは Promise<body>、body（同期）、null のいずれかを返すことがある
 const getBase64Image = (imageProps, cache) => {
   if (!imageProps) {
     return null
   }
 
-  // We only support images that are delivered through Contentful's Image API
+  // Contentful の Image API で配信される画像にだけ対応している
   if (imageProps.baseUrl.indexOf(`images.ctfassets.net`) === -1) {
     return null
   }
 
-  // Keep aspect ratio, image format and other transform options
+  // アスペクト比、画像フォーマット、その他の変換オプションを維持する
   const { aspectRatio } = imageProps
   const originalFormat = imageProps.image.file.contentType.split(`/`)[1]
   const toFormat = imageProps.options.toFormat
@@ -40,13 +40,13 @@ const getBase64Image = (imageProps, cache) => {
 
   const requestUrl = createUrl(imageProps.baseUrl, imageOptions)
 
-  // Prefer to return data sync if we already have it
+  // データがすでにあれば、同期的に返すことを優先する
   const alreadyFetched = resolvedBase64Cache.get(requestUrl)
   if (alreadyFetched) {
     return alreadyFetched
   }
 
-  // If already in flight for this url return the same promise as the first call
+  // この URL の取得がすでに進行中であれば、最初の呼び出しと同じ Promise を返す
   const inFlight = inFlightBase64Cache.get(requestUrl)
   if (inFlight) {
     return inFlight
@@ -137,7 +137,7 @@ const getDominantColor = async ({ image, options, cache }) => {
       return null
     }
 
-    // 256px should be enough to properly detect the dominant color
+    // ドミナントカラーを正しく検出するには 256px で十分なはずである
     if (!options.width) {
       options.width = 256
     }
@@ -190,13 +190,13 @@ function getBasicImageProps(image, args) {
   }
 }
 
-// Generate image source data for gatsby-plugin-image
+// gatsby-plugin-image 用の画像ソースデータを生成する
 export function generateImageSource(
   filename,
   width,
   height,
   toFormat,
-  _fit, // We use resizingBehavior instead
+  _fit, // 代わりに resizingBehavior を使う
   imageTransformOptions
 ) {
   const imageFormatDefaults = imageTransformOptions[`${toFormat}Options`]
@@ -220,7 +220,7 @@ export function generateImageSource(
     resizingBehavior,
     cornerRadius,
   } = imageTransformOptions
-  // Ensure we stay within Contentfuls Image API limits
+  // Contentful の Image API の上限に収まるようにする
   if (width > CONTENTFUL_IMAGE_MAX_SIZE) {
     height = Math.floor((height / width) * CONTENTFUL_IMAGE_MAX_SIZE)
     width = CONTENTFUL_IMAGE_MAX_SIZE
@@ -306,7 +306,7 @@ export async function resolveGatsbyImageData(
     format = `jpg`
   }
 
-  // Translate Contentful resize parameter to gatsby-plugin-image css object fit
+  // Contentful の resize パラメーターを gatsby-plugin-image の CSS の object-fit に変換する
   const fitMap = new Map([
     [`pad`, `contain`],
     [`fill`, `cover`],

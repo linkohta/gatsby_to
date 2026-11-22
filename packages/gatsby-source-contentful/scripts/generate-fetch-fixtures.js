@@ -1,4 +1,4 @@
-// Helper script to generate the test fixtures for the contentfulFetch call
+// contentfulFetch 呼び出しのテストフィクスチャを生成するための補助スクリプト
 
 import { writeFileSync } from "fs"
 import { resolve } from "path"
