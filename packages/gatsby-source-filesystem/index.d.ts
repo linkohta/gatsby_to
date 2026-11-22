@@ -66,7 +66,7 @@ export interface FileSystemNode extends Node {
   relativePath: string
   sourceInstanceName: string
 
-  // parsed path typings
+  // 解析済みパスの型定義
   base: string
   dir: string
   ext: string
@@ -77,11 +77,11 @@ export interface FileSystemNode extends Node {
   atime: Date
   atimeMs: number
   /**
-   * @deprecated Use `birthTime` instead
+   * @deprecated 代わりに `birthTime` を使うこと
    */
   birthtime: Date
   /**
-   * @deprecated Use `birthTime` instead
+   * @deprecated 代わりに `birthTime` を使うこと
    */
   birthtimeMs: number
   ctime: Date

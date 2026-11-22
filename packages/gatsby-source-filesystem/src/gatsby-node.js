@@ -13,7 +13,7 @@ exports.onPreInit = ({ reporter }) => {
 }
 
 /**
- * Create a state machine to manage Chokidar's not-ready/ready states.
+ * Chokidar の not-ready/ready の状態を管理するステートマシンを作成する。
  */
 const createFSMachine = (
   {
@@ -40,16 +40,16 @@ const createFSMachine = (
 
   const deletePathNode = path => {
     const node = getNode(createNodeId(path))
-    // It's possible the node was never created as sometimes tools will
-    // write and then immediately delete temporary files to the file system.
+    // ツールによっては、一時ファイルをファイルシステムに書き込んですぐに削除することがあるので、
+    // ノードが一度も作成されていない可能性がある。
     if (node) {
       deleteNode(node)
     }
   }
 
-  // For every path that is reported before the 'ready' event, we throw them
-  // into a queue and then flush the queue when 'ready' event arrives.
-  // After 'ready', we handle the 'add' event without putting it into a queue.
+  // 'ready' イベントの前に報告されたパスはすべてキューに入れておき、
+  // 'ready' イベントが届いたときにキューを処理する。
+  // 'ready' の後は、'add' イベントをキューに入れずに処理する。
   let pathQueue = []
   const flushPathQueue = () => {
     const queue = pathQueue.slice()
@@ -178,7 +178,7 @@ exports.pluginOptionsSchema = ({ Joi }) =>
   })
 
 exports.sourceNodes = (api, pluginOptions) => {
-  // Validate that the path exists.
+  // パスが存在することを検証する。
   if (!fs.existsSync(pluginOptions.path)) {
     api.reporter.panic(`
 The path passed to gatsby-source-filesystem does not exist on your file system:
@@ -188,16 +188,16 @@ See docs here - https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/
       `)
   }
 
-  // Validate that the path is absolute.
-  // Absolute paths are required to resolve images correctly.
+  // パスが絶対パスであることを検証する。
+  // 画像を正しく解決するには絶対パスが必要である。
   if (!path.isAbsolute(pluginOptions.path)) {
     pluginOptions.path = path.resolve(process.cwd(), pluginOptions.path)
   }
 
   const fsMachine = createFSMachine(api, pluginOptions)
 
-  // Once bootstrap is finished, we only let one File node update go through
-  // the system at a time.
+  // ブートストラップが終わった後は、File ノードの更新を一度に 1 つずつしか
+  // システムに通さない。
   api.emitter.on(`BOOTSTRAP_FINISHED`, () => {
     fsMachine.send(`BOOTSTRAP_FINISHED`)
   })

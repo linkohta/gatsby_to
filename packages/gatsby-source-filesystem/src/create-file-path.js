@@ -2,7 +2,7 @@ const path = require(`path`)
 const { slash } = require(`gatsby-core-utils`)
 
 function findFileNode({ node, getNode }) {
-  // Find the file node.
+  // ファイルノードを探す。
   let fileNode = node
 
   let whileCount = 0
@@ -32,7 +32,7 @@ module.exports = ({
   basePath = `src/pages`,
   trailingSlash = true,
 }) => {
-  // Find the File node
+  // File ノードを探す
   const fileNode = findFileNode({ node, getNode })
   if (!fileNode) return undefined
 

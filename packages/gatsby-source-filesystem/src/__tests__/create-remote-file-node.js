@@ -69,7 +69,7 @@ describe(`create-remote-file-node`, () => {
   it(`passes headers`, async () => {
     await createRemoteFileNode({
       ...defaultArgs,
-      // bypass cache
+      // キャッシュを使わない
       url: `${defaultArgs.url}?header`,
       httpHeaders: {
         "x-test": `test`,
@@ -92,7 +92,7 @@ describe(`create-remote-file-node`, () => {
     }
     await createRemoteFileNode({
       ...defaultArgs,
-      // bypass cache
+      // キャッシュを使わない
       url: `${defaultArgs.url}?auth`,
       auth,
     })
@@ -112,7 +112,7 @@ describe(`create-remote-file-node`, () => {
       )
       await createRemoteFileNode({
         ...defaultArgs,
-        // bypass cache
+        // キャッシュを使わない
         url: `${defaultArgs.url}?error`,
       })
     } catch (err) {

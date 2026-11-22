@@ -16,7 +16,7 @@ exports.createFileNode = async (
   const slashedFile = {
     ...parsedSlashed,
     absolutePath: slashed,
-    // Useful for limiting graphql query with certain parent directory
+    // 特定の親ディレクトリで graphql クエリを絞り込むのに役立つ
     relativeDirectory: slash(
       path.relative(pluginOptions.path || process.cwd(), parsedSlashed.dir)
     ),
@@ -39,10 +39,10 @@ exports.createFileNode = async (
     let contentDigest
 
     if (pluginOptions.fastHash) {
-      // Skip hashing.
+      // ハッシュ化をスキップする。
       contentDigest = key
     } else {
-      // Generate a hash, but only if the file has changed.
+      // ファイルが変更された場合にだけ、ハッシュを生成する。
       contentDigest = cache && (await cache.get(key))
       if (!contentDigest) {
         contentDigest = await md5File(slashedFile.absolutePath)
@@ -60,9 +60,9 @@ exports.createFileNode = async (
   }
 
   return {
-    // Don't actually make the File id the absolute path as otherwise
-    // people will use the id for that and ids shouldn't be treated as
-    // useful information.
+    // File の id を絶対パスそのものにはしない。そうすると
+    // id がパスとして使われてしまうが、id は意味のある情報として
+    // 扱われるべきではない。
     id: createNodeId(pathToFile),
     children: [],
     parent: null,
@@ -80,11 +80,11 @@ exports.createFileNode = async (
     accessTime: stats.atime.toJSON(),
     changeTime: stats.ctime.toJSON(),
     birthTime: stats.birthtime.toJSON(),
-    // Note: deprecate splatting the slashedFile object
-    // Note: the object may contain different properties depending on File or Dir
+    // Note: slashedFile オブジェクトの展開は非推奨にする
+    // Note: オブジェクトが持つプロパティは File か Dir かによって異なることがある
     ...slashedFile,
-    // TODO: deprecate copying the entire object
-    // Note: not splatting for perf reasons (make sure Date objects are serialized)
+    // TODO: オブジェクト全体のコピーを非推奨にする
+    // Note: パフォーマンス上の理由で展開していない（Date オブジェクトが確実にシリアライズされるようにする）
     dev: stats.dev,
     mode: stats.mode,
     nlink: stats.nlink,

@@ -21,7 +21,7 @@ const { createFileNode } = require(`./create-file-node`)
 /**
  * @typedef {CreateRemoteFileNodePayload}
  * @typedef {Object}
- * @description Create Remote File Node Payload
+ * @description リモートファイルのノードを作成するためのペイロード
  *
  * @param  {String} options.url
  * @param  {GatsbyCache} options.cache
@@ -37,10 +37,10 @@ const { createFileNode } = require(`./create-file-node`)
 /**
  * processRemoteNode
  * --
- * Request the remote file and return the fileNode
+ * リモートファイルをリクエストし、fileNode を返す
  *
  * @param {CreateRemoteFileNodePayload} options
- * @return {Promise<Object>} Resolves with the fileNode
+ * @return {Promise<Object>} fileNode で解決される
  */
 async function processRemoteNode({
   url,
@@ -62,22 +62,22 @@ async function processRemoteNode({
     name,
   })
 
-  // Create the file node.
+  // ファイルノードを作成する。
   const fileNode = await createFileNode(filename, createNodeId, {})
   fileNode.internal.description = `File "${url}"`
   fileNode.url = url
   fileNode.parent = parentNodeId
-  // Override the default plugin as gatsby-source-filesystem needs to
-  // be the owner of File nodes or there'll be conflicts if any other
-  // File nodes are created through normal usages of
-  // gatsby-source-filesystem.
+  // デフォルトのプラグインを上書きする。gatsby-source-filesystem が
+  // File ノードの所有者でなければ、gatsby-source-filesystem の通常の使い方で
+  // ほかの File ノードが作成されたときに
+  // 衝突するためである。
   await createNode(fileNode, { name: `gatsby-source-filesystem` })
 
   return fileNode
 }
 
 /**
- * Index of promises resolving to File node from remote url
+ * リモートの URL から File ノードへ解決される Promise の索引
  */
 const processingCache = {}
 
@@ -89,12 +89,12 @@ const processingCache = {}
  * createRemoteFileNode
  * --
  *
- * Download a remote file
- * First checks cache to ensure duplicate requests aren't processed
- * Then pushes to a queue
+ * リモートファイルをダウンロードする
+ * 重複するリクエストを処理しないよう、最初にキャッシュを確認する
+ * その後、キューに追加する
  *
  * @param {CreateRemoteFileNodePayload} options
- * @return {Promise<Object>}                  Returns the created node
+ * @return {Promise<Object>}                  作成したノードを返す
  */
 module.exports = function createRemoteFileNode({
   url,
@@ -108,9 +108,9 @@ module.exports = function createRemoteFileNode({
   ext = null,
   name = null,
 }) {
-  // validation of the input
-  // without this it's notoriously easy to pass in the wrong `createNodeId`
-  // see gatsbyjs/gatsby#6643
+  // 入力の検証
+  // これがないと、誤った `createNodeId` を渡してしまうことが非常に多い
+  // gatsbyjs/gatsby#6643 を参照
   if (typeof createNodeId !== `function`) {
     throw new Error(
       `createNodeId must be a function, was ${typeof createNodeId}`
@@ -120,7 +120,7 @@ module.exports = function createRemoteFileNode({
     throw new Error(`createNode must be a function, was ${typeof createNode}`)
   }
   if (typeof getCache === `function`) {
-    // use cache of this plugin and not cache of function caller
+    // 関数の呼び出し元のキャッシュではなく、このプラグインのキャッシュを使う
     cache = getCache(`gatsby-source-filesystem`)
   }
   if (typeof cache !== `object`) {
@@ -129,8 +129,8 @@ module.exports = function createRemoteFileNode({
     )
   }
 
-  // Check if we already requested node for this remote file
-  // and return stored promise if we did.
+  // このリモートファイルのノードをすでにリクエストしたかを確認し、
+  // していれば保存済みの Promise を返す。
   if (processingCache[url]) {
     return processingCache[url]
   }

@@ -40,7 +40,7 @@ const createApi = () => {
     emitter: mitt(),
     createNodeId: jest.fn(),
     getNode: jest.fn(() => {
-      // return truthy
+      // truthy な値を返す
       return {}
     }),
   }
@@ -84,12 +84,12 @@ describe(`tests`, () => {
     it(`queues node creation from added files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
       await emitChokidarEvent(`add`, `test.md`)
 
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -103,11 +103,11 @@ describe(`tests`, () => {
     it(`queues node creation from changed files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
       await emitChokidarEvent(`change`, `test.md`)
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -121,12 +121,12 @@ describe(`tests`, () => {
     it(`queues node creation from added directories`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
       await emitChokidarEvent(`addDir`, `test`)
 
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -140,12 +140,12 @@ describe(`tests`, () => {
     it(`queues node deletion from deleted files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
       await emitChokidarEvent(`unlink`, `test.md`)
 
-      // ready was not emitted, so no nodes should be deleted
+      // ready は発行されていないので、ノードは削除されないはずである
       expect(api.actions.deleteNode).not.toBeCalled()
 
       await emitChokidarEvent(`ready`)
@@ -158,12 +158,12 @@ describe(`tests`, () => {
     it(`queues node deletion from deleted directories`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
       await emitChokidarEvent(`unlinkDir`, `test`)
 
-      // ready was not emitted, so no nodes should be deleted
+      // ready は発行されていないので、ノードは削除されないはずである
       expect(api.actions.deleteNode).not.toBeCalled()
 
       await emitChokidarEvent(`ready`)
@@ -178,10 +178,10 @@ describe(`tests`, () => {
     it(`creates nodes from added files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -197,10 +197,10 @@ describe(`tests`, () => {
     it(`creates nodes from changed files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -216,10 +216,10 @@ describe(`tests`, () => {
     it(`creates nodes from added directories`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
-      // ready was not emitted, so no nodes should be created
+      // ready は発行されていないので、ノードは作成されないはずである
       expect(createFileNode).not.toBeCalled()
       expect(api.actions.createNode).not.toBeCalled()
 
@@ -235,10 +235,10 @@ describe(`tests`, () => {
     it(`delete nodes from deleted files`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
-      // ready was not emitted, so no nodes should be deleted
+      // ready は発行されていないので、ノードは削除されないはずである
       expect(api.actions.deleteNode).not.toBeCalled()
 
       await emitChokidarEvent(`ready`)
@@ -253,10 +253,10 @@ describe(`tests`, () => {
     it(`delete nodes from deleted directories`, async () => {
       const api = createApi()
       const sourceNodesPromise = gatsbyNode.sourceNodes(api, { path: `` })
-      // allow microtasks execution
+      // マイクロタスクを実行させる
       await tick()
 
-      // ready was not emitted, so no nodes should be deleted
+      // ready は発行されていないので、ノードは削除されないはずである
       expect(api.actions.deleteNode).not.toBeCalled()
 
       await emitChokidarEvent(`ready`)

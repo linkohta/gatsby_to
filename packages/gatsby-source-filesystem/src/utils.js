@@ -5,7 +5,7 @@ const { createFilePath } = require(`gatsby-core-utils`)
 /**
  * getParsedPath
  * --
- * Parses remote url to a path object
+ * リモートの URL を解析してパスオブジェクトにする
  *
  *
  * @param  {String}          url
@@ -18,7 +18,7 @@ function getParsedPath(url) {
 /**
  * getRemoteFileExtension
  * --
- * Parses remote url to retrieve remote file extension
+ * リモートの URL を解析してリモートファイルの拡張子を取得する
  *
  *
  * @param  {String}          url
@@ -31,7 +31,7 @@ export function getRemoteFileExtension(url) {
 /**
  * getRemoteFileName
  * --
- * Parses remote url to retrieve remote file name
+ * リモートの URL を解析してリモートファイルの名前を取得する
  *
  *
  * @param  {String}          url
@@ -41,7 +41,7 @@ export function getRemoteFileName(url) {
   return decodeURIComponent(getParsedPath(url).name)
 }
 
-// createFilePath should be imported from `gatsby-core-utils`
-// but some plugins already do import it from `gatsby-source-filesystem/utils`
-// so just keeping re-export here for backward compatibility
+// createFilePath は `gatsby-core-utils` から import すべきだが、
+// すでに `gatsby-source-filesystem/utils` から import しているプラグインがあるので、
+// 後方互換性のためにここで再エクスポートを残している
 export { createFilePath }
