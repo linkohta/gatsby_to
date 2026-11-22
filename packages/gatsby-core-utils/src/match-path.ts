@@ -1,4 +1,4 @@
-// Does the following transformations:
+// 次の変換を行う:
 //   `/foo/[id]/` => `/foo/:id`
 //   `/foo/[...id]/` => `/foo/*id`
 //   `/foo/[...]/` => `/foo/*`

@@ -3,7 +3,7 @@ import importFrom from "import-from"
 import resolveFrom from "resolve-from"
 
 export function getLmdb(): typeof import("lmdb") {
-  // Try to use lmdb from gatsby if not we use our own version
+  // gatsby の lmdb を使えるか試し、使えなければ自前のバージョンを使う
   try {
     const gatsbyPkgRoot = path.dirname(
       resolveFrom(process.cwd(), `gatsby/package.json`)

@@ -17,10 +17,10 @@ const hashPrimitive = (input: BinaryLike | string): string =>
   crypto.createHash(`md5`).update(input).digest(`hex`)
 
 /**
- * Hashes an input using md5 hash of hexadecimal digest.
+ * 入力を md5 でハッシュ化し、16 進数のダイジェストにする。
  *
- * @param input The input to encrypt
- * @return The content digest
+ * @param input ハッシュ化する入力
+ * @return コンテンツダイジェスト
  */
 
 export const createContentDigest = (

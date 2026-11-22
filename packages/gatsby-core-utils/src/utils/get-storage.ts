@@ -37,11 +37,11 @@ export function getStorage(fullDbPath: string): ICoreUtilsDatabase {
       throw new Error(`LMDB path is not set!`)
     }
 
-    // __GATSBY_OPEN_LMDBS tracks if we already opened given db in this process
-    // In `gatsby serve` case we might try to open it twice - once for engines
-    // and second to get access to `SitePage` nodes (to power trailing slashes
-    // redirect middleware). This ensure there is single instance within a process.
-    // Using more instances seems to cause weird random errors.
+    // __GATSBY_OPEN_LMDBS は、このプロセスで対象の db をすでに開いたかどうかを追跡する
+    // `gatsby serve` の場合は 2 回開こうとすることがある。1 回はエンジン用、
+    // もう 1 回は `SitePage` ノードへアクセスするため（末尾のスラッシュのリダイレクトを行う
+    // ミドルウェアで使う）である。これにより、プロセス内のインスタンスが 1 つになる。
+    // 複数のインスタンスを使うと、原因の分かりにくいエラーがランダムに起きるようである。
     if (!globalThis.__GATSBY_OPEN_LMDBS) {
       globalThis.__GATSBY_OPEN_LMDBS = new Map()
     }

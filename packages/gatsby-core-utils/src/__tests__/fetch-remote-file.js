@@ -29,13 +29,13 @@ async function getFileSize(file) {
 }
 
 /**
- * A utility to help create file responses
- * - Url with attempts will use maxBytes for x amount of time until it delivers the full response
- * - MaxBytes indicates how much bytes we'll be sending
+ * ファイルのレスポンスを作るためのユーティリティ
+ * - attempts 付きの URL は、完全なレスポンスを返すまでの x 回は maxBytes を使う
+ * - maxBytes は送信するバイト数を表す
  *
- * @param {string} file File path on disk
- * @param {Object} req Is the request object from msw
- * @param {{ compress?: boolean}} options Options for the getFilecontent (use gzip or not)
+ * @param {string} file ディスク上のファイルパス
+ * @param {Object} req msw のリクエストオブジェクト
+ * @param {{ compress?: boolean}} options getFilecontent のオプション（gzip を使うかどうか）
  */
 async function getFileContent(file, req, options = {}) {
   const cacheKey = req.url.origin + req.url.pathname
@@ -133,7 +133,7 @@ const server = setupServer(
       ctx.body(content)
     )
   }),
-  // Should test with non-ascii word `개` (which means dog in Korean)
+  // 非 ASCII の単語 `개`（韓国語で犬の意味）でテストすること
   rest.get(
     `http://external.com/${encodeURIComponent(`개`)}.jpg`,
     async (req, res, ctx) => {
@@ -279,7 +279,7 @@ describe(`fetch-remote-file`, () => {
   const cachePath = path.join(__dirname, `.cache-fetch`, `files`)
 
   beforeAll(async () => {
-    // Establish requests interception layer before all tests.
+    // すべてのテストの前に、リクエストを横取りする層を用意する。
     server.listen()
 
     cache = await createMockCache(cachePath)
@@ -291,13 +291,13 @@ describe(`fetch-remote-file`, () => {
     await fs.remove(cacheRoot)
     delete global.__GATSBY
 
-    // Clean up after all tests are done, preventing this
-    // interception layer from affecting irrelevant tests.
+    // すべてのテストが終わった後に後始末をし、この横取りの層が
+    // 無関係なテストに影響しないようにする。
     server.close()
   })
 
   beforeEach(async () => {
-    // simulate a new build each run
+    // 実行のたびに新しいビルドを模擬する
     global.__GATSBY = {
       buildId: global.__GATSBY?.buildId
         ? String(Number(global.__GATSBY.buildId) + 1)
@@ -820,7 +820,7 @@ Fetch details:
 
       expect(gotStream).toBeCalledTimes(3)
     })
-    // @todo retry on network errors
+    // @todo ネットワークエラーのときにリトライする
     it(`Retries on network errors`, async () => {
       await expect(
         fetchRemoteFile({

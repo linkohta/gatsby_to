@@ -2,8 +2,8 @@ import path from "path"
 import os from "os"
 
 /**
- * Joins all given segments and converts using a forward slash (/) as a delimiter
- * @param segments A sequence of segments
+ * 渡されたすべてのセグメントを結合し、スラッシュ (/) を区切り文字として変換する
+ * @param segments セグメントの並び
  */
 export function urlResolve(...segments: Array<string>): string {
   const joinedPath = path.join(...segments)

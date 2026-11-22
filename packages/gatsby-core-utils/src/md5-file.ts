@@ -2,9 +2,9 @@ import { createMD5 } from "hash-wasm"
 import * as fs from "fs-extra"
 
 /**
- * Create a MD5 hash from a given filePath
- * @param filePath Absolute path to the file
- * @returns MD5 hash in hex format
+ * 指定した filePath から MD5 ハッシュを作成する
+ * @param filePath ファイルの絶対パス
+ * @returns 16 進数形式の MD5 ハッシュ
  */
 export const md5File = async (filePath: string): Promise<string> => {
   const md5hasher = await createMD5()

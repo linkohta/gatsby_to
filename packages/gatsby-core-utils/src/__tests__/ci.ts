@@ -5,7 +5,7 @@ describe(`CI detection`, () => {
   beforeEach(() => {
     jest.resetModules()
     process.env = { ...origEnv }
-    // We need to remove the env our CI adds to ensure accurate tests
+    // テストを正確にするため、CI が追加する環境変数を取り除く必要がある
     ;[
       `CI`,
       `CIRCLECI`,

@@ -20,7 +20,7 @@ function lookupCI(): string | null {
         return res
       }
     } catch (e) {
-      // ignore
+      // 無視する
     }
   }
   return null
@@ -28,8 +28,8 @@ function lookupCI(): string | null {
 const CIName = lookupCI()
 
 /**
- * Determines whether the environment where the code is running is in CI
- * @return true if the environment is in CI, false otherwise
+ * コードが実行されている環境が CI かどうかを判定する
+ * @return 環境が CI であれば true、そうでなければ false
  */
 
 export function isCI(): boolean {
@@ -37,8 +37,8 @@ export function isCI(): boolean {
 }
 
 /**
- * Gets the name of the CI environment (e.g. "Vercel", "Heroku", etc.)
- * @return The name of the CI if available. Defaults to null if not in CI
+ * CI 環境の名前（"Vercel"、"Heroku" など）を取得する
+ * @return 取得できた場合は CI の名前。CI でない場合のデフォルトは null
  */
 
 export function getCIName(): string | null {

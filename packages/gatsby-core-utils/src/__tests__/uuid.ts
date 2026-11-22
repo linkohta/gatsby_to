@@ -1,5 +1,5 @@
 /**
- * Copied from https://github.com/lukeed/uuid
+ * https://github.com/lukeed/uuid からコピーしたもの
  * https://github.com/lukeed/uuid/blob/master/test/index.js
  */
 import isUUID from "is-uuid"
