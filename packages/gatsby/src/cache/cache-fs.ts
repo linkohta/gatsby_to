@@ -62,7 +62,7 @@ function DiskStore(this: any, options): void {
     ttl:
       options.ttl >= 0
         ? +options.ttl
-        : 60 * 60 /* 期限切れまでの時間（秒） */,
+        : 60 * 60 /* 期限切れになるまでの時間（秒） */,
     maxsize: options.maxsize || Infinity /* ディスク上の最大サイズ（バイト） */,
     subdirs: options.subdirs || false,
     zip: options.zip || false,
