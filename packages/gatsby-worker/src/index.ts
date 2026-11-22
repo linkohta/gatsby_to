@@ -94,6 +94,7 @@ interface IWorkerInfo<T> {
   }>
   currentTask?: TaskInfo<T>
   ready: Promise<void>
+  isEnding: boolean
 }
 
 export interface IPublicWorkerInfo {
@@ -212,7 +213,10 @@ export class WorkerPool<
           }
 
           worker.send(msg, undefined, undefined, error => {
-            if (error && worker.connected) {
+            // 終了を指示した後のワーカーは、パイプが閉じてから `connected` が
+            // false になるまでの間に EPIPE を返すことがある。実行中のタスクは
+            // exit ハンドラーで reject されるので、このエラーは無視してよい。
+            if (error && worker.connected && !workerInfo.isEnding) {
               throw error
             }
           })
@@ -225,6 +229,7 @@ export class WorkerPool<
         exitedPromise: new Promise(resolve => {
           workerExitResolve = resolve
         }),
+        isEnding: false,
       }
 
       const workerProcessMessageHandler = (msg: ChildMessageUnion): void => {
@@ -351,6 +356,7 @@ export class WorkerPool<
       // ワーカーに正常終了するよう伝える
       const endMessage: ParentMessageUnion = [END, ++this.counter]
 
+      workerInfo.isEnding = true
       workerInfo.send(endMessage)
 
       // ワーカーがすぐに正常終了しない場合は、強制終了する
