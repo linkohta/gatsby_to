@@ -50,7 +50,7 @@ export async function importGatsbyPlugin(
 
     const rawPluginModule = await import(maybeAddFileProtocol(pluginFilePath))
 
-    // If the module is cjs, the properties we care about are nested under a top-level `default` property
+    // モジュールが cjs の場合、必要なプロパティはトップレベルの `default` プロパティの下にネストされている
     pluginModule = preferDefault(rawPluginModule)
 
     pluginModuleCache.set(key, pluginModule)

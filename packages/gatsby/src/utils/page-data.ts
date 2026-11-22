@@ -114,7 +114,7 @@ export async function writePageData(
     slices
   )
 
-  // transform asset size to kB (from bytes) to fit 64 bit to numbers
+  // 64 ビットの値が数値に収まるように、アセットのサイズを（バイトから）kB に変換する
   const pageDataSize = Buffer.byteLength(body) / 1000
 
   store.dispatch({
@@ -197,7 +197,7 @@ type IDataTask =
 
 export async function flush(parentSpan?: Span): Promise<void> {
   if (isFlushing) {
-    // We're already in the middle of a flush
+    // すでに書き出しの途中である
     return
   }
   await waitUntilPageQueryResultsAreStored()
@@ -221,9 +221,9 @@ export async function flush(parentSpan?: Span): Promise<void> {
   let nodeManifestPagePathMap
 
   if (pagePaths.size > 0) {
-    // we process node manifests in this location because we need to add the manifestId to the page data.
-    // We use this manifestId to determine if the page data is up to date when routing. Here we create a map of "pagePath": "manifestId" while processing and writing node manifest files.
-    // We only do this when there are pending page-data writes because otherwise we could flush pending createNodeManifest calls before page-data.json files are written. Which means those page-data files wouldn't have the corresponding manifest id's written to them.
+    // ノードマニフェストをこの場所で処理するのは、page data に manifestId を追加する必要があるためである。
+    // この manifestId は、ルーティングのときに page data が最新かどうかを判定するために使う。ここでは、ノードマニフェストファイルを処理して書き出しながら、"pagePath": "manifestId" のマップを作成する。
+    // これは、保留中の page-data の書き込みがある場合にだけ行う。そうしないと、page-data.json ファイルが書き出される前に、保留中の createNodeManifest の呼び出しを処理してしまう可能性がある。その場合、それらの page-data ファイルには、対応するマニフェスト ID が書き込まれないことになる。
     nodeManifestPagePathMap = await processNodeManifests()
   } else if (nodeManifests.length > 0 && staleNodeManifests) {
     staleNodeManifests = false
@@ -263,39 +263,39 @@ export async function flush(parentSpan?: Span): Promise<void> {
 
       let shouldClearPendingWrite = true
 
-      // It's a gloomy day in Bombay, let me tell you a short story...
-      // Once upon a time, writing page-data.json files were atomic
-      // After this change (#24808), they are not and this means that
-      // between adding a pending write for a page and actually flushing
-      // them, a page might not exist anymore щ（ﾟДﾟщ）
-      // This is why we need this check
+      // ボンベイはどんよりした天気だ。短い話をしよう...
+      // 昔々、page-data.json ファイルの書き込みはアトミックだった
+      // この変更 (#24808) の後はそうではなくなった。つまり、
+      // ページの保留中の書き込みを追加してから実際に書き出すまでの間に、
+      // ページがもう存在しなくなっていることがある щ（ﾟДﾟщ）
+      // だから、この確認が必要である
       if (page) {
         if (page.path && nodeManifestPagePathMap) {
           page.manifestId = nodeManifestPagePathMap.get(page.path)
         }
 
         if (!isBuild && process.env.GATSBY_QUERY_ON_DEMAND) {
-          // check if already did run query for this page
-          // with query-on-demand we might have pending page-data write due to
-          // changes in static queries assigned to page template, but we might not
-          // have query result for it
+          // このページのクエリをすでに実行したかを確認する
+          // query-on-demand では、ページテンプレートに割り当てられた静的クエリの変更によって
+          // 保留中の page-data の書き込みがあっても、そのクエリ結果は
+          // まだないことがある
           const query = queries.trackedQueries.get(page.path)
           if (!query) {
-            // this should not happen ever
+            // これは決して起こらないはずである
             throw new Error(
               `We have a page, but we don't have registered query for it (???)`
             )
           }
 
           if (hasFlag(query.dirty, FLAG_DIRTY_NEW_PAGE)) {
-            // query results are not written yet
+            // クエリ結果はまだ書き出されていない
             setImmediate(() => cb(null, true))
             return
           }
         }
 
-        // In develop we rely on QUERY_ON_DEMAND so we just go through
-        // In build we only build these page-json for SSG pages
+        // develop では QUERY_ON_DEMAND に頼っているので、そのまま通す
+        // build では、SSG のページについてだけ、これらの page-json をビルドする
         if (!isBuild || (isBuild && getPageMode(page) === `SSG`)) {
           const staticQueryHashes =
             staticQueriesByTemplate.get(page.componentPath) || []
@@ -367,8 +367,8 @@ export async function flush(parentSpan?: Span): Promise<void> {
       })
     }
 
-    // `setImmediate` below is a workaround against stack overflow
-    // occurring when there are many non-SSG pages
+    // 下の `setImmediate` は、SSG でないページが多いときに起きる
+    // スタックオーバーフローへの回避策である
     setImmediate(() => cb(null, true))
     return
   }, 25)
@@ -407,9 +407,9 @@ export async function handleStalePageData(parentSpan: Span): Promise<void> {
     return
   }
 
-  // public directory might have stale page-data files from previous builds
-  // we get the list of those and compare against expected page-data files
-  // and remove ones that shouldn't be there anymore
+  // public ディレクトリには、以前のビルドの古い page-data ファイルが残っていることがある
+  // それらの一覧を取得して、期待される page-data ファイルと比較し、
+  // もうあるべきでないものを削除する
 
   const activity = reporter.activityTimer(`Cleaning up stale page-data`, {
     parentSpan,

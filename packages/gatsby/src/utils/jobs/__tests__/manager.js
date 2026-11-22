@@ -13,7 +13,7 @@ const { MESSAGE_TYPES } = require(`../types`)
 let WorkerError
 let jobManager = null
 
-// I need a mock to spy on
+// スパイするためのモックが必要である
 jest.mock(`p-defer`, () =>
   jest.fn().mockImplementation(jest.requireActual(`p-defer`))
 )
@@ -213,8 +213,8 @@ describe(`Jobs manager`, () => {
         { output: `myresult` },
       ])
 
-      // we have 1 pdefer for the job & 1 for the wait until all jobs are done
-      expect(pDefer).toHaveBeenCalledTimes(2) // this should be enough to check if our job is deterministic
+      // ジョブ用に pdefer が 1 つ、すべてのジョブの完了を待つために 1 つある
+      expect(pDefer).toHaveBeenCalledTimes(2) // ジョブが決定的かどうかを確認するには、これで十分なはずである
       expect(endActivity).toHaveBeenCalledTimes(1)
       expect(worker.TEST_JOB).toHaveBeenCalledTimes(1)
     })
@@ -290,7 +290,7 @@ describe(`Jobs manager`, () => {
 
   // getInProcessJobPromise
   describe(`getInProcessJobPromise`, () => {
-    // unsure how to test this yet without a real worker
+    // 実際のワーカーなしでこれをテストする方法は、まだ分からない
     it(`should get a promise when set`, async () => {
       worker.TEST_JOB.mockReturnValue({ output: `myresult` })
       const { enqueueJob, getInProcessJobPromise } = jobManager
@@ -304,7 +304,7 @@ describe(`Jobs manager`, () => {
   })
 
   describe(`removeInProgressJob`, () => {
-    // unsure how to test this yet without a real worker
+    // 実際のワーカーなしでこれをテストする方法は、まだ分からない
     it(`should have all tasks resolved when promise is resolved`, async () => {
       worker.TEST_JOB.mockReturnValue({ output: `myresult` })
       const { enqueueJob, removeInProgressJob } = jobManager
@@ -324,7 +324,7 @@ describe(`Jobs manager`, () => {
   })
 
   describe(`waitUntilAllJobsComplete`, () => {
-    // unsure how to test this yet without a real worker
+    // 実際のワーカーなしでこれをテストする方法は、まだ分からない
     it(`should have all tasks resolved when promise is resolved`, async () => {
       worker.TEST_JOB.mockReturnValue({ output: `myresult` })
       const { enqueueJob, waitUntilAllJobsComplete } = jobManager
@@ -382,8 +382,8 @@ describe(`Jobs manager`, () => {
     let originalProcessOn
     let originalSend
     /**
-     * enqueueJob will run some async code before it sends IPC JOB_CREATED message
-     * This promise allow to await until that moment, to make assertions or execute more code
+     * enqueueJob は、IPC の JOB_CREATED メッセージを送る前に、非同期のコードを実行する
+     * この Promise を使うと、その時点まで待ってから、アサーションをしたり、さらにコードを実行したりできる
      */
     let waitForJobCreatedIPCSend
     beforeEach(() => {
@@ -506,9 +506,9 @@ describe(`Jobs manager`, () => {
         },
       })
 
-      // Make sure that all the promises get resolved
+      // すべての Promise が解決されるようにする
       await new Promise(resolve => {
-        // If this gets flaky, maybe a waitFor?
+        // これが不安定になるようなら、waitFor を使うか？
         timers.setTimeout(resolve, 500)
       })
       jest.runOnlyPendingTimers()

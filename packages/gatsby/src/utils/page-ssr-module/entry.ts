@@ -1,8 +1,8 @@
-// "engines-fs-provider" must be first import, as it sets up global
-// fs and this need to happen before anything else tries to import fs
+// "engines-fs-provider" は最初の import でなければならない。これはグローバルな
+// fs をセットアップするので、他の何かが fs を import しようとする前に行う必要がある
 import "../engines-fs-provider"
 
-// just types - those should not be bundled
+// 型だけ。これらはバンドルされるべきではない
 import type { GraphQLEngine } from "../../schema/graphql-engine/entry"
 import type { IExecutionResult } from "../../query/types"
 import type {
@@ -17,7 +17,7 @@ import type { IPageDataWithQueryResult, ISliceData } from "../page-data"
 import type { Request } from "express"
 import type { Span, SpanContext } from "opentracing"
 
-// actual imports
+// 実際の import
 import * as path from "path"
 import * as fs from "fs-extra"
 import {
@@ -59,16 +59,16 @@ export interface ISSRData {
   templateDetails: ITemplateDetails
   potentialPagePath: string
   /**
-   * This is no longer really just serverDataHeaders, as we add headers
-   * from user defined in gatsby-config
+   * これはもう、単なる serverDataHeaders ではない。gatsby-config で
+   * ユーザーが定義したヘッダーも追加しているためである
    */
   serverDataHeaders?: Record<string, string>
   serverDataStatus?: number
   searchString: string
 }
 
-// just letting TypeScript know about injected data
-// with DefinePlugin
+// DefinePlugin で注入されるデータを
+// TypeScript に知らせているだけである
 declare global {
   const INLINED_TEMPLATE_TO_DETAILS: Record<string, ITemplateDetails>
   const INLINED_HEADERS_CONFIG: Array<IHeader> | undefined
@@ -144,17 +144,17 @@ export async function getData(arg: IGetDataArgs): Promise<ISSRData> {
       }
       potentialPagePath = getPagePathFromPageDataPath(pathName) || pathName
 
-      // 1. Find a page for pathname
+      // 1. pathname に対応するページを探す
       const maybePage = findEnginePageByPath(potentialPagePath)
 
       if (!maybePage) {
-        // page not found, nothing to run query for
+        // ページが見つからないので、クエリを実行する対象がない
         throw new Error(`Page for "${pathName}" not found`)
       }
 
       page = maybePage
 
-      // 2. Lookup query used for a page (template)
+      // 2. ページ（テンプレート）で使われているクエリを調べる
       templateDetails = INLINED_TEMPLATE_TO_DETAILS[page.componentChunkName]
       if (!templateDetails) {
         throw new Error(
@@ -169,8 +169,8 @@ export async function getData(arg: IGetDataArgs): Promise<ISSRData> {
 
     const executionPromises: Array<Promise<any>> = []
 
-    // 3. Execute query
-    // query-runner handles case when query is not there - so maybe we should consider using that somehow
+    // 3. クエリを実行する
+    // query-runner はクエリがない場合も扱えるので、何らかの形でそれを使うことを検討すべきかもしれない
     let results: IExecutionResult = {}
     let serverData: IServerData | undefined
     if (templateDetails.query) {
@@ -225,7 +225,7 @@ export async function getData(arg: IGetDataArgs): Promise<ISSRData> {
       )
     }
 
-    // 4. (if SSR) run getServerData
+    // 4. （SSR の場合）getServerData を実行する
     if (page.mode === `SSR`) {
       let runningGetServerDataActivity: MaybePhantomActivity
       if (getDataWrapperActivity) {
@@ -260,18 +260,18 @@ export async function getData(arg: IGetDataArgs): Promise<ISSRData> {
 
     const serverDataHeaders = {}
 
-    // get headers from defaults and config
+    // デフォルトと config からヘッダーを取得する
     const headersFromConfig = createHeaders(
       getRoutePathFromPage(page),
       MUST_REVALIDATE_HEADERS
     )
-    // convert headers array to object
+    // ヘッダーの配列をオブジェクトに変換する
     for (const header of headersFromConfig) {
       serverDataHeaders[header.key] = header.value
     }
 
     if (serverData?.headers) {
-      // add headers from getServerData to object (which will overwrite headers from config if overlapping)
+      // getServerData からのヘッダーをオブジェクトに追加する（重複する場合は config のヘッダーを上書きする）
       for (const [headerKey, headerValue] of Object.entries(
         serverData.headers
       )) {
@@ -285,7 +285,7 @@ export async function getData(arg: IGetDataArgs): Promise<ISSRData> {
       const maybeQueryString = Object.entries(req.query)
         .map(
           ([k, v]) =>
-            // Preserve QueryString encoding
+            // クエリ文字列のエンコーディングを保つ
             `${encodeURIComponent(k)}=${encodeURIComponent(v as string)}`
         )
         .join(`&`)
@@ -360,7 +360,7 @@ export async function renderPageData({
       slicesUsedByTemplates.set(key, value)
     }
 
-    // TODO: optimize this to only pass name for slices, as it's only used for validation
+    // TODO: これを最適化して、スライスの名前だけを渡すようにする。検証にしか使われないためである
 
     const results = await constructPageDataString(
       {

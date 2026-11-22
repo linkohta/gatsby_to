@@ -64,7 +64,7 @@ function traverseSlicesUsedByTemplates(
 
     formattedSlices[sliceSlot] = concreteSliceForSliceSlot
 
-    // recursively repeat for found slice to find all nested slices
+    // 見つかったスライスについて再帰的に繰り返し、ネストしたすべてのスライスを探す
     traverseSlicesUsedByTemplates(
       pagePath,
       slice.componentPath,

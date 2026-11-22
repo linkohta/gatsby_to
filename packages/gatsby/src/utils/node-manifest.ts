@@ -13,7 +13,7 @@ interface INodeManifestPage {
 }
 
 /**
- * This it the output after processing calls to the public unstable_createNodeManifest action
+ * これは、公開アクション unstable_createNodeManifest の呼び出しを処理した後の出力である
  */
 interface INodeManifestOut {
   page: INodeManifestPage
@@ -26,7 +26,7 @@ interface INodeManifestOut {
 type FoundPageBy =
   | `ownerNodeId`
   | `filesystem-route-api`
-  // for these three we warn to use ownerNodeId instead
+  // この 3 つについては、代わりに ownerNodeId を使うよう警告する
   | `context.id`
   | `context.slug`
   | `queryTracking`
@@ -44,19 +44,19 @@ function getNodeManifestFileLimit(): number {
   return overrideLimit || defaultLimit
 }
 /**
- * This defines a limit to the number number of node manifest files that will be written to disk
+ * これは、ディスクに書き出すノードマニフェストファイルの数の上限を定義する
  */
 const NODE_MANIFEST_FILE_LIMIT = getNodeManifestFileLimit()
 
 /**
- * Finds a final built page by nodeId or by node.slug as a fallback.
+ * nodeId で、またはフォールバックとして node.slug で、最終的にビルドされたページを探す。
  *
- * Note that this function wont work properly in `gatsby develop`
- * since develop no longer runs all page queries when creating pages.
- * We use the node id to query mapping to find the right page but
- * this mapping only exists once you've visited a page in your browser.
- * When this fn is being used for routing to previews the user wont necessarily have
- * visited the page in the browser yet.
+ * この関数は `gatsby develop` では正しく動かないことに注意。
+ * develop は、ページを作成するときにすべてのページクエリを実行しなくなったためである。
+ * 正しいページを探すために、ノード ID からクエリへの対応付けを使っているが、
+ * この対応付けは、ブラウザーでページを訪問して初めて作られる。
+ * この関数がプレビューへのルーティングに使われるとき、ユーザーはまだ
+ * ブラウザーでそのページを訪問しているとは限らない。
  */
 async function findPageOwnedByNode({
   nodeId,
@@ -77,21 +77,21 @@ async function findPageOwnedByNode({
   const nodeType = fullNode?.internal?.type
 
   const firstPagePathWithNodeAsDataDependency =
-    // the first page found in node id to page query path tracking
+    // ノード ID からページクエリのパスへの追跡で、最初に見つかったページ
     byNode?.get(nodeId)?.values()?.next()?.value
 
   const firstPagePathWithNodeInGraphQLListField =
-    // the first page that queries for a list of this node type.
-    // we don't currently store a list of node ids for connection fields to queries
-    // we just store the query id or page path mapped to the connected GraphQL typename.
+    // このノードの型の一覧をクエリしている最初のページ。
+    // 現状では、connection フィールドについて、ノード ID の一覧とクエリの対応は保存していない。
+    // connection の GraphQL の型名に対応付けて、クエリの ID またはページのパスだけを保存している。
     byConnection?.get(nodeType)?.values()?.next()?.value
 
   let pagePath =
     firstPagePathWithNodeAsDataDependency ||
     firstPagePathWithNodeInGraphQLListField
 
-  // for static queries, we can only find the first page using that static query
-  // the reason we would find `sq--` here is because byConnection (above) can return a page path or a static query ID (which starts with `sq--`)
+  // 静的クエリの場合は、その静的クエリを使っている最初のページしか見つけられない
+  // ここで `sq--` が見つかるのは、（上の）byConnection がページのパスまたは静的クエリの ID（`sq--` で始まる）を返しうるためである
   if (pagePath?.startsWith(`sq--`)) {
     const staticQueryComponentPath =
       staticQueryComponents?.get(pagePath)?.componentPath
@@ -113,15 +113,15 @@ async function findPageOwnedByNode({
     let ownerPagePath: string | undefined
     let foundOwnerNodeId = false
 
-    // for each page this nodeId is queried in
+    // この nodeId がクエリされているそれぞれのページについて
     for (const pageObject of pages.values()) {
-      // if we haven't found a page with this nodeId
-      // set as page.ownerNodeId then run this logic.
-      // this condition is on foundOwnerNodeId instead of ownerPagePath
-      // in case we find a page with the nodeId in page.context.id/context.slug
-      // and then later in the loop there's a page with this nodeId
-      // set on page.ownerNodeId.
-      // We always want to prefer ownerPagePath over context.id/context.slug
+      // この nodeId が page.ownerNodeId に設定されたページを
+      // まだ見つけていない場合は、このロジックを実行する。
+      // この条件が ownerPagePath ではなく foundOwnerNodeId に対するものになっているのは、
+      // page.context.id/context.slug に nodeId を持つページを先に見つけ、
+      // ループの後のほうで、この nodeId が page.ownerNodeId に設定された
+      // ページが出てくる場合があるためである。
+      // context.id/context.slug よりも、常に ownerPagePath を優先したい
       if (foundOwnerNodeId) {
         break
       }
@@ -134,7 +134,7 @@ async function findPageOwnedByNode({
 
       const foundPageIdInContext = fullPage?.context?.id === nodeId
 
-      // querying by node.slug in GraphQL queries is common enough that we can search for it as a fallback after ownerNodeId, filesystem routes, and context.id
+      // GraphQL クエリで node.slug を使ってクエリするのは十分に一般的なので、ownerNodeId、ファイルシステムのルート、context.id の後のフォールバックとして検索できる
       const foundPageSlugInContext = slug && fullPage?.context?.slug === slug
 
       if (foundOwnerNodeId) {
@@ -154,21 +154,20 @@ async function findPageOwnedByNode({
 
       if (
         fullPage &&
-        // first check for the ownerNodeId on the page. this is
-        // the defacto owner. Can't get more specific than this
+        // 最初に、ページの ownerNodeId を確認する。これが
+        // 事実上の所有者である。これ以上具体的なものはない
         (foundOwnerNodeId ||
-          // if there's no specified owner look to see if
-          // pageContext has an `id` variable which matches our
-          // nodeId. Using an "id" as a variable in queries is common
-          // and if we don't have an owner this is a better guess
-          // of an owner than grabbing the first page query we find
-          // that's mapped to this node id.
-          // this also makes this work with the filesystem Route API without
-          // changing that API.
+          // 所有者が指定されていない場合は、pageContext に、nodeId と
+          // 一致する `id` 変数があるかを調べる。クエリで変数として "id" を
+          // 使うのは一般的であり、所有者がない場合は、このノード ID に
+          // 対応付けられたページクエリのうち最初に見つかったものを取るよりも、
+          // こちらのほうが所有者の推測として優れている。
+          // これにより、ファイルシステムのルート API でも、その API を
+          // 変更することなく動くようになる。
           foundPageIdInContext ||
           foundPageSlugInContext)
       ) {
-        // save this path to use in our manifest!
+        // マニフェストで使うために、このパスを保存する
         ownerPagePath = fullPage.path
       }
     }
@@ -186,7 +185,7 @@ async function findPageOwnedByNode({
   }
 }
 
-// these id's correspond to error id's in
+// これらの ID は、次のファイルのエラー ID に対応する
 // packages/gatsby-cli/src/structured-errors/error-map.ts
 export const foundPageByToLogIds = {
   none: `11801`,
@@ -198,7 +197,7 @@ export const foundPageByToLogIds = {
 }
 
 /**
- * Takes in some info about a node manifest and the page we did or didn't find for it, then warns and returns the warning string
+ * ノードマニフェストについての情報と、それに対して見つかった（または見つからなかった）ページを受け取り、警告を出して、その警告の文字列を返す
  */
 export function warnAboutNodeManifestMappingProblems({
   inputManifest,
@@ -247,7 +246,7 @@ export function warnAboutNodeManifestMappingProblems({
 }
 
 /**
- * Prepares and then writes out an individual node manifest file to be used for routing to previews. Manifest files are added via the public unstable_createNodeManifest action
+ * プレビューへのルーティングに使う個別のノードマニフェストファイルを準備して、書き出す。マニフェストファイルは、公開アクション unstable_createNodeManifest で追加される
  */
 export async function processNodeManifest(
   inputManifest: INodeManifest,
@@ -276,11 +275,11 @@ export async function processNodeManifest(
     return null
   }
 
-  // map the node to a page that was created
+  // ノードを、作成されたページに対応付ける
   const { page: nodeManifestPage, foundPageBy } = await findPageOwnedByNode({
     nodeId,
     fullNode,
-    // querying by node.slug in GraphQL queries is common enough that we can search for it as a fallback after ownerNodeId, filesystem routes, and context.id
+    // GraphQL クエリで node.slug を使ってクエリするのは十分に一般的なので、ownerNodeId、ファイルシステムのルート、context.id の後のフォールバックとして検索できる
     slug: fullNode?.slug as string,
   })
 
@@ -314,24 +313,24 @@ export async function processNodeManifest(
   let fileNameBase = inputManifest.manifestId
 
   /**
-   * Windows has a handful of special/reserved characters that are not valid in a file path
+   * Windows には、ファイルパスで使えない特殊文字や予約文字がいくつかある
    * @reference https://superuser.com/questions/358855/what-characters-are-safe-in-cross-platform-file-names-for-linux-windows-and-os
    *
-   * The two exceptions to the list linked above are
-   * - the colon that is part of the hard disk partition name at the beginning of a file path (i.e. C:)
-   * - backslashes. We don't want to replace backslashes because those are used to delineate what the actual file path is
+   * 上のリンク先の一覧に対する 2 つの例外は次のとおり
+   * - ファイルパスの先頭にある、ハードディスクのパーティション名の一部であるコロン（つまり C:）
+   * - バックスラッシュ。バックスラッシュは実際のファイルパスの区切りに使われるので、置き換えたくない
    *
-   * During local development, node manifests can be written to disk but are generally unused as they are only used
-   * for Content Sync which runs in Gatsby Cloud. Gatsby cloud is a Linux environment in which these special chars are valid in
-   * filepaths. To avoid errors on Windows, we replace all instances of the special chars in the filepath (with the exception of the
-   * hard disk partition name) with "-" to ensure that local Windows development setups do not break when attempting
-   * to write one of these manifests to disk.
+   * ローカルでの開発中、ノードマニフェストはディスクに書き出されることがあるが、通常は使われない。Gatsby Cloud で動く
+   * Content Sync でしか使われないためである。Gatsby Cloud は Linux 環境であり、これらの特殊文字は
+   * ファイルパスで有効である。Windows でのエラーを避けるために、ファイルパスの中の特殊文字を（ハードディスクの
+   * パーティション名を除いて）すべて "-" に置き換え、ローカルの Windows の開発環境が、これらのマニフェストを
+   * ディスクに書き出そうとしたときに壊れないようにする。
    */
   if (process.platform === `win32`) {
     fileNameBase = fileNameBase.replace(/:|\/|\*|\?|"|<|>|\||\\/g, `-`)
   }
 
-  // write out the manifest file
+  // マニフェストファイルを書き出す
   const manifestFilePath = path.join(
     gatsbySiteDirectory,
     `public`,
@@ -347,10 +346,10 @@ export async function processNodeManifest(
   const previouslyWrittenNodeManifest =
     await previouslyWrittenNodeManifests.get(inputManifest.manifestId)
 
-  // write a manifest if we don't currently have one written for this ID
-  // or if we can replace the written one with a manifest that has found a page
-  // NOTE: We still want to write out a manifest if foundPageBy is "none", this helps with error messaging
-  //       But we prefer to write a manifest that has a foundPageBy that is NOT "none"
+  // この ID のマニフェストがまだ書き出されていない場合、または書き出し済みのものを、
+  // ページが見つかったマニフェストで置き換えられる場合に、マニフェストを書き出す
+  // NOTE: foundPageBy が "none" であっても、マニフェストは書き出したい。エラーメッセージの表示に役立つためである
+  //       ただし、foundPageBy が "none" ではないマニフェストを書き出すほうを優先する
   const shouldWriteManifest =
     !previouslyWrittenNodeManifest ||
     (previouslyWrittenNodeManifest?.foundPageBy === `none` &&
@@ -359,7 +358,7 @@ export async function processNodeManifest(
   if (shouldWriteManifest) {
     const writePromise = fs.writeJSON(manifestFilePath, finalManifest)
 
-    // This prevents two manifests from writing to the same file at the same time
+    // これにより、2 つのマニフェストが同時に同じファイルへ書き込むのを防ぐ
     previouslyWrittenNodeManifests.set(
       inputManifest.manifestId,
       new Promise(resolve => {
@@ -391,9 +390,9 @@ export async function processNodeManifest(
 
 function nodeManifestSortComparerAscendingUpdatedAt(a, b): number {
   /**
-   * Prioritize node manifests that have an updatedAtUTC so that manifests known to be
-   * newest are written to disk first. If neither have an updatedAtUTC, there isn't
-   * anything to sort
+   * updatedAtUTC を持つノードマニフェストを優先し、最も新しいと分かっている
+   * マニフェストが先にディスクへ書き出されるようにする。どちらも updatedAtUTC を
+   * 持たない場合は、並べ替えるものがない
    */
   if (!a.updatedAtUTC && !b.updatedAtUTC) {
     return 0
@@ -411,9 +410,9 @@ function nodeManifestSortComparerAscendingUpdatedAt(a, b): number {
 }
 
 /**
- * Grabs all pending node manifests, processes them, writes them to disk,
- * and then removes them from the store.
- * Manifest files are added via the public unstable_createNodeManifest action in sourceNodes
+ * 保留中のすべてのノードマニフェストを取得して処理し、ディスクに書き出した後、
+ * ストアから取り除く。
+ * マニフェストファイルは、sourceNodes の中で公開アクション unstable_createNodeManifest によって追加される
  */
 export async function processNodeManifests(): Promise<Map<
   string,
@@ -457,8 +456,8 @@ export async function processNodeManifests(): Promise<Map<
       totalFailedManifests++
     }
 
-    // `setImmediate` below is a workaround against stack overflow
-    // occurring when there are many manifests
+    // 下の `setImmediate` は、マニフェストが多いときに起きる
+    // スタックオーバーフローへの回避策である
     setImmediate(() => cb(null, true))
     return
   }
@@ -507,7 +506,7 @@ export async function processNodeManifests(): Promise<Map<
       `To see full warning messages set process.env.VERBOSE_NODE_MANIFEST to "true".\nVisit https://gatsby.dev/nodemanifest for more info on Node Manifests.`
   )
 
-  // clean up all pending manifests from the store
+  // 保留中のすべてのマニフェストをストアから片付ける
   store.dispatch(internalActions.deleteNodeManifests())
   return nodeManifestPagePathMap
 }

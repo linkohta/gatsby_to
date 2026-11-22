@@ -8,7 +8,7 @@ type DefinitionName = string
 type DefinitionMap = Map<DefinitionName, IDefinitionMeta>
 
 /**
- * Makes the schema deterministic by sorting it (so on new saves the whole file doesn't change, only the change that was made). It can be used for e.g. tests when two schema diffs should be compared.
+ * スキーマをソートして決定的にする（そのため、保存し直してもファイル全体は変わらず、加えた変更だけが差分になる）。たとえば、2 つのスキーマの差分を比較するテストなどで使える。
  */
 export function stabilizeSchema(schema: GraphQLSchema): GraphQLSchema {
   return lexicographicSortSchema(schema)
@@ -22,9 +22,9 @@ export function sortDefinitions(
 }
 
 /**
- * Internally in Gatsby we use the function generateQueryName:
+ * Gatsby の内部では、関数 generateQueryName を使っている:
  * packages/gatsby/src/query/file-parser.js
- * This function re-implements this partially to guess if a query is unnamed
+ * この関数は、クエリが無名かどうかを推測するために、それを部分的に再実装している
  */
 function guessIfUnnnamedQuery({
   isStaticQuery,
@@ -53,8 +53,8 @@ function isThirdpartyFragment(def: IDefinitionMeta): boolean {
 }
 
 /**
- * We don't want third-party definitions/queries unless it's a fragment.
- * We also don't want unnamed queries ending up in the TS types.
+ * フラグメントでない限り、サードパーティーの定義やクエリは不要である。
+ * また、無名のクエリが TS の型に入ることも避けたい。
  */
 function isTargetDefinition(def: IDefinitionMeta): boolean {
   if (isThirdpartyFragment(def)) {

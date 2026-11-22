@@ -6,7 +6,7 @@ import { ICert } from "../commands/types"
 import prompts from "prompts"
 
 const absoluteOrDirectory = (directory: string, filePath: string): string => {
-  // Support absolute paths
+  // 絶対パスに対応する
   if (path.isAbsolute(filePath)) {
     return filePath
   }
@@ -49,8 +49,8 @@ export async function getSslCert({
   caFile,
   directory,
 }: IGetSslCertArgs): Promise<ICert | false> {
-  // check that cert file and key file are both true or both false, if they are both
-  // false, it defaults to the automatic ssl
+  // 証明書ファイルと鍵ファイルが、両方とも true か両方とも false であることを確認する。両方とも
+  // false の場合は、デフォルトで自動の ssl になる
   if (certFile ? !keyFile : keyFile) {
     report.panic({
       id: `11521`,
@@ -76,13 +76,13 @@ export async function getSslCert({
   )
   try {
     if ([`linux`, `darwin`].includes(os.platform()) && !process.env.HOME) {
-      // this is a total hack to ensure process.env.HOME is set on linux and mac
-      // devcert creates config path at import time (hence we import devcert after setting dummy value):
+      // これは、linux と mac で process.env.HOME が確実に設定されているようにするための、完全なハックである
+      // devcert は import 時に設定のパスを作成する（そのため、ダミーの値を設定した後に devcert を import する）:
       // - https://github.com/davewasmer/devcert/blob/2b1b8d40eda251616bf74fd69f00ae8222ca1171/src/constants.ts#L15
       // - https://github.com/LinusU/node-application-config-path/blob/ae49ff6748b68b29ec76c00ce4a28ba8e9161d9b/index.js#L13
-      // if HOME is not set, we will get:
+      // HOME が設定されていないと、次の致命的なエラーになる:
       // "The "path" argument must be of type s tring. Received type undefined"
-      // fatal error. This still likely will result in fatal error, but at least it's not on import time
+      // これでもおそらく致命的なエラーになるが、少なくとも import 時には起きない
       const mkdtemp = fs.mkdtempSync(path.join(os.tmpdir(), `home-`))
       process.env.HOME = mkdtemp
     }

@@ -6,12 +6,12 @@ import { store } from "../redux"
 /**
  * copyStaticDirs
  * --
- * Copy files from the static directory to the public directory
+ * static ディレクトリのファイルを public ディレクトリにコピーする
  */
 export const copyStaticDirs = (): void => {
-  // access the store to get themes
+  // ストアにアクセスしてテーマを取得する
   const { flattenedPlugins } = store.getState()
-  // if there are legacy themes, only use them. Otherwise proceed with plugins
+  // 従来のテーマがある場合は、それだけを使う。なければプラグインで続行する
   const themesSet = flattenedPlugins.map(plugin => {
     return {
       themeDir: plugin.pluginFilepath,
@@ -20,11 +20,11 @@ export const copyStaticDirs = (): void => {
   })
 
   themesSet
-    // create an array of potential theme static folders
+    // テーマの static フォルダーの候補の配列を作成する
     .map(theme => nodePath.resolve(theme.themeDir, `static`))
-    // filter out the static folders that don't exist
+    // 存在しない static フォルダーを取り除く
     .filter(themeStaticPath => fs.existsSync(themeStaticPath))
-    // copy the files for each folder into the user's build
+    // それぞれのフォルダーのファイルを、ユーザーのビルドにコピーする
     .map(folder =>
       fs.copySync(folder, nodePath.join(process.cwd(), `public`), {
         dereference: true,
@@ -41,7 +41,7 @@ export const copyStaticDirs = (): void => {
 /**
  * syncStaticDir
  * --
- * Set up a watcher to sync changes from the static directory to the public directory
+ * static ディレクトリの変更を public ディレクトリに同期するウォッチャーをセットアップする
  */
 export const syncStaticDir = (): void => {
   const staticDir = nodePath.join(process.cwd(), `static`)

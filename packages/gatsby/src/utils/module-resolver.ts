@@ -14,7 +14,7 @@ export const resolveModule: ModuleResolver = modulePath => {
       extensions: [`.ts`, `.tsx`, `.js`, `.jsx`],
     })
   } catch (err) {
-    // ignore
+    // 無視する
   }
 
   // @ts-ignore - See https://github.com/microsoft/TypeScript/issues/9568

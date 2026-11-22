@@ -25,7 +25,7 @@ function exponentialBackoff(retry: number): Promise<void> {
 }
 
 /**
- * Construct Parcel with config.
+ * 設定を指定して Parcel を構築する。
  * @see {@link https://parceljs.org/features/targets/}
  */
 export function constructParcel(siteRoot: string, cache?: Cache): Parcel {
@@ -64,8 +64,8 @@ export async function runParcel(siteRoot: string): Promise<RunParcelReturn> {
   const parcel = constructParcel(siteRoot, cache)
   const { bundleGraph } = await parcel.run()
   const bundles = bundleGraph.getBundles()
-  // bundles is not serializable, so we need to extract the data we need
-  // so it crosses IPC boundaries
+  // bundles はシリアライズできないので、IPC の境界を越えられるように、
+  // 必要なデータを取り出す必要がある
   return bundles.map(bundle => {
     return {
       filePath: bundle.filePath,
@@ -75,8 +75,8 @@ export async function runParcel(siteRoot: string): Promise<RunParcelReturn> {
 }
 
 /**
- * Compile known gatsby-* files (e.g. `gatsby-config`, `gatsby-node`)
- * and output in `<SITE_ROOT>/.cache/compiled`.
+ * 既知の gatsby-* ファイル（例: `gatsby-config`、`gatsby-node`）をコンパイルして、
+ * `<SITE_ROOT>/.cache/compiled` に出力する。
  */
 export async function compileGatsbyFiles(
   siteRoot: string,
@@ -85,9 +85,9 @@ export async function compileGatsbyFiles(
   try {
     const gatsbyNodeName = `gatsby-node`
 
-    // Check for gatsby-node.jsx and gatsby-node.tsx (or other misnamed variations)
-    // We want to filter out directory names so we can use "withFileTypes"
-    // With "withFileTypes" the array will contain <fs.Dirent> objects
+    // gatsby-node.jsx と gatsby-node.tsx（やその他の誤った名前のバリエーション）がないかを確認する
+    // ディレクトリ名を取り除きたいので、"withFileTypes" を使う
+    // "withFileTypes" を使うと、配列には <fs.Dirent> オブジェクトが入る
     const filesAndDirectories = await readdir(siteRoot, { withFileTypes: true })
     const files = filesAndDirectories
       .filter(i => !i.isDirectory())
@@ -101,7 +101,7 @@ export async function compileGatsbyFiles(
       }
 
       const { name } = path.parse(file)
-      // Of course, allow valid gatsby-node files
+      // もちろん、有効な gatsby-node ファイルは許可する
       if (
         file === `gatsby-node.js` ||
         file === `gatsby-node.mjs` ||
@@ -110,13 +110,13 @@ export async function compileGatsbyFiles(
         break
       }
 
-      // Check for likely misnamed files
+      // 誤った名前の可能性が高いファイルを確認する
       if (isNearMatch(name, gatsbyNodeName, 3)) {
         nearMatch = file
       }
     }
 
-    // gatsby-node is misnamed
+    // gatsby-node の名前が誤っている
     if (nearMatch) {
       const isTSX = nearMatch.endsWith(`.tsx`)
       reporter.panic({
@@ -144,12 +144,12 @@ export async function compileGatsbyFiles(
 
     let bundles: RunParcelReturn = []
     try {
-      // sometimes parcel segfaults which is not something we can recover from, so we run parcel
-      // in child process and IF it fails we try to delete parcel's cache (this seems to "fix" the problem
-      // causing segfaults?) and retry few times
-      // not ideal, but having gatsby segfaulting is really frustrating and common remedy is to clean
-      // entire .cache for users, which is not ideal either especially when we can just delete parcel's cache
-      // and to recover automatically
+      // parcel は segfault を起こすことがあり、そこからは復旧できない。そのため parcel を
+      // 子プロセスで実行し、失敗した場合は parcel のキャッシュを削除して（これで segfault の原因に
+      // なっている問題が「直る」ようだ）、数回再試行する
+      // 理想的ではないが、gatsby が segfault を起こすのは非常にストレスが大きい。一般的な対処法は .cache 全体を
+      // 消すことだが、それもユーザーにとって理想的ではない。parcel のキャッシュだけを削除して
+      // 自動的に復旧できるなら、なおさらである
       bundles = await worker.single.runParcel(siteRoot)
     } catch (error) {
       if (error.diagnostics) {
@@ -170,8 +170,8 @@ export async function compileGatsbyFiles(
         try {
           await remove(getCacheDir(siteRoot))
         } catch {
-          // in windows we might get "EBUSY" errors if LMDB failed to close, so this try/catch is
-          // to prevent EBUSY errors from potentially hiding real import errors
+          // windows では、LMDB のクローズに失敗すると "EBUSY" エラーになることがある。この try/catch は、
+          // EBUSY エラーが本当の import エラーを隠してしまうのを防ぐためのものである
         }
         await compileGatsbyFiles(siteRoot, retry + 1)
         return
@@ -186,7 +186,7 @@ export async function compileGatsbyFiles(
 
     let compiledTSFilesCount = 0
     for (const bundle of bundles) {
-      // validate that output exists and is valid
+      // 出力が存在し、有効であることを検証する
       try {
         delete require.cache[bundle.filePath]
         require(bundle.filePath)
@@ -202,8 +202,8 @@ export async function compileGatsbyFiles(
             },
           })
         } else if (retry > 0) {
-          // first retry is most flaky and it seems it always get in good state
-          // after that - most likely cache clearing is the trick that fixes the problem
+          // 最初の再試行が最も不安定で、その後は常に良い状態になるようだ。
+          // おそらく、キャッシュの消去が問題を直す決め手になっている
           reporter.verbose(
             `Failed to import compiled file "${
               bundle.filePath
@@ -216,8 +216,8 @@ export async function compileGatsbyFiles(
         try {
           await remove(getCacheDir(siteRoot))
         } catch {
-          // in windows we might get "EBUSY" errors if LMDB failed to close, so this try/catch is
-          // to prevent EBUSY errors from potentially hiding real import errors
+          // windows では、LMDB のクローズに失敗すると "EBUSY" エラーになることがある。この try/catch は、
+          // EBUSY エラーが本当の import エラーを隠してしまうのを防ぐためのものである
         }
 
         await compileGatsbyFiles(siteRoot, retry + 1)
@@ -225,7 +225,7 @@ export async function compileGatsbyFiles(
       }
 
       const mainEntry = bundle.mainEntryPath
-      // mainEntry won't exist for shared chunks
+      // 共有チャンクには mainEntry が存在しない
       if (mainEntry) {
         if (mainEntry.endsWith(`.ts`)) {
           compiledTSFilesCount = compiledTSFilesCount + 1
@@ -252,9 +252,9 @@ function handleErrors(diagnostics: Array<Diagnostic>): void {
   diagnostics.forEach(err => {
     if (err.codeFrames) {
       err.codeFrames.forEach(c => {
-        // Assuming that codeHighlights only ever has one entry in the array. Local tests only ever showed one
+        // codeHighlights の配列には常にエントリーが 1 つしかないと仮定している。ローカルでのテストでは、1 つしか現れなかった
         const codeHighlightsMessage = c?.codeHighlights[0]?.message
-        // If both messages are the same don't print the specific, otherwise they would be duplicate
+        // 両方のメッセージが同じ場合は、具体的なほうを出力しない。そうしないと重複してしまう
         const specificMessage =
           codeHighlightsMessage === err.message
             ? undefined

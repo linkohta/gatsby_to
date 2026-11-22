@@ -10,17 +10,17 @@ const pathRelative: (from: string, to: string) => string = memoize(
 )
 const murmurhash: (str: string, seed: number) => number = memoize(_murmurhash)
 
-// unified routes adds support for files with [] and {},
-// the problem with our generateComponentChunkName is that when you
-// call kebabCase, is strips off characters like that. This means
-// that when you have a app with this sort of setup, the resolutions fail
+// unified routes は、[] や {} を含むファイルへの対応を追加する。
+// generateComponentChunkName の問題は、kebabCase を呼ぶと、
+// そのような文字が取り除かれてしまうことである。そのため、
+// 次のような構成のアプリでは、解決に失敗する
 //
-// src/pages/products/{id}.js (collection route)
-// src/pages/products/[...id].js (should render when a non-matched id is passed in)
+// src/pages/products/{id}.js（コレクションルート）
+// src/pages/products/[...id].js（一致しない id が渡されたときにレンダリングされるはずのもの）
 //
-// without this function, what happens is that all visits to /products/__ resolve to only one
-// of these because the componentChunkName ends up being duplicate. This function ensures that
-// the {} and [] are kept in the componentChunkName. Also there are tests for this.
+// この関数がないと、componentChunkName が重複してしまうので、/products/__ へのすべてのアクセスが
+// このどちらか一方にしか解決されなくなる。この関数は、{} と [] が
+// componentChunkName に残るようにする。これについてのテストもある。
 function replaceUnifiedRoutesKeys(
   kebabedName: string,
   filePath: string
@@ -61,16 +61,16 @@ export function generateComponentChunkName(
     name = replaceUnifiedRoutesKeys(kebabCase(name), name)
 
     /**
-     * File names should not exceed 255 characters
-     * minus 12 for `component---`
-     * minus 7 for `.js.map`
-     * minus 20 for `-[hash].js`
+     * ファイル名は 255 文字を超えてはならない
+     * `component---` の分として 12 を引く
+     * `.js.map` の分として 7 を引く
+     * `-[hash].js` の分として 20 を引く
      */
     const maxLength = 215
     const shouldTruncate = name.length > maxLength
 
     /**
-     * To prevent long file name errors, we truncate the name to a maximum of 60 characters.
+     * ファイル名が長すぎることによるエラーを防ぐために、名前を最大 60 文字に切り詰める。
      */
     if (shouldTruncate) {
       const hash = murmurhash(name, 0)

@@ -1,6 +1,6 @@
-// This is a simple event emitter based on mitt.js
-// It mainly changes the data model to use a Map and Set, rather than a
-// regular object and an array.
+// これは mitt.js を基にした単純なイベントエミッターである
+// 主な違いは、データモデルを、通常のオブジェクトと配列ではなく
+// Map と Set を使うように変えていることである。
 
 type MettHandler<EventName, Payload> = (
   e: Payload,

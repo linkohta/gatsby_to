@@ -25,25 +25,25 @@ export const DEFAULT_DOCUMENT_SEARCH_PATHS = [
 ]
 const NAMESPACE = `Queries`
 
-// These override the defaults from
+// これらは、次のデフォルトを上書きする
 // https://www.graphql-code-generator.com/plugins/typescript
 const DEFAULT_TYPESCRIPT_CONFIG: Readonly<TypeScriptPluginConfig> = {
-  // <Maybe> Type is enough
+  // <Maybe> 型で十分である
   avoidOptionals: true,
-  // Types come from the data layer so they can't be modified
+  // 型はデータレイヤーから来るので、変更できない
   immutableTypes: true,
-  // TODO: Better maybeValue
+  // TODO: maybeValue を改善する
   maybeValue: `T | null`,
-  // We'll want to re-export ourselves
+  // 自分で再 export したい
   noExport: true,
-  // Recommended for .d.ts files
+  // .d.ts ファイルで推奨されている
   enumsAsTypes: true,
   scalars: {
     Date: `string`,
     JSON: `Record<string, unknown>`,
     GatsbyImageData: `import('gatsby-plugin-image').IGatsbyImageData`,
   },
-  // import type {} syntax is nicer
+  // import type {} の構文のほうがよい
   useTypeImports: true,
 }
 
@@ -108,16 +108,16 @@ export async function writeTypeScriptTypes(
   const filename = join(directory, graphqlTypegenOptions.typesOutputPath)
 
   let gatsbyNodeDocuments: Array<Types.DocumentFile> = []
-  // The loadDocuments + CodeFileLoader looks for graphql(``) functions inside the gatsby-node.ts files
-  // And then extracts the queries into documents
-  // TODO: This codepath can be made obsolete if Gatsby itself already places the queries inside gatsby-node into the `definitions`
+  // loadDocuments と CodeFileLoader は、gatsby-node.ts ファイルの中の graphql(``) 関数を探す
+  // そして、クエリをドキュメントとして抽出する
+  // TODO: Gatsby 自体が gatsby-node の中のクエリを `definitions` に入れるようになれば、このコードパスは不要にできる
   try {
     gatsbyNodeDocuments = await loadDocuments(
       graphqlTypegenOptions.documentSearchPaths,
       {
         loaders: [
           new CodeFileLoader({
-            // Configures https://www.graphql-tools.com/docs/graphql-tag-pluck to only check graphql function from Gatsby
+            // https://www.graphql-tools.com/docs/graphql-tag-pluck を、Gatsby の graphql 関数だけを確認するように設定する
             pluckConfig: {
               modules: [{ name: `gatsby`, identifier: `graphql` }],
             },
@@ -127,7 +127,7 @@ export async function writeTypeScriptTypes(
       }
     )
   } catch (e) {
-    // These files might not exist, so just skip this
+    // これらのファイルは存在しないかもしれないので、スキップするだけにする
   }
 
   const documents: Array<Types.DocumentFile> = [
