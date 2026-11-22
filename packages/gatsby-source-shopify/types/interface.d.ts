@@ -23,8 +23,8 @@ type BulkOperationStatus =
 interface IBulkOperationNode {
   status: BulkOperationStatus
   /**
-   * FIXME: The docs say objectCount is a number, but it's a string. Let's
-   * follow up with Shopify on this and make sure it's working as intended.
+   * FIXME: ドキュメントでは objectCount は数値とされているが、実際は文字列である。
+   * Shopify に確認し、意図どおりに動いているかを確かめること。
    */
   objectCount: string
   url: string
@@ -86,7 +86,7 @@ enum ErrorCategory {
 
 interface IErrorMapEntry {
   text: (context: IErrorContext) => string
-  // keyof typeof is used for these enums so that the public facing API (e.g. used by setErrorMap) doesn't rely on enum but gives an union
+  // これらの enum に keyof typeof を使っているのは、公開 API（setErrorMap で使われるものなど）が enum に依存せず、ユニオン型を提供するようにするためである
   level: `${Level}`
   type: `${Type}`
   category: `${ErrorCategory}`

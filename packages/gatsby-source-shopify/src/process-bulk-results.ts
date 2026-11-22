@@ -39,7 +39,7 @@ export async function processBulkResults(
       gatsbyCreateNodeId
     ) as IDecoratedResult
     /**
-     * @todo detect the following different as JSON.stringify order is not deterministic
+     * @todo JSON.stringify の順序は決定的ではないので、次の違いを検出する
      */
     const resultIsNode = isNode(result)
 
@@ -48,17 +48,17 @@ export async function processBulkResults(
       const imageFields = shopifyTypes[type].imageFields
       const referenceFields = shopifyTypes[type].referenceFields
 
-      // Only increment for parent nodes
+      // 親ノードの場合だけ増やす
       if (!result.__parentId) nodeCount++
 
-      // Attach reference fields
+      // 参照フィールドを付ける
       if (referenceFields) {
         for (const referenceField of referenceFields) {
           result[referenceField] = []
         }
       }
 
-      // Attach children references / objects
+      // 子の参照またはオブジェクトを付ける
       if (children[result.shopifyId]) {
         for (const child of children[result.shopifyId]) {
           const childType =
@@ -108,7 +108,7 @@ export async function processBulkResults(
       }
     }
 
-    // If the object is a child store the reference
+    // オブジェクトが子であれば、参照を保存する
     if (result.__parentId) {
       children[result.__parentId] = [
         ...(children[result.__parentId] || []),

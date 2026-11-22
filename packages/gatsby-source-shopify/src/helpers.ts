@@ -89,13 +89,13 @@ export function decorateBulkObject(
       obj[key] = decorateBulkObject(obj[key], createGatsbyNodeId, key, obj)
     }
 
-    // We must convert ID to ShopifyID so that it doesn't collide with Gatsby's internal ID
+    // Gatsby の内部 ID と衝突しないよう、ID を ShopifyID に変換しなければならない
     if (obj.id) {
       obj.shopifyId = obj.id
       delete obj.id
 
-      // if an object only has an ID, we know it's a node reference
-      // so we create a Gatsby node ID for it on a new field to avoid introducing a breaking change
+      // オブジェクトが ID しか持たなければ、それはノードへの参照だと分かる
+      // 破壊的変更を避けるため、新しいフィールドにその Gatsby ノード ID を作成する
       if (Object.keys(input).length === 1 && parent) {
         ;(parent as Record<string, unknown>)[`_${inputKey}`] =
           createGatsbyNodeId(obj.shopifyId as string)

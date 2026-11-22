@@ -7,13 +7,13 @@ import { createNodeId, parseShopifyId } from "./helpers"
 const deletionCounter: { [key: string]: number } = {}
 
 /**
- * invalidateNode - Recursive function that returns an array of node ids that are invalidated
- * @param gatsbyApi - Gatsby Helpers
- * @param pluginOptions - Plugin Options Object
- * @param id - The root node to invalidate
+ * invalidateNode - 無効化されるノード id の配列を返す再帰関数
+ * @param gatsbyApi - Gatsby のヘルパー
+ * @param pluginOptions - プラグインオプションのオブジェクト
+ * @param id - 無効化するルートノード
  *
- * Note: This function is designed to receive a single top-level node on the first pass
- * and then call itself recuresively afterwards for each nested layer of coupled nodes
+ * Note: この関数は、最初はトップレベルのノードを 1 つ受け取り、
+ * その後は結び付いたノードの階層ごとに自分自身を再帰的に呼び出すように設計されている
  */
 function invalidateNode(
   gatsbyApi: SourceNodesArgs,
@@ -84,12 +84,12 @@ export async function updateCache(
     invalidateNode(gatsbyApi, pluginOptions, nodeId, invalidatedNodeIds)
   }
 
-  // don't block event loop for too long
+  // イベントループを長時間ブロックしない
   await new Promise(resolve => setImmediate(resolve))
 
   for (const shopifyType of Object.keys(shopifyTypes)) {
     {
-      // closure so we can let Node GC `nodes` (if needed) before next iteration
+      // 次の反復の前に（必要であれば）Node が `nodes` を GC できるよう、クロージャにしている
       const nodes = gatsbyApi.getNodesByType(
         `${pluginOptions.typePrefix}Shopify${shopifyType}`
       ) as Array<IShopifyNode>
@@ -104,7 +104,7 @@ export async function updateCache(
       }
     }
 
-    // don't block event loop for too long
+    // イベントループを長時間ブロックしない
     await new Promise(resolve => setImmediate(resolve))
   }
 

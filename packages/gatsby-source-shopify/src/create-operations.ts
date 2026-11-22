@@ -75,7 +75,7 @@ export function createOperations(
           await new Promise(resolve => setTimeout(resolve, 1000))
           currentBulkOperation = (await currentOperation()).currentBulkOperation
 
-          // add warning for CI environments
+          // CI 環境向けの警告を追加する
           if (
             process.env.CI &&
             Date.now() > lastWarningTime + warningInterval
@@ -88,7 +88,7 @@ export function createOperations(
               `Operation ${currentBulkOperation.id} is still running after ${runtime} seconds with status "${currentBulkOperation.status}"`
             )
 
-            // handle next interval, slowly increase time so we don't flood every minute
+            // 次の間隔を処理する。毎分大量に送らないよう、時間を少しずつ延ばす
             warningCount += 1
             warningInterval =
               warningCount <= 5
@@ -146,9 +146,9 @@ export function createOperations(
       cancelTimer.setStatus(`Cancelled operation: ${bulkOperation.id}`)
     } else {
       /**
-       * Just because it's not running doesn't mean it's done. For
-       * example, it could be CANCELING. We still have to wait for it
-       * to be officially finished before we start a new one.
+       * 実行中でないからといって、完了しているとは限らない。たとえば
+       * CANCELING の可能性がある。新しいものを始める前に、正式に終了するのを
+       * 待つ必要がある。
        */
       while (!finishedStatuses.includes(bulkOperation.status)) {
         await new Promise(resolve => setTimeout(resolve, 100))
@@ -163,12 +163,11 @@ export function createOperations(
     cancelTimer.end()
   }
 
-  /* Maybe the interval should be adjustable, because users
-   * with larger data sets could easily wait longer. We could
-   * perhaps detect that the interval being used is too small
-   * based on returned object counts and iteration counts, and
-   * surface feedback to the user suggesting that they increase
-   * the interval.
+  /* 間隔は調整できるようにすべきかもしれない。データセットが
+   * 大きいユーザーは、もっと長く待つことも十分にあり得る。返された
+   * オブジェクト数と反復回数から、使っている間隔が短すぎることを
+   * 検出し、間隔を延ばすよう勧めるフィードバックをユーザーに
+   * 示すこともできるだろう。
    */
   async function completedOperation(
     operationId: string,
