@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Renderer } from "react-dom"
 import { EventEmitter } from "events"
-import { WindowLocation, NavigateOptions } from "@reach/router" // These come from `@types/reach__router`
+import { WindowLocation, NavigateOptions } from "@reach/router" // これらは `@types/reach__router` に由来する
 import { Reporter } from "gatsby-cli/lib/reporter/reporter"
 import { Span } from "opentracing"
 export { Reporter }
@@ -59,20 +59,20 @@ export const useScrollRestoration: (key: string) => {
 }
 
 export class StaticQueryDocument {
-  /** Prevents structural type widening. */
+  /** 構造的な型の拡大を防ぐ。 */
   #kind: "StaticQueryDocument"
 
-  /** Allows type-safe access to the static query hash for debugging purposes. */
+  /** デバッグ用に、静的クエリのハッシュへ型安全にアクセスできるようにする。 */
   toString(): string
 }
 
 /**
- * A React Hooks version of StaticQuery.
+ * StaticQuery の React Hooks 版。
  *
- * StaticQuery can do most of the things that page query can, including fragments. The main differences are:
+ * StaticQuery は、フラグメントを含め、ページクエリでできることのほとんどができる。主な違いは次のとおり:
  *
- * - page queries can accept variables (via `pageContext`) but can only be added to _page_ components
- * - StaticQuery does not accept variables (hence the name "static"), but can be used in _any_ component, including pages
+ * - ページクエリは（`pageContext` 経由で）変数を受け取れるが、_ページ_ コンポーネントにしか追加できない
+ * - StaticQuery は変数を受け取れない（そのため「static」という名前である）が、ページを含む _どの_ コンポーネントでも使える
  *
  * @see https://www.gatsbyjs.com/docs/how-to/querying-data/use-static-query/
  */
@@ -83,8 +83,8 @@ export const parsePath: (path: string) => WindowLocation
 export const prefetchPathname: (path: string) => void
 
 /**
- * A props object for adding type safety to your Gatsby pages, can be
- * extended with both the query response shape, and the page context.
+ * Gatsby のページに型安全性を加えるための props オブジェクト。
+ * クエリのレスポンスの形と、ページコンテキストの両方で拡張できる。
  *
  * @example
  * // When typing a default page from the ./pages dir
@@ -111,17 +111,17 @@ export type PageProps<
   LocationState = WindowLocation["state"],
   ServerDataType = object
 > = {
-  /** The path for this current page */
+  /** 現在のページのパス */
   path: string
-  /** The URI for the current page */
+  /** 現在のページの URI */
   uri: string
-  /** An extended version of window.document which comes from @react/router */
+  /** @react/router に由来する、window.document の拡張版 */
   location: WindowLocation<LocationState>
-  /** You can't get passed children as this is the root user-land component */
+  /** これはユーザー側のルートコンポーネントなので、children を受け取ることはできない */
   children: undefined
-  /** The URL parameters when the page has a `matchPath` */
+  /** ページに `matchPath` がある場合の URL パラメーター */
   params: Record<string, string>
-  /** Holds information about the build process for this component */
+  /** このコンポーネントのビルド処理に関する情報を保持する */
   pageResources: {
     component: React.Component
     json: {
@@ -136,9 +136,9 @@ export type PageProps<
     }
   }
   /**
-   * Data passed into the page via an exported GraphQL query. To set up this type
-   * you need to use [generics](https://www.typescriptlang.org/play/#example/generic-functions),
-   * see below for an example
+   * export された GraphQL クエリを通じてページへ渡されるデータ。この型を設定するには
+   * [ジェネリクス](https://www.typescriptlang.org/play/#example/generic-functions) を使う必要がある。
+   * 例は以下を参照
    *
    * @example
    *
@@ -149,12 +149,11 @@ export type PageProps<
    *
    * export default (props: IndexPageProps) => {
    *   ..
-   *
    */
   data: DataType
   /**
-   * A context object which is passed in during the creation of the page. Can be extended if you are using
-   * `createPage` yourself using generics:
+   * ページの作成時に渡されるコンテキストオブジェクト。自分で `createPage` を使っている場合は、
+   * ジェネリクスを使って拡張できる:
    *
    * @example
    *
@@ -168,12 +167,12 @@ export type PageProps<
    *   ..
    */
   pageContext: PageContextType
-  /** Data passed into the page via the [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) SSR function. */
+  /** SSR の関数 [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) を通じてページへ渡されるデータ。 */
   serverData: ServerDataType
 }
 
 /**
- * A props object passed into the Head function for [Gatsby Head API](https://gatsby.dev/gatsby-head).
+ * [Gatsby Head API](https://gatsby.dev/gatsby-head) の Head 関数へ渡される props オブジェクト。
  */
 export type HeadProps<
   DataType = object,
@@ -182,28 +181,28 @@ export type HeadProps<
 > = {
   location: {
     /**
-     * Returns the Location object's URL's path.
+     * Location オブジェクトの URL のパスを返す。
      */
     pathname: string
   }
-  /** The URL parameters when the page has a `matchPath` */
+  /** ページに `matchPath` がある場合の URL パラメーター */
   params: Record<string, string>
   /**
-   * Data passed into the page via an exported GraphQL query.
+   * export された GraphQL クエリを通じてページへ渡されるデータ。
    */
   data: DataType
   /**
-   * A context object which is passed in during the creation of the page.
+   * ページの作成時に渡されるコンテキストオブジェクト。
    */
   pageContext: PageContextType
   /**
-   * Data passed into the page via the [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) SSR function.
+   * SSR の関数 [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) を通じてページへ渡されるデータ。
    */
   serverData: ServerDataType
 }
 
 /**
- * A shorthand type for combining the props and return type for the [Gatsby Head API](https://gatsby.dev/gatsby-head).
+ * [Gatsby Head API](https://gatsby.dev/gatsby-head) の props と戻り値の型をまとめた短縮形の型。
  */
 export type HeadFC<DataType = object, PageContextType = object> = (
   props: HeadProps<DataType, PageContextType>
@@ -223,7 +222,7 @@ interface ISerializableObject {
 }
 
 /**
- * A props object for [slice placholder](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/)
+ * [スライスのプレースホルダー](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) 用の props オブジェクト
  */
 export interface SlicePlaceholderProps {
   alias: string
@@ -233,12 +232,12 @@ export interface SlicePlaceholderProps {
 }
 
 /**
- * Component used as a slice placholder, to mark a place in the page where a [slice](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) should be inserted.
+ * スライスのプレースホルダーとして使うコンポーネント。ページ内で [スライス](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) を挿入する位置を示す。
  */
 export declare function Slice(props: SlicePlaceholderProps): JSX.Element
 
 /**
- * A props object for [slice component](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/)
+ * [スライスコンポーネント](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) 用の props オブジェクト
  */
 export type SliceComponentProps<
   DataType = object,
@@ -251,7 +250,7 @@ export type SliceComponentProps<
 } & AdditionalSerializableProps
 
 /**
- * Props object passed into the [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) function.
+ * [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) 関数へ渡される props オブジェクト。
  */
 export type GetServerDataProps = {
   headers: Map<string, unknown>
@@ -263,7 +262,7 @@ export type GetServerDataProps = {
 }
 
 /**
- * The return type (promise payload) from the [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) function.
+ * [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) 関数の戻り値の型（promise のペイロード）。
  */
 export type GetServerDataReturn<ServerDataType = Record<string, unknown>> =
   Promise<{
@@ -273,24 +272,24 @@ export type GetServerDataReturn<ServerDataType = Record<string, unknown>> =
   }>
 
 /**
- * A shorthand type for combining the props and return type for the [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) function.
+ * [getServerData](https://www.gatsbyjs.com/docs/reference/rendering-options/server-side-rendering/) 関数の props と戻り値の型をまとめた短縮形の型。
  */
 export type GetServerData<ServerDataType> = (
   props: GetServerDataProps
 ) => GetServerDataReturn<ServerDataType>
 
 /**
- * Constructor arguments for the PageRenderer.
+ * PageRenderer のコンストラクター引数。
  */
 export interface PageRendererProps {
   location: WindowLocation
 }
 
 /**
- * PageRenderer's constructor [loads the page resources](https://www.gatsbyjs.com/docs/production-app/#load-page-resources) for the path.
+ * PageRenderer のコンストラクターは、パスに対応する [ページリソースを読み込む](https://www.gatsbyjs.com/docs/production-app/#load-page-resources)。
  *
- * On first load though, these will have already been requested from the server by `<link rel="preload" ... />` in the page's original HTML (see [Link Preloads](https://www.gatsbyjs.com/docs/how-code-splitting-works/#construct-link-and-script-tags-for-current-page) in HTML Generation Docs).
- * The loaded page resources includes the imported component, with which we create the actual page component using [React.createElement()](https://reactjs.org/docs/react-api.html). This element is returned to our RouteHandler which hands it off to Reach Router for rendering.
+ * ただし初回の読み込み時には、ページの元の HTML にある `<link rel="preload" ... />` によって、これらはすでにサーバーへリクエスト済みである（HTML 生成のドキュメントの [Link Preloads](https://www.gatsbyjs.com/docs/how-code-splitting-works/#construct-link-and-script-tags-for-current-page) を参照）。
+ * 読み込まれたページリソースには import されたコンポーネントが含まれており、それを使って [React.createElement()](https://reactjs.org/docs/react-api.html) で実際のページコンポーネントを作成する。この要素は RouteHandler に返され、RouteHandler がレンダリングのために Reach Router へ渡す。
  *
  * @see https://www.gatsbyjs.com/docs/production-app/#page-rendering
  */
@@ -305,11 +304,11 @@ export interface StaticQueryProps<T = any> {
 }
 
 /**
- * StaticQuery can do most of the things that page query can, including fragments. The main differences are:
+ * StaticQuery は、フラグメントを含め、ページクエリでできることのほとんどができる。主な違いは次のとおり:
  *
- * - page queries can accept variables (via `pageContext`) but can only be added to _page_ components
- * - StaticQuery does not accept variables (hence the name "static"), but can be used in _any_ component, including pages
- * - StaticQuery does not work with raw React.createElement calls; please use JSX, e.g. `<StaticQuery />`
+ * - ページクエリは（`pageContext` 経由で）変数を受け取れるが、_ページ_ コンポーネントにしか追加できない
+ * - StaticQuery は変数を受け取れない（そのため「static」という名前である）が、ページを含む _どの_ コンポーネントでも使える
+ * - StaticQuery は React.createElement を直接呼び出す書き方では動作しない。`<StaticQuery />` のように JSX を使うこと
  *
  * @see https://www.gatsbyjs.com/docs/static-query/
  */
@@ -319,9 +318,9 @@ export class StaticQuery<T = any> extends React.Component<
 > {}
 
 /**
- * graphql is a tag function. Behind the scenes Gatsby handles these tags in a particular way
+ * graphql はタグ関数である。Gatsby は内部でこのタグを特別な方法で処理する
  *
- * During the Gatsby build process, GraphQL queries are pulled out of the original source for parsing.
+ * Gatsby のビルド処理の中で、GraphQL クエリは解析のために元のソースから取り出される。
  *
  * @see https://www.gatsbyjs.com/docs/page-query#how-does-the-graphql-tag-work
  */
@@ -340,11 +339,11 @@ type Proxy = {
 
 type Header = {
   /**
-   * The path to match requests against.
+   * リクエストと照合するパス。
    */
   source: string
   /**
-   * Your custom response headers.
+   * 独自のレスポンスヘッダー。
    */
   headers: Array<{
     key: string
@@ -353,56 +352,56 @@ type Header = {
 }
 
 /**
- * Gatsby configuration API.
+ * Gatsby の設定 API。
  *
  * @see https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
  */
 export interface GatsbyConfig {
-  /** When you want to reuse common pieces of data across the site (for example, your site title), you can store that here. */
+  /** サイト全体で共通のデータ（サイトのタイトルなど）を再利用したい場合は、ここに保存できる。 */
   siteMetadata?: Record<string, unknown>
-  /** Plugins are Node.js packages that implement Gatsby APIs. The config file accepts an array of plugins. Some plugins may need only to be listed by name, while others may take options. */
+  /** プラグインは Gatsby の API を実装した Node.js パッケージである。設定ファイルはプラグインの配列を受け取る。名前を列挙するだけでよいプラグインもあれば、オプションを取るプラグインもある。 */
   plugins?: Array<PluginRef>
-  /** You can activate and deactivate current experiments here. These are experimental features that are currently under development and need testing. When opting in to an experiment you'll receive a console message with more information of what it does and a link to an umbrella discussion. */
+  /** 現在の実験的機能をここで有効または無効にできる。これらは開発中でテストが必要な実験的機能である。実験的機能を有効にすると、その内容の詳細と、関連するディスカッションへのリンクがコンソールに表示される。 */
   flags?: Record<string, boolean>
-  /** It’s common for sites to be hosted somewhere other than the root of their domain. Say we have a Gatsby site at `example.com/blog/`. In this case, we would need a prefix (`/blog`) added to all paths on the site. */
+  /** サイトをドメインのルート以外の場所でホスティングすることはよくある。たとえば Gatsby サイトが `example.com/blog/` にあるとする。この場合、サイト内のすべてのパスに接頭辞（`/blog`）を付ける必要がある。 */
   pathPrefix?: string
-  /** `never` removes all trailing slashes, `always` adds it, and `ignore` doesn't automatically change anything and it's in user hands to keep things consistent. By default `always` is used. */
+  /** `never` は末尾のスラッシュをすべて取り除き、`always` は追加する。`ignore` は自動では何も変更せず、一貫性を保つのはユーザーに委ねられる。デフォルトは `always` である。 */
   trailingSlash?: "always" | "never" | "ignore"
-  /** In some circumstances you may want to deploy assets (non-HTML resources such as JavaScript, CSS, etc.) to a separate domain. `assetPrefix` allows you to use Gatsby with assets hosted from a separate domain */
+  /** 状況によっては、アセット（JavaScript や CSS などの HTML 以外のリソース）を別のドメインへデプロイしたいことがある。`assetPrefix` を使うと、別ドメインでホスティングしたアセットと Gatsby を組み合わせて使える */
   assetPrefix?: string
-  /** More easily incorporate content into your pages through automatic TypeScript type generation and better GraphQL IntelliSense. If set to true, the default GraphQLTypegenOptions are used. See https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/ for all options. */
+  /** TypeScript の型の自動生成と、より優れた GraphQL の IntelliSense により、ページへコンテンツを組み込みやすくする。true に設定すると、デフォルトの GraphQLTypegenOptions が使われる。すべてのオプションは https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/ を参照。 */
   graphqlTypegen?: boolean | GraphQLTypegenOptions
-  /** Gatsby uses the ES6 Promise API. Because some browsers don't support this, Gatsby includes a Promise polyfill by default. If you'd like to provide your own Promise polyfill, you can set `polyfill` to false.*/
+  /** Gatsby は ES6 の Promise API を使う。これに対応していないブラウザーがあるため、Gatsby はデフォルトで Promise のポリフィルを含めている。独自の Promise のポリフィルを用意したい場合は、`polyfill` を false に設定できる。*/
   polyfill?: boolean
   mapping?: Record<string, string>
   jsxRuntime?: "automatic" | "classic"
   jsxImportSource?: string
   /**
-   * Setting the proxy config option will tell the develop server to proxy any unknown requests to your specified server.
+   * proxy の設定オプションを指定すると、develop サーバーは未知のリクエストを、指定したサーバーへプロキシする。
    * @see https://www.gatsbyjs.com/docs/api-proxy/
    * */
   proxy?: Proxy | Proxy[]
   /**
-   * A list of trusted URLs that will be proxied for use with the gatsby-script off-main-thread strategy.
+   * gatsby-script の off-main-thread 戦略で使うためにプロキシされる、信頼済み URL の一覧。
    * @see https://gatsby.dev/gatsby-script
    */
   partytownProxiedURLs?: Array<string>
-  /** Sometimes you need more granular/flexible access to the development server. Gatsby exposes the Express.js development server to your site’s gatsby-config.js where you can add Express middleware as needed. */
+  /** 開発サーバーに対して、より細かく柔軟なアクセスが必要になることがある。Gatsby は Express.js の開発サーバーをサイトの gatsby-config.js に公開しているので、必要に応じて Express のミドルウェアを追加できる。 */
   developMiddleware?(app: any): void
   /**
-   * You can set custom HTTP headers on the response of a given path. This allows you to, e.g. modify the caching behavior or configure access control. You can apply HTTP headers to static routes and redirects.
+   * 特定のパスのレスポンスに独自の HTTP ヘッダーを設定できる。これにより、キャッシュの挙動を変更したり、アクセス制御を設定したりできる。HTTP ヘッダーは静的なルートとリダイレクトに適用できる。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/headers/
    */
   headers?: Array<Header>
   /**
-   * Adapters are responsible for taking the production output from Gatsby and turning it into something your deployment platform understands. They make it easier to build and deploy Gatsby on any deployment platform.
+   * アダプターは、Gatsby の本番用の出力を受け取り、デプロイ先のプラットフォームが理解できる形に変換する役割を持つ。これにより、どのデプロイ先でも Gatsby をビルドしてデプロイしやすくなる。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/adapters/
    */
   adapter?: IAdapter
 }
 
 /**
- * Gatsby API for Node.js.
+ * Node.js 向けの Gatsby API。
  *
  * @see https://www.gatsbyjs.com/docs/node-apis/
  */
@@ -411,9 +410,9 @@ export interface GatsbyNode<
   TContext = Record<string, unknown>
 > {
   /**
-   * Tell plugins to add pages. This extension point is called only after the initial
-   * sourcing and transformation of nodes plus creation of the GraphQL schema are
-   * complete so you can query your data in order to create pages.
+   * プラグインにページの追加を指示する。この拡張ポイントは、ノードの最初の
+   * ソーシングと変換、および GraphQL スキーマの作成が完了した後にだけ
+   * 呼ばれるので、データをクエリしてページを作成できる。
    *
    * @see https://www.gatsbyjs.com/docs/node-apis/#createPages
    */
@@ -426,18 +425,18 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Like `createPages` but for plugins who want to manage creating and removing
-   * pages themselves in response to changes in data *not* managed by Gatsby.
-   * Plugins implementing `createPages` will get called regularly to recompute
-   * page information as Gatsby's data changes but those implementing
-   * `createPagesStatefully` will not.
+   * `createPages` に似ているが、Gatsby が管理して *いない* データの変更に応じて、
+   * ページの作成と削除を自分で管理したいプラグインのためのものである。
+   * `createPages` を実装したプラグインは、Gatsby のデータが変わるたびに
+   * ページ情報を再計算するために定期的に呼ばれるが、
+   * `createPagesStatefully` を実装したプラグインは呼ばれない。
    *
-   * An example of a plugin that uses this extension point is the plugin
+   * この拡張ポイントを使うプラグインの例として
    * [gatsby-plugin-page-creator](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-page-creator)
-   * which monitors the `src/pages` directory for the adding and removal of JS
-   * pages. As its source of truth, files in the pages directory, is not known by
-   * Gatsby, it needs to keep its own state about its world to know when to
-   * add and remove pages.
+   * がある。このプラグインは `src/pages` ディレクトリを監視し、JS のページの
+   * 追加と削除を検知する。信頼できる情報源である pages ディレクトリ内の
+   * ファイルを Gatsby は把握していないため、ページをいつ追加し、いつ削除するかを
+   * 知るには、プラグイン自身が状態を保持する必要がある。
    */
   createPagesStatefully?(
     args: CreatePagesArgs & {
@@ -448,9 +447,9 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Let plugins extend/mutate the site's Babel configuration.
-   * This API will change before 2.0 as it needs still to be converted to use
-   * Redux actions.
+   * プラグインがサイトの Babel 設定を拡張または変更できるようにする。
+   * この API は、Redux のアクションを使う形への変換がまだ必要なため、
+   * 2.0 より前に変更される。
    */
   onCreateBabelConfig?(
     args: CreateBabelConfigArgs,
@@ -459,10 +458,10 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Run when gatsby develop server is started, its useful to add proxy and middleware
-   * to the dev server app
+   * gatsby develop のサーバーが起動したときに実行される。開発サーバーのアプリに
+   * プロキシやミドルウェアを追加するのに役立つ
    * @param {object} $0
-   * @param {Express} $0.app The [Express app](https://expressjs.com/en/4x/api.html#app) used to run the dev server
+   * @param {Express} $0.app 開発サーバーの実行に使う [Express アプリ](https://expressjs.com/en/4x/api.html#app)
    *
    * @example
    *
@@ -479,16 +478,16 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Called when a new node is created. Plugins wishing to extend or
-   * transform nodes created by other plugins should implement this API.
+   * 新しいノードが作成されたときに呼ばれる。他のプラグインが作成したノードを
+   * 拡張または変換したいプラグインは、この API を実装すること。
    *
-   * See also the documentation for `createNode`
-   * and [`createNodeField`](https://www.gatsbyjs.com/docs/reference/config-files/actions/#createNodeField)
+   * `createNode` と [`createNodeField`](https://www.gatsbyjs.com/docs/reference/config-files/actions/#createNodeField) の
+   * ドキュメントも参照
    * @param {object} $0
-   * @param {object} $0.node A node object.
+   * @param {object} $0.node ノードオブジェクト。
    * @param {object} $0.actions
-   * @param {function} $0.actions.createNode Create a new node.
-   * @param {function} $0.actions.createNodeField Extend another node. The new node field is placed under the fields key on the extended node object.
+   * @param {function} $0.actions.createNode 新しいノードを作成する。
+   * @param {function} $0.actions.createNodeField 別のノードを拡張する。新しいノードフィールドは、拡張されたノードオブジェクトの fields キーの下に置かれる。
    * @example
    * exports.onCreateNode = ({ node, getNode, actions }) => {
    *   const { createNodeField } = actions
@@ -520,9 +519,9 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Called before scheduling a `onCreateNode` callback for a plugin. If it returns falsy
-   * then Gatsby will not schedule the `onCreateNode` callback for this node for this plugin.
-   * Note: this API does not receive the regular `api` that other callbacks get as first arg.
+   * プラグインの `onCreateNode` コールバックをスケジュールする前に呼ばれる。falsy を返すと、
+   * Gatsby はそのノードについて、そのプラグインの `onCreateNode` コールバックをスケジュールしない。
+   * 注: この API は、他のコールバックが第 1 引数として受け取る通常の `api` を受け取らない。
    *
    * @gatsbyVersion 2.24.80
    * @example
@@ -531,12 +530,12 @@ export interface GatsbyNode<
   shouldOnCreateNode?(args: { node: TNode }, options: PluginOptions): boolean
 
   /**
-   * Called when a new page is created. This extension API is useful
-   * for programmatically manipulating pages created by other plugins e.g.
-   * if you want paths without trailing slashes.
+   * 新しいページが作成されたときに呼ばれる。この拡張 API は、他のプラグインが
+   * 作成したページをプログラムから操作するのに役立つ。たとえば、
+   * 末尾のスラッシュがないパスにしたい場合などである。
    *
-   * See the guide [Creating and Modifying Pages](https://www.gatsbyjs.com/docs/creating-and-modifying-pages/)
-   * for more on this API.
+   * この API の詳細は、ガイド [Creating and Modifying Pages](https://www.gatsbyjs.com/docs/creating-and-modifying-pages/)
+   * を参照。
    */
   onCreatePage?(
     args: CreatePageArgs<TContext>,
@@ -545,7 +544,7 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Let plugins extend/mutate the site's webpack configuration.
+   * プラグインがサイトの webpack 設定を拡張または変更できるようにする。
    * @see https://www.gatsbyjs.com/docs/node-apis/#onCreateWebpackConfig
    */
   onCreateWebpackConfig?(
@@ -554,35 +553,35 @@ export interface GatsbyNode<
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** Called at the end of the bootstrap process after all other extension APIs have been called. */
+  /** ブートストラップ処理の最後、他のすべての拡張 API が呼ばれた後に呼ばれる。 */
   onPostBootstrap?(
     args: ParentSpanPluginArgs,
     options: PluginOptions,
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** The last extension point called after all other parts of the build process are complete. */
+  /** ビルド処理の他のすべての部分が完了した後に呼ばれる、最後の拡張ポイント。 */
   onPostBuild?(
     args: BuildArgs,
     options: PluginOptions,
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** Called at the end of the bootstrap process after all other extension APIs have been called. If you indend to use this API in a plugin, use "onPluginInit" instead. */
+  /** ブートストラップ処理の最後、他のすべての拡張 API が呼ばれた後に呼ばれる。プラグインでこの API を使うつもりなら、代わりに "onPluginInit" を使うこと。 */
   onPreBootstrap?(
     args: ParentSpanPluginArgs,
     options: PluginOptions,
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** The first extension point called during the build process. Called after the bootstrap has completed but before the build steps start. */
+  /** ビルド処理の中で最初に呼ばれる拡張ポイント。ブートストラップが完了した後、ビルドのステップが始まる前に呼ばれる。 */
   onPreBuild?(
     args: BuildArgs,
     options: PluginOptions,
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** Called once Gatsby has initialized itself and is ready to bootstrap your site. */
+  /** Gatsby が自身の初期化を終え、サイトをブートストラップする準備ができたときに呼ばれる。 */
   onPreExtractQueries?(
     args: ParentSpanPluginArgs,
     options: PluginOptions,
@@ -590,7 +589,7 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Lifecycle executed in each process (one time per process). Used to store actions, etc. for later use. Plugins should use this over other APIs like "onPreBootstrap" or "onPreInit" since onPluginInit will run in main process + all workers to support Parallel Query Running.
+   * 各プロセスで（プロセスごとに 1 回）実行されるライフサイクル。アクションなどを後で使うために保存するのに使う。プラグインは "onPreBootstrap" や "onPreInit" などの他の API ではなく、これを使うべきである。onPluginInit は、クエリの並列実行に対応するために、メインプロセスとすべてのワーカーで実行されるためである。
    * @gatsbyVersion 3.9.0
    * @example
    * let createJobV2
@@ -605,7 +604,7 @@ export interface GatsbyNode<
     callback: PluginCallback<void>
   ): void | Promise<void>
 
-  /** The first API called during Gatsby execution, runs as soon as plugins are loaded, before cache initialization and bootstrap preparation. If you indend to use this API in a plugin, use "onPluginInit" instead. */
+  /** Gatsby の実行中に最初に呼ばれる API。プラグインが読み込まれた直後、キャッシュの初期化とブートストラップの準備の前に実行される。プラグインでこの API を使うつもりなら、代わりに "onPluginInit" を使うこと。 */
   onPreInit?(
     args: PreInitArgs,
     options: PluginOptions,
@@ -613,8 +612,8 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Ask compile-to-js plugins to process source to JavaScript so the query
-   * runner can extract out GraphQL queries for running.
+   * JS へコンパイルする系統のプラグインに、ソースを JavaScript へ変換するよう依頼する。
+   * クエリランナーが GraphQL クエリを取り出して実行できるようにするためである。
    */
   preprocessSource?(
     args: PreprocessSourceArgs,
@@ -623,7 +622,7 @@ export interface GatsbyNode<
   ): void | string | Promise<void | string>
 
   /**
-   * Lets plugins implementing support for other compile-to-js add to the list of "resolvable" file extensions. Gatsby supports `.js` and `.jsx` by default.
+   * JS へコンパイルする他の言語への対応を実装するプラグインが、「解決可能な」ファイル拡張子の一覧に追加できるようにする。Gatsby はデフォルトで `.js` と `.jsx` に対応している。
    */
   resolvableExtensions?(
     args: ResolvableExtensionsArgs,
@@ -632,21 +631,21 @@ export interface GatsbyNode<
   ): Array<string> | Promise<Array<string>>
 
   /**
-   * Called during the creation of the GraphQL schema. Allows plugins
-   * to add new fields to the types created from data nodes. It will be called
-   * separately for each type.
+   * GraphQL スキーマの作成中に呼ばれる。プラグインは、データノードから
+   * 作成された型に新しいフィールドを追加できる。型ごとに個別に
+   * 呼ばれる。
    *
-   * This function should return an object in the shape of
+   * この関数は
    * [GraphQLFieldConfigMap](https://graphql.org/graphql-js/type/#graphqlobjecttype)
-   * which will be appended to fields inferred by Gatsby from data nodes.
+   * の形のオブジェクトを返すこと。それが、Gatsby がデータノードから推論したフィールドに追加される。
    *
-   * *Note:* Import GraphQL types from `gatsby/graphql` and don't add the `graphql`
-   * package to your project/plugin dependencies to avoid Schema must
-   * contain unique named types but contains multiple types named errors.
-   * `gatsby/graphql` exports all builtin GraphQL types as well as the `graphQLJSON`
-   * type.
+   * *注:* GraphQL の型は `gatsby/graphql` から import し、`graphql` パッケージを
+   * プロジェクトやプラグインの依存に追加しないこと。Schema must
+   * contain unique named types but contains multiple types named というエラーを避けるためである。
+   * `gatsby/graphql` は、組み込みの GraphQL の型すべてと、`graphQLJSON` 型を
+   * export している。
    *
-   * Many transformer plugins use this to add fields that take arguments.
+   * 多くのトランスフォーマープラグインは、引数を取るフィールドを追加するためにこれを使う。
    *
    * @see https://www.gatsbyjs.com/docs/node-apis/#setFieldsOnGraphQLNodeType
    */
@@ -657,12 +656,12 @@ export interface GatsbyNode<
   ): any
 
   /**
-   * Extension point to tell plugins to source nodes. This API is called during
-   * the Gatsby bootstrap sequence. Source plugins use this hook to create nodes.
-   * This API is called exactly once per plugin (and once for your site's
-   * `gatsby-config.js` file). If you define this hook in `gatsby-node.js` it
-   * will be called exactly once after all of your source plugins have finished
-   * creating nodes.
+   * プラグインにノードのソーシングを指示する拡張ポイント。この API は Gatsby の
+   * ブートストラップの過程で呼ばれる。ソースプラグインはこのフックを使ってノードを作成する。
+   * この API はプラグインごとにちょうど 1 回（およびサイトの
+   * `gatsby-config.js` ファイルに対して 1 回）呼ばれる。このフックを `gatsby-node.js` で
+   * 定義した場合は、すべてのソースプラグインがノードの作成を終えた後に、
+   * ちょうど 1 回呼ばれる。
    *
    * @see https://www.gatsbyjs.com/docs/node-apis/#sourceNodes
    */
@@ -673,36 +672,36 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Add custom field resolvers to the GraphQL schema.
+   * GraphQL スキーマに独自のフィールドリゾルバーを追加する。
    *
-   * Allows adding new fields to types by providing field configs, or adding resolver
-   * functions to existing fields.
+   * フィールドの設定を渡して型に新しいフィールドを追加したり、既存のフィールドに
+   * リゾルバー関数を追加したりできる。
    *
-   * Things to note:
-   * * Overriding field types is disallowed, instead use the `createTypes`
-   *   action. In case of types added from third-party schemas, where this is not
-   *   possible, overriding field types is allowed.
-   * * New fields will not be available on `filter` and `sort` input types. Extend
-   *   types defined with `createTypes` if you need this.
-   * * In field configs, types can be referenced as strings.
-   * * When extending a field with an existing field resolver, the original
-   *   resolver function is available from `info.originalResolver`.
-   * * The `createResolvers` API is called as the last step in schema generation.
-   *   Thus, an intermediate schema is made available on the `schema` property.
-   *   In resolver functions themselves, it is recommended to access the final
-   *   built schema from `info.schema`.
-   * * Gatsby's data layer, including all internal query capabilities, is
-   *   exposed on [`context.nodeModel`](/docs/node-model/). The node store can be
-   *   queried directly with `findOne`, `getNodeById` and `getNodesByIds`,
-   *   while more advanced queries can be composed with `findAll`.
-   * * It is possible to add fields to the root `Query` type.
-   * * When using the first resolver argument (`source` in the example below,
-   *   often also called `parent` or `root`), take care of the fact that field
-   *   resolvers can be called more than once in a query, e.g. when the field is
-   *   present both in the input filter and in the selection set. This means that
-   *   foreign-key fields on `source` can be either resolved or not-resolved.
+   * 注意点:
+   * * フィールドの型の上書きは許可されていない。代わりに `createTypes`
+   *   アクションを使うこと。サードパーティのスキーマから追加された型のように
+   *   それができない場合は、フィールドの型の上書きが許可される。
+   * * 新しいフィールドは `filter` と `sort` の入力型では使えない。それが必要な場合は、
+   *   `createTypes` で定義した型を拡張すること。
+   * * フィールドの設定では、型を文字列で参照できる。
+   * * 既存のフィールドリゾルバーを持つフィールドを拡張する場合、元の
+   *   リゾルバー関数は `info.originalResolver` から利用できる。
+   * * `createResolvers` API は、スキーマ生成の最後のステップとして呼ばれる。
+   *   そのため、`schema` プロパティでは中間のスキーマが提供される。
+   *   リゾルバー関数の中では、最終的に構築されたスキーマに
+   *   `info.schema` からアクセスすることを推奨する。
+   * * 内部のクエリ機能すべてを含む Gatsby のデータレイヤーは、
+   *   [`context.nodeModel`](/docs/node-model/) で公開されている。ノードストアは
+   *   `findOne`、`getNodeById`、`getNodesByIds` で直接クエリでき、
+   *   より高度なクエリは `findAll` で組み立てられる。
+   * * ルートの `Query` 型にフィールドを追加できる。
+   * * リゾルバーの第 1 引数（下の例では `source`。
+   *   `parent` や `root` と呼ばれることも多い）を使うときは、フィールド
+   *   リゾルバーが 1 つのクエリの中で複数回呼ばれうることに注意する。たとえば、
+   *   フィールドが入力のフィルターと選択セットの両方にある場合である。つまり、
+   *   `source` の外部キーのフィールドは、解決済みのことも未解決のこともある。
    *
-   * For fuller examples, see [`using-type-definitions`](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-type-definitions).
+   * より詳しい例は [`using-type-definitions`](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-type-definitions) を参照。
    *
    * @see https://www.gatsbyjs.com/docs/reference/config-files/gatsby-node/#createResolvers
    */
@@ -713,13 +712,13 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Customize Gatsby’s GraphQL schema by creating type definitions, field extensions or adding third-party schemas.
-   * The createTypes, createFieldExtension and addThirdPartySchema actions are only available in this API.
+   * 型定義やフィールド拡張を作成したり、サードパーティのスキーマを追加したりして、Gatsby の GraphQL スキーマをカスタマイズする。
+   * createTypes、createFieldExtension、addThirdPartySchema の各アクションは、この API でだけ利用できる。
    *
-   * For details on their usage please refer to the actions documentation.
+   * 使い方の詳細は、アクションのドキュメントを参照。
    *
-   * This API runs immediately before schema generation. For modifications of the generated schema, e.g.
-   * to customize added third-party types, use the createResolvers API.
+   * この API はスキーマ生成の直前に実行される。追加されたサードパーティの型をカスタマイズするなど、
+   * 生成されたスキーマを変更する場合は、createResolvers API を使うこと。
    * @see https://www.gatsbyjs.com/docs/node-apis/#createSchemaCustomization
    */
   createSchemaCustomization?(
@@ -729,14 +728,14 @@ export interface GatsbyNode<
   ): void | Promise<void>
 
   /**
-   * Add a Joi schema for the possible options of your plugin.
-   * Currently experimental and not enabled by default.
+   * プラグインが取りうるオプションの Joi スキーマを追加する。
+   * 現在は実験的で、デフォルトでは有効になっていない。
    */
   pluginOptionsSchema?(args: PluginOptionsSchemaArgs): ObjectSchema
 }
 
 /**
- * Gatsby browser API.
+ * Gatsby のブラウザー API。
  *
  * @see https://www.gatsbyjs.com/docs/browser-apis/
  */
@@ -802,7 +801,7 @@ export interface GatsbyBrowser<
 }
 
 /**
- * Gatsby server-side rendering API.
+ * Gatsby のサーバーサイドレンダリング API。
  *
  * @see https://www.gatsbyjs.com/docs/ssr-apis/
  */
@@ -811,9 +810,9 @@ export interface GatsbySSR<
   PageContext = Record<string, unknown>
 > {
   /**
-   * Called after every page Gatsby server renders while building HTML so you can
-   * replace head components to be rendered in your `html.js`. This is useful if
-   * you need to reorder scripts or styles added by other plugins.
+   * HTML のビルド中に Gatsby がページをサーバーレンダリングするたびに呼ばれる。
+   * `html.js` でレンダリングする head のコンポーネントを置き換えられる。
+   * 他のプラグインが追加したスクリプトやスタイルを並べ替える必要があるときに役立つ。
    * @example
    * // Move Typography.js styles to the top of the head section so they're loaded first.
    * exports.onPreRenderHTML = ({ getHeadComponents, replaceHeadComponents }) => {
@@ -832,22 +831,22 @@ export interface GatsbySSR<
   onPreRenderHTML?(args: PreRenderHTMLArgs, options: PluginOptions): void
 
   /**
-   * Called after every page Gatsby server renders while building HTML so you can
-   * set head and body components to be rendered in your `html.js`.
+   * HTML のビルド中に Gatsby がページをサーバーレンダリングするたびに呼ばれる。
+   * `html.js` でレンダリングする head と body のコンポーネントを設定できる。
    *
-   * Gatsby does a two-pass render for HTML. It loops through your pages first
-   * rendering only the body and then takes the result body HTML string and
-   * passes it as the `body` prop to your `html.js` to complete the render.
+   * Gatsby は HTML を 2 パスでレンダリングする。まず各ページの body だけを
+   * レンダリングし、その結果の body の HTML 文字列を `body` prop として
+   * `html.js` へ渡してレンダリングを完了する。
    *
-   * It's often handy to be able to send custom components to your `html.js`.
-   * For example, it's a very common pattern for React.js libraries that
-   * support server rendering to pull out data generated during the render to
-   * add to your HTML.
+   * 独自のコンポーネントを `html.js` へ渡せると便利なことが多い。
+   * たとえば、サーバーレンダリングに対応した React.js のライブラリでは、
+   * レンダリング中に生成したデータを取り出して HTML に追加するパターンが
+   * 非常によく使われる。
    *
-   * Using this API over `replaceRenderer` is preferable as
-   * multiple plugins can implement this API where only one plugin can take
-   * over server rendering. However, if your plugin requires taking over server
-   * rendering then that's the one to use
+   * `replaceRenderer` よりも、この API を使うことが望ましい。
+   * この API は複数のプラグインが実装できるが、サーバーレンダリングを
+   * 引き受けられるプラグインは 1 つだけだからである。ただし、プラグインが
+   * サーバーレンダリングを引き受ける必要がある場合は、そちらを使うこと
    * @example
    * const { Helmet } = require("react-helmet")
    *
@@ -871,9 +870,8 @@ export interface GatsbySSR<
   onRenderBody?(args: RenderBodyArgs, options: PluginOptions): void
 
   /**
-   * Replace the default server renderer. This is useful for integration with
-   * Redux, css-in-js libraries, etc. that need custom setups for server
-   * rendering.
+   * デフォルトのサーバーレンダラーを置き換える。Redux や css-in-js ライブラリなど、
+   * サーバーレンダリングに独自のセットアップが必要なものと統合するときに役立つ。
    * @example
    * // From gatsby-plugin-glamor
    * const { renderToString } = require("react-dom/server")
@@ -892,12 +890,12 @@ export interface GatsbySSR<
   ): void | Promise<void>
 
   /**
-   * Allow a plugin to wrap the page element.
+   * プラグインがページ要素をラップできるようにする。
    *
-   * This is useful for setting wrapper component around pages that won't get
-   * unmounted on page change. For setting Provider components use `wrapRootElement`.
+   * ページが切り替わってもアンマウントされないラッパーコンポーネントを、
+   * ページの周りに配置するときに役立つ。Provider コンポーネントを設定する場合は `wrapRootElement` を使うこと。
    *
-   * _Note:_ [There is equivalent hook in Browser API](https://www.gatsbyjs.com/docs/browser-apis/#wrapPageElement)
+   * _注:_ [Browser API にも同等のフックがある](https://www.gatsbyjs.com/docs/browser-apis/#wrapPageElement)
    * @example
    * const React = require("react")
    * const Layout = require("./src/components/layout")
@@ -914,12 +912,12 @@ export interface GatsbySSR<
   ): React.ReactElement
 
   /**
-   * Allow a plugin to wrap the root element.
+   * プラグインがルート要素をラップできるようにする。
    *
-   * This is useful to setup any Providers component that will wrap your application.
-   * For setting persistent UI elements around pages use `wrapPageElement`.
+   * アプリケーション全体をラップする Provider コンポーネントを設定するときに役立つ。
+   * ページの周りに常駐する UI 要素を配置する場合は `wrapPageElement` を使うこと。
    *
-   * _Note:_ [There is equivalent hook in Browser API](https://www.gatsbyjs.com/docs/browser-apis/#wrapRootElement)
+   * _注:_ [Browser API にも同等のフックがある](https://www.gatsbyjs.com/docs/browser-apis/#wrapRootElement)
    * @example
    * const React = require("react")
    * const { Provider } = require("react-redux")
@@ -1146,31 +1144,31 @@ export interface ParentSpanPluginArgs extends NodePluginArgs {
 
 export interface NodePluginArgs {
   /**
-   * Use to prefix resources URLs. `pathPrefix` will be either empty string or
-   * path that starts with slash and doesn't end with slash. `pathPrefix` also
-   * becomes `<assetPrefix>/<pathPrefix>` when you pass both `assetPrefix` and
-   * `pathPrefix` in your `gatsby-config.js`.
+   * リソースの URL に接頭辞を付けるために使う。`pathPrefix` は空文字列か、
+   * スラッシュで始まりスラッシュで終わらないパスのどちらかになる。`gatsby-config.js` で
+   * `assetPrefix` と `pathPrefix` の両方を渡した場合、`pathPrefix` は
+   * `<assetPrefix>/<pathPrefix>` になる。
    *
-   * See [Adding a Path Prefix](https://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/path-prefix/)
-   * page for details about path prefixing.
+   * パスの接頭辞の詳細は [Adding a Path Prefix](https://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/path-prefix/)
+   * のページを参照。
    */
   pathPrefix: string
 
   /**
-   * This is the same as `pathPrefix` passed in `gatsby-config.js`.
-   * It's an empty string if you don't pass `pathPrefix`.
-   * When using assetPrefix, you can use this instead of pathPrefix to recieve the string you set in `gatsby-config.js`.
-   * It won't include the `assetPrefix`.
+   * `gatsby-config.js` で渡した `pathPrefix` と同じものである。
+   * `pathPrefix` を渡していない場合は空文字列になる。
+   * assetPrefix を使っている場合は、pathPrefix の代わりにこれを使うと、`gatsby-config.js` で設定した文字列を受け取れる。
+   * `assetPrefix` は含まれない。
    */
   basePath: string
 
   /**
-   * Collection of functions used to programmatically modify Gatsby’s internal state.
+   * Gatsby の内部状態をプログラムから変更するための関数の集まり。
    */
   actions: Actions
 
   /**
-   * Get content for a node from the plugin that created it.
+   * ノードを作成したプラグインから、そのノードのコンテンツを取得する。
    *
    * @example
    * module.exports = async function onCreateNode(
@@ -1186,43 +1184,43 @@ export interface NodePluginArgs {
   loadNodeContent(this: void, node: Node): Promise<string>
 
   /**
-   * Internal redux state used for application state. Do not use, unless you
-   * absolutely must. Store is considered a private API and can change with
-   * any version.
+   * アプリケーションの状態に使う内部の redux の state。どうしても必要な場合を除き、
+   * 使わないこと。store はプライベートな API とみなされ、どのバージョンでも
+   * 変わりうる。
    */
   store: Store
 
   /**
-   * Internal event emitter / listener.  Do not use, unless you absolutely
-   * must. Emitter is considered a private API and can change with any version.
+   * 内部のイベントエミッターとリスナー。どうしても必要な場合を除き、使わないこと。
+   * emitter はプライベートな API とみなされ、どのバージョンでも変わりうる。
    */
   emitter: EventEmitter
 
   /**
-   * Get array of all nodes.
+   * すべてのノードの配列を取得する。
    *
-   * @returns Array of nodes.
+   * @returns ノードの配列。
    * @example
    * const allNodes = getNodes()
    */
   getNodes(this: void): Node[]
 
   /**
-   * Get single node by given ID.
-   * Don't use this in graphql resolvers - see
-   * `getNodeAndSavePathDependency`
+   * 指定した ID のノードを 1 つ取得する。
+   * graphql のリゾルバーでは使わないこと。
+   * `getNodeAndSavePathDependency` を参照
    *
-   * @param id id of the node.
-   * @returns Single node instance.
+   * @param id ノードの id。
+   * @returns ノードのインスタンス 1 つ。
    * @example
    * const node = getNode(id)
    */
   getNode(this: void, id: string): Node | undefined
 
   /**
-   * Get array of nodes of given type.
-   * @param type Type of nodes
-   * @returns Array of nodes.
+   * 指定した型のノードの配列を取得する。
+   * @param type ノードの型
+   * @returns ノードの配列。
    *
    * @example
    * const markdownNodes = getNodesByType(`MarkdownRemark`)
@@ -1230,42 +1228,42 @@ export interface NodePluginArgs {
   getNodesByType(this: void, type: string): Node[]
 
   /**
-   * Set of utilities to output information to user
+   * ユーザーへ情報を出力するためのユーティリティ一式
    */
   reporter: Reporter
 
   /**
-   * Get single node by given ID and create dependency for given path.
-   * This should be used instead of `getNode` in graphql resolvers to enable
-   * tracking dependencies for query results. If it's not used Gatsby will
-   * not rerun query if node changes leading to stale query results. See
+   * 指定した ID のノードを 1 つ取得し、指定したパスへの依存関係を作成する。
+   * クエリ結果の依存関係を追跡できるよう、graphql のリゾルバーでは `getNode` の代わりに
+   * これを使うこと。使わない場合、ノードが変わっても Gatsby はクエリを再実行せず、
+   * クエリ結果が古いままになる。詳細は
    * [Page -> Node Dependency Tracking](/docs/page-node-dependencies/)
-   * for more details.
-   * @param id id of the node.
-   * @param path of the node.
-   * @returns Single node instance.
+   * を参照。
+   * @param id ノードの id。
+   * @param path ノードのパス。
+   * @returns ノードのインスタンス 1 つ。
    */
   getNodeAndSavePathDependency(this: void, id: string, path: string): Node
 
   /**
-   * Key-value store used to persist results of time/memory/cpu intensive
-   * tasks. All functions are async and return promises.
+   * 時間、メモリ、CPU を多く使う処理の結果を永続化するための
+   * キーバリューストア。すべての関数は非同期で、promise を返す。
    */
   cache: GatsbyCache
 
   /**
-   * Get cache instance by name - this should only be used by plugins that accept subplugins.
-   * @param id id of the node
-   * @returns See [cache](https://www.gatsbyjs.com/docs/reference/config-files/node-api-helpers/#cache) section for reference.
+   * 名前を指定してキャッシュのインスタンスを取得する。サブプラグインを受け付けるプラグインだけが使うこと。
+   * @param id ノードの id
+   * @returns [cache](https://www.gatsbyjs.com/docs/reference/config-files/node-api-helpers/#cache) の節を参照。
    */
   getCache(this: void, id: string): GatsbyCache
 
   /**
-   * Utility function useful to generate globally unique and stable node IDs.
-   * It will generate different IDs for different plugins if they use same
-   * input.
+   * グローバルに一意で安定したノード ID を生成するのに役立つユーティリティ関数。
+   * 同じ入力を使っても、プラグインが異なれば異なる ID を
+   * 生成する。
    *
-   * @returns UUIDv5 ID string
+   * @returns UUIDv5 の ID 文字列
    * @example
    * const node = {
    *   id: createNodeId(`${backendData.type}${backendData.id}`),
@@ -1275,12 +1273,12 @@ export interface NodePluginArgs {
   createNodeId(this: void, input: string): string
 
   /**
-   * Create a stable content digest from a string or object, you can use the
-   * result of this function to set the `internal.contentDigest` field
-   * on nodes. Gatsby uses the value of this field to invalidate stale data
-   * when your content changes.
+   * 文字列またはオブジェクトから、安定したコンテンツダイジェストを作成する。
+   * この関数の結果は、ノードの `internal.contentDigest` フィールドの設定に
+   * 使える。Gatsby はこのフィールドの値を使って、コンテンツが変わったときに
+   * 古いデータを無効化する。
    * @param input
-   * @returns Hash string
+   * @returns ハッシュ文字列
    * @example
    * const node = {
    *   ...nodeData,
@@ -1293,10 +1291,10 @@ export interface NodePluginArgs {
   createContentDigest(this: void, input: string | object): string
 
   /**
-   * Set of utilities that allow adding more detailed tracing for plugins.
-   * Check
+   * プラグインにより詳細なトレースを追加できるユーティリティ一式。
+   * 詳細は
    * [Performance tracing](https://www.gatsbyjs.com/docs/performance-tracing)
-   * page for more details.
+   * のページを参照。
    */
   tracing: Tracing
   schema: NodePluginSchema
@@ -1517,7 +1515,7 @@ export interface Actions {
   ): void
 
   /**
-   * Marks the source plugin that called this function as stateful. Gatsby will not check for stale nodes for any plugin that calls this.
+   * この関数を呼び出したソースプラグインを、ステートフルとしてマークする。これを呼び出したプラグインについては、Gatsby は古いノードの確認を行わない。
    */
   enableStatefulSourceNodes?(this: void, plugin?: ActionPlugin): void
 
@@ -1558,7 +1556,7 @@ export type ActivityArgs = {
 }
 
 /**
- * @deprecated Use `GatsbyCache` instead
+ * @deprecated 代わりに `GatsbyCache` を使うこと
  */
 export interface Cache {
   name: string
@@ -1581,28 +1579,28 @@ export interface GatsbyCache {
   name: string
   directory: string
   /**
-   * Retrieve cached value
-   * @param key Cache key
-   * @returns Promise resolving to cached value
+   * キャッシュされた値を取得する
+   * @param key キャッシュのキー
+   * @returns キャッシュされた値で解決される Promise
    * @example
    * const value = await cache.get(`unique-key`)
    */
   get(key: string): Promise<any>
 
   /**
-   * Cache value
-   * @param key Cache key
-   * @param value Value to be cached
-   * @returns Promise resolving to cached value
+   * 値をキャッシュする
+   * @param key キャッシュのキー
+   * @param value キャッシュする値
+   * @returns キャッシュされた値で解決される Promise
    * @example
    * await cache.set(`unique-key`, value)
    */
   set(key: string, value: any): Promise<any>
 
   /**
-   * Deletes cached value
-   * @param {string} key Cache key
-   * @returns {Promise<void>} Promise resolving once key is deleted from cache
+   * キャッシュされた値を削除する
+   * @param {string} key キャッシュのキー
+   * @returns {Promise<void>} キーがキャッシュから削除されると解決される Promise
    * @example
    * await cache.del(`unique-key`)
    */
@@ -1810,7 +1808,7 @@ export interface IPluginRefObject {
   resolve: string
   options?: IPluginRefOptions
   parentDir?: string
-  /** @private Internal key used by create-gatsby during plugin installation. Not necessary to define and can be removed. */
+  /** @private プラグインのインストール時に create-gatsby が使う内部のキー。定義する必要はなく、削除してよい。 */
   __key?: string
 }
 
@@ -1827,24 +1825,24 @@ export interface PluginOptionsSchemaArgs {
 }
 
 /**
- * Send body of response
+ * レスポンスの本文を送信する
  */
 type Send<T> = (body: T) => void
 
 /**
- * Gatsby Function route response
+ * Gatsby Function のルートのレスポンス
  */
 export interface GatsbyFunctionResponse<T = any> extends ServerResponse {
   /**
-   * Send `any` data in response
+   * レスポンスで `any` のデータを送信する
    */
   send: Send<T>
   /**
-   * Send `JSON` data in response
+   * レスポンスで `JSON` のデータを送信する
    */
   json: Send<T>
   /**
-   * Set the HTTP status code of the response
+   * レスポンスの HTTP ステータスコードを設定する
    */
   status: (statusCode: number) => GatsbyFunctionResponse<T>
   redirect(url: string): GatsbyFunctionResponse<T>
@@ -1852,25 +1850,25 @@ export interface GatsbyFunctionResponse<T = any> extends ServerResponse {
 }
 
 /**
- * Gatsby function route request
+ * Gatsby Function のルートのリクエスト
  */
 export interface GatsbyFunctionRequest<ReqBody = any> extends IncomingMessage {
   /**
-   * Object of values from URL query parameters (after the ? in the URL)
+   * URL のクエリパラメーター（URL の ? より後ろ）の値を持つオブジェクト
    */
   query: Record<string, string>
 
   /**
-   * Object of values from route parameters
+   * ルートパラメーターの値を持つオブジェクト
    */
   params: Record<string, string>
   body: ReqBody
   /**
-   * Object of `cookies` from header
+   * ヘッダーから得た `cookies` のオブジェクト
    */
   cookies: Record<string, string>
   /**
-   * Optional field to store the full raw URL by adapters
+   * アダプターが完全な生の URL を保存するための任意のフィールド
    */
   rawUrl?: string
 }
