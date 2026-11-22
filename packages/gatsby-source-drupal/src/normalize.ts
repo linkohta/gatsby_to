@@ -21,7 +21,7 @@ export const imageCDNState = {
 let four04WarningCount = 0
 let corruptFileWarningCount = 0
 /**
- * This FN takes in node data and returns Gatsby Image CDN fields that should be added to that node. If the input node isn't an image an empty object is returned.
+ * この関数はノードのデータを受け取り、そのノードに追加すべき Gatsby Image CDN のフィールドを返す。入力のノードが画像でなければ、空のオブジェクトを返す。
  */
 const getGatsbyImageCdnFields = async ({
   node,
@@ -83,7 +83,7 @@ const getGatsbyImageCdnFields = async ({
 
     const hasRequiredData = input => input && input.width && input.height
 
-    // extraNodeData comes from the fileNodesExtendedData Map which is built up in sourceNodes in gatsby-node. The data in this Map is found by looking at connections to file nodes from other node types. This is needed because Drupal's JSON API doesn't provide image widths/heights and placeholder urls for file nodes when querying directly for file nodes. This data can only be found on other nodes with relationships to file nodes. In the case that we don't have this data, we use probe-image-size to find the width/height of the image so that image CDN still works even if we don't have the data.
+    // extraNodeData は、gatsby-node の sourceNodes で組み立てる fileNodesExtendedData の Map から取得する。この Map のデータは、ほかのノードタイプからファイルノードへの接続を調べて集めたものである。これが必要なのは、Drupal の JSON API でファイルノードを直接クエリしても、画像の幅と高さやプレースホルダーの URL が返らないためである。このデータは、ファイルノードとのリレーションシップを持つほかのノードからしか得られない。このデータがない場合は probe-image-size で画像の幅と高さを調べ、データがなくても image CDN が動くようにする。
     const imageSize = hasRequiredData(extraNodeData)
       ? extraNodeData
       : await probeImageSize(url)
@@ -231,7 +231,7 @@ export const createNodeIdWithVersion = ({
 }) => {
   const options = getOptions()
 
-  // Fallback to default language for entities that don't translate.
+  // 翻訳されないエンティティでは、デフォルト言語にフォールバックする。
   if (
     options?.languageConfig?.nonTranslatableEntities?.includes(type) &&
     options.languageConfig.defaultLanguage
@@ -239,8 +239,8 @@ export const createNodeIdWithVersion = ({
     langcode = options.languageConfig.defaultLanguage
   }
 
-  // If the source plugin hasn't enabled `translation` then always just set langcode
-  // to "undefined".
+  // ソースプラグインで `translation` が有効になっていない場合は、langcode を常に
+  // "undefined" に設定する。
   let langcodeNormalized = options.languageConfig ? langcode : `und`
 
   const renamedCode = options?.languageConfig?.renamedEnabledLanguages?.find(
@@ -265,8 +265,8 @@ export const createNodeIdWithVersion = ({
     entityReferenceRevisions
   )
 
-  // The relationship between an entity and another entity also depends on the revision ID if the field is of type
-  // entity reference revision such as for paragraphs.
+  // フィールドの型が、paragraphs などで使われる entity reference revision の場合、
+  // エンティティ同士のリレーションシップはリビジョン ID にも依存する。
   const idVersion = isReferenceRevision
     ? `${langcodeNormalized}.${id}.${revisionId || 0}`
     : `${langcodeNormalized}.${id}`
@@ -294,11 +294,11 @@ const getFileUrl = (node, baseUrl) => {
   let fileUrl = node.url
 
   if (typeof node.uri === `object`) {
-    // Support JSON API 2.x file URI format https://www.drupal.org/node/2982209
+    // JSON API 2.x のファイル URI の形式に対応する https://www.drupal.org/node/2982209
     fileUrl = node.uri.url
   }
 
-  // Resolve w/ baseUrl if node.uri isn't absolute.
+  // node.uri が絶対 URL でなければ、baseUrl を基準に解決する。
   const url = new URL(fileUrl, baseUrl)
 
   return url
@@ -308,21 +308,21 @@ export const downloadFile = async (
   { node, cache, createNode, createNodeId, getCache },
   { basicAuth, baseUrl, typePrefix }: Record<string, any>
 ) => {
-  // handle file downloads
+  // ファイルのダウンロードを処理する
   if (!isFileNode(node, typePrefix)) {
     return
   }
   let fileType
 
   if (typeof node.uri === `object`) {
-    // get file type from uri prefix ("S3:", "public:", etc.)
+    // URI の接頭辞（"S3:"、"public:" など）からファイルの種類を取得する
     const uriPrefix = node.uri.value.match(/^\w*:/)
     fileType = uriPrefix ? uriPrefix[0] : null
   }
 
   const url = getFileUrl(node, baseUrl)
 
-  // If we have basicAuth credentials, add them to the request.
+  // basicAuth の認証情報があれば、リクエストに追加する。
   const basicAuthFileSystems = [`public:`, `private:`, `temporary:`]
   const auth =
     typeof basicAuth === `object` && basicAuthFileSystems.includes(fileType)

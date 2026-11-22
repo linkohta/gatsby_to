@@ -59,7 +59,7 @@ async function worker([url, options]) {
   httpSpan.setTag(SemanticAttributes.HTTP_TARGET, parsedUrl.pathname)
   httpSpan.setTag(`plugin`, `gatsby-source-drupal`)
 
-  // Log out progress during the initial sourcing.
+  // 最初のソーシング中に進捗をログに出力する。
   if (initialSourcing) {
     apiRequestCount += 1
     if (!start) {
@@ -81,8 +81,8 @@ async function worker([url, options]) {
     const searchParams = new URLSearchParams(options.searchParams)
     const searchKeys = Array.from(searchParams.keys())
     searchKeys.forEach(searchKey => {
-      // Only add search params to url if it has not already been
-      // added.
+      // 検索パラメーターは、まだ追加されていない場合にだけ
+      // URL に追加する。
       if (!url.searchParams.has(searchKey)) {
         url.searchParams.set(searchKey, searchParams.get(searchKey))
       }
@@ -118,9 +118,9 @@ const asyncPool = require(`tiny-async-pool`)
 const bodyParser = require(`body-parser`)
 
 function gracefullyRethrow(activity, error) {
-  // activity.panicOnBuild was implemented at some point in gatsby@2
-  // but plugin can still be used with older version of gatsby core
-  // so need to do some checking here
+  // activity.panicOnBuild は gatsby@2 の途中で実装されたが、
+  // このプラグインはそれより古いバージョンの gatsby コアでも使えるので、
+  // ここで確認が必要になる
   if (activity.panicOnBuild) {
     activity.panicOnBuild(error)
   }
@@ -188,7 +188,7 @@ exports.sourceNodes = async (
     },
   } = pluginOptions
 
-  // older versions of Gatsby didn't use Joi's default value for plugin options
+  // 古いバージョンの Gatsby は、プラグインオプションに Joi のデフォルト値を使っていなかった
   if (!(`imageCDN` in pluginOptions)) {
     pluginOptions.imageCDN = true
   }
@@ -199,7 +199,7 @@ exports.sourceNodes = async (
     touchNode,
     unstable_createNodeManifest,
   } = actions
-  // Update the concurrency limit from the plugin options
+  // プラグインオプションから同時実行数の上限を更新する
   requestQueue.concurrency = concurrentAPIRequests
 
   if (webhookBody && Object.keys(webhookBody).length) {
@@ -312,7 +312,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
 
     let requireFullRebuild = false
 
-    // lastFetched isn't set so do a full rebuild.
+    // lastFetched が設定されていないので、フルリビルドを行う。
     if (!lastFetched) {
       setPluginStatus({ lastFetched: Math.floor(new Date().getTime() / 1000) })
       requireFullRebuild = true
@@ -325,7 +325,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
       drupalFetchIncrementalActivity.start()
 
       try {
-        // Hit fastbuilds endpoint with the lastFetched date.
+        // lastFetched の日時を付けて fastbuilds のエンドポイントにアクセスする。
         const res = await requestQueue.push([
           urlJoin(
             baseUrl,
@@ -340,23 +340,23 @@ ${JSON.stringify(webhookBody, null, 4)}`
             responseType: `json`,
             parentSpan: fastBuildsSpan,
             timeout: {
-              // Occasionally requests to Drupal stall. Set a (default) 30s timeout to retry in this case.
+              // Drupal へのリクエストは、ときどき止まることがある。その場合にリトライできるよう、（デフォルトで）30 秒のタイムアウトを設定する。
               request: requestTimeoutMS,
             },
           },
         ])
 
-        // Fastbuilds returns a -1 if:
-        // - the timestamp has expired
-        // - if old fastbuild logs were purged
-        // - it's been a really long time since you synced so you just do a full fetch.
+        // Fastbuilds は次の場合に -1 を返す:
+        // - タイムスタンプの期限が切れている
+        // - 古い fastbuild のログが削除された
+        // - 前回の同期からかなり時間がたっているので、フルフェッチを行うことになる。
         if (res.body.status === -1) {
-          // The incremental data is expired or this is the first fetch.
+          // 差分データの期限が切れているか、これが最初の取得である。
           reporter.info(`Unable to pull incremental data changes from Drupal`)
           setPluginStatus({ lastFetched: res.body.timestamp })
           requireFullRebuild = true
         } else {
-          // Touch nodes so they are not garbage collected by Gatsby.
+          // Gatsby にガベージコレクションされないよう、ノードを touch する。
           if (initialSourcing) {
             const touchNodesSpan = tracer.startSpan(`sourceNodes.touchNodes`, {
               childOf: fastBuildsSpan,
@@ -383,12 +383,12 @@ ${JSON.stringify(webhookBody, null, 4)}`
             res.body.entities?.length
           )
 
-          // Process sync data from Drupal.
+          // Drupal からの同期データを処理する。
           const nodesToSync = res.body.entities
 
-          // First create all nodes that we haven't seen before. That
-          // way we can create relationships correctly next as the nodes
-          // will exist in Gatsby.
+          // まず、これまでに見たことのないノードをすべて作成する。こうしておけば、
+          // ノードが Gatsby に存在する状態になるので、次にリレーションシップを
+          // 正しく作成できる。
           for (const nodeSyncData of nodesToSync) {
             if (nodeSyncData.action === `delete`) {
               continue
@@ -424,8 +424,8 @@ ${JSON.stringify(webhookBody, null, 4)}`
                 pluginOptions,
               })
             } else {
-              // The data could be a single Drupal entity or an array of Drupal
-              // entities to update.
+              // データは、更新対象の Drupal エンティティ 1 つのことも、Drupal エンティティの
+              // 配列のこともある。
               let nodesToUpdate = nodeSyncData.data
               if (!Array.isArray(nodeSyncData.data)) {
                 nodesToUpdate = [nodeSyncData.data]
@@ -463,7 +463,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
       drupalFetchIncrementalActivity.end()
       fastBuildsSpan.finish()
 
-      // We're now done with the initial (fastbuilds flavored) sourcing.
+      // これで、最初の（fastbuilds を使った）ソーシングは完了である。
       initialSourcing = false
 
       if (!requireFullRebuild) {
@@ -482,7 +482,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
   fullFetchSpan.setTag(`plugin`, `gatsby-source-drupal`)
   fullFetchSpan.setTag(`sourceNodes.fetch.type`, `full`)
 
-  // Fetch articles.
+  // 記事を取得する。
   reporter.info(`Starting to fetch all data from Drupal`)
 
   drupalFetchActivity.start()
@@ -500,7 +500,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
         responseType: `json`,
         parentSpan: fullFetchSpan,
         timeout: {
-          // Occasionally requests to Drupal stall. Set a (default) 30s timeout to retry in this case.
+          // Drupal へのリクエストは、ときどき止まることがある。その場合にリトライできるよう、（デフォルトで）30 秒のタイムアウトを設定する。
           request: requestTimeoutMS,
         },
       },
@@ -512,7 +512,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
         if (!url) return
         if (!type) return
 
-        // Lookup this type in our list of language alterable entities.
+        // 言語を切り替えられるエンティティの一覧から、この型を探す。
         const isTranslatable = languageConfig.translatableEntities.some(
           entityType => entityType === type
         )
@@ -524,20 +524,20 @@ ${JSON.stringify(webhookBody, null, 4)}`
           renamedEnabledLanguages
         ) => {
           if (typeof url === `object`) {
-            // url can be string or object containing href field
+            // url は文字列のことも、href フィールドを持つオブジェクトのこともある
             url = url.href
 
-            // Apply any filters configured in gatsby-config.js. Filters
-            // can be any valid JSON API filter query string.
-            // See https://www.drupal.org/docs/8/modules/jsonapi/filtering
+            // gatsby-config.js で設定されたフィルターを適用する。フィルターには、
+            // 有効な JSON API のフィルタークエリ文字列であれば何でも指定できる。
+            // https://www.drupal.org/docs/8/modules/jsonapi/filtering を参照
             if (typeof filters === `object`) {
               if (filters.hasOwnProperty(type)) {
                 url = new URL(url)
                 const filterParams = new URLSearchParams(filters[type])
                 const filterKeys = Array.from(filterParams.keys())
                 filterKeys.forEach(filterKey => {
-                  // Only add filter params to url if it has not already been
-                  // added.
+                  // フィルターパラメーターは、まだ追加されていない場合にだけ
+                  // URL に追加する。
                   if (!url.searchParams.has(filterKey)) {
                     url.searchParams.set(filterKey, filterParams.get(filterKey))
                   }
@@ -547,7 +547,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
             }
           }
 
-          // If proxyUrl is defined, use it instead of baseUrl to get the content.
+          // proxyUrl が定義されていれば、コンテンツの取得に baseUrl ではなくそちらを使う。
           if (proxyUrl !== baseUrl) {
             url = url.replace(baseUrl, proxyUrl)
           }
@@ -564,14 +564,14 @@ ${JSON.stringify(webhookBody, null, 4)}`
                 responseType: `json`,
                 parentSpan: fullFetchSpan,
                 timeout: {
-                  // Occasionally requests to Drupal stall. Set a (default) 30s timeout to retry in this case.
+                  // Drupal へのリクエストは、ときどき止まることがある。その場合にリトライできるよう、（デフォルトで）30 秒のタイムアウトを設定する。
                   request: requestTimeoutMS,
                 },
               },
             ])
           } catch (error) {
             if (error.response && error.response.statusCode == 405) {
-              // The endpoint doesn't support the GET method, so just skip it.
+              // このエンドポイントは GET メソッドに対応していないので、スキップする。
               return
             } else {
               console.error(`Failed to fetch ${url}`, error.message)
@@ -601,30 +601,30 @@ ${JSON.stringify(webhookBody, null, 4)}`
             dataArray.push(...(d.body.data || []))
           }
 
-          // Add support for includes. Includes allow entity data to be expanded
-          // based on relationships. The expanded data is exposed as `included`
-          // in the JSON API response.
-          // See https://www.drupal.org/docs/8/modules/jsonapi/includes
+          // includes に対応する。includes を使うと、リレーションシップに基づいて
+          // エンティティのデータを展開できる。展開されたデータは、JSON API の
+          // レスポンスの `included` として公開される。
+          // https://www.drupal.org/docs/8/modules/jsonapi/includes を参照
           if (d.body.included) {
             // @ts-ignore
             dataArray.push(...(d.body.included || []))
           }
 
-          // If JSON:API extras is configured to add the resource count, we can queue
-          // all API requests immediately instead of waiting for each request to return
-          // the next URL. This lets us request resources in parallel vs. sequentially
-          // which is much faster.
+          // JSON:API extras がリソース数を追加するように設定されていれば、各リクエストが
+          // 次の URL を返すのを待たずに、すべての API リクエストをすぐにキューへ入れられる。
+          // これにより、リソースを順番にではなく並列にリクエストでき、
+          // はるかに速くなる。
           if (d.body.meta?.count) {
             const typeLangKey = type + currentLanguage
-            // If we hadn't added urls yet
+            // まだ URL を追加していない場合
             if (
               d.body.links.next?.href &&
               !typeRequestsQueued.has(typeLangKey)
             ) {
               typeRequestsQueued.add(typeLangKey)
 
-              // Get count of API requests
-              // We round down as we've already gotten the first page at this point.
+              // API リクエストの数を求める
+              // この時点で最初のページは取得済みなので、切り捨てる。
               const pageSize = Number(
                 new URL(d.body.links.next.href).searchParams.get(`page[limit]`)
               )
@@ -637,9 +637,9 @@ ${JSON.stringify(webhookBody, null, 4)}`
               const newUrl = new URL(d.body.links.next.href)
               await Promise.all(
                 _.range(requestsCount).map((pageOffset: number) => {
-                  // We're starting 1 ahead.
+                  // 1 つ先から始める。
                   pageOffset += 1
-                  // Construct URL with new pageOffset.
+                  // 新しい pageOffset で URL を組み立てる。
                   newUrl.searchParams.set(
                     `page[offset]`,
                     String(pageOffset * pageSize)
@@ -670,7 +670,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
             let currentLanguage = languageConfig.enabledLanguages[i]
             const urlPath = url.href.split(`${apiBase}/`).pop()
             const baseUrlWithoutTrailingSlash = baseUrl.replace(/\/$/, ``)
-            // The default language's JSON API is at the root.
+            // デフォルト言語の JSON API はルートにある。
 
             if (
               currentLanguage === getOptions().languageConfig.defaultLanguage ||
@@ -726,7 +726,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
   const nodes = new Map()
   const fileNodesExtendedData = getExtendedFileNodeData(allData)
 
-  // first pass - create basic nodes
+  // 1 回目のパス: 基本的なノードを作成する
   for (const contentType of allData) {
     if (!contentType) {
       continue
@@ -769,7 +769,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
 
   createNodesSpan.setTag(`sourceNodes.createNodes.count`, nodes.size)
 
-  // second pass - handle relationships and back references
+  // 2 回目のパス: リレーションシップとバックリファレンスを処理する
   for (const node of Array.from(nodes.values())) {
     await handleReferences(node, {
       getNode: nodes.get.bind(nodes),
@@ -786,7 +786,7 @@ ${JSON.stringify(webhookBody, null, 4)}`
   } else {
     reporter.info(`Downloading remote files from Drupal`)
 
-    // Download all files (await for each pool to complete to fix concurrency issues)
+    // すべてのファイルをダウンロードする（同時実行の問題を避けるため、各プールの完了を await する）
     const fileNodes = [...nodes.values()].filter(node =>
       isFileNode(node, pluginOptions.typePrefix)
     )
@@ -818,20 +818,20 @@ ${JSON.stringify(webhookBody, null, 4)}`
     }
   }
 
-  // Create each node
+  // 各ノードを作成する
   for (const node of nodes.values()) {
     node.internal.contentDigest = createContentDigest(node)
     createNode(node)
   }
 
-  // We're now done with the initial sourcing.
+  // これで、最初のソーシングは完了である。
   initialSourcing = false
 
   createNodesSpan.finish()
   return
 }
 
-// This is maintained for legacy reasons and will eventually be removed.
+// これは過去の経緯のために残しているもので、いずれ削除される。
 exports.onCreateDevServer = (
   {
     app,
@@ -945,7 +945,7 @@ exports.pluginOptionsSchema = ({ Joi }) =>
   })
 
 exports.onCreateDevServer = async ({ app, store }) => {
-  // this makes the gatsby develop image CDN emulator work on earlier versions of Gatsby.
+  // これにより、gatsby develop の image CDN エミュレーターが、以前のバージョンの Gatsby でも動くようになる。
   polyfillImageServiceDevRoutes(app, store)
 }
 
@@ -955,8 +955,8 @@ exports.createSchemaCustomization = (
 ) => {
   if (pluginOptions.skipFileDownloads && pluginOptions.imageCDN) {
     actions.createTypes([
-      // polyfill so image CDN works on older versions of Gatsby
-      // this type is merged in with the inferred file__file and files types, adding Image CDN support via the gatsbyImage GraphQL field. The `RemoteFile` interface as well as the polyfill above are what add the gatsbyImage field.
+      // 古いバージョンの Gatsby でも image CDN が動くようにするためのポリフィル
+      // この型は、推論された file__file 型と files 型にマージされ、GraphQL の gatsbyImage フィールドを通じて Image CDN への対応を追加する。gatsbyImage フィールドを追加するのは、`RemoteFile` インターフェースと上のポリフィルである。
       addRemoteFilePolyfillInterface(
         schema.buildObjectType({
           name: generateTypeName(`file--file`, pluginOptions.typePrefix),

@@ -66,8 +66,8 @@ export async function handleReferences(
         const meta = _.compact(
           v.data.map(data => (!_.isEmpty(data.meta) ? data.meta : null))
         )
-        // If there's meta on the field and it's not an existing/internal one
-        // create a new node's field with that meta. It can't exist on both
+        // フィールドに meta があり、それが既存または内部のものでなければ、
+        // その meta で新しいノードのフィールドを作成する。両方に存在することはできない
         // @see https://jsonapi.org/format/#document-resource-object-fields
         if (!_.isEmpty(meta) && !(k in node)) {
           node[k] = meta
@@ -88,8 +88,8 @@ export async function handleReferences(
           referencedNodes.push(referencedNodeId)
         }
 
-        // If there's meta on the field and it's not an existing/internal one
-        // create a new node's field with that meta. It can't exist on both
+        // フィールドに meta があり、それが既存または内部のものでなければ、
+        // その meta で新しいノードのフィールドを作成する。両方に存在することはできない
         // @see https://jsonapi.org/format/#document-resource-object-fields
         if (!_.isEmpty(v.data.meta) && !(k in node)) {
           node[k] = v.data.meta
@@ -161,43 +161,43 @@ export const handleDeletedNode = async ({
     )
   )
 
-  // Perhaps the node was already deleted and Drupal is sending us references
-  // to old nodes.
+  // ノードがすでに削除されていて、Drupal が古いノードへの参照を
+  // 送ってきているのかもしれない。
   if (!deletedNode) {
     return deletedNode
   }
 
-  // Clone node so we're not mutating the original node.
+  // 元のノードを書き換えないよう、ノードをクローンする。
   deletedNode = _.cloneDeep(deletedNode)
 
   await cache.del(makeBackRefsKey(deletedNode.id))
   await cache.del(makeRefNodesKey(deletedNode.id))
 
-  // Remove relationships from other nodes and re-create them.
+  // ほかのノードからリレーションシップを取り除き、作り直す。
   Object.keys(deletedNode.relationships).forEach(async key => {
     let ids = deletedNode.relationships[key]
     ids = [].concat(ids)
     for (const id of ids) {
       let node = getNode(id)
 
-      // The referenced node might have already been deleted.
+      // 参照先のノードはすでに削除されている可能性がある。
       if (node) {
-        // Clone node so we're not mutating the original node.
+        // 元のノードを書き換えないよう、ノードをクローンする。
         node = _.cloneDeep(node)
         let referencedNodes = await cache.get(makeRefNodesKey(node.id))
 
         if (referencedNodes?.includes(deletedNode.id)) {
-          // Loop over relationships and cleanup references.
+          // リレーションシップを順に処理し、参照を整理する。
           Object.entries(
             node.relationships as Record<string, string | Array<string>>
           ).forEach(([key, value]) => {
-            // If a string ref matches, delete it.
+            // 文字列の参照が一致すれば削除する。
             if (_.isString(value) && value === deletedNode.id) {
               delete node.relationships[key]
             }
 
-            // If it's an array, filter, then check if the array is empty and then delete
-            // if so
+            // 配列の場合はフィルターをかけ、配列が空になったかを確認して、
+            // 空であれば削除する
             if (Array.isArray(value)) {
               value = value.filter(v => v !== deletedNode.id)
 
@@ -209,14 +209,14 @@ export const handleDeletedNode = async ({
             }
           })
 
-          // Remove deleted node from array of referencedNodes
+          // 削除されたノードを referencedNodes の配列から取り除く
           referencedNodes = referencedNodes.filter(
             nId => nId !== deletedNode.id
           )
           await cache.set(makeRefNodesKey(node.id), referencedNodes)
         }
 
-        // Recreate the referenced node with its now cleaned-up relationships.
+        // リレーションシップを整理し終えた参照先のノードを作り直す。
         if (node.internal.owner) {
           delete node.internal.owner
         }
@@ -267,7 +267,7 @@ ${JSON.stringify(nodeToUpdate, null, 4)}
   )
 
   const oldNode = getNode(newNodeId)
-  // Node doesn't yet exist so we'll create it now.
+  // ノードがまだ存在しないので、ここで作成する。
   if (!oldNode) {
     const newNode = await nodeFromData(
       nodeToUpdate,
@@ -347,9 +347,9 @@ ${JSON.stringify(nodeToUpdate, null, 4)}
 
   let oldNode = getNode(newNode.id)
   if (oldNode) {
-    // Clone node so we're not mutating the original node.
+    // 元のノードを書き換えないよう、ノードをクローンする。
     oldNode = _.cloneDeep(oldNode)
-    // copy over back references from old node
+    // 古いノードからバックリファレンスをコピーする
     const backRefsNames = await cache.get(makeBackRefsKey(oldNode.id))
     if (backRefsNames) {
       await cache.set(makeBackRefsKey(newNode.id), backRefsNames)
@@ -360,7 +360,7 @@ ${JSON.stringify(nodeToUpdate, null, 4)}
     }
 
     const newNodeReferencedNodes = await cache.get(makeRefNodesKey(newNode.id))
-    // see what nodes are no longer referenced and remove backRefs from them
+    // 参照されなくなったノードを調べ、そこから backRefs を取り除く
     let removedReferencedNodes = _.difference(
       oldNodeReferencedNodes,
       newNodeReferencedNodes
@@ -390,7 +390,7 @@ ${JSON.stringify(nodeToUpdate, null, 4)}
     })
   }
 
-  // Download file.
+  // ファイルをダウンロードする。
   const { skipFileDownloads, typePrefix } = pluginOptions
   if (isFileNode(newNode, typePrefix) && !skipFileDownloads) {
     await downloadFile(
@@ -431,8 +431,8 @@ let warnOnceForNoSupport = false
 let warnOnceToUpgradeGatsby = false
 
 /**
- * This fn creates node manifests which are used for Gatsby Cloud Previews via the Content Sync API/feature.
- * Content Sync routes a user from Drupal to a page created from the entry data they're interested in previewing.
+ * この関数はノードマニフェストを作成する。ノードマニフェストは、Content Sync の API と機能による Gatsby Cloud のプレビューで使われる。
+ * Content Sync は、ユーザーを Drupal から、プレビューしたいエントリーのデータで作られたページへ案内する。
  */
 export function drupalCreateNodeManifest({
   attributes,
@@ -475,7 +475,7 @@ export function drupalCreateNodeManifest({
 }
 
 /**
- * This FN returns a Map with additional file node information that Drupal doesn't return on actual file nodes (namely the width/height of images)
+ * この関数は、Drupal が実際のファイルノードでは返さないファイルノードの追加情報（具体的には画像の幅と高さ）を持つ Map を返す
  */
 export const getExtendedFileNodeData = allData => {
   const fileNodesExtendedData = new Map()
@@ -511,7 +511,7 @@ export const getExtendedFileNodeData = allData => {
                 relationshipNode.id
               )
 
-              // if we already have extended data for this file node, we need to merge the new data with it
+              // このファイルノードの拡張データがすでにあれば、新しいデータをマージする必要がある
               if (existingExtendedData) {
                 const existingImageDerivativeLinks =
                   existingExtendedData?.imageDerivatives?.links || {}
@@ -533,7 +533,7 @@ export const getExtendedFileNodeData = allData => {
 
                 fileNodesExtendedData.set(relationshipNode.id, newMeta)
               } else {
-                // otherwise we just add the extended data to the map
+                // なければ、拡張データをそのまま Map に追加する
                 fileNodesExtendedData.set(
                   relationshipNode.id,
                   relationshipNode.meta
