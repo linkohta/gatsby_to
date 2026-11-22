@@ -1,4 +1,4 @@
-// NOTE: Previously `infer-graphql-input-from-fields-test.js`
+// NOTE: 以前は `infer-graphql-input-from-fields-test.js` だった
 
 const { createSchemaComposer } = require(`../../schema-composer`)
 import { getFilterInput } from "../filter"
@@ -390,7 +390,7 @@ describe(`GraphQL Input args from fields`, () => {
     expect(entryPointBFields.typea.type.name).toBe(`TypeAFilterInput`)
   })
 
-  // NOTE: We now convert all scalars and enums
+  // NOTE: 現在は、すべてのスカラーと enum を変換する
   it.skip(`recovers from unknown output types`, async () => {
     const fields = {
       obj: {
@@ -442,8 +442,8 @@ describe(`GraphQL Input args from fields`, () => {
     expect(innerObjFields.ba).toBeUndefined()
     isIntInput(innerObjFields.bar.type)
 
-    // innerObj.baz is object containing only unsupported types
-    // so it should not be defined
+    // innerObj.baz は、対応していない型だけを含むオブジェクトなので、
+    // 定義されないはずである
     expect(innerObj.baz).toBeUndefined()
   })
 

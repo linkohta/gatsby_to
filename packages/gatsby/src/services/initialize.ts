@@ -37,14 +37,14 @@ interface IPluginResolutionSSR extends IPluginResolution {
   name: string
 }
 
-// If the env variable GATSBY_EXPERIMENTAL_FAST_DEV is set, enable
-// all DEV experimental changes (but only during development & not on CI).
+// 環境変数 GATSBY_EXPERIMENTAL_FAST_DEV が設定されている場合は、
+// DEV の実験的な変更をすべて有効にする（ただし開発中だけで、CI では有効にしない）。
 if (
   process.env.gatsby_executing_command === `develop` &&
   process.env.GATSBY_EXPERIMENTAL_FAST_DEV &&
   !isCI() &&
-  // skip FAST_DEV handling in workers, all env vars will be handle
-  // by main process already and passed to worker
+  // ワーカーでは FAST_DEV の処理をスキップする。すべての環境変数は、メインプロセスで
+  // すでに処理されてワーカーに渡される
   !process.env.GATSBY_WORKER_POOL_WORKER
 ) {
   process.env.GATSBY_EXPERIMENTAL_DEV_SSR = `true`
@@ -60,15 +60,15 @@ Please give feedback on their respective umbrella issues!
   `)
 }
 
-// Show stack trace on unhandled promises.
+// 未処理の Promise についてスタックトレースを表示する。
 process.on(`unhandledRejection`, (reason: unknown) => {
   // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/33636
   reporter.panic((reason as Error) || `Unhandled rejection`)
 })
 
-// Override console.log to add the source file + line number.
-// Useful for debugging if you lose a console.log somewhere.
-// Otherwise leave commented out.
+// console.log を上書きして、ソースファイルと行番号を追加する。
+// どこかに置いた console.log を見失ったときのデバッグに役立つ。
+// それ以外のときはコメントアウトしたままにしておく。
 // require(`../bootstrap/log-line-function`)
 
 type WebhookBody = IDataLayerContext["webhookBody"]
@@ -91,18 +91,18 @@ export async function initialize({
     reporter.panic(`Missing program args`)
   }
 
-  /* Time for a little story...
-   * When running `gatsby develop`, the globally installed gatsby-cli starts
-   * and sets up a Redux store (which is where logs are now stored). When gatsby
-   * finds your project's locally installed gatsby-cli package in node_modules,
-   * it switches over. This instance will have a separate redux store. We need to
-   * ensure that the correct store is used which is why we call setStore
+  /* 少し経緯を説明する...
+   * `gatsby develop` を実行すると、グローバルにインストールされた gatsby-cli が起動し、
+   * Redux ストアをセットアップする（現在はここにログが保存される）。gatsby は、
+   * プロジェクトにローカルでインストールされた gatsby-cli パッケージを node_modules で見つけると、
+   * そちらに切り替える。このインスタンスは別の redux ストアを持つ。正しいストアが
+   * 使われるようにする必要があり、そのために setStore を呼ぶ
    * (/packages/gatsby-cli/src/reporter/redux/index.js)
    *
-   * This function
-   * - copies over the logs from the global gatsby-cli to the local one
-   * - sets the store to the local one (so that further actions dispatched by
-   * the global gatsby-cli are handled by the local one)
+   * この関数は次のことを行う
+   * - グローバルの gatsby-cli からローカルの gatsby-cli へログをコピーする
+   * - ストアをローカルのものに設定する（これにより、グローバルの gatsby-cli が以後に
+   * dispatch するアクションは、ローカルの側で処理される）
    */
   if (args.setStore) {
     args.setStore(store)
@@ -116,8 +116,8 @@ export async function initialize({
         for (const [, { job }] of store.getState().jobsV2.incomplete) {
           outputs.push(job)
           if (outputs.length >= 5) {
-            // 5 not finished jobs should be enough to track down issues
-            // this is just limiting output "spam"
+            // 問題を追跡するには、完了していないジョブが 5 個あれば十分なはずである
+            // これは、出力が埋め尽くされるのを抑えているだけである
             break
           }
         }
@@ -137,7 +137,7 @@ export async function initialize({
     ...args,
     extensions: [],
     browserslist: getBrowsersList(directory),
-    // Fix program directory path for windows env.
+    // windows 環境向けに、プログラムのディレクトリのパスを修正する。
     directory,
   }
 
@@ -166,13 +166,13 @@ export async function initialize({
 
   const siteDirectory = program.directory
 
-  // Compile root gatsby files
+  // ルートの gatsby ファイルをコンパイルする
   let activity = reporter.activityTimer(`compile gatsby files`)
   activity.start()
   await compileGatsbyFiles(siteDirectory)
   activity.end()
 
-  // Load gatsby config
+  // gatsby の config を読み込む
   activity = reporter.activityTimer(`load gatsby config`, {
     parentSpan,
   })
@@ -185,13 +185,13 @@ export async function initialize({
 
   let adapterManager: IAdapterManager | undefined = undefined
 
-  // Only initialize adapters during "gatsby build"
+  // アダプターは "gatsby build" のときにだけ初期化する
   if (process.env.gatsby_executing_command === `build`) {
     adapterManager = await initAdapterManager()
     await adapterManager.restoreCache()
   }
 
-  // Load plugins
+  // プラグインを読み込む
   activity = reporter.activityTimer(`load plugins`, {
     parentSpan,
   })
@@ -200,10 +200,10 @@ export async function initialize({
   activity.end()
 
   // GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR=false gatsby develop
-  // to disable query on demand loading indicator
+  // とすると、query on demand のローディングインジケーターを無効にできる
   if (!process.env.GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR) {
-    // if GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR was not set at all
-    // enable loading indicator
+    // GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR がまったく設定されていない場合は、
+    // ローディングインジケーターを有効にする
     process.env.GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR = `true`
   }
 
@@ -217,12 +217,12 @@ export async function initialize({
     )
   }
 
-  // Throughout the codebase GATSBY_QUERY_ON_DEMAND is used to conditionally enable the QoD behavior, depending on if "gatsby develop" is running or not. In CI QoD is disabled by default, too.
-  // You can use GATSBY_ENABLE_QUERY_ON_DEMAND_IN_CI to force enable it in CI.
+  // コードベース全体で、GATSBY_QUERY_ON_DEMAND は、"gatsby develop" が実行中かどうかに応じて QoD の動作を条件付きで有効にするために使われている。CI でも、QoD はデフォルトで無効である。
+  // GATSBY_ENABLE_QUERY_ON_DEMAND_IN_CI を使うと、CI で強制的に有効にできる。
   process.env.GATSBY_QUERY_ON_DEMAND = `true`
   if (process.env.gatsby_executing_command !== `develop`) {
-    // we don't want to ever have this flag enabled for anything than develop
-    // in case someone have this env var globally set
+    // 誰かがこの環境変数をグローバルに設定していた場合に備えて、
+    // develop 以外ではこのフラグを決して有効にしない
     delete process.env.GATSBY_QUERY_ON_DEMAND
   } else if (isCI() && !process.env.GATSBY_ENABLE_QUERY_ON_DEMAND_IN_CI) {
     delete process.env.GATSBY_QUERY_ON_DEMAND
@@ -231,12 +231,12 @@ export async function initialize({
     )
   }
 
-  // run stale jobs
+  // 古くなったジョブを実行する
   // @ts-ignore we'll need to fix redux typings https://redux.js.org/usage/usage-with-typescript
   store.dispatch(removeStaleJobs(store.getState().jobsV2))
 
-  // Start plugin runner which listens to the store
-  // and invokes Gatsby API based on actions.
+  // ストアを監視し、アクションに基づいて Gatsby の API を呼び出す
+  // プラグインランナーを起動する。
   startPluginRunner()
 
   // onPreInit
@@ -258,11 +258,11 @@ export async function initialize({
   const workerCacheDirExists = fs.existsSync(workerCacheDirectory)
   const lmdbCacheDirExists = fs.existsSync(lmdbCacheDirectory)
 
-  // check the cache file that is used by the current configuration
+  // 現在の設定で使われるキャッシュファイルを確認する
   const cacheDirExists = lmdbCacheDirExists
 
-  // For builds in case public dir exists, but cache doesn't, we need to clean up potentially stale
-  // artifacts from previous builds (due to cache not being available, we can't rely on tracking of artifacts)
+  // ビルドで、public ディレクトリは存在するがキャッシュが存在しない場合は、以前のビルドの古いかもしれない
+  // 成果物を片付ける必要がある（キャッシュがないので、成果物の追跡には頼れない）
   if (
     process.env.NODE_ENV === `production` &&
     publicDirExists &&
@@ -290,8 +290,8 @@ export async function initialize({
     activity.end()
   }
 
-  // When the main process and workers communicate they save parts of their redux state to .cache/worker
-  // We should clean this directory to remove stale files that a worker might accidentally reuse then
+  // メインプロセスとワーカーは、やり取りをするときに、redux の状態の一部を .cache/worker に保存する
+  // ワーカーが誤って再利用しかねない古いファイルを取り除くために、このディレクトリを片付けるべきである
   if (workerCacheDirExists) {
     activity = reporter.activityTimer(
       `delete worker cache from previous builds`,
@@ -310,16 +310,16 @@ export async function initialize({
     parentSpan,
   })
   activity.start()
-  // Check if any plugins have been updated since our last run. If so,
-  // we delete the cache as there's likely been changes since
-  // the previous run.
+  // 前回の実行以降にプラグインが更新されたかを確認する。更新されていれば、
+  // 前回の実行から変更があった可能性が高いので、
+  // キャッシュを削除する。
   //
-  // We do this by creating a hash of all the version numbers of installed
-  // plugins, the site's package.json, gatsby-config.js, and gatsby-node.js.
-  // The last, gatsby-node.js, is important as many gatsby sites put important
-  // logic in there e.g. generating slugs for custom pages.
+  // これは、インストールされているプラグインのすべてのバージョン番号、サイトの
+  // package.json、gatsby-config.js、gatsby-node.js からハッシュを作ることで行う。
+  // 最後の gatsby-node.js は重要である。多くの gatsby サイトが、独自のページの
+  // slug の生成など、重要なロジックをそこに置いているためである。
   const pluginVersions = flattenedPlugins.map(p => p.version)
-  // we should include gatsby version as well
+  // gatsby のバージョンも含めるべきである
   pluginVersions.push(require(`../../package.json`).version)
   const optionalFiles = [
     `${program.directory}/gatsby-config.js`,
@@ -331,7 +331,7 @@ export async function initialize({
   const state = store.getState()
 
   const hashes = await Promise.all(
-    // Ignore optional files with .catch() as these are not required
+    // 省略可能なファイルは必須ではないので、.catch() で無視する
     [md5File(`package.json`), state.config.trailingSlash as string].concat(
       optionalFiles.map(f => md5File(f).catch(() => ``))
     )
@@ -341,11 +341,11 @@ export async function initialize({
 
   const oldPluginsHash = state && state.status ? state.status.PLUGINS_HASH : ``
 
-  // Check if anything has changed. If it has, delete the site's .cache
-  // directory and tell reducers to empty themselves.
+  // 何かが変わったかを確認する。変わっていれば、サイトの .cache
+  // ディレクトリを削除し、レデューサーに自身を空にするよう伝える。
   //
-  // Also if the hash isn't there, then delete things just in case something
-  // is weird.
+  // また、ハッシュが存在しない場合も、何かがおかしいときに備えて
+  // 念のため削除する。
   if (oldPluginsHash && pluginsHash !== oldPluginsHash) {
     reporter.info(reporter.stripIndent`
       One or more of your plugins have changed since the last time you ran Gatsby. As
@@ -353,8 +353,8 @@ export async function initialize({
     `)
   }
 
-  // .cache directory exists in develop at this point
-  // so checking for .cache/json or .cache/caches-lmdb as a heuristic (could be any expected file)
+  // develop では、この時点で .cache ディレクトリが存在する
+  // そのため、ヒューリスティックとして .cache/json または .cache/caches-lmdb を確認する（期待されるファイルであれば何でもよい）
   const cacheIsCorrupt = cacheDirExists && !publicDirExists
   if (cacheIsCorrupt) {
     reporter.info(reporter.stripIndent`
@@ -366,7 +366,7 @@ export async function initialize({
 
   if (!oldPluginsHash || pluginsHash !== oldPluginsHash || cacheIsCorrupt) {
     try {
-      // Comment out inviet until we can test perf impact
+      // パフォーマンスへの影響をテストできるまで、案内はコメントアウトしておく
       //
       // let sourceFileSystemVersion = flattenedPlugins.find(
       // plugin => plugin.name === `gatsby-source-filesystem`
@@ -421,19 +421,19 @@ export async function initialize({
       // }
 
       const deleteGlobs = [
-        // By default delete all files & subdirectories
+        // デフォルトでは、すべてのファイルとサブディレクトリを削除する
         `.cache/**`,
         `.cache/data/**`,
         `!.cache/data/gatsby-core-utils/**`,
         `!.cache/compiled`,
-        // Add webpack
+        // webpack を追加する
         `!.cache/webpack`,
         `!.cache/adapters`,
       ]
 
       if (process.env.GATSBY_EXPERIMENTAL_PRESERVE_FILE_DOWNLOAD_CACHE) {
-        // Stop the caches directory from being deleted, add all sub directories,
-        // but remove gatsby-source-filesystem
+        // caches ディレクトリが削除されないようにし、すべてのサブディレクトリを追加するが、
+        // gatsby-source-filesystem は取り除く
         deleteGlobs.push(`!.cache/caches`)
         deleteGlobs.push(`.cache/caches/*`)
         deleteGlobs.push(`!.cache/caches/gatsby-source-filesystem`)
@@ -447,31 +447,31 @@ export async function initialize({
     } catch (e) {
       reporter.error(`Failed to remove .cache files.`, e)
     }
-    // Tell reducers to delete their data (the store will already have
-    // been loaded from the file system cache).
+    // レデューサーにデータを削除するよう伝える（ストアはすでに
+    // ファイルシステムのキャッシュから読み込まれている）。
     store.dispatch({
       type: `DELETE_CACHE`,
       cacheIsCorrupt,
     })
 
-    // make sure all previous mutexes are released
+    // 以前のミューテックスがすべて解放されているようにする
     await releaseAllMutexes()
   }
 
-  // Update the store with the new plugins hash.
+  // 新しいプラグインのハッシュでストアを更新する。
   store.dispatch({
     type: `UPDATE_PLUGINS_HASH`,
     payload: pluginsHash,
   })
 
-  // Now that we know the .cache directory is safe, initialize the cache
-  // directory.
+  // .cache ディレクトリが安全であることが分かったので、キャッシュの
+  // ディレクトリを初期化する。
   await fs.ensureDir(cacheDirectory)
 
-  // Ensure the public/static directory
+  // public/static ディレクトリが存在するようにする
   await fs.ensureDir(`${publicDirectory}/static`)
 
-  // Init plugins once cache is initialized
+  // キャッシュが初期化されたら、プラグインを初期化する
   await apiRunnerNode(`onPluginInit`, {
     parentSpan: activity.span,
   })
@@ -493,32 +493,32 @@ export async function initialize({
     })
     await fs.ensureDir(`${cacheDirectory}/${lmdbCacheDirectoryName}`)
 
-    // Ensure .cache/fragments exists and is empty. We want fragments to be
-    // added on every run in response to data as fragments can only be added if
-    // the data used to create the schema they're dependent on is available.
+    // .cache/fragments が存在し、空であるようにする。フラグメントは、実行のたびに
+    // データに応じて追加したい。フラグメントを追加できるのは、それが依存する
+    // スキーマの作成に使われるデータが利用できる場合だけだからである。
     await fs.emptyDir(`${cacheDirectory}/fragments`)
   } catch (err) {
     reporter.panic(`Unable to copy site files to .cache`, err)
   }
 
-  // Find plugins which implement gatsby-browser and gatsby-ssr and write
-  // out api-runners for them.
+  // gatsby-browser と gatsby-ssr を実装しているプラグインを探し、
+  // それらのための api-runner を書き出す。
   const hasAPIFile = (env, plugin): string | undefined => {
-    // The plugin loader has disabled SSR APIs for this plugin. Usually due to
-    // multiple implementations of an API that can only be implemented once
+    // プラグインローダーが、このプラグインの SSR API を無効にしている。通常は、
+    // 一度しか実装できない API が複数実装されていることが原因である
     if (env === `ssr` && plugin.skipSSR === true) return undefined
 
     const envAPIs = plugin[`${env}APIs`]
 
-    // Always include gatsby-browser.js files if they exist as they're
-    // a handy place to include global styles and other global imports.
+    // gatsby-browser.js ファイルが存在する場合は、常に含める。グローバルな
+    // スタイルやその他のグローバルな import を置くのに便利な場所だからである。
     try {
       if (env === `browser`) {
         const modulePath = path.join(plugin.resolve, `gatsby-${env}`)
         return slash(resolveModule(modulePath) as string)
       }
     } catch (e) {
-      // ignore
+      // 無視する
     }
 
     if (envAPIs && Array.isArray(envAPIs) && envAPIs.length > 0) {
@@ -553,7 +553,7 @@ export async function initialize({
 
   const browserPluginsRequires = browserPlugins
     .map(plugin => {
-      // we need a relative import path to keep contenthash the same if directory changes
+      // ディレクトリが変わっても contenthash が同じになるように、相対的な import のパスが必要である
       const relativePluginPath = path.relative(siteDir, plugin.resolve)
       return `{
       plugin: require('${slash(relativePluginPath)}'),
@@ -593,7 +593,7 @@ export async function initialize({
 
   activity.end()
   /**
-   * Start the main bootstrap processes.
+   * メインの bootstrap の処理を開始する。
    */
 
   // onPreBootstrap
@@ -606,10 +606,10 @@ export async function initialize({
   })
   activity.end()
 
-  // Collect resolvable extensions and attach to program.
+  // 解決できる拡張子を集めて、program に付ける。
   const extensions = [`.mjs`, `.js`, `.jsx`, `.wasm`, `.json`]
-  // Change to this being an action and plugins implement `onPreBootstrap`
-  // for adding extensions.
+  // これをアクションに変更し、プラグインが拡張子を追加するために
+  // `onPreBootstrap` を実装するようにする。
   const apiResults = await apiRunnerNode(`resolvableExtensions`, {
     traceId: `initial-resolvableExtensions`,
     parentSpan,
@@ -623,7 +623,7 @@ export async function initialize({
   const workerPool = WorkerPool.create()
 
   if (state.config.graphqlTypegen) {
-    // This is only run during `gatsby develop`
+    // これは `gatsby develop` のときにだけ実行される
     if (process.env.gatsby_executing_command === `develop`) {
       writeGraphQLConfig(program)
     }

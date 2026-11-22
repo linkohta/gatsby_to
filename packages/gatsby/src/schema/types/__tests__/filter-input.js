@@ -63,8 +63,8 @@ describe(`Filter input`, () => {
   })
 
   it(`removes empty input filter fields`, async () => {
-    // This can happen when a type has only one GraphQLUnion type field,
-    // which will be skipped by `toInputObjectType`
+    // これは、型が GraphQLUnion 型のフィールドを 1 つしか持たない場合に起こりうる。
+    // そのフィールドは `toInputObjectType` によってスキップされる
     const schema = await buildSchema()
     const parentFilterInput = schema.getType(`ParentFilterInput`)
     const fields = parentFilterInput.getFields()

@@ -64,8 +64,8 @@ const descriptionLines = (
     if (line.length < maxLen + 5) {
       return line
     }
-    // For > 120 character long lines, cut at space boundaries into sublines
-    // of ~80 chars.
+    // 120 文字を超える行は、スペースの位置で区切って、約 80 文字の
+    // 行に分ける。
     return breakLine(line, maxLen)
   })
 }
@@ -185,7 +185,7 @@ const printArgs = (
     return ``
   }
 
-  // If all args have no description, print them on one line
+  // すべての引数に説明がない場合は、1 行で出力する
   if (argsArray.every(([_name, argTC]) => !argTC.description)) {
     return `(` + argsArray.map(printInputValue).join(`, `) + `)`
   }
@@ -386,9 +386,9 @@ export const printTypeDefinitions = ({
     return true
   }
 
-  // Save processed type names, not references to the type composers,
-  // because of how graphql-compose, at least in v6, processes
-  // inline types
+  // 型コンポーザーへの参照ではなく、処理済みの型の名前を保存する。
+  // graphql-compose が（少なくとも v6 では）インラインの型を
+  // 処理する方法のためである
   const processedTypes = new Set<string>()
   const typeDefs = new Set<NamedTypeComposer<unknown>>()
 
@@ -431,9 +431,9 @@ export const printTypeDefinitions = ({
             try {
               addWithFieldTypes(tc.getFieldArgTC(fieldName, argName))
             } catch {
-              // this type might not exist yet. If it won't be created by the end
-              // of schema creation then building schema will fail and fact that we
-              // skip it here won't matter
+              // この型はまだ存在しないかもしれない。スキーマの作成が終わるまでに
+              // 作成されなければ、スキーマのビルドは失敗するので、ここで
+              // スキップしたことは問題にならない
             }
           })
         }

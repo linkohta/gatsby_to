@@ -149,8 +149,8 @@ const convert = ({
     const type = getNamedType(fieldConfig.type)
 
     if (type instanceof GraphQLInputObjectType) {
-      // Input type composers has names `FooInput`, get the type associated
-      // with it
+      // 入力型のコンポーザーは `FooInput` という名前を持つ。それに対応する
+      // 型を取得する
       const typeComposer = schemaComposer.getAnyTC(
         type.name.replace(/Input$/, ``)
       )
@@ -167,7 +167,7 @@ const convert = ({
         listInputComposer,
       })
 
-      // TODO: array of arrays?
+      // TODO: 配列の配列は？
       const isListType =
         getNullableType(fieldConfig.type) instanceof GraphQLList
 

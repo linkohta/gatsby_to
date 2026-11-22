@@ -11,8 +11,8 @@ export async function graphQLTypegen({
   parentSpan,
   reporter,
 }: IBuildContext): Promise<void> {
-  // TypeScript requires null/undefined checks for these
-  // But this should never happen unless e.g. the state machine doesn't receive this information from a parent state machine
+  // TypeScript はこれらに null/undefined の確認を要求する
+  // しかし、たとえばステートマシンが親のステートマシンからこの情報を受け取らない、といったことがない限り、これは起こらないはずである
   if (!program || !store || !reporter) {
     throw new Error(
       `Missing required params in graphQLTypegen. program: ${!!program}. store: ${!!store}.`

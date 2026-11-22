@@ -188,7 +188,7 @@ export function maybeConvertSortInputObjectToSortPath(args: any): any {
   }
 
   if (_CFLAGS_.GATSBY_MAJOR === `5`) {
-    // check if it's already in expected format
+    // すでに期待する形式になっているかを確認する
     if (
       Array.isArray(args.sort?.fields) &&
       Array.isArray(args.sort?.order) &&

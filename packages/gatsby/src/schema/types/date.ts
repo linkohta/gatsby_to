@@ -32,7 +32,7 @@ const ISO_8601_FORMAT = [
   `YYYY-MM-DD`,
   `YYYYMMDD`,
 
-  // Local Time
+  // ローカル時刻
   `YYYY-MM-DDTHH`,
   `YYYY-MM-DDTHH:mm`,
   `YYYY-MM-DDTHHmm`,
@@ -45,7 +45,7 @@ const ISO_8601_FORMAT = [
   // `YYYY-MM-DDTHH:mm:ss.SSSSSSSSS`,
   // `YYYY-MM-DDTHHmmss.SSSSSSSSS`,
 
-  // Local Time (Omit T)
+  // ローカル時刻（T を省略）
   `YYYY-MM-DD HH`,
   `YYYY-MM-DD HH:mm`,
   `YYYY-MM-DD HHmm`,
@@ -58,7 +58,7 @@ const ISO_8601_FORMAT = [
   // `YYYY-MM-DD HH:mm:ss.SSSSSSSSS`,
   // `YYYY-MM-DD HHmmss.SSSSSSSSS`,
 
-  // Coordinated Universal Time (UTC)
+  // 協定世界時（UTC）
   `YYYY-MM-DDTHHZ`,
   `YYYY-MM-DDTHH:mmZ`,
   `YYYY-MM-DDTHHmmZ`,
@@ -71,7 +71,7 @@ const ISO_8601_FORMAT = [
   // `YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ`,
   // `YYYY-MM-DDTHHmmss.SSSSSSSSSZ`,
 
-  // Coordinated Universal Time (UTC) (Omit T)
+  // 協定世界時（UTC）（T を省略）
   `YYYY-MM-DD HHZ`,
   `YYYY-MM-DD HH:mmZ`,
   `YYYY-MM-DD HHmmZ`,
@@ -84,7 +84,7 @@ const ISO_8601_FORMAT = [
   // `YYYY-MM-DD HH:mm:ss.SSSSSSSSSZ`,
   // `YYYY-MM-DD HHmmss.SSSSSSSSSZ`,
 
-  // Coordinated Universal Time (UTC) (Omit T, Extra Space before Z)
+  // 協定世界時（UTC）（T を省略し、Z の前に余分なスペースがある）
   `YYYY-MM-DD HH Z`,
   `YYYY-MM-DD HH:mm Z`,
   `YYYY-MM-DD HHmm Z`,
@@ -137,16 +137,16 @@ const momentFormattingRegexes = {
 const ISO_8601_FORMAT_AS_REGEX = ISO_8601_FORMAT.map(format => {
   const matchedFormat = format.match(momentFormattingTokens)
   if (matchedFormat === null) return ``
-  // convert ISO string to a map of momentTokens ([YYYY, MM, DD])
+  // ISO 文字列を momentTokens のマップ（[YYYY, MM, DD]）に変換する
   return [...matchedFormat]
     .map(token =>
-      // see if the token (YYYY or ss) is found, else we just return the value
+      // トークン（YYYY や ss）が見つかるかを調べ、見つからなければ値をそのまま返す
       momentFormattingRegexes[token] ? momentFormattingRegexes[token] : token
     )
     .join(``)
 }).join(`|`)
 
-// calculate all lengths of the formats, if a string is longer or smaller it can't be valid
+// フォーマットのすべての長さを計算する。文字列がそれより長いか短ければ、有効ではありえない
 const ISO_8601_FORMAT_LENGTHS = [
   ...new Set(
     ISO_8601_FORMAT.reduce((acc: Array<number>, val: string) => {
@@ -154,35 +154,35 @@ const ISO_8601_FORMAT_LENGTHS = [
         return acc.concat(val.length)
       }
 
-      // we add count of +01 & +01:00
+      // +01 と +01:00 の分の文字数を加える
       return acc.concat([val.length, val.length + 3, val.length + 5])
     }, [])
   ),
 ]
 
-// lets imagine these formats: YYYY-MM-DDTHH & YYYY-MM-DD HHmmss.SSSSSS Z
-// this regex looks like (/^(\d{4}-\d{2}-\d{2}T\d{2}|\d{4}-\d{2}-\d{2} \d{2}\d{2}\d{2}.\d{6} Z)$)
+// 次のフォーマットを考える: YYYY-MM-DDTHH と YYYY-MM-DD HHmmss.SSSSSS Z
+// この正規表現は (/^(\d{4}-\d{2}-\d{2}T\d{2}|\d{4}-\d{2}-\d{2} \d{2}\d{2}\d{2}.\d{6} Z)$) のようになる
 const quickDateValidateRegex = new RegExp(`^(${ISO_8601_FORMAT_AS_REGEX})$`)
 
 const looksLikeDateStartRegex = /^\d{4}/
-// this regex makes sure the last characters are a number or the letter Z
+// この正規表現は、最後の文字が数字または文字 Z であることを確認する
 const looksLikeDateEndRegex = /(\d|Z)$/
 
 /**
- * looksLikeADate isn't a 100% valid check if it is a real date but at least it's something that looks like a date.
- * It won't catch values like 2010-02-30
- * 1) is it a number?
- * 2) does the length of the value comply with any of our formats
- * 3) does the str starts with 4 digites (YYYY)
- * 4) does the str ends with something that looks like a date
- * 5) Small regex to see if it matches any of the formats
- * 6) check momentjs
+ * looksLikeADate は、本物の日付であるかを 100% 正しく確認するものではないが、少なくとも日付らしく見えるものを判定する。
+ * 2010-02-30 のような値は検出できない
+ * 1) 数値であるか？
+ * 2) 値の長さが、いずれかのフォーマットに合っているか
+ * 3) 文字列が 4 桁の数字（YYYY）で始まっているか
+ * 4) 文字列が日付らしく見えるもので終わっているか
+ * 5) いずれかのフォーマットに一致するかを調べる小さな正規表現
+ * 6) momentjs で確認する
  *
  * @param {*} value
  * @return {boolean}
  */
 export function looksLikeADate(value?: string): boolean {
-  // quick check if value does not look like a date
+  // 値が日付らしく見えないかを手早く確認する
   if (
     !value ||
     (value.length && !ISO_8601_FORMAT_LENGTHS.includes(value.length)) ||
@@ -192,8 +192,8 @@ export function looksLikeADate(value?: string): boolean {
     return false
   }
 
-  // If it looks like a date we parse the date with a regex to see if we can handle it.
-  // momentjs just does regex validation itself if you don't do any operations on it.
+  // 日付らしく見える場合は、扱えるかどうかを調べるために正規表現で日付をパースする。
+  // momentjs は、何も操作をしなければ、自身も正規表現による検証をするだけである。
   if (typeof value === `string` && quickDateValidateRegex.test(value)) {
     return true
   }

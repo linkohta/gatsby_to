@@ -20,27 +20,27 @@ export async function calculateDirtyQueries({
     process.env.gatsby_executing_command === `develop` &&
     process.env.GATSBY_QUERY_ON_DEMAND
   ) {
-    // 404 are special cases in our runtime that ideally use
-    // generic things to work, but for now they have special handling
+    // 404 はランタイムの中で特別なケースになっている。理想的には汎用の仕組みで
+    // 動かしたいが、今のところは特別な処理をしている
     const pagePathFilter = new Set([`/404.html`, `/dev-404-page/`])
 
-    // we want to make sure we run queries for pages that user currently
-    // view in the browser
+    // ユーザーが現在ブラウザーで見ているページのクエリを
+    // 確実に実行したい
     if (websocketManager?.activePaths) {
       for (const activePath of websocketManager.activePaths) {
         pagePathFilter.add(activePath)
       }
     }
 
-    // we also want to make sure we include pages that were requested from
-    // via `page-data` fetches or websocket requests
+    // `page-data` の fetch や websocket のリクエストによって
+    // 要求されたページも確実に含めたい
     if (currentlyHandledPendingQueryRuns) {
       for (const pendingQuery of currentlyHandledPendingQueryRuns) {
         pagePathFilter.add(pendingQuery)
       }
     }
 
-    // static and slice queries are also not on demand
+    // 静的クエリとスライスのクエリもオンデマンドではない
     queriesToRun = queryIds.filter(
       queryId =>
         queryId.startsWith(`sq--`) ||

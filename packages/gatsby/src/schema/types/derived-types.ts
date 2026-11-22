@@ -1,7 +1,7 @@
 /**
- * Derived types are types that make sense only when their base type exists
+ * 派生型とは、基になる型が存在するときにだけ意味を持つ型である
  *
- * Take this node for example:
+ * 次のノードを例にする:
  * {
  *   internal: { type: 'Foo' },
  *   fields: {
@@ -9,7 +9,7 @@
  *   }
  * }
  *
- * It will produce following types:
+ * これは次の型を生成する:
  * Foo
  * FooFields
  *
@@ -18,16 +18,16 @@
  *
  * FooFieldsInputFilter
  * FooFieldsSortFilter
- * etc
+ * など
  *
- * Derived types:
+ * 派生型:
  *   Foo: FooFields, FooInputFilter, FooSortInput
  *   FooFields: FooFieldsInputFilter, FooFieldsSortFilter
  *
- * Caveats:
- *   Only types created via inference are marked as derived. So if in the example above
- *   user explicitly defines `FooFields` type (via `createTypes` call) it won't be considered
- *   a derived type
+ * 注意点:
+ *   派生型として印が付くのは、推論によって作成された型だけである。そのため、上の例で
+ *   ユーザーが（`createTypes` の呼び出しで）`FooFields` 型を明示的に定義した場合、
+ *   それは派生型とは見なされない
  */
 import {
   ObjectTypeComposer,

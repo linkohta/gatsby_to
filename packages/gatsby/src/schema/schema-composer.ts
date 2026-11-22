@@ -14,7 +14,7 @@ export const createSchemaComposer = <TSource, TArgs>({
   const schemaComposer: SchemaComposer<IGatsbyResolverContext<TSource, TArgs>> =
     new SchemaComposer()
 
-  // set default interfaces so plugins can use them
+  // プラグインが使えるように、デフォルトのインターフェースを設定する
   getNodeInterface({ schemaComposer })
   getOrCreateRemoteFileInterface(schemaComposer)
 

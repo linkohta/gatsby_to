@@ -27,7 +27,7 @@ jest.mock(`gatsby-cli/lib/reporter`, () => {
   }
 })
 
-// Timestamps grabbed from https://github.com/moment/moment/blob/2e2a5b35439665d4b0200143d808a7c26d6cd30f/src/test/moment/is_valid.js
+// タイムスタンプは https://github.com/moment/moment/blob/2e2a5b35439665d4b0200143d808a7c26d6cd30f/src/test/moment/is_valid.js から持ってきたもの
 
 describe(`isDate`, () => {
   it.each([
@@ -108,7 +108,7 @@ describe(`isDate`, () => {
     `2010-00-00`,
     `2010-01-00`,
     `2010-01-40`,
-    `2010-01-01T24:01`, // 24:00:00 is actually valid
+    `2010-01-01T24:01`, // 24:00:00 は実際には有効である
     `2010-01-01T23:60`,
     `2010-01-01T23:59:60`,
     `2010-01-40T23:59:59.9999`,
@@ -120,8 +120,8 @@ describe(`isDate`, () => {
     `2010-01-40T23:59:60+00:00`,
     `2010-01-40T23:59:59.9999+00:00`,
     `2010-01-40T23:59:59,9999+00:00`,
-    `2012-04-01T00:00:00-5:00`, // should be -05:00
-    `2012-04-01T00:00:00+1:00`, // should be +01:00
+    `2012-04-01T00:00:00-5:00`, // -05:00 になるはず
+    `2012-04-01T00:00:00+1:00`, // +01:00 になるはず
     undefined,
     `undefined`,
     null,
@@ -208,7 +208,7 @@ describe(`looksLikeADate`, () => {
     `2010-00-00`,
     `2010-01-00`,
     `2010-01-40`,
-    `2010-01-01T24:01`, // 24:00:00 is actually valid
+    `2010-01-01T24:01`, // 24:00:00 は実際には有効である
     `2010-01-40T24:01+00:00`,
     `2010-01-01T23:60`,
     `2010-01-01T23:59:60`,
@@ -225,8 +225,8 @@ describe(`looksLikeADate`, () => {
     `2010-00-00T+00:00`,
     `2010-01-00T+00:00`,
     `2010-01-40T+00:00`,
-    `2012-04-01T00:00:00-5:00`, // should be -05:00
-    `2012-04-01T00:00:00+1:00`, // should be +01:00
+    `2012-04-01T00:00:00-5:00`, // -05:00 になるはず
+    `2012-04-01T00:00:00+1:00`, // +01:00 になるはず
     undefined,
     `undefined`,
     null,
@@ -287,7 +287,7 @@ describe(`dateResolver`, () => {
         invalidDate1: `2010-00-00`,
         invalidDate2: `2010-01-00`,
         invalidDate3: `2010-01-40`,
-        invalidDate4: `2010-01-01T24:01`, // 24:00:00 is actually valid
+        invalidDate4: `2010-01-01T24:01`, // 24:00:00 は実際には有効である
         invalidDate5: `2010-01-01T23:60`,
         invalidDate6: `2010-01-01T23:59:60`,
         invalidDate7: `2010-01-40T23:59:59.9999`,
@@ -401,7 +401,7 @@ describe(`dateResolver`, () => {
     `2018-W05-1`,
     `2018-01-29T23:25:16.019345+02:00`,
     `2018-01-29T23:25:16.019345Z`,
-    // Seems to not require nanosecond definition to not fail
+    // 失敗させないためにナノ秒の定義は必要ないようだ
     `2018-01-29T23:25:16.019345123+02:00`,
     `2018-01-29T23:25:16.019345123Z`,
   ])(`should return "Jan 29, 2018": %s`, async dateString => {
@@ -427,7 +427,7 @@ describe(`dateResolver`, () => {
     `2010-01-01T23:60`,
     `2010-01-01T23:59:60`,
     `2010-01-40T23:59:59.9999`,
-    // Combine with above statement once we figure out why it passes
+    // なぜ通るのかが分かったら、上の文とまとめる
     // `2018-08-31T23:25:16.01234567899993+02:00`,
   ])(`should return "Invalid Date": %s`, async dateString => {
     const schema = await buildTestSchema()
