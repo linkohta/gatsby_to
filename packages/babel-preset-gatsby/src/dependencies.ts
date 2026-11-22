@@ -1,4 +1,4 @@
-// This file is heavily based on create-react-app's implementation
+// このファイルは create-react-app の実装を大いに参考にしている
 // @see https://github.com/facebook/create-react-app/blob/master/packages/babel-preset-react-app/dependencies.js
 
 import * as path from "path"
@@ -9,9 +9,9 @@ interface IPresetOptions {
   stage?: "build-javascript" | "build-html" | "develop" | "develop-html"
 }
 
-// export default is required here because it is passed directly to webpack
-// via require.resolve
-// This function has a better inference than would be beneficial to type, and it's relatively easy to grok.
+// require.resolve 経由で webpack に直接渡されるので、ここでは export default が
+// 必要である
+// この関数は、型を書くよりも推論に任せたほうがよい結果になり、内容も比較的理解しやすい。
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default (_?: unknown, options: IPresetOptions = {}) => {
   const absoluteRuntimePath = path.dirname(
@@ -23,25 +23,25 @@ export default (_?: unknown, options: IPresetOptions = {}) => {
   const targets = pluginBabelConfig.browserslist
 
   return {
-    // Babel assumes ES Modules, which isn't safe until CommonJS
-    // dies. This changes the behavior to assume CommonJS unless
-    // an `import` or `export` is present in the file.
+    // Babel は ES Modules を前提にするが、CommonJS がなくなるまでは
+    // 安全ではない。ここでは、ファイル内に `import` か `export` がない限り
+    // CommonJS とみなすように挙動を変えている。
     // https://github.com/webpack/webpack/issues/4039#issuecomment-419284940
     sourceType: `unambiguous`,
     presets: [
       [
-        // Latest stable ECMAScript features
+        // 最新の安定版の ECMAScript の機能
         require.resolve(`@babel/preset-env`),
         {
-          // Allow importing core-js in entrypoint and use browserlist to select polyfills
-          // V3 change, make this entry
+          // エントリーポイントで core-js を import できるようにし、browserslist を使ってポリフィルを選ぶ
+          // V3 での変更。これを entry にする
           useBuiltIns: `usage`,
           corejs: 3,
           modules: false,
           // debug: true,
           targets,
           exclude: [
-            // Exclude transforms that make all code slower (https://github.com/facebook/create-react-app/pull/5278)
+            // すべてのコードを遅くする変換を除外する (https://github.com/facebook/create-react-app/pull/5278)
             `transform-typeof-symbol`,
             ...polyfillsToExclude,
           ],
@@ -49,7 +49,7 @@ export default (_?: unknown, options: IPresetOptions = {}) => {
       ],
     ],
     plugins: [
-      // Polyfills the runtime needed for async/await, generators, and friends
+      // async/await、ジェネレーターなどに必要なランタイムのポリフィルを入れる
       // https://babeljs.io/docs/en/babel-plugin-transform-runtime
       [
         require.resolve(`@babel/plugin-transform-runtime`),
@@ -58,19 +58,19 @@ export default (_?: unknown, options: IPresetOptions = {}) => {
           helpers: true,
           regenerator: true,
           // https://babeljs.io/docs/en/babel-plugin-transform-runtime#useesmodules
-          // We should turn this on once the lowest version of Node LTS
-          // supports ES Modules.
+          // Node の LTS の最も古いバージョンが ES Modules に対応したら、
+          // これを有効にすべきである。
           useESModules: true,
-          // Undocumented option that lets us encapsulate our runtime, ensuring
-          // the correct version is used
+          // ランタイムをカプセル化し、正しいバージョンが確実に使われるようにする、
+          // ドキュメントに載っていないオプション
           // https://github.com/babel/babel/blob/090c364a90fe73d36a30707fc612ce037bdbbb24/packages/babel-plugin-transform-runtime/src/index.js#L35-L42
           absoluteRuntime: absoluteRuntimePath,
         },
       ],
-      // Adds syntax support for import()
+      // import() の構文に対応する
       require.resolve(`@babel/plugin-syntax-dynamic-import`),
       stage === `build-javascript` && [
-        // Remove PropTypes from production build
+        // 本番ビルドから PropTypes を削除する
         require.resolve(`babel-plugin-transform-react-remove-prop-types`),
         {
           removeImport: true,

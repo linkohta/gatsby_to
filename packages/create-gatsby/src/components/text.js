@@ -25,7 +25,7 @@ export class TextInput extends Input {
     let output = await this.format()
     const unstyled = this.styles.unstyle(output)
 
-    // Make a fake cursor if we're showing the placeholder
+    // プレースホルダーを表示している場合は、疑似的なカーソルを作る
     if (!this.input?.length && unstyled.length) {
       this.cursorHide()
       output =

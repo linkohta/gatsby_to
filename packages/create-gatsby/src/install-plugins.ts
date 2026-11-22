@@ -29,23 +29,23 @@ const resolveGatsbyCliPath = (
       installPluginCommand = requireResolve(
         `gatsby-cli/lib/handlers/plugin-add`,
         {
-          // Try to find gatsby-cli in the site root, or in the site's gatsby dir
+          // サイトのルート、またはサイトの gatsby ディレクトリから gatsby-cli を探す
           paths: [rootPath, path.dirname(gatsbyPath)],
         }
       )
     } catch (e) {
-      // We'll error out later
+      // 後でエラーにする
     }
     try {
       if (!installPluginCommand) {
-        // Older location
+        // 以前の場所
         console.log(`looking in old place`)
         installPluginCommand = requireResolve(`gatsby-cli/lib/plugin-add`, {
           paths: [rootPath, path.dirname(gatsbyPath)],
         })
       }
     } catch (e) {
-      // We'll error out later
+      // 後でエラーにする
     }
 
     if (!installPluginCommand) {

@@ -11,22 +11,22 @@ jest.mock(`enquirer`, () => {
   class MockedEnquirer extends OriginalEnquirer {
     constructor() {
       super()
-      // Turns waiting for user input off and autofills with answers
+      // ユーザー入力の待機をやめ、回答を自動で入力する
       this.options = { show: false, autofill: true }
 
-      // Mock answers
+      // 回答のモック
       this.answers = {
-        // First prompt answer
+        // 最初のプロンプトの回答
         name: `my-site`,
 
-        // Main question set answers
+        // メインの質問セットの回答
         project: `hello-world`,
         language: `js`,
         cms: `none`,
         styling: `none`,
         features: [],
 
-        // Confirmation prompt answer
+        // 確認プロンプトの回答
         confirm: true,
       }
     }

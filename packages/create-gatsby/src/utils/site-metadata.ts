@@ -10,6 +10,6 @@ export async function setSiteMetadata(
     const { addFieldToMinimalSiteMetadata } = require(coreUtilsPath)
     await addFieldToMinimalSiteMetadata({ root }, { name, value })
   } catch (e) {
-    // Silently fail, as it's fine if we don't add it to the config
+    // 何もせずに失敗させる。設定に追加できなくても問題ないため
   }
 }

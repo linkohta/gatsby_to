@@ -1,6 +1,6 @@
 import colors from "ansi-colors"
 
-// We don't want to depend on the whole of gatsby-cli, so we can't use reporter
+// gatsby-cli 全体には依存したくないので、reporter は使えない
 export const reporter = {
   info: (message: string): void => console.log(message),
   verbose: (message: string): void => console.log(message),
