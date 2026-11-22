@@ -145,7 +145,7 @@ const builtInFieldExtensions = {
   },
 }
 
-// Reserved for internal use
+// 内部用に予約されている
 const internalExtensionNames = [
   `createdFrom`,
   `default`,
@@ -167,14 +167,14 @@ const toDirectives = ({
   Object.keys(extensions).map(name => {
     const extension = extensions[name]
     const { args, description, locations, type } = extension
-    // Allow field extensions to register a return type
+    // フィールド拡張が戻り値の型を登録できるようにする
     if (type) {
       schemaComposer.createTC(type)
     }
-    // Support the `graphql-compose` style of directly providing the field type as string
+    // フィールドの型を文字列で直接指定する `graphql-compose` の書き方に対応する
     const normalizedArgs = schemaComposer.typeMapper.convertArgConfigMap(args)
 
-    // arg.type is a composer that needs to be converted to graphql-js type
+    // arg.type は composer であり、graphql-js の型に変換する必要がある
     Object.keys(normalizedArgs).forEach(argName => {
       normalizedArgs[argName].type = normalizedArgs[argName].type.getType()
     })
@@ -215,8 +215,8 @@ const processFieldExtensions = ({
       .forEach(name => {
         const { extend } = fieldExtensions[name] || {}
         if (typeof extend === `function`) {
-          // Always get fresh field config as it will have been changed
-          // by previous field extension
+          // フィールドの設定は、前のフィールド拡張によって変更されているので、
+          // 常に最新のものを取得する
           const prevFieldConfig = typeComposer.getFieldConfig(fieldName)
           typeComposer.extendField(
             fieldName,

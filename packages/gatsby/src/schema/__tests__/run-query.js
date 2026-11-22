@@ -3,7 +3,7 @@ const { actions } = require(`../../redux/actions`)
 const { getDataStore } = require(`../../datastore`)
 
 const makeNodesUneven = () => [
-  // Note: This is assumed to be an uneven node count
+  // 注: これはノード数が奇数であることを前提にしている
   {
     id: `0`,
     internal: { type: `Test`, contentDigest: `0` },
@@ -196,7 +196,7 @@ const makeNodesUneven = () => [
   },
 ]
 const makeNodesEven = () => [
-  // Deliberate even count of nodes to test lt/lte/gt/gte search
+  // lt/lte/gt/gte の検索をテストするために、意図的にノード数を偶数にしている
   {
     id: `0`,
     internal: { type: `Test`, contentDigest: `0` },
@@ -220,8 +220,8 @@ const makeNodesEven = () => [
 ]
 
 const makeNodesNeNull = () => [
-  // This set of nodes checks `ne` behavior with null and non-existing props in
-  // the target path, every step of the way.
+  // このノードの集合では、対象のパスの途中の各段階に null のプロパティや
+  // 存在しないプロパティがある場合の `ne` の動作を確認する。
   {
     id: `0`,
     internal: { type: `Test`, contentDigest: `0` },
@@ -392,7 +392,7 @@ describe(`Filter fields`, () => {
     it(`handles empty filter`, async () => {
       const [result, allNodes] = await runFilter({})
 
-      // Expecting all nodes
+      // すべてのノードが返るはずである
       expect(result?.length).toEqual(allNodes.length)
     })
   })
@@ -404,11 +404,11 @@ describe(`Filter fields`, () => {
         hair: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair).toEqual(needle))
     })
 
@@ -418,11 +418,11 @@ describe(`Filter fields`, () => {
         boolean: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.boolean === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.boolean).toEqual(needle))
     })
 
@@ -432,30 +432,30 @@ describe(`Filter fields`, () => {
         hair: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair).toEqual(needle))
     })
 
     it(`handles eq operator with null`, async () => {
-      const needle = null // note: this should find nodes with null OR undefined (apparently)
+      const needle = null // 注: これは null または undefined のノードを見つけるはずである（どうやら）
       const [result, allNodes] = await runFilter({
         nil: { eq: needle },
       })
 
-      // Also returns nodes that do not have the property at all (NULL in db)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのプロパティをまったく持たないノード（db では NULL）も返す
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil == needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.nil == null).toEqual(true))
     })
 
-    // grapqhl would never pass on `undefined`
+    // grapqhl が `undefined` を渡してくることはない
     // it(`handles eq operator with undefined`, async () => {
     //   const [result, allNodes] = await runFastFilter{ undef: { eq: undefined } })
     //
@@ -470,11 +470,11 @@ describe(`Filter fields`, () => {
         strArray: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.strArray === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.strArray).toEqual(needle))
     })
 
@@ -484,11 +484,11 @@ describe(`Filter fields`, () => {
         anArray: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.anArray?.includes(needle)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.anArray?.includes(needle)).toEqual(true)
       )
@@ -500,23 +500,23 @@ describe(`Filter fields`, () => {
         singleArray: { eq: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.singleArray?.includes(needle)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.singleArray?.includes(needle)).toEqual(true)
       )
     })
 
     it(`does not coerce numbers against single-element arrays`, async () => {
-      const needle = `8` // note: `('8' == [8]) === true`
+      const needle = `8` // 注: `('8' == [8]) === true`
       const [result] = await runFilter({
         singleArray: { eq: needle },
       })
 
-      // Note: no coercion, so [8]=='8' is true but the comparison is strict
+      // 注: 型の強制はしない。[8]=='8' は true だが、ここでの比較は厳密である
       expect(result).toEqual([])
     })
   })
@@ -528,32 +528,32 @@ describe(`Filter fields`, () => {
         hair: { ne: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair).not.toEqual(needle))
     })
 
     it(`coerces number to string`, async () => {
-      const needle = 2 // Note: `id` is a numstr
+      const needle = 2 // 注: `id` は数値の文字列である
       const [result, allNodes] = await runFilter({ id: { ne: needle } })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.id !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.id).not.toEqual(needle))
     })
 
-    // This test causes a stack overflow right now
+    // このテストは現状ではスタックオーバーフローを起こす
     it.skip(`dpes not coerce string to number`, async () => {
-      const needle = `2` // Note: `id` is a numstr
+      const needle = `2` // 注: `id` は数値の文字列である
       const [result] = await runFilter({ id: { hair: needle } })
 
-      // Slow filter because it's an empty result
+      // 結果が空になるので、低速なフィルターになる
       expect(result).toEqual(null)
     })
 
@@ -563,17 +563,17 @@ describe(`Filter fields`, () => {
         boolean: { ne: true },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.boolean !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.boolean).not.toEqual(needle))
     })
 
     describe(`exhaustive checks for null and partial paths`, () => {
-      // This group of tests exhausitvely checks what happens when you $ne on path a.b.c=value a node that
-      // has a partial path, either ending in null or undefined prematurely, for all partials of the path.
+      // このテスト群は、パス a.b.c=value に対して $ne を使ったときに、パスが途中までしかない
+      // ノード（途中で null または undefined で終わるノード）で何が起きるかを、パスのすべての途中段階について網羅的に確認する。
 
       it(`should deal with eq null`, async () => {
         const needle = null
@@ -583,13 +583,13 @@ describe(`Filter fields`, () => {
           allNodes
         )
 
-        // For legacy reasons, apply strict check; only return id=6,7, where a.b.c===true/false.
+        // 歴史的な理由により、厳密な確認を適用する。a.b.c===true/false である id=6,7 だけを返す。
 
-        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
         expect(result?.length).toEqual(
           allNodes.filter(node => !(node?.a?.b?.c == null)).length
         )
-        expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+        expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
         result.forEach(node => expect(node?.a?.b?.c).not.toEqual(needle))
       })
 
@@ -601,13 +601,13 @@ describe(`Filter fields`, () => {
           allNodes
         )
 
-        // For legacy reasons, apply strict check; only omit id=6, where a.b.c===true (contrary to searching for null)
+        // 歴史的な理由により、厳密な確認を適用する。a.b.c===true である id=6 だけを除外する（null を検索する場合とは逆）
 
-        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
         expect(result?.length).toEqual(
           allNodes.filter(node => node?.a?.b?.c !== needle).length
         )
-        expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+        expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
         result.forEach(node => expect(node?.a?.b?.c).not.toEqual(needle))
       })
 
@@ -619,13 +619,13 @@ describe(`Filter fields`, () => {
           allNodes
         )
 
-        // For legacy reasons, apply strict check; only omit id=7, where a.b.c===false (contrary to searching for null)
+        // 歴史的な理由により、厳密な確認を適用する。a.b.c===false である id=7 だけを除外する（null を検索する場合とは逆）
 
-        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+        expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
         expect(result?.length).toEqual(
           allNodes.filter(node => node?.a?.b?.c !== needle).length
         )
-        expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+        expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
         result.forEach(node => expect(node?.a?.b?.c).not.toEqual(needle))
       })
     })
@@ -636,13 +636,13 @@ describe(`Filter fields`, () => {
         waxOnly: { foo: { ne: true } },
       })
 
-      // Note: one node has this, one node has waxOnly=null, one node does not have the waxOnly property at all.
-      // Redux seems to return only the node that doesn't have the property at all (node.id=0)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 注: 1 つのノードはこれを持ち、1 つのノードは waxOnly=null で、1 つのノードは waxOnly プロパティをまったく持たない。
+      // Redux は、プロパティをまったく持たないノード（node.id=0）だけを返すようだ
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.waxOnly?.foo !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.waxOnly?.foo).not.toEqual(needle))
     })
 
@@ -652,11 +652,11 @@ describe(`Filter fields`, () => {
         hair: { ne: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair).not.toEqual(needle))
     })
 
@@ -666,16 +666,16 @@ describe(`Filter fields`, () => {
         nil: { ne: needle },
       })
 
-      // Should only return nodes who do have the property, not set to null
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // プロパティを持ち、かつ null に設定されていないノードだけを返すはずである
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.nil).not.toEqual(needle))
     })
 
-    // grapqhl would never pass on `undefined`
+    // grapqhl が `undefined` を渡してくることはない
     // it(`handles ne operator with undefined`, async () => {
     //   const [result, allNodes] = await runFastFilter({ undef: { ne: undefined } })
     //
@@ -692,11 +692,11 @@ describe(`Filter fields`, () => {
         waxOnly: { bar: { baz: { ne: needle } } },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.waxOnly?.bar?.baz !== needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.waxOnly?.bar?.baz).not.toEqual(needle))
     })
 
@@ -706,13 +706,13 @@ describe(`Filter fields`, () => {
         anArray: { ne: needle },
       })
 
-      // For legacy reasons; return only the node that doesn't have the property at all (the other two arrays contain 1)
+      // 歴史的な理由により、プロパティをまったく持たないノードだけを返す（他の 2 つの配列は 1 を含む）
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => !node.anArray?.includes(needle)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.anArray?.includes(needle)).not.toEqual(true)
       )
@@ -726,11 +726,11 @@ describe(`Filter fields`, () => {
         hair: { lt: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair < needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair < needle).toEqual(true))
     })
 
@@ -740,9 +740,9 @@ describe(`Filter fields`, () => {
         allNodes
       )
 
-      // Just check whether the reported count is equal to the actual count
-      // We prepend the "hint" to make debugging easier; this way you know whether it's even/uneven and needle
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 報告された件数が実際の件数と等しいかだけを確認する
+      // デバッグしやすいように "hint" を先頭に付ける。こうすると、偶数か奇数かと needle が分かる
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length ?? 0).toEqual(
         allNodes.filter(node => node.exh < needle).length
       )
@@ -755,8 +755,8 @@ describe(`Filter fields`, () => {
           it(
             `should be able to lt anywhere in an array i=` + i.toFixed(1),
             async () => {
-              // Test op on all positions in an even/uneven ordered node list. `exh` will only be 1,2,3,4 or 1,2,3
-              // This checks the ordered search, to check before, on every, between, and after each position in the list
+              // 偶数個または奇数個の、順序付きのノードの一覧のすべての位置で op をテストする。`exh` は 1,2,3,4 か 1,2,3 のどちらかにしかならない
+              // 順序付きの検索について、一覧のそれぞれの位置の前、位置そのもの、位置の間、位置の後を確認する
               await confirmPosition(
                 count === `even` ? makeNodesEven() : makeNodesUneven(),
                 i
@@ -765,50 +765,50 @@ describe(`Filter fields`, () => {
           )
         }
 
-        // Note: needle property ranges from 1 to 99 or 100. Needles should not exist, otherwise binary search
-        // is skipped entirely. This test is trying to verify the op when the needle misses with ~100 nodes.
+        // 注: needle のプロパティは 1 から 99 または 100 までの範囲である。needle は存在しない値にすべきである。存在すると二分探索が
+        // 完全にスキップされる。このテストは、約 100 個のノードで needle が見つからない場合の op を検証しようとしている。
         for (const needle of [
           0, 1.5, 33.5, 49.5, 50.5, 66.5, 98.5, 99.5, 100.5,
         ]) {
           it(`should pivot upward when needle does not exist, needle=${needle}`, async () => {
-            // This caught a bug in the binary search algo which was incorrectly generating the next pivot index.
+            // これは、次のピボットのインデックスを誤って生成していた二分探索アルゴリズムのバグを検出した。
             await confirmPosition(make100Nodes(count === `even`), needle)
           })
         }
       })
     })
 
-    // Note: this test currently stackoverflows
+    // 注: このテストは現在スタックオーバーフローを起こす
     it.skip(`should lt when type coercion fails direct value lookup`, async () => {
-      // Here 1.5 exists but only as number. However, `1.5 < '1.5' === true`
-      // This test checks whether we don't incorrectly assume that if the
-      // value wasn't mapped, that it can't be found.
+      // ここでは 1.5 は存在するが、数値としてだけである。しかし、`1.5 < '1.5' === true` である
+      // このテストは、値がマップされていなければ見つからない、と
+      // 誤って決めつけていないかを確認する。
       const needle = `1.5`
       const [result, allNodes] = await runFilter({
         float: { lt: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.float < needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.float < needle).toEqual(true))
     })
 
     it(`handles lt operator with null`, async () => {
       const needle = null
-      // Note: Slow filter because it returns an empty result
+      // 注: 結果が空になるので、低速なフィルターになる
       const [result, allNodes] = await runFilter({
         nil: { lt: needle },
       })
 
-      // Nothing is lt null so zero nodes should match
-      // (Note: this is different from `lte`, which does return nulls here!)
+      // null より小さいものはないので、一致するノードは 0 個のはずである
+      // （注: これは、ここで null を返す `lte` とは異なる）
       expect(result).toEqual([])
       expect(
         allNodes.filter(node => node.nil === needle).length
-      ).toBeGreaterThan(0) // They should _exist_...
+      ).toBeGreaterThan(0) // これらは _存在する_ はずである...
     })
   })
 
@@ -819,11 +819,11 @@ describe(`Filter fields`, () => {
         hair: { lte: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair <= needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair <= needle).toEqual(true))
     })
 
@@ -833,9 +833,9 @@ describe(`Filter fields`, () => {
         allNodes
       )
 
-      // Just check whether the reported count is equal to the actual count
-      // We prepend the "hint" to make debugging easier; this way you know whether it's even/uneven and needle
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 報告された件数が実際の件数と等しいかだけを確認する
+      // デバッグしやすいように "hint" を先頭に付ける。こうすると、偶数か奇数かと needle が分かる
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length ?? 0).toEqual(
         allNodes.filter(node => node.exh <= needle).length
       )
@@ -848,8 +848,8 @@ describe(`Filter fields`, () => {
           it(
             `should be able to lte anywhere in an array i=` + i.toFixed(1),
             async () => {
-              // Test op on all positions in an even/uneven ordered node list. `exh` will only be 1,2,3,4 or 1,2,3
-              // This checks the ordered search, to check before, on every, between, and after each position in the list
+              // 偶数個または奇数個の、順序付きのノードの一覧のすべての位置で op をテストする。`exh` は 1,2,3,4 か 1,2,3 のどちらかにしかならない
+              // 順序付きの検索について、一覧のそれぞれの位置の前、位置そのもの、位置の間、位置の後を確認する
               await confirmPosition(
                 count === `even` ? makeNodesEven() : makeNodesUneven(),
                 i
@@ -858,34 +858,34 @@ describe(`Filter fields`, () => {
           )
         }
 
-        // Note: needle property ranges from 1 to 99 or 100. Needles should not exist, otherwise binary search
-        // is skipped entirely. This test is trying to verify the op when the needle misses with ~100 nodes.
+        // 注: needle のプロパティは 1 から 99 または 100 までの範囲である。needle は存在しない値にすべきである。存在すると二分探索が
+        // 完全にスキップされる。このテストは、約 100 個のノードで needle が見つからない場合の op を検証しようとしている。
         for (const needle of [
           0, 1.5, 33.5, 49.5, 50.5, 66.5, 98.5, 99.5, 100.5,
         ]) {
           it(`should pivot upward when needle does not exist, needle=${needle}`, async () => {
-            // This caught a bug in the binary search algo which was incorrectly generating the next pivot index.
+            // これは、次のピボットのインデックスを誤って生成していた二分探索アルゴリズムのバグを検出した。
             await confirmPosition(make100Nodes(count === `even`), needle)
           })
         }
       })
     })
 
-    // Note: this test currently stackoverflows
+    // 注: このテストは現在スタックオーバーフローを起こす
     it.skip(`should lte when type coercion fails direct value lookup`, async () => {
-      // Here 1.5 exists but only as number. However, `1.5 <= '1.5' === true`
-      // This test checks whether we don't incorrectly assume that if the
-      // value wasn't mapped, that it can't be found.
+      // ここでは 1.5 は存在するが、数値としてだけである。しかし、`1.5 <= '1.5' === true` である
+      // このテストは、値がマップされていなければ見つからない、と
+      // 誤って決めつけていないかを確認する。
       const needle = `1.5`
       const [result, allNodes] = await runFilter({
         float: { lte: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.float <= needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.float <= needle).toEqual(true))
     })
 
@@ -895,12 +895,12 @@ describe(`Filter fields`, () => {
         nil: { lte: needle },
       })
 
-      // lte null matches null but no nodes without the property (NULL)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // lte null は null に一致するが、プロパティを持たないノード（NULL）には一致しない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.nil === needle).toEqual(true))
     })
   })
@@ -912,11 +912,11 @@ describe(`Filter fields`, () => {
         hair: { gt: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair > needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair > needle).toEqual(true))
     })
 
@@ -926,9 +926,9 @@ describe(`Filter fields`, () => {
         allNodes
       )
 
-      // Just check whether the reported count is equal to the actual count
-      // We prepend the "hint" to make debugging easier; this way you know whether it's even/uneven and needle
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 報告された件数が実際の件数と等しいかだけを確認する
+      // デバッグしやすいように "hint" を先頭に付ける。こうすると、偶数か奇数かと needle が分かる
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length ?? 0).toEqual(
         allNodes.filter(node => node.exh > needle).length
       )
@@ -941,8 +941,8 @@ describe(`Filter fields`, () => {
           it(
             `should be able to gt anywhere in an array i=` + i.toFixed(1),
             async () => {
-              // Test op on all positions in an even/uneven ordered node list. `exh` will only be 1,2,3,4 or 1,2,3
-              // This checks the ordered search, to check before, on every, between, and after each position in the list
+              // 偶数個または奇数個の、順序付きのノードの一覧のすべての位置で op をテストする。`exh` は 1,2,3,4 か 1,2,3 のどちらかにしかならない
+              // 順序付きの検索について、一覧のそれぞれの位置の前、位置そのもの、位置の間、位置の後を確認する
               await confirmPosition(
                 count === `even` ? makeNodesEven() : makeNodesUneven(),
                 i
@@ -951,51 +951,51 @@ describe(`Filter fields`, () => {
           )
         }
 
-        // Note: needle property ranges from 1 to 99 or 100. Needles should not exist, otherwise binary search
-        // is skipped entirely. This test is trying to verify the op when the needle misses with ~100 nodes.
+        // 注: needle のプロパティは 1 から 99 または 100 までの範囲である。needle は存在しない値にすべきである。存在すると二分探索が
+        // 完全にスキップされる。このテストは、約 100 個のノードで needle が見つからない場合の op を検証しようとしている。
         for (const needle of [
           0, 1.5, 33.5, 49.5, 50.5, 66.5, 98.5, 99.5, 100.5,
         ]) {
           it(`should pivot upward when needle does not exist, needle=${needle}`, async () => {
-            // This caught a bug in the binary search algo which was incorrectly generating the next pivot index.
+            // これは、次のピボットのインデックスを誤って生成していた二分探索アルゴリズムのバグを検出した。
             await confirmPosition(make100Nodes(count === `even`), needle)
           })
         }
       })
     })
 
-    // Note: this test currently stackoverflows
+    // 注: このテストは現在スタックオーバーフローを起こす
     it.skip(`should gt when type coercion fails direct value lookup`, async () => {
-      // Here 1.5 exists but only as number. However, `1.5 < '1.5' === true`
-      // This test checks whether we don't incorrectly assume that if the
-      // value wasn't mapped, that it can't be found.
+      // ここでは 1.5 は存在するが、数値としてだけである。しかし、`1.5 < '1.5' === true` である
+      // このテストは、値がマップされていなければ見つからない、と
+      // 誤って決めつけていないかを確認する。
       const needle = `1.5`
       const [result, allNodes] = await runFilter({
         float: { gt: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.float > needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.float > needle).toEqual(true))
     })
 
     it(`handles gt operator with null`, async () => {
       const needle = null
-      // Note: Slow filter because it returns an empty result
+      // 注: 結果が空になるので、低速なフィルターになる
       const [result, allNodes] = await runFilter({
         nil: { gt: needle },
       })
 
-      // Nothing is gt null so zero nodes should match
-      // (Note: this is different from `gte`, which does return nulls here!)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // null より大きいものはないので、一致するノードは 0 個のはずである
+      // （注: これは、ここで null を返す `gte` とは異なる）
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result).toEqual([])
       expect(
         allNodes.filter(node => node.nil === needle).length
-      ).toBeGreaterThan(0) // They should _exist_...
+      ).toBeGreaterThan(0) // これらは _存在する_ はずである...
     })
   })
 
@@ -1006,11 +1006,11 @@ describe(`Filter fields`, () => {
         hair: { gte: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.hair >= needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.hair >= needle).toEqual(true))
     })
 
@@ -1020,9 +1020,9 @@ describe(`Filter fields`, () => {
         allNodes
       )
 
-      // Just check whether the reported count is equal to the actual count
-      // We prepend the "hint" to make debugging easier; this way you know whether it's even/uneven and needle
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 報告された件数が実際の件数と等しいかだけを確認する
+      // デバッグしやすいように "hint" を先頭に付ける。こうすると、偶数か奇数かと needle が分かる
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length ?? 0).toEqual(
         allNodes.filter(node => node.exh >= needle).length
       )
@@ -1035,8 +1035,8 @@ describe(`Filter fields`, () => {
           it(
             `should be able to gte anywhere in an array i=` + i.toFixed(1),
             async () => {
-              // Test op on all positions in an even/uneven ordered node list. `exh` will only be 1,2,3,4 or 1,2,3
-              // This checks the ordered search, to check before, on every, between, and after each position in the list
+              // 偶数個または奇数個の、順序付きのノードの一覧のすべての位置で op をテストする。`exh` は 1,2,3,4 か 1,2,3 のどちらかにしかならない
+              // 順序付きの検索について、一覧のそれぞれの位置の前、位置そのもの、位置の間、位置の後を確認する
               await confirmPosition(
                 count === `even` ? makeNodesEven() : makeNodesUneven(),
                 i
@@ -1045,34 +1045,34 @@ describe(`Filter fields`, () => {
           )
         }
 
-        // Note: needle property ranges from 1 to 99 or 100. Needles should not exist, otherwise binary search
-        // is skipped entirely. This test is trying to verify the op when the needle misses with ~100 nodes.
+        // 注: needle のプロパティは 1 から 99 または 100 までの範囲である。needle は存在しない値にすべきである。存在すると二分探索が
+        // 完全にスキップされる。このテストは、約 100 個のノードで needle が見つからない場合の op を検証しようとしている。
         for (const needle of [
           0, 1.5, 33.5, 49.5, 50.5, 66.5, 98.5, 99.5, 100.5,
         ]) {
           it(`should pivot upward when needle does not exist, needle=${needle}`, async () => {
-            // This caught a bug in the binary search algo which was incorrectly generating the next pivot index.
+            // これは、次のピボットのインデックスを誤って生成していた二分探索アルゴリズムのバグを検出した。
             await confirmPosition(make100Nodes(count === `even`), needle)
           })
         }
       })
     })
 
-    // Note: this test currently stackoverflows
+    // 注: このテストは現在スタックオーバーフローを起こす
     it.skip(`should gte when type coercion fails direct value lookup`, async () => {
-      // Here 1.5 exists but only as number. However, `1.5 < '1.5' === true`
-      // This test checks whether we don't incorrectly assume that if the
-      // value wasn't mapped, that it can't be found.
+      // ここでは 1.5 は存在するが、数値としてだけである。しかし、`1.5 < '1.5' === true` である
+      // このテストは、値がマップされていなければ見つからない、と
+      // 誤って決めつけていないかを確認する。
       const needle = `1.5`
       const [result, allNodes] = await runFilter({
         float: { gte: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.float >= needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.float >= needle).toEqual(true))
     })
 
@@ -1082,12 +1082,12 @@ describe(`Filter fields`, () => {
         nil: { gte: needle },
       })
 
-      // gte null matches null but no nodes without the property (NULL)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // gte null は null に一致するが、プロパティを持たないノード（NULL）には一致しない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil === needle).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.nil === needle).toEqual(true))
     })
   })
@@ -1100,27 +1100,27 @@ describe(`Filter fields`, () => {
         name: { regex: needleStr },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needleRex.test(node.name)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needleRex.test(node.name)).toEqual(true))
     })
 
     it(`handles the regex operator with i-flag`, async () => {
-      // Note: needle is different from checked because `new RegExp('/a/i')` does _not_ work
+      // 注: needle は確認に使う値と異なる。`new RegExp('/a/i')` は _動かない_ ためである
       const needleRex = /^the.*wax/i
       const needleStr = `/^the.*wax/i`
       const [result, allNodes] = await runFilter({
         name: { regex: needleStr },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needleRex.test(node.name)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needleRex.test(node.name)).toEqual(true))
     })
 
@@ -1141,24 +1141,24 @@ describe(`Filter fields`, () => {
     })
 
     it(`accepts strings without leading slash`, async () => {
-      // If this test starts failing, that might be okay and it should be dropped.
-      // At the time of writing it, this was a status quo edge case for Sift
+      // このテストが失敗するようになっても問題ないかもしれず、その場合は削除してよい。
+      // これを書いた時点では、Sift の現状のエッジケースだった
 
-      // Passes because the requirement is mostly about a .split() failing
-      // for the other fail cases. As long as it passes a regex ultimately
-      // we don't really have to care / validate.
+      // これは通る。この要件は主に、他の失敗ケースで .split() が失敗することに
+      // 関するものだからである。最終的に正規表現を渡してさえいれば、
+      // あまり気にしたり検証したりする必要はない。
 
-      const needleRex = /(?:)/i // This was what it turned into
+      const needleRex = /(?:)/i // これは最終的にこうなった
       const needleStr = `^the.*wax/i`
       const [result, allNodes] = await runFilter({
         name: { regex: needleStr },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needleRex.test(node.name)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needleRex.test(node.name)).toEqual(true))
     })
 
@@ -1177,7 +1177,7 @@ describe(`Filter fields`, () => {
         nestedRegex: { field: { regex: needleStr } },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(
           node =>
@@ -1186,7 +1186,7 @@ describe(`Filter fields`, () => {
             needleRex.test(node.nestedRegex.field)
         ).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(
           node.nestedRegex === undefined ||
@@ -1212,11 +1212,11 @@ describe(`Filter fields`, () => {
         string: { in: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needle.includes(node.string)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needle.includes(node.string)).toEqual(true))
     })
 
@@ -1226,11 +1226,11 @@ describe(`Filter fields`, () => {
         index: { in: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needle.includes(node.index)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needle.includes(node.index)).toEqual(true))
     })
 
@@ -1240,11 +1240,11 @@ describe(`Filter fields`, () => {
         float: { in: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => needle.includes(node.float)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(needle.includes(node.float)).toEqual(true))
     })
 
@@ -1253,13 +1253,13 @@ describe(`Filter fields`, () => {
         nil: { in: [null] },
       })
 
-      // May not have the property, or must be null
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // プロパティを持たないか、null でなければならない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil === undefined || node.nil === null)
           .length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.nil === undefined || node.nil === null).toEqual(true)
       )
@@ -1270,13 +1270,13 @@ describe(`Filter fields`, () => {
         nil: { in: [null, null] },
       })
 
-      // May not have the property, or must be null
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // プロパティを持たないか、null でなければならない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil === undefined || node.nil === null)
           .length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.nil === undefined || node.nil === null).toEqual(true)
       )
@@ -1287,13 +1287,13 @@ describe(`Filter fields`, () => {
         nil: { in: [5, null] },
       })
 
-      // Include the nodes without a `nil` property
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `nil` プロパティを持たないノードも含める
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.nil === undefined || node.nil === null)
           .length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(node.nil === undefined || node.nil === null).toEqual(true)
       )
@@ -1304,15 +1304,15 @@ describe(`Filter fields`, () => {
         index: { in: [2, null] },
       })
 
-      // Include the nodes without a `index` property (there aren't any)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `index` プロパティを持たないノードも含める（そのようなノードはない）
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(
           node =>
             node.index === undefined || node.index === null || node.index === 2
         ).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(
           node.index === undefined || node.index === null || node.index === 2
@@ -1325,45 +1325,45 @@ describe(`Filter fields`, () => {
         boolean: { in: [true] },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.boolean === true).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.boolean === true).toEqual(true))
     })
 
     it(`handles the in operator for array with one element`, async () => {
-      // Note: `node.anArray` doesn't exist or it's an array of multiple numbers
+      // 注: `node.anArray` は存在しないか、複数の数値の配列である
       const [result, allNodes] = await runFilter({
         anArray: { in: [5] },
       })
 
-      // The first one has a 5, the second one does not have a 5, the third does
-      // not have the property at all (NULL). It should return the first and last.
-      // (If the target value has `null` then the third should be omitted)
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 1 番目は 5 を含み、2 番目は 5 を含まず、3 番目はプロパティを
+      // まったく持たない（NULL）。1 番目と最後を返すはずである。
+      // （対象の値に `null` がある場合は、3 番目は除外されるはずである）
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.anArray?.includes(5)).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node.anArray?.includes(5)).toEqual(true))
     })
 
     it(`handles the in operator for array some elements`, async () => {
-      // Note: `node.anArray` doesn't exist or it's an array of multiple numbers
+      // 注: `node.anArray` は存在しないか、複数の数値の配列である
       const needle = [20, 5, 300]
       const [result, allNodes] = await runFilter({
         anArray: { in: needle },
       })
 
-      // Same as the test for just `[5]`. 20 and 300 do not appear anywhere.
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `[5]` だけの場合のテストと同じ。20 と 300 はどこにも現れない。
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node => node.anArray?.some(n => needle.includes(n)))
           .length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(
           node.anArray && needle.some(n => node.anArray.includes(n))
@@ -1372,18 +1372,18 @@ describe(`Filter fields`, () => {
     })
 
     it(`handles the in operator and return a unique list even if multiple requested elements match the same array`, async () => {
-      const needle = [1, 2] // both elements appear in each node's ainArray list, but it should still return each node once
+      const needle = [1, 2] // 両方の要素がそれぞれのノードの ainArray のリストに現れるが、それでも各ノードは 1 回だけ返すはずである
       const [result, allNodes] = await runFilter({
         anArray: { in: needle },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
-      // Same as the test for just `[5]`. 20 and 300 do not appear anywhere.
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
+      // `[5]` だけの場合のテストと同じ。20 と 300 はどこにも現れない。
       expect(result?.length).toEqual(
         allNodes.filter(node => node.anArray?.some(n => needle.includes(n)))
           .length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(
           node.anArray && needle.some(n => node.anArray.includes(n))
@@ -1397,13 +1397,13 @@ describe(`Filter fields`, () => {
         frontmatter: { tags: { in: needle } },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result?.length).toEqual(
         allNodes.filter(node =>
           node.frontmatter.tags?.some(n => needle.includes(n))
         ).length
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node =>
         expect(
           node.frontmatter?.tags &&
@@ -1429,7 +1429,7 @@ describe(`Filter fields`, () => {
       ).rejects.toThrow()
     })
 
-    // I'm convinced this only worked in Sift because of a fluke
+    // これが Sift で動いていたのは、まぐれにすぎなかったと確信している
     it.skip(`refuses a non-arg string argument`, async () => {
       await expect(
         runFilter({
@@ -1463,7 +1463,7 @@ describe(`Filter fields`, () => {
         },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(
         result[0]?.singleElem?.things.some(e => e?.one?.two?.three === 123)
@@ -1485,9 +1485,9 @@ describe(`Filter fields`, () => {
         },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
-      // Should contain the entire array even only one matched
+      // 1 つしか一致しなくても、配列全体が含まれるはずである
       expect(result[0].singleElem.things[0].one.two.three).toEqual(123)
       expect(result[0].singleElem.things[1].one.five.three).toEqual(153)
     })
@@ -1499,7 +1499,7 @@ describe(`Filter fields`, () => {
             elemMatch: {
               one: {
                 two: {
-                  three: { lt: 1000 }, // one match is 123, the other 404
+                  three: { lt: 1000 }, // 一致する一方は 123、もう一方は 404
                 },
               },
             },
@@ -1507,10 +1507,10 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // The `elemMatch` operator only returns the first nodde that matches so
-      // even though the `lt 1000` would match two elements in the `things` array
-      // it will return one node.
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `elemMatch` 演算子は、一致した最初のノードだけを返す。そのため、
+      // `lt 1000` は `things` 配列の 2 つの要素に一致するが、
+      // 返すノードは 1 つである。
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].singleElem.things[0].one.two.three).toEqual(123)
       expect(result[0].singleElem.things[2].one.two.three).toEqual(404)
@@ -1549,7 +1549,7 @@ describe(`Filter fields`, () => {
         },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].index).toEqual(2)
     })
@@ -1573,7 +1573,7 @@ describe(`Filter fields`, () => {
         },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].index).toEqual(2)
     })
@@ -1587,8 +1587,8 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Does NOT contain nodes that do not have the field
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのフィールドを持たないノードは含まれない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].boolean).toEqual(true)
     })
@@ -1602,8 +1602,8 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Does NOT contain nodes that do not have the field so returns 2nd node
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのフィールドを持たないノードは含まれないので、2 番目のノードを返す
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].boolSecondOnly).toEqual(false)
     })
@@ -1617,8 +1617,8 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Does NOT contain nodes that do not have the field
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのフィールドを持たないノードは含まれない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].string).toEqual(`a`)
     })
@@ -1632,9 +1632,9 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Can return more than one node
-      // Does NOT contain nodes that do not have the field
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // 複数のノードを返すことがある
+      // そのフィールドを持たないノードは含まれない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
       expect(result[0].name).toEqual(`The Mad Wax`)
       expect(result[1].name).toEqual(`The Mad Wax`)
@@ -1649,8 +1649,8 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Does NOT contain nodes that do not have the field so returns 2nd node
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのフィールドを持たないノードは含まれないので、2 番目のノードを返す
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].strSecondOnly).toEqual(`needle`)
     })
@@ -1664,8 +1664,8 @@ describe(`Filter fields`, () => {
         },
       })
 
-      // Does NOT contain nodes that do not have the field
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // そのフィールドを持たないノードは含まれない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].float).toEqual(1.5)
     })
@@ -1675,16 +1675,16 @@ describe(`Filter fields`, () => {
     it(`handles the nin operator for array [5]`, async () => {
       const [result] = await runFilter({ anArray: { nin: [5] } })
 
-      // Since the array does not contain `null`, the query should also return the
-      // nodes that do not have the field at all (NULL).
+      // 配列に `null` が含まれないので、クエリは、そのフィールドを
+      // まったく持たないノード（NULL）も返すはずである。
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
-      // Either does not exist or does not contain
+      // 存在しないか、含んでいないかのどちらか
       result
         .filter(node => node.anArray !== undefined)
         .forEach(node => {
-          // In this test, if the property exists it should be an array
+          // このテストでは、プロパティが存在する場合は配列であるはずである
           expect(Array.isArray(node.anArray)).toBe(true)
           expect(node.anArray.includes(5)).toBe(false)
         })
@@ -1695,10 +1695,10 @@ describe(`Filter fields`, () => {
         nullArray: { nin: [null] },
       })
 
-      // Since the array contains `null`, the query should NOT return the
-      // nodes that do not have the field at all (NULL).
+      // 配列に `null` が含まれるので、クエリは、そのフィールドを
+      // まったく持たないノード（NULL）を返さないはずである。
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       expect(result[0].nullArray.includes(null)).toBe(false)
     })
@@ -1708,7 +1708,7 @@ describe(`Filter fields`, () => {
         string: { nin: [`b`, `c`] },
       })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       result.forEach(node => {
         expect(node.string).not.toEqual(`b`)
@@ -1719,7 +1719,7 @@ describe(`Filter fields`, () => {
     it(`handles the nin operator for ints`, async () => {
       const [result] = await runFilter({ index: { nin: [0, 2] } })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       result.forEach(node => {
         expect(node.index).not.toEqual(0)
@@ -1730,10 +1730,10 @@ describe(`Filter fields`, () => {
     it(`handles the nin operator for floats`, async () => {
       const [result] = await runFilter({ float: { nin: [1.5] } })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
       result.forEach(node => {
-        // Might not have the property (-> undefined), must not be 1.5
+        // プロパティを持たなくてもよい（-> undefined）。1.5 であってはならない
         expect(node.float).not.toEqual(1.5)
       })
     })
@@ -1743,11 +1743,11 @@ describe(`Filter fields`, () => {
         boolean: { nin: [true, null] },
       })
 
-      // Do not return the node that does not have the field because of `null`
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `null` があるので、そのフィールドを持たないノードは返さない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       result.forEach(node => {
-        // Must have the property, must not be true nor null
+        // プロパティを持っていなければならず、true でも null でもあってはならない
         expect(node.boolean !== undefined).toBe(true)
         expect(node.boolean !== true && node.boolean !== null).toBe(true)
       })
@@ -1758,11 +1758,11 @@ describe(`Filter fields`, () => {
         nil: { nin: [null, null] },
       })
 
-      // Do not return the node that does not have the field because of `null`
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `null` があるので、そのフィールドを持たないノードは返さない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       result.forEach(node => {
-        // Must have the property, must not be null
+        // プロパティを持っていなければならず、null であってはならない
         expect(node.nil !== undefined).toBe(true)
         expect(node.nil !== null).toBe(true)
       })
@@ -1773,11 +1773,11 @@ describe(`Filter fields`, () => {
         nil: { nin: [5, null] },
       })
 
-      // Do not return the node that does not have the field because of `null`
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `null` があるので、そのフィールドを持たないノードは返さない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(1)
       result.forEach(node => {
-        // Must have the property, must not be 5 nor null
+        // プロパティを持っていなければならず、5 でも null でもあってはならない
         expect(node.nil !== undefined).toBe(true)
         expect(node.nil !== 5 && node.nil !== null).toBe(true)
       })
@@ -1788,11 +1788,11 @@ describe(`Filter fields`, () => {
         index: { nin: [2, null] },
       })
 
-      // Do not return the node that does not have the field because of `null`
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      // `null` があるので、そのフィールドを持たないノードは返さない
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
       result.forEach(node => {
-        // Must have the property, must not be 2 nor null
+        // プロパティを持っていなければならず、2 でも null でもあってはならない
         expect(node.index !== undefined).toBe(true)
         expect(node.index !== 2 && node.index !== null).toBe(true)
       })
@@ -1800,12 +1800,12 @@ describe(`Filter fields`, () => {
   })
 
   describe(`$glob`, () => {
-    // Note: glob internally uses $regex
+    // 注: glob は内部で $regex を使う
 
     it(`handles the glob operator`, async () => {
       const [result] = await runFilter({ name: { glob: `*Wax` } })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
       expect(result[0].name).toEqual(`The Mad Wax`)
     })
@@ -1815,7 +1815,7 @@ describe(`Filter fields`, () => {
     it(`filters date fields`, async () => {
       const [result] = await runFilter({ date: { ne: null } })
 
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result.length).toEqual(2)
       expect(result[0].index).toEqual(0)
       expect(result[1].index).toEqual(2)
@@ -1857,11 +1857,11 @@ describe(`Multiple filter fields`, () => {
         },
         allNodes
       )
-      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // result should contain unique elements
+      expect(result?.length ?? 0).toEqual(new Set(result ?? []).size) // 結果の要素は重複していないはずである
       expect(result).toEqual(
         allNodes.filter(node => node?.b != null && node?.c != null)
       )
-      expect(result?.length).toBeGreaterThan(0) // Make sure there _are_ results, don't let this be zero
+      expect(result?.length).toBeGreaterThan(0) // 結果が _存在する_ ことを確認する。0 件であってはならない
       result.forEach(node => expect(node?.b).not.toEqual(needle))
       result.forEach(node => expect(node?.c).not.toEqual(needle))
     })
@@ -1923,9 +1923,9 @@ describe(`collection fields`, () => {
 
     expect(result.length).toEqual(3)
 
-    // Nodes 1 and 2 both have value 10010, so correct sorting order is undefined
-    //  LMDB actually sorts according to node.counter in addition to main sorting
-    //  and the old fast filters do not do any secondary sorting, hence the difference
+    // ノード 1 と 2 はどちらも値が 10010 なので、正しいソート順は定まらない
+    //  LMDB は、主となるソートに加えて実際には node.counter でもソートするが、
+    //  古い高速フィルターは二次的なソートを一切しないので、違いが出る
     if (process.env.GATSBY_EXPERIMENTAL_LMDB_INDEXES) {
       expect(result[0].id).toEqual(`2`)
       expect(result[1].id).toEqual(`1`)
@@ -1938,14 +1938,14 @@ describe(`collection fields`, () => {
   })
 
   describe(`num, null, and nullable order`, () => {
-    // This suite asserts the order of a field that is a number vs a field that
-    // is explicitly set to the value `null`, vs a field that is not set
-    // (which gets NULL in the database). This should do whatever redux does!
-    // Exhaustive suite; 2^3 x2 = 12 tests, all cases in asc and desc
+    // このスイートは、数値のフィールド、明示的に値 `null` が設定された
+    // フィールド、設定されていないフィールド（データベースでは NULL になる）の
+    // 間の順序を確認する。redux と同じ動作をするはずである。
+    // 網羅的なスイート。2^3 x2 = 12 個のテストで、すべてのケースを asc と desc で確認する
 
     // node 1  2   3
-    //  - num_null_not    1st node has field set, 2nd set to null, 3rd not set
-    //  - num_not_null    etc
+    //  - num_null_not    1 番目のノードはフィールドが設定され、2 番目は null が設定され、3 番目は未設定
+    //  - num_not_null    以下同様
     //  - null_num_not
     //  - null_not_num
     //  - not_null_num
@@ -2121,14 +2121,14 @@ describe(`collection fields`, () => {
   })
 
   describe(`string, null, and nullable order`, () => {
-    // This suite asserts the order of a field that is a string vs a field that
-    // is explicitly set to the value `null`, vs a field that is not set
-    // (which gets NULL in the database). This should do whatever redux does!
-    // Exhaustive suite; 2^3 x2 = 12 tests, all cases in asc and desc
+    // このスイートは、文字列のフィールド、明示的に値 `null` が設定された
+    // フィールド、設定されていないフィールド（データベースでは NULL になる）の
+    // 間の順序を確認する。redux と同じ動作をするはずである。
+    // 網羅的なスイート。2^3 x2 = 12 個のテストで、すべてのケースを asc と desc で確認する
 
     // node 1  2   3
-    //  - str_null_not    1st node has field set, 2nd set to null, 3rd not set
-    //  - str_not_null    etc
+    //  - str_null_not    1 番目のノードはフィールドが設定され、2 番目は null が設定され、3 番目は未設定
+    //  - str_not_null    以下同様
     //  - null_str_not
     //  - null_not_str
     //  - not_null_str
@@ -2304,14 +2304,14 @@ describe(`collection fields`, () => {
   })
 
   describe(`obj, null, and nullable order`, () => {
-    // This suite asserts the order of a field that is a object vs a field that
-    // is explicitly set to the value `null`, vs a field that is not set
-    // (which gets NULL in the database). This should do whatever redux does!
-    // Exhaustive suite; 2^3 x2 = 12 tests, all cases in asc and desc
+    // このスイートは、オブジェクトのフィールド、明示的に値 `null` が設定された
+    // フィールド、設定されていないフィールド（データベースでは NULL になる）の
+    // 間の順序を確認する。redux と同じ動作をするはずである。
+    // 網羅的なスイート。2^3 x2 = 12 個のテストで、すべてのケースを asc と desc で確認する
 
     // node 1  2   3
-    //  - obj_null_not    1st node has field set, 2nd set to null, 3rd not set
-    //  - obj_not_null    etc
+    //  - obj_null_not    1 番目のノードはフィールドが設定され、2 番目は null が設定され、3 番目は未設定
+    //  - obj_not_null    以下同様
     //  - null_obj_not
     //  - null_not_obj
     //  - not_null_obj
@@ -2495,7 +2495,7 @@ describe(`collection fields`, () => {
       },
     })
 
-    // 0 doesn't have it, 1 has it as an object, 2 has it as null
+    // 0 はそれを持たず、1 はオブジェクトとして持ち、2 は null として持つ
 
     expect(result.length).toEqual(3)
     expect(result[0].id).toEqual(`0`)
@@ -2512,7 +2512,7 @@ describe(`collection fields`, () => {
       },
     })
 
-    // 0 doesn't have it, 1 has it as an object, 2 has it as null
+    // 0 はそれを持たず、1 はオブジェクトとして持ち、2 は null として持つ
 
     expect(result.length).toEqual(3)
     expect(result[0].id).toEqual(`1`)
@@ -2525,7 +2525,7 @@ describe(`collection fields`, () => {
       limit: 10,
       sort: {
         fields: [`frontmatter.blue`, `id`],
-        order: [`desc`], // `id` field will be sorted asc
+        order: [`desc`], // `id` フィールドは昇順でソートされる
       },
     })
 
@@ -2540,7 +2540,7 @@ describe(`collection fields`, () => {
       limit: 10,
       sort: {
         fields: [`frontmatter.blue`, `id`],
-        order: [`desc`, `desc`], // `id` field will be sorted desc
+        order: [`desc`, `desc`], // `id` フィールドは降順でソートされる
       },
     })
 

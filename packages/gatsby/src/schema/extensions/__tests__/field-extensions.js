@@ -285,7 +285,7 @@ describe(`GraphQL field extensions`, () => {
         name: `hello`,
         args: {
           planet: {
-            // type provided as string
+            // 型を文字列で指定する場合
             type: `String`,
           },
         },
@@ -329,7 +329,7 @@ describe(`GraphQL field extensions`, () => {
       createFieldExtension({
         name: `hello`,
         args: {
-          // type provided as flat string
+          // 型を単純な文字列で指定する場合
           planet: `String`,
         },
         extend(options) {
@@ -574,7 +574,7 @@ describe(`GraphQL field extensions`, () => {
     expect(results).toEqual(expected)
   })
 
-  // TODO: Decide on intended behavior
+  // TODO: 意図する動作を決める
   it(`input type reflects changed type when extension changes field type`, async () => {
     dispatch(
       createFieldExtension({
@@ -739,10 +739,10 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // FIXME: error message for directive is different from extension error,
-  // because directive is checked before by graphql-compose. also: we get
-  // parsing panics, not error messages.
-  // we get an extension option with a wrong type
+  // FIXME: ディレクティブのエラーメッセージは、拡張のエラーとは異なる。
+  // ディレクティブは graphql-compose が先に確認するためである。また、
+  // エラーメッセージではなく、パースの panic になる。
+  // 型が誤っている拡張のオプションを受け取る
   it(`validates type of extension options`, async () => {
     dispatch(
       createFieldExtension({
@@ -775,7 +775,7 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // we get an extension option with a wrong type
+  // 型が誤っている拡張のオプションを受け取る
   it(`validates type of extension options (type builder)`, async () => {
     dispatch(
       createFieldExtension({
@@ -817,8 +817,8 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // FIXME: See above (directive error messages different than with extensions,
-  // because they are reported as parsing errors (which are panics, not errors))
+  // FIXME: 上を参照（ディレクティブのエラーメッセージは、拡張の場合とは異なる。
+  // パースエラー（エラーではなく panic）として報告されるためである）
   it(`validates non-null and list types of extension options`, async () => {
     dispatch(
       createFieldExtension({
@@ -1000,8 +1000,8 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // FIXME: `graphql-compose` (in `parseDirectives`) silently omits invalid extension options.
-  // we get an extension option that has not been defined.
+  // FIXME: `graphql-compose` は（`parseDirectives` の中で）無効な拡張のオプションを黙って取り除く。
+  // 定義されていない拡張のオプションを受け取る。
   it.skip(`validates non-existing extension options`, async () => {
     dispatch(
       createFieldExtension({
@@ -1029,7 +1029,7 @@ describe(`GraphQL field extensions`, () => {
     expect(report.error).toBeCalledWith(`Some error message`)
   })
 
-  // we get an extension option that has not been defined.
+  // 定義されていない拡張のオプションを受け取る。
   it(`validates non-existing extension options (type builder)`, async () => {
     dispatch(
       createFieldExtension({
@@ -1070,7 +1070,7 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // we get an extension that has not been defined
+  // 定義されていない拡張を受け取る
   it(`validates non-existing extension`, async () => {
     dispatch(
       createTypes(
@@ -1085,7 +1085,7 @@ describe(`GraphQL field extensions`, () => {
     )
   })
 
-  // we get an extension that has not been defined
+  // 定義されていない拡張を受け取る
   it(`validates non-existing extension (type builder)`, async () => {
     dispatch(
       createTypes(

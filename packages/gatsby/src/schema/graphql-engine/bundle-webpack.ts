@@ -60,7 +60,7 @@ const getInternalPackagesCacheDir = (
     `${functionsTarget.platform}-${functionsTarget.arch}`
   )
 
-// Create a directory and JS module where we install internally used packages
+// 内部で使うパッケージをインストールするためのディレクトリと JS モジュールを作成する
 const createInternalPackagesCacheDir = async (
   functionsTarget: IPlatformAndArch
 ): Promise<void> => {
@@ -89,7 +89,7 @@ function getLMDBBinaryFromSiteLocation(
   version: string,
   functionsTarget: IPlatformAndArch
 ): string | undefined {
-  // Read lmdb's package.json, go through its optional depedencies and validate if there's a prebuilt lmdb module with a compatible binary to our platform and arch
+  // lmdb の package.json を読み、その optional dependencies を調べて、現在のプラットフォームとアーキテクチャに対応するバイナリを持つビルド済みの lmdb モジュールがあるかを検証する
   let packageJson: PackageJson
   try {
     const modulePath = path
@@ -98,10 +98,10 @@ function getLMDBBinaryFromSiteLocation(
     const packageJsonPath = path.join(modulePath, `package.json`)
     packageJson = JSON.parse(fs.readFileSync(packageJsonPath, `utf-8`))
   } catch (e) {
-    // If we fail to read lmdb's package.json there's bigger problems here so just skip installation
+    // lmdb の package.json の読み込みに失敗するなら、もっと大きな問題があるので、インストールをスキップするだけにする
     return undefined
   }
-  // If there's no lmdb prebuilt package for our arch/platform listed as optional dep no point in trying to install it
+  // 現在のアーキテクチャとプラットフォーム向けのビルド済みの lmdb パッケージが optional dep に挙がっていなければ、インストールを試みても意味がない
   const { optionalDependencies = {} } = packageJson
   if (!Object.keys(optionalDependencies).find(p => p === lmdbPackageName)) {
     throw new Error(
@@ -194,12 +194,12 @@ function checkIfInstalledInInternalPackagesCache(
   }
 }
 
-// Install lmdb's native system module under our internal cache if we detect the current installation
-// isn't using the pre-build binaries
+// 現在のインストールがビルド済みのバイナリを使っていないことを検出した場合は、
+// lmdb のネイティブモジュールを内部キャッシュの下にインストールする
 function checkIfNeedToInstallMissingLmdb(
   functionsTarget: IPlatformAndArch
 ): IBinaryPackageStatus {
-  // lmdb module with prebuilt binaries for target platform
+  // 対象のプラットフォーム向けのビルド済みバイナリを持つ lmdb モジュール
   const lmdbPackageName = `@lmdb/lmdb-${functionsTarget.platform}-${functionsTarget.arch}`
 
   const lmdbBinaryFromSiteLocation = getLMDBBinaryFromSiteLocation(
@@ -233,14 +233,14 @@ function checkIfNeedToInstallMissingSharp(
   currentTarget: IPlatformAndArch
 ): IBinaryPackageStatus | undefined {
   try {
-    // check if sharp is resolvable
+    // sharp が解決できるかを確認する
     const sharp: typeof import("sharp") = require(`sharp`)
 
     if (isEqual(functionsTarget, currentTarget)) {
-      // if current platform and target is the same as functions target, we need to check if vendored libvips
-      // exists in the current sharp installation as it will be needed in lambda
+      // 現在のプラットフォームとターゲットが関数のターゲットと同じ場合は、現在の sharp のインストールに
+      // 同梱の libvips があるかを確認する必要がある。lambda で必要になるためである
       if (sharp.vendor.installed.includes(sharp.vendor.current)) {
-        // vendored libvips is installed, so we can use it
+        // 同梱の libvips がインストールされているので、それを使える
         return undefined
       }
     }
@@ -285,9 +285,9 @@ async function installMissing(
     env: {
       npm_config_arch: functionsTarget.arch,
       npm_config_platform: functionsTarget.platform,
-      // force sharp to download vendored libvips and not skip it if globally installed libvips matches sharp requirements
-      // so that produced function is self-sufficient and doesn't rely on function execution environment having (same)
-      // globally available libvips
+      // グローバルにインストールされた libvips が sharp の要件を満たしていても、スキップせずに、同梱の libvips を sharp に強制的にダウンロードさせる
+      // これにより、生成される関数は自己完結し、関数の実行環境にグローバルで使える（同じ）libvips が
+      // あることに依存しなくなる
       SHARP_IGNORE_GLOBAL_LIBVIPS: `1`,
     },
   }
@@ -302,7 +302,7 @@ async function installMissing(
     `always`,
     `--legacy-peer-deps`,
     `--save-exact`,
-    // target platform might be different than current and force allows us to install it
+    // 対象のプラットフォームは現在のものと異なるかもしれず、force を使うとそれをインストールできる
     `--force`,
   ]
 
@@ -366,8 +366,8 @@ export async function createGraphqlEngineBundle(
   const dynamicAliases: Record<string, string> = {}
   let forcedLmdbBinaryModule: string | undefined = undefined
 
-  // we need to make sure we have internal packages cache directory setup for current lambda target
-  // before we attempt to check if we can reuse those packages
+  // パッケージを再利用できるかを確認する前に、現在の lambda のターゲット向けの
+  // 内部パッケージのキャッシュディレクトリがセットアップされているようにする必要がある
   await createInternalPackagesCacheDir(functionsTarget)
 
   const [lmdbPackageInfo, sharpPackageInfo] = await installMissing(
@@ -381,8 +381,8 @@ export async function createGraphqlEngineBundle(
   if (!lmdbPackageInfo) {
     throw new Error(`Failed to find required LMDB binary`)
   } else if (functionsTarget.platform === `linux`) {
-    // function execution platform is primarily linux, which is tested the most, so we only force that specific binary
-    // to not cause untested code paths
+    // 関数の実行プラットフォームは主に linux であり、最もよくテストされている。そのため、テストされていない
+    // コードパスを通さないように、その特定のバイナリだけを強制する
     if (lmdbPackageInfo.needToInstall) {
       throw new Error(
         `Failed to locate or install LMDB binary for functions execution platform/arch (${functionsTarget.platform}/${functionsTarget.arch})`
@@ -424,10 +424,10 @@ export async function createGraphqlEngineBundle(
       },
       version: JSON.stringify(functionsTarget),
     },
-    // those are required in some runtime paths, but we don't need them
+    // これらは一部の実行時のパスで require されるが、ここでは必要ない
     externals: [
-      `cbor-x`, // optional dep of lmdb-store, but we are using `msgpack` (default) encoding, so we don't need it
-      `electron`, // :shrug: `got` seems to have electron specific code path
+      `cbor-x`, // lmdb-store の optional dep だが、`msgpack`（デフォルト）のエンコーディングを使っているので必要ない
+      `electron`, // :shrug: `got` には electron 専用のコードパスがあるようだ
       mod.builtinModules.reduce((acc, builtinModule) => {
         if (builtinModule === `fs`) {
           acc[builtinModule] = `global _actualFsWrapper`
@@ -445,9 +445,9 @@ export async function createGraphqlEngineBundle(
         {
           oneOf: [
             {
-              // specific set of loaders for sharp
+              // sharp 専用のローダーの組み合わせ
               test: /node_modules[/\\]sharp[/\\].*\.[cm]?js$/,
-              // it is recommended for Node builds to turn off AMD support
+              // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
               parser: { amd: false },
               use: [
                 assetRelocatorUseEntry,
@@ -457,9 +457,9 @@ export async function createGraphqlEngineBundle(
               ],
             },
             {
-              // specific set of loaders for LMBD - our custom patch to massage lmdb to work with relocator -> relocator
+              // LMBD 専用のローダーの組み合わせ - lmdb が relocator で動くように加工する独自のパッチ -> relocator
               test: /node_modules[/\\]lmdb[/\\].*\.[cm]?js/,
-              // it is recommended for Node builds to turn off AMD support
+              // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
               parser: { amd: false },
               use: [
                 assetRelocatorUseEntry,
@@ -472,9 +472,9 @@ export async function createGraphqlEngineBundle(
               ],
             },
             {
-              // specific set of loaders for gatsby-node files - our babel transform that removes lifecycles not needed for engine -> relocator
+              // gatsby-node ファイル専用のローダーの組み合わせ - エンジンに不要なライフサイクルを取り除く独自の babel 変換 -> relocator
               test: /gatsby-node\.(cjs|mjs|js|ts)$/,
-              // it is recommended for Node builds to turn off AMD support
+              // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
               parser: { amd: false },
               use: [
                 assetRelocatorUseEntry,
@@ -490,10 +490,10 @@ export async function createGraphqlEngineBundle(
               ],
             },
             {
-              // generic loader for all other cases than lmdb or gatsby-node - we don't do anything special other than using relocator on it
-              // For node binary relocations, include ".node" files as well here
+              // lmdb と gatsby-node 以外のすべてのケース向けの汎用ローダー - relocator を適用する以外に特別なことはしない
+              // Node のバイナリの再配置のために、".node" ファイルもここに含める
               test: /\.(cjs|mjs|js|ts|node)$/,
-              // it is recommended for Node builds to turn off AMD support
+              // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
               parser: { amd: false },
               use: assetRelocatorUseEntry,
             },
@@ -543,7 +543,7 @@ export async function createGraphqlEngineBundle(
         [require.resolve(`gatsby-cli/lib/reporter/loggers/ink/index.js`)]:
           false,
         inquirer: false,
-        // only load one version of lmdb
+        // lmdb は 1 つのバージョンだけを読み込む
         lmdb: require.resolve(`lmdb`),
         "ts-node": require.resolve(`./shims/ts-node`),
         "gatsby-sharp$": require.resolve(`./shims/gatsby-sharp`),
@@ -551,7 +551,7 @@ export async function createGraphqlEngineBundle(
         "graphql-import-node/register$":
           require.resolve(`./shims/no-op-module`),
         "babel-runtime/helpers/asyncToGenerator":
-          require.resolve(`./shims/no-op-module`), // undeclared dep of yurnalist (but used in code path we don't use)
+          require.resolve(`./shims/no-op-module`), // yurnalist の宣言されていない依存（ただし、ここでは通らないコードパスで使われている）
       },
     },
     plugins: [
@@ -587,8 +587,8 @@ export async function createGraphqlEngineBundle(
         }
 
         if (webpackModule?.modules) {
-          // ConcatenatedModule is a collection of modules so we have to go deeper to actually get a path,
-          // at this point we won't know which one so we just grab first module here
+          // ConcatenatedModule はモジュールの集まりなので、実際にパスを得るにはさらに深くたどる必要がある。
+          // この時点ではどれなのか分からないので、ここでは最初のモジュールを取得する
           const [firstSubModule] = webpackModule.modules
           return getResourcePath(firstSubModule)
         }
@@ -633,9 +633,9 @@ export async function createGraphqlEngineBundle(
 
         if (!isEqual(functionsTarget, currentTarget)) {
           const binaryFixingPromises: Array<Promise<void>> = []
-          // sigh - emitAsset used by relocator seems to corrupt binaries
-          // resulting in "ELF file's phentsize not the expected size" errors
-          // - see size diff
+          // やれやれ - relocator が使う emitAsset は、バイナリを壊してしまうようで、
+          // "ELF file's phentsize not the expected size" というエラーになる
+          // - サイズの差を参照
           //   > find . -name node.abi83.glibc.node
           // ./.cache/internal-packages/node_modules/@lmdb/lmdb-linux-x64/node.abi83.glibc.node
           // ./.cache/query-engine/assets/node.abi83.glibc.node
@@ -643,7 +643,7 @@ export async function createGraphqlEngineBundle(
           // -rw-r--r-- 1 misiek 197121 1285429 Mar 14 11:36 ./.cache/query-engine/assets/node.abi83.glibc.node
           // > ls -al ./.cache/internal-packages/node_modules/@lmdb/lmdb-linux-x64/node.abi83.glibc.node
           // -rw-r--r-- 1 misiek 197121 693544 Mar 14 11:35 ./.cache/internal-packages/node_modules/@lmdb/lmdb-linux-x64/node.abi83.glibc.node
-          // so this tries to fix it by straight copying it over
+          // そのため、そのまま直接コピーすることで直そうとしている
           for (const asset of (
             stats?.compilation?.assetsInfo ?? new Map()
           ).keys()) {
