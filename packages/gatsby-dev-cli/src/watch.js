@@ -24,8 +24,8 @@ const quit = () => {
 const MAX_COPY_RETRIES = 3
 
 /*
- * non-existent packages break on('ready')
- * See: https://github.com/paulmillr/chokidar/issues/449
+ * 存在しないパッケージがあると on('ready') が動かなくなる
+ * 参照: https://github.com/paulmillr/chokidar/issues/449
  */
 async function watch(
   root,
@@ -42,8 +42,8 @@ async function watch(
   }
 ) {
   setDefaultSpawnStdio(quiet ? `ignore` : `inherit`)
-  // determine if in yarn workspace - if in workspace, force using verdaccio
-  // as current logic of copying files will not work correctly.
+  // yarn workspace の中かどうかを判定する。workspace の中であれば verdaccio の使用を強制する。
+  // 現在のファイルコピーの処理は正しく動かないためである。
   const yarnWorkspaceRoot = findWorkspaceRoot()
   if (yarnWorkspaceRoot && process.env.NODE_ENV !== `test`) {
     console.log(`Yarn workspace found.`)
@@ -70,12 +70,12 @@ async function watch(
         }
       }
 
-      // When the gatsby binary is copied over, it is not setup with the executable
-      // permissions that it is given when installed via yarn.
-      // This fixes the issue where after running gatsby-dev, running `yarn gatsby develop`
-      // fails with a permission issue.
+      // gatsby のバイナリをコピーしただけでは、yarn でインストールしたときに付く
+      // 実行権限が設定されない。
+      // ここでは、gatsby-dev の実行後に `yarn gatsby develop` を実行すると
+      // 権限の問題で失敗する不具合を修正している。
       // @fixes https://github.com/gatsbyjs/gatsby/issues/18809
-      // Binary files we target:
+      // 対象のバイナリファイル:
       // - gatsby/bin/gatsby.js
       //  -gatsby/cli.js
       //  -gatsby-cli/cli.js
@@ -126,8 +126,8 @@ async function watch(
       )
     )
   }
-  // check packages deps and if they depend on other packages from monorepo
-  // add them to packages list
+  // パッケージの依存を調べ、モノレポのほかのパッケージに依存していれば
+  // パッケージの一覧に追加する
   const { seenPackages, depTree } = traversePackagesDeps({
     root,
     packages: _.uniq(localPackages),
@@ -162,7 +162,7 @@ async function watch(
           packageManager,
         })
       } else {
-        // run `yarn`
+        // `yarn` を実行する
         const yarnInstallCmd = [`yarn`]
 
         console.log(`Installing packages from public NPM registry`)
@@ -222,7 +222,7 @@ async function watch(
         return
       }
 
-      // match against paths
+      // パスと照合する
       let packageName
 
       for (const [_packageName, packagePath] of packagePathMatchingEntries) {
@@ -239,8 +239,8 @@ async function watch(
 
       const prefix = packageNameToPath.get(packageName)
 
-      // Copy it over local version.
-      // Don't copy over the Gatsby bin file as that breaks the NPM symlink.
+      // ローカルのバージョンに上書きコピーする。
+      // Gatsby の bin ファイルは上書きしない。NPM のシンボリックリンクが壊れるためである。
       if (_.includes(filePath, `dist/gatsby-cli.js`)) {
         return
       }
@@ -253,13 +253,13 @@ async function watch(
       )
 
       if (relativePackageFile === `package.json`) {
-        // package.json files will change during publish to adjust version of package (and dependencies), so ignore
-        // changes during this process
+        // 公開の途中で、パッケージ（と依存）のバージョンを調整するために package.json ファイルが変更されるので、
+        // その間の変更は無視する
         if (isPublishing) {
           return
         }
 
-        // Compare dependencies with local version
+        // 依存をローカルのバージョンと比較する
 
         const didDepsChangedPromise = checkDepsChanges({
           newPath,
@@ -271,11 +271,11 @@ async function watch(
         })
 
         if (isInitialScan) {
-          // normally checkDepsChanges would be sync,
-          // but because it also can do async GET request
-          // to unpkg if local package is not installed
-          // keep track of it to make sure all of it
-          // finish before installing
+          // checkDepsChanges は通常なら同期的だが、
+          // ローカルにパッケージがインストールされていない場合は
+          // unpkg への非同期の GET リクエストも行うことがある
+          // そのため、処理を記録しておき、インストールの前に
+          // すべてが終わるようにする
 
           waitFor.add(didDepsChangedPromise)
         }
@@ -290,36 +290,36 @@ async function watch(
         if (didDepsChanged) {
           if (isInitialScan) {
             waitFor.delete(didDepsChangedPromise)
-            // handle dependency change only in initial scan - this is for sure doable to
-            // handle this in watching mode correctly - but for the sake of shipping
-            // this I limit more work/time consuming edge cases.
+            // 依存の変更を処理するのは最初のスキャンのときだけである。監視モードで正しく
+            // 処理することももちろん可能だが、まずリリースすることを優先し、
+            // 手間と時間のかかるエッジケースは対象から外している。
 
-            // Dependency changed - now we need to figure out
-            // the packages that actually need to be published.
-            // If package with changed dependencies is dependency of other
-            // gatsby package - like for example `gatsby-plugin-page-creator`
-            // we need to publish both `gatsby-plugin-page-creator` and `gatsby`
-            // and install `gatsby` in example site project.
+            // 依存が変更されたので、実際に公開する必要があるパッケージを
+            // 特定しなければならない。
+            // 依存が変更されたパッケージが、ほかの gatsby パッケージの依存である場合、
+            // たとえば `gatsby-plugin-page-creator` であれば、
+            // `gatsby-plugin-page-creator` と `gatsby` の両方を公開し、
+            // サンプルサイトのプロジェクトに `gatsby` をインストールする必要がある。
             getDependantPackages({
               packageName,
               depTree,
               packages,
             }).forEach(packageToPublish => {
-              // scheduling publish - we will publish when `ready` is emitted
-              // as we can do single publish then
+              // 公開を予約する。`ready` が発行されたときに公開すれば、
+              // 1 回の公開で済むためである
               packagesToPublish.add(packageToPublish)
             })
           }
         }
 
-        // don't ever copy package.json as this will mess up any future dependency
-        // changes checks
+        // package.json は決してコピーしない。以後の依存の変更の確認が
+        // おかしくなるためである
         return
       }
 
       const localCopies = [copyPath(filePath, newPath, quiet, packageName)]
 
-      // If this is from "cache-dir" also copy it into the site's .cache
+      // "cache-dir" のファイルであれば、サイトの .cache にもコピーする
       if (_.includes(filePath, `cache-dir`)) {
         const newCachePath = path.join(
           `.cache/`,
@@ -331,8 +331,8 @@ async function watch(
       allCopies = allCopies.concat(localCopies)
     })
     .on(`ready`, async () => {
-      // wait for all async work needed to be done
-      // before publishing / installing
+      // 公開とインストールの前に、必要な非同期の処理が
+      // すべて終わるのを待つ
       await Promise.all(Array.from(waitFor))
 
       if (isInitialScan) {
@@ -351,7 +351,7 @@ async function watch(
           packagesToPublish.clear()
           isPublishing = false
         } else if (anyPackageNotInstalled) {
-          // run `yarn`
+          // `yarn` を実行する
           const yarnInstallCmd = [`yarn`]
 
           console.log(`Installing packages from public NPM registry`)
@@ -363,7 +363,7 @@ async function watch(
         runQueuedCopies()
       }
 
-      // all files watched, quit once all files are copied if necessary
+      // すべてのファイルを監視し終えた。必要であれば、すべてのファイルのコピーが終わった時点で終了する
       Promise.all(allCopies).then(() => {
         if (scanOnce) {
           quit()

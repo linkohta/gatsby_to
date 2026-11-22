@@ -20,12 +20,12 @@ function difference(object, base) {
 }
 
 /**
- * Compare dependencies of installed packages and monorepo package.
- * It will skip dependencies that are removed in monorepo package.
+ * インストール済みのパッケージとモノレポのパッケージの依存を比較する。
+ * モノレポのパッケージで削除された依存はスキップする。
  *
- * If local package is not installed, it will check unpkg.com.
- * This allow gatsby-dev to skip publishing unnecesairly and
- * let install packages from public npm repository if nothing changed.
+ * ローカルにパッケージがインストールされていない場合は、unpkg.com を確認する。
+ * これにより、gatsby-dev は不要な公開を省き、何も変わっていなければ
+ * 公開の npm リポジトリからパッケージをインストールさせることができる。
  */
 exports.checkDepsChanges = async ({
   newPath,
@@ -41,8 +41,8 @@ exports.checkDepsChanges = async ({
     localPKGjson = JSON.parse(fs.readFileSync(newPath, `utf-8`))
   } catch {
     packageNotInstalled = true
-    // there is no local package - so we still need to install deps
-    // this is nice because devs won't need to do initial package installation - we can handle this.
+    // ローカルにパッケージがないので、依存のインストールはやはり必要である
+    // 開発者が最初のパッケージのインストールをしなくて済み、こちらで処理できるので都合がよい。
     if (!isInitialScan) {
       console.log(
         `'${packageName}' doesn't seem to be installed. Restart gatsby-dev to publish it`
@@ -53,12 +53,12 @@ exports.checkDepsChanges = async ({
       }
     }
 
-    // if package is not installed, we will do http GET request to
-    // unkpg to check if dependency in package published in public
-    // npm repository are different
+    // パッケージがインストールされていない場合は、unkpg へ http の GET リクエストを送り、
+    // 公開の npm リポジトリにあるパッケージの依存が
+    // 異なるかどうかを調べる
 
-    // this allow us to not publish to local repository
-    // and save some time/work
+    // これにより、ローカルリポジトリへの公開を省き、
+    // 時間と手間を節約できる
     try {
       const version = getPackageVersion(packageName)
       const url = `https://unpkg.com/${packageName}@${version}/package.json`
@@ -89,8 +89,8 @@ exports.checkDepsChanges = async ({
   const monorepoPKGjson = JSON.parse(monorepoPKGjsonString)
   if (ignoredPackageJSON.has(packageName)) {
     if (ignoredPackageJSON.get(packageName).includes(monorepoPKGjsonString)) {
-      // we are in middle of publishing and content of package.json is one set during publish process,
-      // so we need to not cause false positives
+      // 公開の途中であり、package.json の内容は公開処理の中で設定されたものなので、
+      // 誤検出を起こさないようにする必要がある
       return {
         didDepsChanged: false,
         packageNotInstalled,
@@ -122,15 +122,15 @@ exports.checkDepsChanges = async ({
     const depChangeLog = _.uniq(Object.keys({ ...diff, ...diff2 }))
       .reduce((acc, key) => {
         if (monorepoPKGjson.dependencies[key] === `gatsby-dev`) {
-          // if we are in middle of publishing to local repository - ignore
+          // ローカルリポジトリへの公開の途中であれば無視する
           isPublishing = true
           return acc
         }
 
         if (localPKGjson.dependencies[key] === `gatsby-dev`) {
-          // monorepo packages will restore version, but after installation
-          // in local site - it will use `gatsby-dev` dist tag - we need
-          // to ignore changes that
+          // モノレポのパッケージはバージョンを元に戻すが、ローカルのサイトへ
+          // インストールした後は `gatsby-dev` の dist タグが使われる。その変更は
+          // 無視する必要がある
           return acc
         }
 
@@ -138,11 +138,11 @@ exports.checkDepsChanges = async ({
           localPKGjson.dependencies[key] &&
           monorepoPKGjson.dependencies[key]
         ) {
-          // Check only for version changes in packages
-          // that are not from gatsby repo.
-          // Changes in gatsby packages will be copied over
-          // from monorepo - and if those contain other dependency
-          // changes - they will be covered
+          // gatsby リポジトリ以外のパッケージについてだけ、
+          // バージョンの変更を確認する。
+          // gatsby のパッケージの変更はモノレポからコピーされ、
+          // そこにほかの依存の変更が含まれていれば、
+          // それも対象になる
           if (!monoRepoPackages.includes(key)) {
             acc.push(
               ` - '${key}' changed version from ${localPKGjson.dependencies[key]} to ${monorepoPKGjson.dependencies[key]}`
@@ -154,7 +154,7 @@ exports.checkDepsChanges = async ({
           needPublishing = true
         } else {
           acc.push(` - '${key}@${localPKGjson.dependencies[key]}' was removed`)
-          // this doesn't need publishing really, so will skip this
+          // これは実際には公開する必要がないので、スキップする
         }
         return acc
       }, [])
