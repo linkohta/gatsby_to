@@ -1,12 +1,12 @@
 // @ts-check
 
 /**
- * List of adapters that should be automatically installed if not present already.
- * The first item which test function returns `true` will be used.
- * 
- * If you're the author of an adapter and want to add it to this list, please open a PR!
- * If you want to create an adapter, please see: http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/creating-an-adapter/
- * 
+ * 未インストールの場合に自動でインストールするアダプターの一覧。
+ * test 関数が `true` を返した最初の項目が使われる。
+ *
+ * アダプターの作者で、この一覧に追加したい場合は PR を送ってほしい。
+ * アダプターを作りたい場合は次を参照: http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/creating-an-adapter/
+ *
  * @type {Array<import("./src/utils/adapter/types").IAdapterManifestEntry>}
  * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/zero-configuration-deployments/
  */

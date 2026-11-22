@@ -22,7 +22,7 @@ function WrappedAccordionItem({ error, open }) {
     }
   }
 
-  // Sometimes the GraphQL error text has ANSI in it. If it's only text, it'll be passed through
+  // GraphQL のエラー文には ANSI が含まれることがある。テキストだけの場合はそのまま通す
   const decoded = prettifyStack(error.text)
 
   return (

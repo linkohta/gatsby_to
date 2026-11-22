@@ -11,8 +11,8 @@ export const ServerSliceRenderer = ({ sliceId, children }) => {
   ]
 
   if (children) {
-    // if children exist, we split the slice into a before and after piece
-    // see renderSlices in render-html
+    // children がある場合は、スライスを前半と後半に分割する
+    // render-html の renderSlices を参照
     contents.push(children)
     contents.push(
       React.createElement(`slice-start`, {

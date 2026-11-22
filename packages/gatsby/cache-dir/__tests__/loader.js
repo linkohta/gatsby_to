@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-// This is by no means a full test file for loader.js so feel free to add more tests.
+// これは loader.js の完全なテストファイルではないので、テストを自由に追加してほしい。
 import mock from "xhr-mock"
 import { setImmediate } from "timers"
 import { ProdLoader } from "../loader"
@@ -21,7 +21,7 @@ describe(`Production loader`, () => {
     global.__PATH_PREFIX__ = ``
   })
 
-  // put the real XHR object back and clear the mocks after each test
+  // 各テストの後に、本物の XHR オブジェクトを元に戻してモックをクリアする
   afterEach(() => {
     global.__BASE_PATH__ = originalBasePath
     global.__PATH_PREFIX__ = originalPathPrefix
@@ -57,13 +57,13 @@ describe(`Production loader`, () => {
       path: `/mypage/`,
     }
 
-    // replace the real XHR object with the mock XHR object before each test
+    // 各テストの前に、本物の XHR オブジェクトをモックの XHR オブジェクトに置き換える
     beforeEach(() => {
       xhrCount = 0
       mock.setup()
     })
 
-    // put the real XHR object back and clear the mocks after each test
+    // 各テストの後に、本物の XHR オブジェクトを元に戻してモックをクリアする
     afterEach(() => {
       mock.teardown()
     })
@@ -566,7 +566,7 @@ describe(`Production loader`, () => {
 
       expect(await prefetchPromise).toBe(true)
 
-      // wait for doPrefetchPromise
+      // doPrefetchPromise を待つ
       await flushPromises()
 
       expect(prodLoader.apiRunner).toHaveBeenCalledWith(`onPrefetchPathname`, {
@@ -594,7 +594,7 @@ describe(`Production loader`, () => {
       expect(await prefetchPromise).toBe(true)
       expect(await prefetchPromise2).toBe(true)
 
-      // wait for doPrefetchPromise
+      // doPrefetchPromise を待つ
       await flushPromises()
 
       expect(prodLoader.apiRunner).toHaveBeenCalledTimes(2)

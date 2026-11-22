@@ -43,7 +43,7 @@ export function getValidHeadNodesAndAttributesSSR(
   const seenIds = new Map()
   const validHeadNodes = []
 
-  // Filter out non-element nodes before looping since we don't care about them
+  // 要素以外のノードは不要なので、ループの前に取り除く
   for (const node of rootNode.childNodes) {
     const { rawTagName } = node
     const id = node.attributes?.id
@@ -62,7 +62,7 @@ export function getValidHeadNodesAndAttributesSSR(
           ...nonStyleAttributes,
         }
 
-        // Unfortunately renderToString converts inline styles to a string, so we have to convert them back to an object
+        // 残念ながら renderToString はインラインスタイルを文字列に変換するので、オブジェクトへ戻す必要がある
         if (style) {
           htmlAndBodyAttributes[NodeName].style = {
             ...htmlAndBodyAttributes[NodeName]?.style,
@@ -124,7 +124,7 @@ export function getValidHeadNodesAndAttributesSSR(
   return { validHeadNodes, htmlAndBodyAttributes }
 }
 
-// see explanation in "head-export-handler-for-browser.js" module for reasons behind this patching
+// このパッチを当てる理由は "head-export-handler-for-browser.js" モジュールの説明を参照
 let applyCreateElementPatch = undefined
 let revertCreateElementPatch = undefined
 let needToRevertCreateElementPatch = false
@@ -159,9 +159,9 @@ if (reactMajor !== 18) {
   }
 }
 
-// if this sync function is changed to async one, make sure to cover potential React.createElement patching as
-// current handling relies on it being sync and we can just modify React.createElement temporarily without checking context of render
-// (check how it's done in "head-export-handler-for-browser.js" module for potential solution)
+// この同期関数を非同期に変更する場合は、React.createElement へのパッチについても必ず対応すること。
+// 現在の処理は同期であることに依存しており、レンダリングのコンテキストを確認せずに React.createElement を一時的に変更している
+// （解決策の候補は "head-export-handler-for-browser.js" モジュールでの実装を参照）
 export function headHandlerForSSR({
   pageComponent,
   setHeadComponents,
@@ -229,7 +229,7 @@ export function headHandlerForSSR({
 
       setHeadComponents(validHeadNodes)
     } catch (e) {
-      // make sure that we don't leave this function without reverting the patch
+      // パッチを元に戻さずにこの関数を抜けることがないようにする
       revertCreateElementPatch?.()
       throw e
     }

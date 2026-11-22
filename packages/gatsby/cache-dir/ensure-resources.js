@@ -51,7 +51,7 @@ class EnsureResources extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    // Always return false if we're missing resources.
+    // リソースが不足している場合は常に false を返す。
     if (!nextState.pageResources) {
       this.loadResources(
         nextProps.location.pathname + nextProps.location.search
@@ -69,7 +69,7 @@ class EnsureResources extends React.Component {
       return false
     }
 
-    // Check if the component or json have changed.
+    // コンポーネントまたは JSON が変わったかどうかを確認する。
     if (this.state.pageResources !== nextState.pageResources) {
       return true
     }
@@ -82,8 +82,8 @@ class EnsureResources extends React.Component {
     if (this.state.pageResources.json !== nextState.pageResources.json) {
       return true
     }
-    // Check if location has changed on a page using internal routing
-    // via matchPath configuration.
+    // matchPath の設定による内部ルーティングを使うページで、
+    // location が変わったかどうかを確認する。
     if (
       this.state.location.key !== nextState.location.key &&
       nextState.pageResources.page &&

@@ -34,7 +34,7 @@ export class WritableAsPromise extends Writable {
     this.destroy()
   }
 
-  // disguise us as a promise
+  // promise のように振る舞わせる
   then(resolve, reject) {
     return this._deferred.promise.then(resolve, reject)
   }

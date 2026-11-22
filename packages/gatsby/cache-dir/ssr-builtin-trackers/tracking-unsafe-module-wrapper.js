@@ -1,4 +1,4 @@
-// initializing global here for unsafe builtin usage at import time
+// import 時点での安全でない組み込みモジュールの使用に備え、ここでグローバルを初期化する
 global.unsafeBuiltinUsage = []
 
 function createProxyHandler(prefix, options) {
@@ -13,7 +13,7 @@ function createProxyHandler(prefix, options) {
 
       const fieldDescriptor = Object.getOwnPropertyDescriptor(target, key)
       if (fieldDescriptor && !fieldDescriptor.writable) {
-        // this is to prevent errors like:
+        // 次のようなエラーを防ぐためのもの:
         // ```
         // TypeError: 'get' on proxy: property 'constants' is a read - only and
         // non - configurable data property on the proxy target but the proxy
@@ -30,10 +30,10 @@ function createProxyHandler(prefix, options) {
           }
           Error.captureStackTrace(myErrorHolder, wrapper)
 
-          // - loadPageDataSync already is tracked with dedicated warning messages,
-          // so skipping marking it to avoid multiple messages for same usage
-          // - node-gyp-build will use fs.readDirSync in attempt to load binaries
-          // this should be ok to ignore.
+          // - loadPageDataSync はすでに専用の警告メッセージで追跡しているので、
+          // 同じ使用に対して複数のメッセージが出ないよう、マークを省く
+          // - node-gyp-build はバイナリを読み込もうとして fs.readDirSync を使う
+          // これは無視して問題ないはずである。
           if (
             !myErrorHolder.stack.includes(`loadPageDataSync`) &&
             !myErrorHolder.stack.includes(`node-gyp-build`)

@@ -4,7 +4,7 @@ import { findPath } from "./find-path"
 import getSocket from "./socketIo"
 import normalizePagePath from "./normalize-page-path"
 
-// TODO move away from lodash
+// TODO lodash の使用をやめる
 import isEqual from "lodash/isEqual"
 
 function mergePageEntry(cachedPage, newPageData) {
@@ -13,8 +13,8 @@ function mergePageEntry(cachedPage, newPageData) {
     payload: {
       ...cachedPage.payload,
       json: {
-        // For SSR, cachedPage may contain "data" and "serverData"
-        // But newPageData may contain only "data" or only "serverData" depending on what was updated
+        // SSR の場合、cachedPage は "data" と "serverData" を含むことがある
+        // 一方で newPageData は、何が更新されたかによって "data" だけ、または "serverData" だけを含むことがある
         ...cachedPage.payload.json,
         ...newPageData.result,
       },
@@ -41,7 +41,7 @@ class DevLoader extends BaseLoader {
 
       return (
         this.asyncRequires[exportType][chunkName]()
-          // loader will handle the case when component is error
+          // コンポーネントがエラーの場合は loader が処理する
           .catch(err => err)
       )
     }
@@ -88,8 +88,8 @@ class DevLoader extends BaseLoader {
 
   loadPageDataJson(rawPath) {
     return super.loadPageDataJson(rawPath).then(data => {
-      // when we can't find a proper 404.html we fallback to dev-404-page
-      // we need to make sure to mark it as not found.
+      // 適切な 404.html が見つからない場合は dev-404-page にフォールバックする。
+      // その場合は、見つからなかったことを必ずマークしておく必要がある。
       if (
         data.status === PageResourceStatus.Error &&
         rawPath !== `/dev-404-page/`
@@ -129,7 +129,7 @@ class DevLoader extends BaseLoader {
 
     const cacheKey = msg.payload.id
 
-    // raw json db
+    // 生の JSON の DB
     {
       const cachedResult = this.slicesDataDb.get(cacheKey)
       if (!isEqual(newResult, cachedResult)) {
@@ -137,7 +137,7 @@ class DevLoader extends BaseLoader {
       }
     }
 
-    // processed data
+    // 処理済みのデータ
     {
       const cachedResult = this.slicesDb.get(cacheKey)
       if (
@@ -160,9 +160,9 @@ class DevLoader extends BaseLoader {
     const cachedPageData = this.pageDataDb.get(pageDataDbCacheKey)?.payload
 
     if (!isEqual(newPageData, cachedPageData)) {
-      // TODO: if this is update for current page and there are any new static queries added
-      // that are not yet cached, there is currently no trigger to fetch them (yikes)
-      // always update canonical key for pageDataDb
+      // TODO: これが現在のページの更新で、まだキャッシュされていない静的クエリが新しく追加されていても、
+      // 現状ではそれらを取得するきっかけがない（困った）
+      // pageDataDb の正規のキーは常に更新する
       this.pageDataDb.set(pageDataDbCacheKey, {
         pagePath: pageDataDbCacheKey,
         payload: newPageData,
@@ -177,10 +177,10 @@ class DevLoader extends BaseLoader {
         )
       }
 
-      // Additionally if those are query results for "/404.html"
-      // we have to update all paths user wanted to visit, but didn't have
-      // page for it, because we do store them under (normalized) path
-      // user wanted to visit
+      // さらに、これが "/404.html" のクエリ結果である場合は、
+      // ユーザーがアクセスしようとしたがページがなかったパスも
+      // すべて更新する必要がある。それらはユーザーがアクセスしようとした
+      // （正規化済みの）パスで保存しているためである
       if (pageDataDbCacheKey === `/404.html`) {
         this.notFoundPagePathsInCaches.forEach(notFoundPath => {
           const previousPageDataEntry = this.pageDataDb.get(notFoundPath)
@@ -207,21 +207,21 @@ class DevLoader extends BaseLoader {
 
   markAsStale = dirtyQueryId => {
     if (dirtyQueryId === `/dev-404-page/` || dirtyQueryId === `/404.html`) {
-      // those pages are not on demand so skipping
+      // これらのページはオンデマンドではないのでスキップする
       return
     }
 
     const normalizedId = normalizePagePath(dirtyQueryId)
 
-    // We can't just delete items in caches, because then
-    // using history.back() would show dev-404 page
-    // due to our special handling of it in root.js (loader.isPageNotFound check)
-    // so instead we mark it as stale and instruct loader's async methods
-    // to refetch resources if they are marked as stale
+    // キャッシュ内の項目を単純に削除することはできない。削除すると、
+    // history.back() を使ったときに dev-404 ページが表示されてしまう
+    // （root.js での特別な扱い、つまり loader.isPageNotFound のチェックによる）
+    // そのため、代わりに stale とマークし、stale とマークされたリソースは
+    // 再取得するよう loader の非同期メソッドに指示する
 
     const cachedPageData = this.pageDataDb.get(normalizedId)
     if (cachedPageData) {
-      // if we have page data in cache, mark it as stale
+      // キャッシュにページデータがある場合は、stale とマークする
       this.pageDataDb.set(normalizedId, {
         ...cachedPageData,
         stale: true,
@@ -230,7 +230,7 @@ class DevLoader extends BaseLoader {
 
     const cachedPage = this.pageDb.get(normalizedId)
     if (cachedPage) {
-      // if we have page data in cache, mark it as stale
+      // キャッシュにページデータがある場合は、stale とマークする
       this.pageDb.set(normalizedId, {
         ...cachedPage,
         payload: { ...cachedPage.payload, stale: true },
@@ -254,7 +254,7 @@ class DevLoader extends BaseLoader {
   handleStaleServerDataMessage() {
     const activePath = normalizePagePath(location.pathname)
 
-    // For now just invalidate every single page with serverData
+    // 今のところ、serverData を持つページはすべて無効化する
     for (const [key, value] of this.pageDataDb) {
       if (value?.payload?.result?.serverData) {
         this.markAsStale(key)
@@ -268,8 +268,8 @@ class DevLoader extends BaseLoader {
   reFetchServerData(pagePath) {
     this.fetchPageDataJson({ pagePath }).then(data => {
       const updated = this.updatePageData(data.pagePath, data.payload)
-      // SSR could be slow, so we should only emit serverDataResult
-      // when still on the same page
+      // SSR は遅いことがあるので、まだ同じページにいる場合に限って
+      // serverDataResult を emit する
       if (updated && pagePath === normalizePagePath(location.pathname)) {
         ___emitter.emit(`serverDataResult`, data.payload)
       }

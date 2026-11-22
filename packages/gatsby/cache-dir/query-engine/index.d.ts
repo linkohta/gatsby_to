@@ -1,4 +1,4 @@
-// IGatsbyPage, SystemPath and copied/inlined from redux/types so this file is self contained
+// IGatsbyPage と SystemPath は、このファイルが自己完結するように redux/types からコピーしてインライン化した
 type SystemPath = string
 type Identifier = string
 
@@ -18,7 +18,7 @@ export interface IGatsbyPage {
   ownerNodeId: Identifier
 }
 
-// also inlined
+// これもインライン化した
 export interface IQueryResult {
   errors?: Array<Error>
   data?: any

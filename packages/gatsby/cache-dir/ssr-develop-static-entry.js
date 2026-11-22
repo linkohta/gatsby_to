@@ -20,7 +20,7 @@ import {
   SlicesPropsContext,
 } from "./slice/context"
 
-// prefer default export if available
+// default export があればそちらを優先する
 const preferDefault = m => (m && m.default) || m
 
 const testRequireError = (moduleName, err) => {
@@ -208,7 +208,7 @@ export default async function staticPage({
       })
     )
       .filter(s => isObject(s))
-      .sort((s1, _s2) => (s1.rel == `preload` ? -1 : 1)) // given priority to preload
+      .sort((s1, _s2) => (s1.rel == `preload` ? -1 : 1)) // preload を優先する
 
     scriptsAndStyles = uniqBy(scriptsAndStyles, item => item.name)
 
@@ -327,7 +327,7 @@ export default async function staticPage({
       )
     }
 
-    // Let the site or plugin render the page component.
+    // サイトまたはプラグインにページコンポーネントをレンダリングさせる。
     await apiRunnerAsync(`replaceRenderer`, {
       bodyComponent,
       replaceBodyHTMLString,
@@ -341,7 +341,7 @@ export default async function staticPage({
       pathPrefix: __PATH_PREFIX__,
     })
 
-    // If no one stepped up, we'll handle it.
+    // 誰も引き受けなかった場合は、ここで処理する。
     if (!bodyHtml) {
       try {
         const writableStream = new WritableAsPromise()
@@ -356,7 +356,7 @@ export default async function staticPage({
 
         bodyHtml = await writableStream
       } catch (e) {
-        // ignore @reach/router redirect errors
+        // @reach/router のリダイレクトエラーは無視する
         if (!isRedirect(e)) throw e
       }
     }
@@ -371,8 +371,8 @@ export default async function staticPage({
       pathname: pagePath,
     })
 
-    // we want to run Head after onRenderBody, so Html and Body attributes
-    // from Head wins over global ones from onRenderBody
+    // Head は onRenderBody の後に実行したい。Head による Html と Body の属性が、
+    // onRenderBody によるグローバルな属性よりも優先されるようにするためである
     headHandlerForSSR({
       pageComponent,
       setHeadComponents,

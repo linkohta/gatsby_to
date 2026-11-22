@@ -1,2 +1,2 @@
-// Dummy file to work around a webpack hot reloading bug.
+// webpack のホットリロードのバグを回避するためのダミーファイル。
 export const a = 1

@@ -34,7 +34,7 @@ export const ServerSlice = ({
 
   const sliceId = getSliceId(concreteSliceName, sliceProps)
 
-  // set props on context object for static-entry to return
+  // static-entry が返せるように、コンテキストオブジェクトに props を設定する
   let sliceUsage = slicesProps[sliceId]
   if (!sliceUsage) {
     slicesProps[sliceId] = sliceUsage = {

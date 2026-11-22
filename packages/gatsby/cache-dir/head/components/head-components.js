@@ -15,16 +15,16 @@ export function getValidHeadComponentReplacements(
 ) {
   function useIsHeadRender() {
     if (forceHeadRenderContext) {
-      // for SSR we don't need to use React context, because head rendering is sync
-      // so forcing it is more performant
+      // SSR では head のレンダリングが同期的なので、React のコンテキストを使う必要はない
+      // そのため、強制するほうがパフォーマンスがよい
       return true
     }
 
-    // for Browser we use React Context
-    // note: technically this is breaking rules of hooks, because useContext is used
-    // not at the top of the hook after some conditional code did run,
-    // but this would only manifest if `forceHeadRenderContext` could change between rerenders,
-    // and because this is factory argument, it can't change
+    // ブラウザーでは React のコンテキストを使う
+    // 注: 厳密にはフックのルールに違反している。条件付きのコードが実行された後で、
+    // フックの先頭ではない位置で useContext を使っているためである。
+    // ただし、これが問題になるのは `forceHeadRenderContext` が再レンダリングの間に変わりうる場合だけであり、
+    // これはファクトリーの引数なので変わることはない
     const isHeadRenderFromContext = React.useContext(IsHeadRenderContext)
 
     return isHeadRenderFromContext
@@ -32,7 +32,7 @@ export function getValidHeadComponentReplacements(
 
   function htmlOrBodyComponentFactory(TagName) {
     const HeadAwareComponent = props => {
-      // De-risk monkey patch by only applying it within a `Head()` render.
+      // モンキーパッチのリスクを下げるため、`Head()` のレンダリング中にだけ適用する。
       const isHeadRender = useIsHeadRender()
       if (isHeadRender) {
         const allProps = {
@@ -50,9 +50,9 @@ export function getValidHeadComponentReplacements(
 
   function nodeComponentFactory(TagName) {
     const HeadAwareComponent = props => {
-      // De-risk monkey patch by only applying it within a `Head()` render:
+      // モンキーパッチのリスクを下げるため、`Head()` のレンダリング中にだけ適用する:
       const isHeadRender = useIsHeadRender()
-      // only modify props if ITEM_PROP_WORKAROUND_KEY is not set in props
+      // props に ITEM_PROP_WORKAROUND_KEY が設定されていない場合にだけ props を変更する
       if (isHeadRender && !(ITEM_PROP_WORKAROUND_KEY in props)) {
         const propsWithWorkaround = {
           ...props,
@@ -69,11 +69,11 @@ export function getValidHeadComponentReplacements(
 
   return new Map(
     VALID_NODE_NAMES.map(nodeName => {
-      // for each of valid head nodes we will create replacement component
-      // that can check IsHeadRenderContext context (it is a new component,
-      // so this won't break rules of hooks) and apply workarounds for
-      // React 19 automatic handling of meta tags which is incompatible with
-      // Gatsby Head API
+      // 有効な head のノードごとに、置き換え用のコンポーネントを作成する。
+      // このコンポーネントは IsHeadRenderContext コンテキストを確認でき
+      // （新しいコンポーネントなのでフックのルールには違反しない）、
+      // React 19 による meta タグの自動処理への回避策を適用する。
+      // この自動処理は Gatsby の Head API と互換性がない
 
       const replacement =
         nodeName === `html` || nodeName === `body`

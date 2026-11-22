@@ -6,7 +6,7 @@ export class ErrorBoundary extends React.Component {
   componentDidCatch(error) {
     this.setState({ error })
 
-    // Forward component errors to Fast Refresh overlay system
+    // コンポーネントのエラーを Fast Refresh のオーバーレイのシステムへ転送する
     if (
       window._gatsbyEvents &&
       typeof window._gatsbyEvents.push === `function`
@@ -22,7 +22,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   render() {
-    // Without this check => possible infinite loop
+    // このチェックがないと無限ループになる可能性がある
     return this.state.error && this.props.hasErrors ? null : this.props.children
   }
 }

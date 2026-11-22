@@ -6,8 +6,8 @@ import {
 } from "./constants"
 
 /**
- * Filter the props coming from a page down to just the ones that are relevant for head.
- * This e.g. filters out properties that are undefined during SSR.
+ * ページから渡された props を、head に関係するものだけに絞り込む。
+ * たとえば、SSR 中に undefined になるプロパティを取り除く。
  */
 export function filterHeadProps(input) {
   return {
@@ -22,7 +22,7 @@ export function filterHeadProps(input) {
 }
 
 /**
- * Throw error if Head export is not a valid function
+ * Head の export が有効な関数でない場合はエラーを投げる
  */
 export function headExportValidator(head) {
   if (typeof head !== `function`)
@@ -32,7 +32,7 @@ export function headExportValidator(head) {
 }
 
 /**
- * Warn once for same messsage
+ * 同じメッセージの警告は 1 回だけ出す
  */
 let warnOnce = _ => {}
 if (process.env.NODE_ENV !== `production`) {
@@ -46,7 +46,7 @@ if (process.env.NODE_ENV !== `production`) {
 }
 
 /**
- * Warn for invalid tags in Head which may have been directly added or introduced by `wrapRootElement`
+ * Head 内の無効なタグについて警告する。直接追加された場合と、`wrapRootElement` によって持ち込まれた場合がある
  * @param {string} tagName
  */
 export function warnForInvalidTag(tagName) {
@@ -63,24 +63,24 @@ function createWarningForInvalidTag(tagName) {
 }
 
 /**
- * When a `nonce` is present on an element, browsers such as Chrome and Firefox strip it out of the
- * actual HTML attributes for security reasons *when the element is added to the document*. Thus,
- * given two equivalent elements that have nonces, `Element,isEqualNode()` will return false if one
- * of those elements gets added to the document. Although the `element.nonce` property will be the
- * same for both elements, the one that was added to the document will return an empty string for
- * its nonce HTML attribute value.
+ * 要素に `nonce` がある場合、Chrome や Firefox などのブラウザーはセキュリティ上の理由から、
+ * *要素がドキュメントに追加された時点で* 実際の HTML 属性から nonce を取り除く。そのため、
+ * nonce を持つ等価な 2 つの要素があっても、片方がドキュメントに追加されると
+ * `Element,isEqualNode()` は false を返す。`element.nonce` プロパティは両方の要素で
+ * 同じだが、ドキュメントに追加されたほうは、nonce の HTML 属性値として
+ * 空文字列を返す。
  *
- * This custom `isEqualNode()` function therefore removes the nonce value from the `newTag` before
- * comparing it to `oldTag`, restoring it afterwards.
+ * そこで、この独自の `isEqualNode()` 関数は、`oldTag` と比較する前に `newTag` から
+ * nonce の値を取り除き、比較後に元へ戻す。
  *
- * For more information, see:
+ * 詳細は次を参照:
  * https://bugs.chromium.org/p/chromium/issues/detail?id=1211471#c12
  */
 export function isEqualNode(oldTag, newTag) {
   if (oldTag instanceof HTMLElement && newTag instanceof HTMLElement) {
     const nonce = newTag.getAttribute(`nonce`)
-    // Only strip the nonce if `oldTag` has had it stripped. An element's nonce attribute will not
-    // be stripped if there is no content security policy response header that includes a nonce.
+    // `oldTag` の nonce が取り除かれている場合にだけ nonce を取り除く。nonce を含む Content Security Policy の
+    // レスポンスヘッダーがない場合、要素の nonce 属性は取り除かれない。
     if (nonce && !oldTag.getAttribute(`nonce`)) {
       const cloneTag = newTag.cloneNode(true)
       cloneTag.setAttribute(`nonce`, ``)
@@ -101,12 +101,12 @@ export function diffNodes({ oldNodes, newNodes, onStale, onNew }) {
     if (indexInNewNodes === -1) {
       onStale(existingHeadElement)
     } else {
-      // this node is re-created as-is, so we keep old node, and remove it from list of new nodes (as we handled it already here)
+      // このノードはそのまま再作成されるので、古いノードを残し、新しいノードの一覧から取り除く（ここで処理済みのため）
       newNodes.splice(indexInNewNodes, 1)
     }
   }
 
-  // remaing new nodes didn't have matching old node, so need to be added
+  // 残りの新しいノードには一致する古いノードがなかったので、追加する必要がある
   for (const newNode of newNodes) {
     onNew(newNode)
   }
@@ -123,7 +123,7 @@ export function getValidHeadNodesAndAttributes(
   const validHeadNodes = []
 
   for (const node of rootNode.childNodes) {
-    // Filter out non-element nodes before looping since we don't care about them
+    // 要素以外のノードは不要なので、ループの前に取り除く
     if (!isElementType(node)) continue
 
     const nodeName =
@@ -132,14 +132,14 @@ export function getValidHeadNodesAndAttributes(
     const id = node.attributes?.id?.value
 
     if (isValidNodeName(nodeName)) {
-      // <html> and <body> tags are treated differently, in that we don't render them, we only extract the attributes and apply them separetely
+      // <html> と <body> のタグは扱いが異なる。レンダリングはせず、属性だけを取り出して別途適用する
       if (nodeName === `html` || nodeName === `body`) {
         for (const attribute of node.attributes) {
           if (attribute.name === HTML_BODY_ORIGINAL_TAG_ATTRIBUTE_KEY) continue
 
           const isStyleAttribute = attribute.name === `style`
 
-          // Merge attributes for same nodeName from previous loop iteration
+          // 前回のループで処理した同じ nodeName の属性をマージする
           htmlAndBodyAttributes[nodeName] = {
             ...htmlAndBodyAttributes[nodeName],
           }
@@ -148,7 +148,7 @@ export function getValidHeadNodesAndAttributes(
             htmlAndBodyAttributes[nodeName][attribute.name] = attribute.value
           }
 
-          // If there is already a style attribute, we need to merge them as otherwise the last one will "win"
+          // すでに style 属性がある場合はマージする必要がある。そうしないと最後のものが「勝って」しまう
           if (isStyleAttribute) {
             htmlAndBodyAttributes[nodeName].style = `${
               htmlAndBodyAttributes[nodeName]?.style
@@ -168,12 +168,12 @@ export function getValidHeadNodesAndAttributes(
           clonedNode.removeAttribute(ITEM_PROP_WORKAROUND_KEY)
         }
 
-        // This is a hack to make script tags work
-        // TODO(serhalp): Explain what this is solving
+        // script タグを動作させるためのハック
+        // TODO(serhalp): これが何を解決しているのか説明する
         if (clonedNode.nodeName.toLowerCase() === `script`) {
           clonedNode = cloneNodeWithoutNS(clonedNode)
         }
-        // Duplicate ids are not allowed in the head, so we need to dedupe them
+        // head 内で id の重複は許されないので、重複を取り除く必要がある
         if (id) {
           if (!seenIds.has(id)) {
             validHeadNodes.push(clonedNode)
@@ -207,9 +207,9 @@ export function getValidHeadNodesAndAttributes(
 }
 
 /**
- * Recreate an element in the HTML namespace.
+ * HTML 名前空間で要素を再作成する。
  *
- * This is similar to `cloneNode()` but reinitializes immutable properties like the namespace.
+ * `cloneNode()` に似ているが、名前空間のような変更不可のプロパティを初期化し直す。
  */
 function cloneNodeWithoutNS(node) {
   const clonedNode = document.createElement(node.nodeName)
@@ -225,15 +225,15 @@ export function isValidNodeName(nodeName) {
   return VALID_NODE_NAMES.includes(nodeName)
 }
 /*
- * For Head, we only care about element nodes(type = 1), so this util is used to skip over non-element nodes
- * For Node type, see https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+ * Head では要素ノード（type = 1）だけが対象なので、このユーティリティで要素以外のノードを読み飛ばす
+ * ノードの種類については https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType を参照
  */
 export function isElementType(node) {
   return node.nodeType === 1
 }
 
 /**
- * Removes all the head elements that were added by `Head`
+ * `Head` が追加した head の要素をすべて削除する
  */
 export function removePrevHeadElements() {
   const prevHeadNodes = document.querySelectorAll(`[data-gatsby-head]`)

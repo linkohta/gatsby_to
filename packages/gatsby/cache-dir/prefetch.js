@@ -73,7 +73,7 @@ const prefetch = function (url, options) {
         resolve()
         preFetched[url] = true
       })
-      .catch(() => {}) // 404s are logged to the console anyway
+      .catch(() => {}) // 404 はいずれにせよコンソールに記録される
   })
 }
 

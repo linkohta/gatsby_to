@@ -3,15 +3,15 @@ import emitter from "./emitter"
 import { setMatchPaths, findPath, findMatchPath } from "./find-path"
 
 /**
- * Available resource loading statuses
+ * リソース読み込みの状態として取りうる値
  */
 export const PageResourceStatus = {
   /**
-   * At least one of critical resources failed to load
+   * 重要なリソースのうち少なくとも 1 つの読み込みに失敗した
    */
   Error: `error`,
   /**
-   * Resources loaded successfully
+   * リソースの読み込みに成功した
    */
   Success: `success`,
 }
@@ -33,8 +33,8 @@ const createPageDataUrl = rawPath => {
 }
 
 /**
- * Utility to check the path that goes into doFetch for e.g. potential malicious intentions.
- * It checks for "//" because with this you could do a fetch request to a different domain.
+ * doFetch に渡すパスに、悪意のある意図などがないかを確認するユーティリティ。
+ * "//" があると別ドメインへ fetch リクエストを送れてしまうため、これを確認する。
  */
 const shouldAbortFetch = rawPath => rawPath.startsWith(`//`)
 
@@ -66,7 +66,7 @@ const doesConnectionSupportPrefetch = () => {
   return true
 }
 
-// Regex that matches common search crawlers
+// 一般的な検索クローラーに一致する正規表現
 const BOT_REGEX = /bot|crawler|spider|crawling/i
 
 const toPageResources = (pageData, component = null, head) => {
@@ -110,11 +110,11 @@ function waitForResponse(response) {
 
 export class BaseLoader {
   constructor(loadComponent, matchPaths) {
-    // Map of pagePath -> Page. Where Page is an object with: {
+    // pagePath -> Page のマップ。Page は次の形のオブジェクトである: {
     //   status: PageResourceStatus.Success || PageResourceStatus.Error,
-    //   payload: PageResources, // undefined if PageResourceStatus.Error
+    //   payload: PageResources, // PageResourceStatus.Error の場合は undefined
     // }
-    // PageResources is {
+    // PageResources は次の形である: {
     //   component,
     //   json: pageData.result,
     //   page: {
@@ -151,7 +151,7 @@ export class BaseLoader {
       this.inFlightNetworkRequests.set(url, inFlightPromise)
     }
 
-    // Prefer duplication with then + catch over .finally to prevent problems in ie11 + firefox
+    // ie11 と firefox での問題を避けるため、.finally よりも then と catch での重複を選ぶ
     return inFlightPromise
       .then(response => {
         this.inFlightNetworkRequests.delete(url)
@@ -174,7 +174,7 @@ export class BaseLoader {
     return this.memoizedGet(url).then(req => {
       const { status, responseText } = req
 
-      // Handle 200
+      // 200 を処理する
       if (status === 200) {
         try {
           const jsonPayload = JSON.parse(responseText)
@@ -192,27 +192,27 @@ export class BaseLoader {
             payload: jsonPayload,
           })
         } catch (err) {
-          // continue regardless of error
+          // エラーがあっても続行する
         }
       }
 
-      // Handle 404
+      // 404 を処理する
       if (status === 404 || status === 200) {
-        // If the request was for a 404/500 page and it doesn't exist, we're done
+        // リクエストが 404/500 ページ向けで、そのページが存在しない場合はここで終了する
         if (pagePath === `/404.html` || pagePath === `/500.html`) {
           return Object.assign(loadObj, {
             status: PageResourceStatus.Error,
           })
         }
 
-        // Need some code here to cache the 404 request. In case
-        // multiple loadPageDataJsons result in 404s
+        // 404 のリクエストをキャッシュするコードがここに必要である。
+        // 複数の loadPageDataJson が 404 になる場合に備える
         return this.fetchPageDataJson(
           Object.assign(loadObj, { pagePath: `/404.html`, notFound: true })
         )
       }
 
-      // handle 500 response (Unrecoverable)
+      // 500 のレスポンスを処理する（回復不能）
       if (status === 500) {
         return this.fetchPageDataJson(
           Object.assign(loadObj, {
@@ -222,14 +222,14 @@ export class BaseLoader {
         )
       }
 
-      // Handle everything else, including status === 0, and 503s. Should retry
+      // status === 0 や 503 を含む、それ以外のすべてを処理する。リトライすべきである
       if (retries < 3) {
         return this.fetchPageDataJson(
           Object.assign(loadObj, { retries: retries + 1 })
         )
       }
 
-      // Retried 3 times already, result is an error.
+      // すでに 3 回リトライしたので、結果はエラーとする。
       return Object.assign(loadObj, {
         status: PageResourceStatus.Error,
       })
@@ -242,7 +242,7 @@ export class BaseLoader {
     return this.memoizedGet(url).then(req => {
       const { status, responseText } = req
 
-      // Handle 200
+      // 200 を処理する
       if (status === 200) {
         try {
           return Object.assign(loadObj, {
@@ -250,27 +250,27 @@ export class BaseLoader {
             payload: responseText,
           })
         } catch (err) {
-          // continue regardless of error
+          // エラーがあっても続行する
         }
       }
 
-      // Handle 404
+      // 404 を処理する
       if (status === 404 || status === 200) {
-        // If the request was for a 404/500 page and it doesn't exist, we're done
+        // リクエストが 404/500 ページ向けで、そのページが存在しない場合はここで終了する
         if (pagePath === `/404.html` || pagePath === `/500.html`) {
           return Object.assign(loadObj, {
             status: PageResourceStatus.Error,
           })
         }
 
-        // Need some code here to cache the 404 request. In case
-        // multiple loadPageDataJsons result in 404s
+        // 404 のリクエストをキャッシュするコードがここに必要である。
+        // 複数の loadPageDataJson が 404 になる場合に備える
         return this.fetchPartialHydrationJson(
           Object.assign(loadObj, { pagePath: `/404.html`, notFound: true })
         )
       }
 
-      // handle 500 response (Unrecoverable)
+      // 500 のレスポンスを処理する（回復不能）
       if (status === 500) {
         return this.fetchPartialHydrationJson(
           Object.assign(loadObj, {
@@ -280,14 +280,14 @@ export class BaseLoader {
         )
       }
 
-      // Handle everything else, including status === 0, and 503s. Should retry
+      // status === 0 や 503 を含む、それ以外のすべてを処理する。リトライすべきである
       if (retries < 3) {
         return this.fetchPartialHydrationJson(
           Object.assign(loadObj, { retries: retries + 1 })
         )
       }
 
-      // Retried 3 times already, result is an error.
+      // すでに 3 回リトライしたので、結果はエラーとする。
       return Object.assign(loadObj, {
         status: PageResourceStatus.Error,
       })
@@ -345,7 +345,7 @@ export class BaseLoader {
     return findMatchPath(rawPath)
   }
 
-  // TODO check all uses of this and whether they use undefined for page resources not exist
+  // TODO これの使用箇所をすべて確認し、ページリソースが存在しない場合に undefined を使っているかを調べる
   loadPage(rawPath) {
     const pagePath = findPath(rawPath)
     if (this.pageDb.has(pagePath)) {
@@ -449,12 +449,12 @@ export class BaseLoader {
           loadChunkPromises.push(this.loadComponent(componentChunkName))
         }
 
-        // In develop we have separate chunks for template and Head components
-        // to enable HMR (fast refresh requires single exports).
-        // In production we have shared chunk with both exports. Double loadComponent here
-        // will be deduped by webpack runtime resulting in single request and single module
-        // being loaded for both `component` and `head`.
-        // get list of components to get
+        // develop では、HMR を有効にするために、テンプレートと Head のコンポーネントを
+        // 別々のチャンクにしている（Fast Refresh は単一の export を必要とする）。
+        // 本番では、両方の export を持つ共有チャンクになる。ここで loadComponent を 2 回呼んでも
+        // webpack のランタイムが重複を取り除くので、`component` と `head` の両方に対して
+        // リクエストは 1 回、読み込まれるモジュールも 1 つになる。
+        // 取得するコンポーネントの一覧を得る
         const componentChunkPromises = Promise.all(loadChunkPromises).then(
           components => {
             const [sliceComponents, headComponent, pageComponent] = components
@@ -503,13 +503,13 @@ export class BaseLoader {
                     controller.enqueue(te.encode(rscDataResponse.payload))
                   },
                   pull(controller) {
-                    // close on next read when queue is empty
+                    // キューが空になったら、次の読み取りで閉じる
                     controller.close()
                   },
                   cancel() {},
                 })
 
-                // Only load this experimental module if opting in to experimental Partial Hydration
+                // 実験的な Partial Hydration を有効にしている場合にだけ、この実験的なモジュールを読み込む
                 return import(`react-server-dom-webpack`)
                   .then(({ createFromReadableStream }) =>
                     waitForResponse(createFromReadableStream(readableStream))
@@ -528,15 +528,15 @@ export class BaseLoader {
               }
             }
 
-            // undefined if final result is an error
+            // 最終結果がエラーの場合は undefined
             return pageResources
           }
         )
 
-        // get list of static queries to get
+        // 取得する静的クエリの一覧を得る
         const staticQueryBatchPromise = Promise.all(
           dedupedStaticQueryHashes.map(staticQueryHash => {
-            // Check for cache in case this static query result has already been loaded
+            // この静的クエリの結果がすでに読み込まれている場合に備えて、キャッシュを確認する
             if (this.staticQueryDb[staticQueryHash]) {
               const jsonPayload = this.staticQueryDb[staticQueryHash]
               return { staticQueryHash, jsonPayload }
@@ -590,7 +590,7 @@ export class BaseLoader {
 
               return payload
             })
-            // when static-query fail to load we throw a better error
+            // 静的クエリの読み込みに失敗した場合は、より分かりやすいエラーを投げる
             .catch(err => {
               return {
                 error: err,
@@ -615,7 +615,7 @@ export class BaseLoader {
     return inFlightPromise
   }
 
-  // returns undefined if the page does not exists in cache
+  // ページがキャッシュに存在しない場合は undefined を返す
   loadPageSync(rawPath, options = {}) {
     const pagePath = findPath(rawPath)
     if (this.pageDb.has(pagePath)) {
@@ -636,17 +636,17 @@ export class BaseLoader {
   }
 
   shouldPrefetch(pagePath) {
-    // Skip prefetching if we know user is on slow or constrained connection
+    // ユーザーの回線が低速、または制限されていると分かっている場合はプリフェッチしない
     if (!doesConnectionSupportPrefetch()) {
       return false
     }
 
-    // Don't prefetch if this is a crawler bot
+    // クローラーのボットの場合はプリフェッチしない
     if (navigator.userAgent && BOT_REGEX.test(navigator.userAgent)) {
       return false
     }
 
-    // Check if the page exists.
+    // ページが存在するかどうかを確認する。
     if (this.pageDb.has(pagePath)) {
       return false
     }
@@ -681,7 +681,7 @@ export class BaseLoader {
     const abortC = new AbortController()
     abortC.signal.addEventListener(`abort`, () => {
       const index = this.prefetchQueued.findIndex(([p]) => p === pagePath)
-      // remove from the queue
+      // キューから取り除く
       if (index !== -1) {
         this.prefetchQueued.splice(index, 1)
       }
@@ -707,14 +707,14 @@ export class BaseLoader {
       const toPrefetch = this.prefetchQueued.splice(0, 4)
       const prefetches = Promise.all(
         toPrefetch.map(([pagePath, dPromise]) => {
-          // Tell plugins with custom prefetching logic that they should start
-          // prefetching this path.
+          // 独自のプリフェッチロジックを持つプラグインに、このパスのプリフェッチを
+          // 開始するよう伝える。
           if (!this.prefetchTriggered.has(pagePath)) {
             this.apiRunner(`onPrefetchPathname`, { pathname: pagePath })
             this.prefetchTriggered.add(pagePath)
           }
 
-          // If a plugin has disabled core prefetching, stop now.
+          // プラグインがコアのプリフェッチを無効にしている場合は、ここで止める。
           if (this.prefetchDisabled) {
             return dPromise.resolve(false)
           }
@@ -751,16 +751,16 @@ export class BaseLoader {
           crossOrigin: `anonymous`,
           as: `fetch`,
         }).then(() =>
-          // This was just prefetched, so will return a response from
-          // the cache instead of making another request to the server
+          // これはプリフェッチしたばかりなので、サーバーへ再度リクエストせずに
+          // キャッシュからレスポンスが返る
           this.loadPageDataJson(pagePath)
         ),
         prefetchHelper(pageDataUrl.replace(`.json`, `-rsc.json`), {
           crossOrigin: `anonymous`,
           as: `fetch`,
         }).then(() =>
-          // This was just prefetched, so will return a response from
-          // the cache instead of making another request to the server
+          // これはプリフェッチしたばかりなので、サーバーへ再度リクエストせずに
+          // キャッシュからレスポンスが返る
           this.loadPartialHydrationJson(pagePath)
         ),
       ])
@@ -769,8 +769,8 @@ export class BaseLoader {
         crossOrigin: `anonymous`,
         as: `fetch`,
       }).then(() =>
-        // This was just prefetched, so will return a response from
-        // the cache instead of making another request to the server
+        // これはプリフェッチしたばかりなので、サーバーへ再度リクエストせずに
+        // キャッシュからレスポンスが返る
         this.loadPageDataJson(pagePath)
       )
     }
@@ -809,11 +809,11 @@ export class BaseLoader {
         let appData
 
         if (status !== 200 && retries < 3) {
-          // Retry 3 times incase of non-200 responses
+          // 200 以外のレスポンスの場合は 3 回リトライする
           return this.loadAppData(retries + 1)
         }
 
-        // Handle 200
+        // 200 を処理する
         if (status === 200) {
           try {
             const jsonPayload = JSON.parse(responseText)
@@ -823,7 +823,7 @@ export class BaseLoader {
 
             appData = jsonPayload
           } catch (err) {
-            // continue regardless of error
+            // エラーがあっても続行する
           }
         }
 
@@ -853,7 +853,7 @@ export class ProdLoader extends BaseLoader {
 
       return (
         asyncRequires[exportType][chunkName]()
-          // loader will handle the case when component is error
+          // コンポーネントがエラーの場合は loader が処理する
           .catch(err => err)
       )
     }
@@ -887,20 +887,20 @@ export class ProdLoader extends BaseLoader {
         if (shouldAbortFetch(rawPath)) {
           return data
         }
-        // check if html file exist using HEAD request:
-        // if it does we should navigate to it instead of showing 404
+        // HEAD リクエストで html ファイルが存在するかを確認する:
+        // 存在する場合は、404 を表示せずにそこへ遷移すべきである
         return doFetch(rawPath, `HEAD`).then(req => {
           if (req.status === 200) {
-            // page (.html file) actually exist (or we asked for 404 )
-            // returning page resources status as errored to trigger
-            // regular browser navigation to given page
+            // ページ（.html ファイル）が実際に存在する（または 404 を要求した）
+            // ページリソースの状態をエラーとして返し、そのページへの
+            // 通常のブラウザー遷移を発生させる
             return {
               status: PageResourceStatus.Error,
             }
           }
 
-          // if HEAD request wasn't 200, return notFound result
-          // and show 404 page
+          // HEAD リクエストが 200 でなかった場合は、notFound の結果を返して
+          // 404 ページを表示する
           return data
         })
       }
@@ -914,20 +914,20 @@ export class ProdLoader extends BaseLoader {
         if (shouldAbortFetch(rawPath)) {
           return data
         }
-        // check if html file exist using HEAD request:
-        // if it does we should navigate to it instead of showing 404
+        // HEAD リクエストで html ファイルが存在するかを確認する:
+        // 存在する場合は、404 を表示せずにそこへ遷移すべきである
         return doFetch(rawPath, `HEAD`).then(req => {
           if (req.status === 200) {
-            // page (.html file) actually exist (or we asked for 404 )
-            // returning page resources status as errored to trigger
-            // regular browser navigation to given page
+            // ページ（.html ファイル）が実際に存在する（または 404 を要求した）
+            // ページリソースの状態をエラーとして返し、そのページへの
+            // 通常のブラウザー遷移を発生させる
             return {
               status: PageResourceStatus.Error,
             }
           }
 
-          // if HEAD request wasn't 200, return notFound result
-          // and show 404 page
+          // HEAD リクエストが 200 でなかった場合は、notFound の結果を返して
+          // 404 ページを表示する
           return data
         })
       }
@@ -945,11 +945,11 @@ export const setLoader = _loader => {
 export const publicLoader = {
   enqueue: rawPath => instance.prefetch(rawPath),
 
-  // Real methods
+  // 実際のメソッド
   getResourceURLsForPathname: rawPath =>
     instance.getResourceURLsForPathname(rawPath),
   loadPage: rawPath => instance.loadPage(rawPath),
-  // TODO add deprecation to v4 so people use withErrorDetails and then we can remove in v5 and change default behaviour
+  // TODO v4 で非推奨の警告を追加して withErrorDetails を使ってもらい、v5 で削除してデフォルトの挙動を変える
   loadPageSync: (rawPath, options = {}) =>
     instance.loadPageSync(rawPath, options),
   prefetch: rawPath => instance.prefetch(rawPath),

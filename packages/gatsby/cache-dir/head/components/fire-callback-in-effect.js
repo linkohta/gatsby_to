@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 
 /*
- * Calls callback in an effect and renders children
+ * effect の中でコールバックを呼び、children をレンダリングする
  */
 export function FireCallbackInEffect({ children, callback }) {
   useEffect(() => {

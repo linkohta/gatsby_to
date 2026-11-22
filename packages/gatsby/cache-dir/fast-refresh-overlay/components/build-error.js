@@ -3,14 +3,14 @@ import { Overlay, Header, Body, Footer, HeaderOpenClose } from "./overlay"
 import { CodeFrame } from "./code-frame"
 import { prettifyStack, openInEditor } from "../utils"
 
-// Error that is thrown on e.g. webpack errors and thus can't be dismissed and must be fixed
+// webpack のエラーなどで投げられるエラー。閉じることはできず、修正する必要がある
 export function BuildError({ error }) {
-  // Incoming build error shape is like this:
-  // Sometimes "Enter"
+  // 渡されてくるビルドエラーは次のような形をしている:
+  // "Enter" が入ることがある
   // ./relative-path-to-file
-  // Additional information (sometimes empty line => handled in "prettifyStack" function)
+  // 追加情報（空行のこともある => "prettifyStack" 関数で処理する）
   // /absolute-path-to-file
-  // Errors/Warnings
+  // エラーや警告
   const decoded = prettifyStack(error)
   const [filePath] = decoded
   const file = filePath.content.split(`\n`)[0]

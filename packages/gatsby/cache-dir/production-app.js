@@ -27,7 +27,7 @@ import {
 import EnsureResources from "./ensure-resources"
 import stripPrefix from "./strip-prefix"
 
-// Generated during bootstrap
+// ブートストラップ中に生成される
 import matchPaths from "$virtual/match-paths.json"
 import { reactDOMUtils } from "./react-dom-utils"
 
@@ -55,20 +55,20 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     apiRunner(`onCaughtError`, { error, errorInfo })
   }
 
-  // Let plugins register a service worker. The plugin just needs
-  // to return true.
+  // プラグインが Service Worker を登録できるようにする。プラグインは
+  // true を返すだけでよい。
   if (apiRunner(`registerServiceWorker`).filter(Boolean).length > 0) {
     require(`./register-service-worker`)
   }
 
-  // In gatsby v2 if Router is used in page using matchPaths
-  // paths need to contain full path.
-  // For example:
-  //   - page have `/app/*` matchPath
-  //   - inside template user needs to use `/app/xyz` as path
-  // Resetting `basepath`/`baseuri` keeps current behaviour
-  // to not introduce breaking change.
-  // Remove this in v3
+  // gatsby v2 では、matchPath を使うページで Router を使う場合、
+  // パスに完全なパスを含める必要がある。
+  // 例:
+  //   - ページの matchPath が `/app/*` である
+  //   - テンプレート内では、ユーザーはパスとして `/app/xyz` を使う必要がある
+  // 破壊的変更を持ち込まないよう、`basepath`/`baseuri` をリセットして
+  // 現在の挙動を維持する。
+  // v3 で削除する
   const RouteHandler = props => (
     <BaseContext.Provider
       value={{
@@ -165,15 +165,15 @@ apiRunnerAsync(`onClientEntry`).then(() => {
 
   const { pagePath, location: browserLoc } = window
 
-  // Explicitly call navigate if the canonical path (window.pagePath)
-  // is different to the browser path (window.location.pathname). SSR
-  // page paths might include search params, while SSG and DSG won't.
-  // If page path include search params we also compare query params.
-  // But only if NONE of the following conditions hold:
+  // 正規のパス（window.pagePath）がブラウザーのパス（window.location.pathname）と
+  // 異なる場合は、明示的に navigate を呼ぶ。SSR のページパスには
+  // 検索パラメーターが含まれることがあるが、SSG と DSG では含まれない。
+  // ページパスに検索パラメーターが含まれる場合は、クエリパラメーターも比較する。
+  // ただし、次の条件がどれも当てはまらない場合に限る:
   //
-  // - The url matches a client side route (page.matchPath)
-  // - it's a 404 page
-  // - it's the offline plugin shell (/offline-plugin-app-shell-fallback/)
+  // - URL がクライアントサイドのルート（page.matchPath）に一致する
+  // - 404 ページである
+  // - offline プラグインのシェル（/offline-plugin-app-shell-fallback/）である
   if (
     pagePath &&
     __BASE_PATH__ + pagePath !==
@@ -195,7 +195,7 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     )
   }
 
-  // It's possible that sessionStorage can throw an exception if access is not granted, see https://github.com/gatsbyjs/gatsby/issues/34512
+  // アクセスが許可されていない場合、sessionStorage が例外を投げることがある。https://github.com/gatsbyjs/gatsby/issues/34512 を参照
   const getSessionStorage = () => {
     try {
       return sessionStorage
@@ -211,7 +211,7 @@ apiRunnerAsync(`onClientEntry`).then(() => {
       page?.page?.webpackCompilationHash &&
       page.page.webpackCompilationHash !== window.___webpackCompilationHash
     ) {
-      // Purge plugin-offline cache
+      // plugin-offline のキャッシュを消去する
       if (
         `serviceWorker` in navigator &&
         navigator.serviceWorker.controller !== null &&
@@ -222,12 +222,12 @@ apiRunnerAsync(`onClientEntry`).then(() => {
         })
       }
 
-      // We have not matching html + js (inlined `window.___webpackCompilationHash`)
-      // with our data (coming from `app-data.json` file). This can cause issues such as
-      // errors trying to load static queries (as list of static queries is inside `page-data`
-      // which might not match to currently loaded `.js` scripts).
-      // We are making attempt to reload if hashes don't match, but we also have to handle case
-      // when reload doesn't fix it (possibly broken deploy) so we don't end up in infinite reload loop
+      // html と js（インライン化された `window.___webpackCompilationHash`）が、
+      // データ（`app-data.json` ファイル由来）と一致していない。これは、静的クエリの
+      // 読み込みエラーなどの問題を引き起こすことがある（静的クエリの一覧は `page-data` の中にあり、
+      // 現在読み込まれている `.js` スクリプトと一致しない可能性があるため）。
+      // ハッシュが一致しない場合はリロードを試みるが、リロードしても直らない場合
+      // （デプロイが壊れている可能性がある）にも対処し、無限にリロードし続けないようにする
       if (sessionStorage) {
         const isReloaded = sessionStorage.getItem(reloadStorageKey) === `1`
 
@@ -246,8 +246,8 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     if (!page || page.status === PageResourceStatus.Error) {
       const message = `page resources for ${browserLoc.pathname} not found. Not rendering React`
 
-      // if the chunk throws an error we want to capture the real error
-      // This should help with https://github.com/gatsbyjs/gatsby/issues/19618
+      // チャンクがエラーを投げた場合は、本当のエラーを捕捉したい
+      // これは https://github.com/gatsbyjs/gatsby/issues/19618 の助けになるはずである
       if (page && page.error) {
         console.error(message)
         throw page.error
@@ -284,8 +284,8 @@ apiRunnerAsync(`onClientEntry`).then(() => {
 
     const focusEl = document.getElementById(`gatsby-focus-wrapper`)
 
-    // Client only pages have any empty body so we just do a normal
-    // render to avoid React complaining about hydration mis-matches.
+    // クライアント専用のページは body が空なので、React がハイドレーションの
+    // 不一致を訴えないよう、通常のレンダリングを行う。
     let defaultRenderer = (Component, el) =>
       render(Component, el, {
         onUncaughtError: handleUncaughtError,
@@ -314,7 +314,7 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     }
 
     // https://github.com/madrobby/zepto/blob/b5ed8d607f67724788ec9ff492be297f64d47dfc/src/zepto.js#L439-L450
-    // TODO remove IE 10 support
+    // TODO IE 10 のサポートを削除する
     const doc = document
     if (
       doc.readyState === `complete` ||

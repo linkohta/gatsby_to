@@ -1,5 +1,5 @@
-// During bootstrap, we write requires at top of this file which looks
-// basically like:
+// ブートストラップ中に、このファイルの先頭へ require を書き込む。
+// 内容はおおよそ次のようになる:
 // module.exports = [
 //   {
 //     plugin: require("/path/to/plugin1/gatsby-browser.js"),

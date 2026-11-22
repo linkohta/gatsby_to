@@ -24,7 +24,7 @@ const {
 } = require(`./slice/context`)
 const { ServerSliceRenderer } = require(`./slice/server-slice-renderer`)
 
-// we want to force posix-style joins, so Windows doesn't produce backslashes for urls
+// posix 形式での結合を強制し、Windows で URL にバックスラッシュが入らないようにする
 const { join } = path.posix
 
 const testRequireError = (moduleName, err) => {
@@ -57,8 +57,8 @@ export const sanitizeComponents = components => {
   const componentsArray = [].concat(components).flat(Infinity).filter(Boolean)
 
   return componentsArray.map(component => {
-    // Ensure manifest is always loaded from content server
-    // And not asset server when an assetPrefix is used
+    // assetPrefix を使っている場合でも、マニフェストがアセットサーバーではなく
+    // 常にコンテンツサーバーから読み込まれるようにする
     if (__ASSET_PREFIX__ && component.props.rel === `manifest`) {
       return React.cloneElement(component, {
         href: component.props.href.replace(__ASSET_PREFIX__, ``),
@@ -91,7 +91,7 @@ function deepMerge(a, b) {
 }
 
 /**
-Reorder headComponents so meta tags are always at the top and aren't missed by crawlers by being pushed down by large inline styles, etc.
+headComponents を並べ替え、meta タグが常に先頭に来るようにする。大きなインラインスタイルなどで下へ押しやられて、クローラーに見落とされないようにするためである。
 @see https://github.com/gatsbyjs/gatsby/issues/22206
 */
 export const reorderHeadComponents = headComponents => {
@@ -106,8 +106,8 @@ export const reorderHeadComponents = headComponents => {
 }
 
 const DEFAULT_CONTEXT = {
-  // whether or not we're building the site now
-  // usage in determining original build or engines
+  // 現在サイトをビルド中かどうか
+  // 元のビルドなのかエンジンなのかを判定するために使う
   isDuringBuild: false,
 }
 
@@ -126,7 +126,7 @@ export default async function staticPage({
 }) {
   const renderContext = Object.assign(DEFAULT_CONTEXT, context)
 
-  // for this to work we need this function to be sync or at least ensure there is single execution of it at a time
+  // これが機能するには、この関数が同期的であるか、少なくとも同時に 1 つしか実行されないことを保証する必要がある
   global.unsafeBuiltinUsage = []
 
   try {
@@ -146,14 +146,14 @@ export default async function staticPage({
 
     function loadPageDataSync(_pagePath) {
       if (_pagePath === pagePath) {
-        // no need to use fs if we are asking for pageData of current page
+        // 現在のページの pageData を要求している場合は、fs を使う必要はない
         return pageData
       }
 
       const pageDataPath = getPageDataPath(_pagePath)
       const pageDataFile = join(process.cwd(), `public`, pageDataPath)
       try {
-        // deprecation notice
+        // 非推奨の通知
         const myErrorHolder = {
           name: `Usage of loadPageDataSync for page other than currently generated page disables incremental html generation in future builds`,
         }
@@ -162,7 +162,7 @@ export default async function staticPage({
         const pageDataJson = fs.readFileSync(pageDataFile)
         return JSON.parse(pageDataJson)
       } catch (error) {
-        // not an error if file is not found. There's just no page data
+        // ファイルが見つからなくてもエラーではない。ページデータがないだけである
         return null
       }
     }
@@ -176,12 +176,12 @@ export default async function staticPage({
     }
 
     const setHtmlAttributes = attributes => {
-      // TODO - we should remove deep merges
+      // TODO - ディープマージは削除すべきである
       htmlAttributes = deepMerge(htmlAttributes, attributes)
     }
 
     const setBodyAttributes = attributes => {
-      // TODO - we should remove deep merges
+      // TODO - ディープマージは削除すべきである
       bodyAttributes = deepMerge(bodyAttributes, attributes)
     }
 
@@ -198,7 +198,7 @@ export default async function staticPage({
     }
 
     const setBodyProps = props => {
-      // TODO - we should remove deep merges
+      // TODO - ディープマージは削除すべきである
       bodyProps = deepMerge({}, bodyProps, props)
     }
 
@@ -270,16 +270,16 @@ export default async function staticPage({
     ).pop()
 
     const slicesContext = {
-      // if we're in build now, we know we're on the server
-      // otherwise we're in an engine
+      // 現在ビルド中であれば、サーバー上にいることが分かる
+      // そうでなければエンジンの中にいる
       renderEnvironment: renderContext.isDuringBuild ? `server` : `engines`,
     }
     if (process.env.GATSBY_SLICES) {
-      // if we're running in an engine, we need to manually wrap body with
-      // the results context to pass the map of slice name to component/data/context
+      // エンジンの中で実行している場合は、スライス名からコンポーネント、データ、コンテキストへの
+      // マップを渡すために、body を結果のコンテキストで手動でラップする必要がある
       if (slicesContext.renderEnvironment === `engines`) {
-        // this is the same name used in the browser
-        // since this immitates behavior
+        // 挙動を模倣するため、
+        // ブラウザーで使っているものと同じ名前にしている
         const slicesDb = new Map()
 
         for (const sliceName of Object.values(slicesMap)) {
@@ -319,7 +319,7 @@ export default async function staticPage({
       </StaticQueryContext.Provider>
     )
 
-    // Let the site or plugin render the page component.
+    // サイトまたはプラグインにページコンポーネントをレンダリングさせる。
     await apiRunnerAsync(`replaceRenderer`, {
       bodyComponent,
       replaceBodyHTMLString,
@@ -333,7 +333,7 @@ export default async function staticPage({
       pathPrefix: __PATH_PREFIX__,
     })
 
-    // If no one stepped up, we'll handle it.
+    // 誰も引き受けなかった場合は、ここで処理する。
     if (!bodyHtml) {
       try {
         const writableStream = new WritableAsPromise()
@@ -348,7 +348,7 @@ export default async function staticPage({
 
         bodyHtml = await writableStream
       } catch (e) {
-        // ignore @reach/router redirect errors
+        // @reach/router のリダイレクトエラーは無視する
         if (!isRedirect(e)) throw e
       }
     }
@@ -368,8 +368,8 @@ export default async function staticPage({
       pathPrefix: __PATH_PREFIX__,
     })
 
-    // we want to run Head after onRenderBody, so Html and Body attributes
-    // from Head wins over global ones from onRenderBody
+    // Head は onRenderBody の後に実行したい。Head による Html と Body の属性が、
+    // onRenderBody によるグローバルな属性よりも優先されるようにするためである
     headHandlerForSSR({
       pageComponent,
       setHeadComponents,
@@ -381,7 +381,7 @@ export default async function staticPage({
     })
 
     reversedScripts.forEach(script => {
-      // Add preload/prefetch <link>s magic comments
+      // preload/prefetch 用の <link> のマジックコメントを追加する
       if (script.shouldGenerateLink) {
         headComponents.push(
           <link
@@ -395,8 +395,8 @@ export default async function staticPage({
     })
 
     reversedStyles.forEach(style => {
-      // Add <link>s for styles that should be prefetched
-      // otherwise, inline as a <style> tag
+      // プリフェッチすべきスタイルには <link> を追加する
+      // それ以外は <style> タグとしてインライン化する
 
       if (style.rel === `prefetch`) {
         headComponents.push(
@@ -420,7 +420,7 @@ export default async function staticPage({
       }
     })
 
-    // Add page metadata for the current page
+    // 現在のページのページメタデータを追加する
     const windowPageData = `/*<![CDATA[*/window.pagePath=${JSON.stringify(
       pagePath
     )};${
@@ -449,8 +449,8 @@ export default async function staticPage({
       )
     } else {
       const chunkMapping = require(`../public/chunk-map.json`)
-      // restore the old behavior
-      // Add chunk mapping metadata
+      // 以前の挙動に戻す
+      // チャンクの対応関係のメタデータを追加する
       const scriptChunkMapping = `/*<![CDATA[*/window.___chunkMapping=${JSON.stringify(
         chunkMapping
       )};/*]]>*/`
@@ -475,8 +475,8 @@ export default async function staticPage({
         })
       }
 
-      // Filter out prefetched bundles as adding them as a script tag
-      // would force high priority fetching.
+      // プリフェッチ済みのバンドルは取り除く。script タグとして追加すると、
+      // 高い優先度での取得を強制してしまうためである。
       bodyScripts = bodyScripts.concat(
         scripts
           .filter(s => s.rel !== `prefetch`)
@@ -549,9 +549,9 @@ export async function renderSlice({ slice, staticQueryContext, props = {} }) {
   const { default: SliceComponent } = await getPageChunk(slice)
 
   const slicesContext = {
-    // we are not yet supporting using <Slice /> placeholders within slice components
-    // setting this renderEnvironemnt to throw meaningful error on `<Slice />` usage
-    // `slices` renderEnvironment should be removed once we support nested `<Slice />` placeholders
+    // スライスコンポーネントの中で <Slice /> プレースホルダーを使うことには、まだ対応していない
+    // `<Slice />` が使われたときに意味のあるエラーを投げるよう、この renderEnvironemnt を設定する
+    // ネストした `<Slice />` プレースホルダーに対応したら、`slices` の renderEnvironment は削除すべきである
     renderEnvironment: `slices`,
     sliceRoot: slice,
   }
