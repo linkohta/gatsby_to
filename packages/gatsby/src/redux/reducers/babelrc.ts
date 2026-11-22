@@ -52,8 +52,8 @@ export const babelrcReducer = (
           state.stages[stage].plugins,
           (plugin: IPlugin) => plugin.name === action.payload.name
         )
-        // If the plugin already exists, merge the options.
-        // Otherwise, add it to the end.
+        // プラグインがすでに存在する場合は、オプションをマージする。
+        // そうでなければ、末尾に追加する。
         if (index !== -1) {
           const plugin = state.stages[stage].plugins[index]
           state.stages[stage].plugins[index] = {
@@ -80,8 +80,8 @@ export const babelrcReducer = (
           state.stages[stage].presets,
           (plugin: IPlugin) => plugin.name === action.payload.name
         )
-        // If the plugin already exists, merge the options.
-        // Otherwise, add it to the end.
+        // プラグインがすでに存在する場合は、オプションをマージする。
+        // そうでなければ、末尾に追加する。
         if (index !== -1) {
           const plugin = state.stages[stage].presets[index]
           state.stages[stage].presets[index] = {

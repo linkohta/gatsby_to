@@ -3,8 +3,8 @@ import { IGatsbyState, ActionsUnion } from "../types"
 
 let programStatus = `BOOTSTRAPPING`
 
-// TODO: replace usages of this reducer with queries.trackedComponents
-//  It is here merely for compatibility.
+// TODO: このレデューサーの使用箇所を queries.trackedComponents に置き換える
+//  これは互換性のためだけに残っている。
 export const componentsReducer = (
   state: IGatsbyState["components"] = new Map(),
   action: ActionsUnion
@@ -36,7 +36,7 @@ export const componentsReducer = (
       programStatus = action.payload
       return state
     case `CREATE_PAGE`: {
-      // Create XState service.
+      // XState のサービスを作成する。
       let component = state.get(action.payload.componentPath)
       if (!component) {
         component = {

@@ -21,7 +21,7 @@ export const telemetryReducer = (
     case `MERGE_WORKER_QUERY_STATE`: {
       const { queryStateTelemetryChunk } = action.payload
 
-      // This action may be dispatched in cases where queries might not be included in the merge data
+      // このアクションは、マージするデータに queries が含まれていない場合にも dispatch されることがある
       if (!queryStateTelemetryChunk) {
         return state
       }

@@ -30,7 +30,7 @@ export const redirectsReducer = (
     case `CREATE_REDIRECT`: {
       const redirect = action.payload
 
-      // Add redirect only if it wasn't yet added to prevent duplicates
+      // 重複を防ぐために、まだ追加されていない場合にだけリダイレクトを追加する
       if (!exists(redirect)) {
         add(redirect)
 

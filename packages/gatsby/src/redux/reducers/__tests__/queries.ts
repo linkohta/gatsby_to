@@ -119,7 +119,7 @@ describe(`create page`, () => {
   it(`does not mark existing page query as dirty`, () => {
     state = createPage(state, Pages.foo)
     state = runQuery(state, { path: Pages.foo.path })
-    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // 念のための確認
     state = createPage(state, Pages.foo)
 
     expect(state.trackedQueries.get(`/foo`)).toMatchObject({
@@ -130,7 +130,7 @@ describe(`create page`, () => {
   it(`marks existing page query with modified context as dirty`, () => {
     state = createPage(state, Pages.foo)
     state = runQuery(state, { path: Pages.foo.path })
-    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // 念のための確認
     state = createPage(state, Pages.foo, { contextModified: true })
 
     expect(state.trackedQueries.get(`/foo`)).toMatchObject({
@@ -172,7 +172,7 @@ describe(`create page`, () => {
   it(`cancels scheduled page deletion`, () => {
     state = createPage(state, Pages.foo)
     state = deletePage(state, Pages.foo)
-    // sanity check
+    // 念のための確認
     expect(state.deletedQueries).toEqual(new Set([Pages.foo.path]))
 
     state = createPage(state, Pages.foo)
@@ -226,7 +226,7 @@ describe(`delete page`, () => {
   it(`schedules page query for deletion from tracked queries`, () => {
     state = deletePage(state, Pages.foo)
 
-    // Pages still exist just scheduled for deletion:
+    // ページはまだ存在しており、削除が予定されているだけである:
     expect(state.deletedQueries.has(`/foo`)).toEqual(true)
     expect(state.deletedQueries.has(`/bar`)).toEqual(false)
 
@@ -273,16 +273,16 @@ describe(`replace static query`, () => {
   })
 
   it(`marks existing static query text as dirty`, () => {
-    // We do this even if actual static query text hasn't changed
-    // (assuming this action is only called when query text changes internally)
-    // FIXME: probably we shouldn't invalidate query text if it didn't actually change
+    // 実際の静的クエリのテキストが変わっていなくても、これを行う
+    // （このアクションは、内部でクエリのテキストが変わったときにだけ呼ばれると想定している）
+    // FIXME: 実際に変わっていないなら、おそらくクエリのテキストを無効化すべきではない
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     state = runQuery(state, {
       path: StaticQueries.q1.id,
       componentPath: StaticQueries.q1.componentPath,
       isPage: false,
     })
-    expect(state.trackedQueries.get(`sq--q1`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`sq--q1`)?.dirty).toEqual(0) // 念のための確認
 
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     expect(state.trackedQueries.get(`sq--q1`)).toMatchObject({
@@ -293,15 +293,15 @@ describe(`replace static query`, () => {
   it(`cancels scheduled static query deletion`, () => {
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     state = removeStaticQuery(state, StaticQueries.q1.id)
-    expect(state.deletedQueries.has(StaticQueries.q1.id)).toEqual(true) // sanity check
+    expect(state.deletedQueries.has(StaticQueries.q1.id)).toEqual(true) // 念のための確認
 
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     expect(state.deletedQueries.has(StaticQueries.q1.id)).toEqual(false)
   })
 
-  // TODO: currently we track static query components in a separate "static-query-components" reducer
-  //   Instead we should track all query relations uniformly in "queries" reducer.
-  //   Then this test will make sense
+  // TODO: 現在は、静的クエリのコンポーネントを別の "static-query-components" レデューサーで追跡している
+  //   本来は、すべてのクエリの関係を "queries" レデューサーで一律に追跡すべきである。
+  //   そうなれば、このテストは意味を持つようになる
   it.skip(`bind static query with corresponding component`, () => {
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     state = reducer(state, replaceStaticQuery(StaticQueries.q2))
@@ -426,7 +426,7 @@ describe(`createPages API end`, () => {
     expect(state.byConnection.get(`Test`)).toEqual(new Set([`/bar`]))
   })
 
-  // TODO: see a note in the "replace static query"
+  // TODO: "replace static query" の注記を参照
   it.skip(`removes binding of static query with corresponding component`, () => {
     state = removeStaticQuery(state, StaticQueries.q1.id)
 
@@ -435,7 +435,7 @@ describe(`createPages API end`, () => {
     ).toMatchObject({
       staticQueries: new Set([]),
     })
-    // sanity check:
+    // 念のための確認:
     expect(
       state.trackedComponents.get(`/static-query-component2.js`)
     ).toMatchObject({
@@ -445,8 +445,8 @@ describe(`createPages API end`, () => {
 })
 
 describe(`query extraction`, () => {
-  // QUERY_EXTRACTED is only called for page queries
-  // static queries are handled separately via REPLACE_STATIC_QUERY 🤷‍
+  // QUERY_EXTRACTED はページクエリに対してだけ呼ばれる
+  // 静的クエリは REPLACE_STATIC_QUERY で別に処理される 🤷‍
 
   beforeEach(() => {
     state = createPage(state, Pages.foo)
@@ -472,7 +472,7 @@ describe(`query extraction`, () => {
     expect(state.trackedQueries.get(`/bar2`)).toMatchObject({
       dirty: FLAG_DIRTY_NEW_PAGE | FLAG_DIRTY_TEXT,
     })
-    // Sanity check
+    // 念のための確認
     expect(state.trackedQueries.get(`/foo`)).toMatchObject({
       dirty: FLAG_DIRTY_NEW_PAGE,
     })
@@ -482,14 +482,14 @@ describe(`query extraction`, () => {
     state = editFooQuery(state, ComponentQueries.foo)
 
     expect(state.trackedQueries.get(`/foo`)).toMatchObject({ dirty: 0 })
-    // sanity-check (we didn't run or extract /bar)
+    // 念のための確認（/bar は実行も抽出もしていない）
     expect(state.trackedQueries.get(`/bar`)).toMatchObject({
       dirty: FLAG_DIRTY_NEW_PAGE,
     })
   })
 
   it(`doesn't mark page query as dirty if component has query extraction errors`, () => {
-    // extract to a valid state first and run to reset initial dirty flag
+    // まず有効な状態になるように抽出し、実行して初期のダーティフラグをリセットする
     state = editFooQuery(state, ComponentQueries.foo)
     state = reducer(
       state,
@@ -498,7 +498,7 @@ describe(`query extraction`, () => {
         {} as any
       )
     )
-    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // 念のための確認
     state = reducer(
       state,
       queryExtracted({ componentPath: `/foo.js`, query: `` }, {} as any)
@@ -507,7 +507,7 @@ describe(`query extraction`, () => {
   })
 
   it(`recovers after component query extraction errors`, () => {
-    // extract to a valid state first and run to reset initial dirty flag
+    // まず有効な状態になるように抽出し、実行して初期のダーティフラグをリセットする
     state = editFooQuery(state, ComponentQueries.foo)
     state = reducer(
       state,
@@ -520,7 +520,7 @@ describe(`query extraction`, () => {
       state,
       queryExtracted({ componentPath: `/foo.js`, query: `` }, {} as any)
     )
-    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // 念のための確認
     state = reducer(
       state,
       queryExtractedBabelSuccess({ componentPath: `/foo.js` }, {} as any)
@@ -541,7 +541,7 @@ describe(`query extraction`, () => {
   })
 
   it.skip(`marks all static queries associated with this component as dirty`, () => {
-    // TODO: when we merge static queries and page queries together
+    // TODO: 静的クエリとページクエリを統合するときに対応する
   })
 
   it(`saves query text when it changes`, () => {
@@ -553,7 +553,7 @@ describe(`query extraction`, () => {
   })
 
   it(`does not change error status of the component (GraphQL)`, () => {
-    // We call both actions in the real world on extraction failure
+    // 実際には、抽出に失敗したときに両方のアクションを呼ぶ
     state = reducer(
       state,
       queryExtractionGraphQLError(
@@ -592,7 +592,7 @@ describe(`query extraction`, () => {
   function editFooQuery(state, newFoo): QueriesState {
     state = reducer(state, queryExtracted(ComponentQueries.foo, {} as any))
     state = runQuery(state, { path: Pages.foo.path })
-    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // sanity-check
+    expect(state.trackedQueries.get(`/foo`)?.dirty).toEqual(0) // 念のための確認
     return reducer(state, queryExtracted(newFoo, {} as any))
   }
 })
@@ -765,9 +765,9 @@ describe(`add page data dependency`, () => {
     }
 
     let state = reducer(undefined, action)
-    // Do it again
+    // もう一度行う
     state = reducer(state, action)
-    // Add different action
+    // 別のアクションを追加する
     state = reducer(state, action2)
 
     expect(state.byConnection.get(`MarkdownRemark`)?.size).toEqual(2)
@@ -885,7 +885,7 @@ describe(`delete cache`, () => {
     state = createPage(state, Pages.bar)
     state = reducer(state, replaceStaticQuery(StaticQueries.q1))
     state = reducer(state, replaceStaticQuery(StaticQueries.q2))
-    // sanity check
+    // 念のための確認
     expect(state).not.toEqual(initialState)
 
     state = reducer(state, { type: `DELETE_CACHE` })

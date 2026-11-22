@@ -109,8 +109,8 @@ export const typeOwnersReducer = (
 
       setTypeOwner(type, plugin, typeOwners, node)
 
-      // If the node has been created in the past, check that
-      // the current plugin is the same as the previous.
+      // ノードが過去に作成されている場合は、現在のプラグインが
+      // 以前のプラグインと同じであることを確認する。
       if (oldNode && oldNode.internal.owner !== owner) {
         throw new Error(
           stripIndent`

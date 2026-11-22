@@ -20,7 +20,7 @@ export const pagesReducer = (
       return new Map()
 
     case `CREATE_PAGE`: {
-      // throws an error if the page is not created by a plugin
+      // ページがプラグインによって作成されたものでない場合は、例外を投げる
       if (!action.plugin?.name) {
         console.log(``)
         console.error(JSON.stringify(action, null, 4))
@@ -31,7 +31,7 @@ export const pagesReducer = (
         )
       }
 
-      // Add page to the state with the path as key
+      // パスをキーにして、ページを状態に追加する
       state.set(action.payload.path, action.payload)
 
       return state

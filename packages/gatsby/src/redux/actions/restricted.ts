@@ -50,18 +50,18 @@ export interface ICreateSliceInput {
 
 export const actions = {
   /**
-   * Add a third-party schema to be merged into main schema. Schema has to be a
-   * graphql-js GraphQLSchema object.
+   * メインのスキーマにマージするサードパーティーのスキーマを追加する。スキーマは
+   * graphql-js の GraphQLSchema オブジェクトでなければならない。
    *
-   * This schema is going to be merged as-is. Merging it in this way will
-   * easily break the main Gatsby Schema. Since we do not want that, therefore
-   * it is the user's responsibility to make sure that it does not happen.
-   * One such way of avoiding it is by namespacing the schema.
+   * このスキーマはそのままマージされる。この方法でマージすると、
+   * Gatsby のメインのスキーマを簡単に壊してしまう。それは避けたいので、
+   * そうならないようにするのはユーザーの責任である。
+   * 避ける方法の 1 つは、スキーマに名前空間を付けることである。
    *
    * @availableIn [createSchemaCustomization, sourceNodes]
    *
    * @param {Object} $0
-   * @param {GraphQLSchema} $0.schema GraphQL schema to add
+   * @param {GraphQLSchema} $0.schema 追加する GraphQL スキーマ
    */
   addThirdPartySchema: (
     { schema }: { schema: GraphQLSchema },
@@ -77,49 +77,49 @@ export const actions = {
   },
 
   /**
-   * Add type definitions to the GraphQL schema.
+   * GraphQL スキーマに型定義を追加する。
    *
    * @availableIn [createSchemaCustomization, sourceNodes]
    *
-   * @param {string | GraphQLOutputType | GatsbyGraphQLType | string[] | GraphQLOutputType[] | GatsbyGraphQLType[]} types Type definitions
+   * @param {string | GraphQLOutputType | GatsbyGraphQLType | string[] | GraphQLOutputType[] | GatsbyGraphQLType[]} types 型定義
    *
-   * Type definitions can be provided either as
-   * [`graphql-js` types](https://graphql.org/graphql-js/), in
-   * [GraphQL schema definition language (SDL)](https://graphql.org/learn/)
-   * or using Gatsby Type Builders available on the `schema` API argument.
+   * 型定義は、
+   * [`graphql-js` の型](https://graphql.org/graphql-js/)、
+   * [GraphQL のスキーマ定義言語（SDL）](https://graphql.org/learn/)、
+   * または API の引数 `schema` から使える Gatsby Type Builder のいずれかで渡せる。
    *
-   * Things to note:
-   * * type definitions targeting node types, i.e. `MarkdownRemark` and others
-   *   added in `sourceNodes` or `onCreateNode` APIs, need to implement the
-   *   `Node` interface. Interface fields will be added automatically, but it
-   *   is mandatory to label those types with `implements Node`.
-   * * by default, explicit type definitions from `createTypes` will be merged
-   *   with inferred field types, and default field resolvers for `Date` (which
-   *   adds formatting options) and `File` (which resolves the field value as
-   *   a `relativePath` foreign-key field) are added. This behavior can be
-   *   customised with `@infer`, `@dontInfer` directives or extensions. Fields
-   *   may be assigned resolver (and other option like args) with additional
-   *   directives. Currently `@dateformat`, `@link`, `@fileByRelativePath` and
-   *   `@proxy` are available.
+   * 注意点:
+   * * ノードの型を対象にする型定義、つまり `MarkdownRemark` や、
+   *   `sourceNodes` や `onCreateNode` の API で追加されるその他の型は、
+   *   `Node` インターフェースを実装する必要がある。インターフェースのフィールドは自動的に
+   *   追加されるが、それらの型に `implements Node` を付けることは必須である。
+   * * デフォルトでは、`createTypes` による明示的な型定義は、推論された
+   *   フィールドの型とマージされる。また、`Date`（書式のオプションを
+   *   追加する）と `File`（フィールドの値を `relativePath` の外部キーの
+   *   フィールドとして解決する）のデフォルトのフィールドリゾルバーが追加される。この動作は、
+   *   `@infer`、`@dontInfer` ディレクティブまたは extensions でカスタマイズできる。フィールドには、
+   *   追加のディレクティブでリゾルバー（や args などのオプション）を
+   *   割り当てられる。現在は `@dateformat`、`@link`、`@fileByRelativePath`、
+   *   `@proxy` が使える。
    *
    *
-   * Schema customization controls:
-   * * `@infer` - run inference on the type and add fields that don't exist on the
-   * defined type to it.
-   * * `@dontInfer` - don't run any inference on the type
+   * スキーマのカスタマイズの制御:
+   * * `@infer` - 型に対して推論を実行し、定義された型に存在しないフィールドを
+   * 追加する。
+   * * `@dontInfer` - 型に対して推論を一切実行しない
    *
-   * Extensions to add resolver options:
-   * * `@dateformat` - add date formatting arguments. Accepts `formatString` and
-   *   `locale` options that sets the defaults for this field
-   * * `@link` - connect to a different Node. Arguments `by` and `from`, which
-   *   define which field to compare to on a remote node and which field to use on
-   *   the source node
-   * * `@fileByRelativePath` - connect to a File node. Same arguments. The
-   *   difference from link is that this normalizes the relative path to be
-   *   relative from the path where source node is found.
-   * * `@proxy` - in case the underlying node data contains field names with
-   *   characters that are invalid in GraphQL, `proxy` allows to explicitly
-   *   proxy those properties to fields with valid field names. Takes a `from` arg.
+   * リゾルバーのオプションを追加する拡張:
+   * * `@dateformat` - 日付の書式の引数を追加する。このフィールドのデフォルトを
+   *   設定する `formatString` と `locale` のオプションを受け取る
+   * * `@link` - 別の Node に接続する。引数は `by` と `from` で、
+   *   接続先のノードのどのフィールドと比較するかと、接続元のノードのどのフィールドを
+   *   使うかを指定する
+   * * `@fileByRelativePath` - File ノードに接続する。引数は同じ。
+   *   link との違いは、相対パスを、接続元のノードがある場所からの
+   *   相対パスになるように正規化することである。
+   * * `@proxy` - 元になるノードのデータに、GraphQL で無効な文字を含む
+   *   フィールド名がある場合に、`proxy` を使うと、それらのプロパティを
+   *   有効な名前のフィールドへ明示的にプロキシできる。引数 `from` を受け取る。
    *
    *
    * @example
@@ -237,19 +237,19 @@ export const actions = {
   },
 
   /**
-   * Add a field extension to the GraphQL schema.
+   * GraphQL スキーマにフィールド拡張を追加する。
    *
-   * Extensions allow defining custom behavior which can be added to fields
-   * via directive (in SDL) or on the `extensions` prop (with Type Builders).
+   * 拡張を使うと独自の動作を定義でき、ディレクティブ（SDL の場合）または
+   * `extensions` プロパティ（Type Builder の場合）でフィールドに追加できる。
    *
-   * The extension definition takes a `name`, an `extend` function, and optional
-   * extension `args` for options. The `extend` function has to return a (partial)
-   * field config, and receives the extension options and the previous field config
-   * as arguments.
+   * 拡張の定義は、`name`、`extend` 関数、省略可能なオプション用の
+   * `args` を受け取る。`extend` 関数は（部分的な）フィールドの設定を
+   * 返さなければならず、拡張のオプションと直前のフィールドの設定を
+   * 引数として受け取る。
    *
    * @availableIn [createSchemaCustomization, sourceNodes]
    *
-   * @param {GraphQLFieldExtensionDefinition} extension The field extension definition
+   * @param {GraphQLFieldExtensionDefinition} extension フィールド拡張の定義
    * @example
    * exports.createSchemaCustomization = ({ actions }) => {
    *   const { createFieldExtension } = actions
@@ -315,28 +315,28 @@ export const actions = {
     },
 
   /**
-   * Write GraphQL schema to file
+   * GraphQL スキーマをファイルに書き出す
    *
-   * Writes out inferred and explicitly specified type definitions. This is not
-   * the full GraphQL schema, but only the types necessary to recreate all type
-   * definitions, i.e. it does not include directives, built-ins, and derived
-   * types for filtering, sorting, pagination etc. Optionally, you can define a
-   * list of types to include/exclude. This is recommended to avoid including
-   * definitions for plugin-created types.
+   * 推論された型定義と、明示的に指定された型定義を書き出す。これは完全な
+   * GraphQL スキーマではなく、すべての型定義を作り直すのに必要な型だけである。
+   * つまり、ディレクティブ、組み込みの型、フィルターやソートやページネーションなどの
+   * ための派生型は含まれない。必要に応じて、含める型や除外する型の一覧を
+   * 指定できる。プラグインが作成した型の定義を含めないようにするために、
+   * 指定することを推奨する。
    *
-   * The first object parameter is required, however all the fields in the object are optional.
+   * 最初のオブジェクトの引数は必須だが、オブジェクトの中のフィールドはすべて省略できる。
    *
    * @availableIn [createSchemaCustomization]
    *
    * @param {object} $0
-   * @param {string} [$0.path] The path to the output file, defaults to `schema.gql`
-   * @param {object} [$0.include] Configure types to include
-   * @param {string[]} [$0.include.types] Only include these types
-   * @param {string[]} [$0.include.plugins] Only include types owned by these plugins
-   * @param {object} [$0.exclude] Configure types to exclude
-   * @param {string[]} [$0.exclude.types] Do not include these types
-   * @param {string[]} [$0.exclude.plugins] Do not include types owned by these plugins
-   * @param {boolean} [$0.withFieldTypes] Include field types, defaults to `true`
+   * @param {string} [$0.path] 出力ファイルへのパス。デフォルトは `schema.gql`
+   * @param {object} [$0.include] 含める型を設定する
+   * @param {string[]} [$0.include.types] これらの型だけを含める
+   * @param {string[]} [$0.include.plugins] これらのプラグインが所有する型だけを含める
+   * @param {object} [$0.exclude] 除外する型を設定する
+   * @param {string[]} [$0.exclude.types] これらの型を含めない
+   * @param {string[]} [$0.exclude.plugins] これらのプラグインが所有する型を含めない
+   * @param {boolean} [$0.withFieldTypes] フィールドの型を含める。デフォルトは `true`
    * @example
    * exports.createSchemaCustomization = ({ actions }) => {
    *   // This code writes a GraphQL schema to a file named `schema.gql`.
@@ -377,13 +377,13 @@ export const actions = {
   },
 
   /**
-   * Make functionality available on field resolver `context`
+   * フィールドリゾルバーの `context` から機能を使えるようにする
    *
    * @availableIn [createSchemaCustomization]
    *
-   * @param {object} context Object to make available on `context`.
-   * When called from a plugin, the context value will be namespaced under
-   * the camel-cased plugin name without the "gatsby-" prefix
+   * @param {object} context `context` から使えるようにするオブジェクト。
+   * プラグインから呼ばれた場合、コンテキストの値は、"gatsby-" プレフィックスを
+   * 除いてキャメルケースにしたプラグイン名の名前空間の下に置かれる
    * @example
    * const getHtml = md => remark().use(html).process(md)
    * exports.createSchemaCustomization = ({ actions }) => {
@@ -438,17 +438,17 @@ export const actions = {
     },
 
   /**
-   * Create a new Slice. See the technical docs for the [Gatsby Slice API](/docs/reference/built-in-components/gatsby-slice).
+   * 新しい Slice を作成する。[Gatsby Slice API](/docs/reference/built-in-components/gatsby-slice) の技術ドキュメントを参照。
    *
    * @availableIn [createPages]
    *
    * @param {object} $0
-   * @param {Object} slice a slice object
-   * @param {string} slice.id The unique ID for this slice
-   * @param {string} slice.component The absolute path to the component for this slice
-   * @param {Object} slice.context Context data for this slice. Passed as props
-   * to the component `this.props.sliceContext` as well as to the graphql query
-   * as graphql arguments.
+   * @param {Object} slice スライスオブジェクト
+   * @param {string} slice.id このスライスの一意な ID
+   * @param {string} slice.component このスライスのコンポーネントへの絶対パス
+   * @param {Object} slice.context このスライスのコンテキストデータ。props として
+   * コンポーネントの `this.props.sliceContext` に渡されるほか、graphql クエリにも
+   * graphql の引数として渡される。
    * @example
    * exports.createPages = ({ actions }) => {
    *   actions.createSlice({
@@ -519,7 +519,7 @@ export const actions = {
             `slice`
           ),
           componentPath,
-          // note: we use "name" internally instead of id
+          // 注: 内部では id ではなく "name" を使う
           name: payload.id,
           context: payload.context || {},
           updatedAt: Date.now(),
@@ -533,12 +533,12 @@ export const actions = {
     }
   },
   /**
-   * Declares URL Pattern that should be allowed to be used for Image or File CDN to prevent using of unexpected RemoteFile URLs.
+   * 予期しない RemoteFile の URL が使われるのを防ぐために、Image CDN や File CDN での使用を許可する URL パターンを宣言する。
    *
    * @availableIn [onPreInit, onPreBootstrap, onPluginInit, createSchemaCustomization]
    *
-   * @param {string | string []} url URLPattern or Array of URL Patternss that should be allowed.
-   * URLPattern is a string that can contain wildcards (*) or parameter placeholders (e.g. :id).
+   * @param {string | string []} url 許可する URLPattern、または URL パターンの配列。
+   * URLPattern は、ワイルドカード（*）や引数のプレースホルダー（例: :id）を含められる文字列である。
    * @example
    * exports.onPreInit = ({ actions }) => {
    *   actions.addRemoteFileAllowedUrl(`https://your-wordpress-instance.com/*`)
@@ -577,7 +577,7 @@ const withDeprecationWarning =
 const withErrorMessage =
   (actionName: RestrictionActionNames, api: API, allowedIn: Array<API>) =>
   () =>
-  // return a thunk that does not dispatch anything
+  // 何も dispatch しない thunk を返す
   (): void => {
     report.error(
       `\`${actionName}\` is not available in the \`${api}\` API. ` +

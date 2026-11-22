@@ -31,7 +31,7 @@ export interface IRedirect {
   redirectInBrowser?: boolean
   ignoreCase: boolean
   statusCode?: HttpStatusCode
-  // Users can add anything to this createRedirect API
+  // ユーザーは、この createRedirect API に何でも追加できる
   [key: string]: any
 }
 
@@ -59,10 +59,10 @@ export interface IGatsbyPage {
   manifestId?: string
   defer?: boolean
   /**
-   * INTERNAL. Do not use `page.mode`, it can be removed at any time
-   * `page.mode` is currently reliable only in engines and `onPostBuild` hook
-   * (in develop it is dynamic and can change at any time)
-   * TODO: remove, see comments in utils/page-mode:materializePageMode
+   * 内部用。`page.mode` を使わないこと。いつでも削除される可能性がある
+   * `page.mode` が現在信頼できるのは、エンジンの中と `onPostBuild` フックの中だけである
+   * （develop では動的であり、いつでも変わりうる）
+   * TODO: 削除する。utils/page-mode:materializePageMode のコメントを参照
    *
    * @internal
    */
@@ -79,21 +79,21 @@ export interface IGatsbySlice {
 }
 
 export interface IGatsbyFunction {
-  /** The route in the browser to access the function **/
+  /** ブラウザーからこの関数にアクセスするためのルート **/
   functionRoute: string
-  /** The absolute path to the original function **/
+  /** 元の関数への絶対パス **/
   originalAbsoluteFilePath: string
-  /** The relative path to the original function **/
+  /** 元の関数への相対パス **/
   originalRelativeFilePath: string
-  /** The relative path to the compiled function (always ends with .js) **/
+  /** コンパイルされた関数への相対パス（常に .js で終わる） **/
   relativeCompiledFilePath: string
-  /** The absolute path to the compiled function (doesn't transfer across machines) **/
+  /** コンパイルされた関数への絶対パス（別のマシンには持ち越せない） **/
   absoluteCompiledFilePath: string
-  /** The matchPath regex created by path-to-regexp. Only created if the function is dynamic. **/
+  /** path-to-regexp が作成した matchPath の正規表現。関数が動的な場合にだけ作成される。 **/
   matchPath: string | undefined
-  /** The plugin that owns this function route **/
+  /** この関数のルートを所有するプラグイン **/
   pluginName: string
-  /** Function identifier used to match functions usage in routes manifest */
+  /** ルートマニフェストの中での関数の使用箇所との照合に使う、関数の識別子 */
   functionId: string
 }
 
@@ -111,10 +111,10 @@ export interface IHeader {
   }>
 }
 
-// TODO: The keys of IGatsbyConfig are all optional so that in reducers like reducers/config.ts the default state for the config can be an empty object. This isn't ideal because some of those options are actually always defined because Joi validation sets defaults. Somehow fix this :D
+// TODO: IGatsbyConfig のキーはすべて省略可能になっている。reducers/config.ts のようなレデューサーで、config のデフォルトの状態を空のオブジェクトにできるようにするためである。しかし、Joi のバリデーションがデフォルト値を設定するので、一部のオプションは実際には常に定義されており、これは理想的ではない。何とかして直す :D
 export interface IGatsbyConfig {
   plugins?: Array<{
-    // This is the name of the plugin like `gatsby-plugin-manifest`
+    // これは `gatsby-plugin-manifest` のようなプラグインの名前である
     resolve: string
     options: {
       [key: string]: unknown
@@ -125,7 +125,7 @@ export interface IGatsbyConfig {
     author?: string
     description?: string
     siteUrl?: string
-    // siteMetadata is free form
+    // siteMetadata は自由な形式である
     [key: string]: unknown
   }
   // @deprecated
@@ -355,7 +355,7 @@ export interface IGatsbyState {
     complete: Map<Identifier, IGatsbyCompleteJobV2>
     jobsByRequest: Map<string, Set<Identifier>>
   }
-  webpack: any // TODO This should be the output from ./utils/webpack.config.js
+  webpack: any // TODO これは ./utils/webpack.config.js の出力であるべき
   webpackCompilationHash: string
   redirects: Array<IRedirect>
   babelrc: {
@@ -380,7 +380,7 @@ export interface IGatsbyState {
   }
   logs: IGatsbyCLIState
   inferenceMetadata: {
-    step: string // TODO make enum or union
+    step: string // TODO enum か union にする
     typeMap: {
       [key: string]: ITypeMetadata
     }
@@ -1053,7 +1053,7 @@ export interface IAddChildNodeToParentNodeAction {
 
 export interface IDeleteNodeAction {
   type: `DELETE_NODE`
-  // FIXME: figure out why payload can be undefined here
+  // FIXME: ここでペイロードが undefined になりうる理由を突き止める
   payload: IGatsbyNode | void
   plugin: IGatsbyPlugin
   isRecursiveChildrenDelete?: boolean
@@ -1267,375 +1267,375 @@ export interface IClearJobV2Context {
 
 export const HTTP_STATUS_CODE = {
   /**
-   * The server has received the request headers and the client should proceed to send the request body
-   * (in the case of a request for which a body needs to be sent; for example, a POST request).
-   * Sending a large request body to a server after a request has been rejected for inappropriate headers would be inefficient.
-   * To have a server check the request's headers, a client must send Expect: 100-continue as a header in its initial request
-   * and receive a 100 Continue status code in response before sending the body. The response 417 Expectation Failed indicates the request should not be continued.
+   * サーバーがリクエストヘッダーを受け取ったので、クライアントはリクエストボディの送信に進んでよい
+   * （ボディを送る必要があるリクエストの場合。たとえば POST リクエスト）。
+   * 不適切なヘッダーのためにリクエストが拒否された後で、大きなリクエストボディをサーバーへ送るのは非効率である。
+   * サーバーにリクエストヘッダーを確認させるには、クライアントは最初のリクエストでヘッダーとして Expect: 100-continue を送り、
+   * ボディを送る前にレスポンスとして 100 Continue のステータスコードを受け取らなければならない。レスポンスの 417 Expectation Failed は、リクエストを続けるべきでないことを示す。
    */
   CONTINUE_100: 100,
 
   /**
-   * The requester has asked the server to switch protocols and the server has agreed to do so.
+   * リクエストした側がサーバーにプロトコルの切り替えを求め、サーバーがそれに同意した。
    */
   SWITCHING_PROTOCOLS_101: 101,
 
   /**
-   * A WebDAV request may contain many sub-requests involving file operations, requiring a long time to complete the request.
-   * This code indicates that the server has received and is processing the request, but no response is available yet.
-   * This prevents the client from timing out and assuming the request was lost.
+   * WebDAV のリクエストは、ファイル操作を伴う多数のサブリクエストを含むことがあり、リクエストの完了に長い時間がかかる。
+   * このコードは、サーバーがリクエストを受け取って処理しているが、まだレスポンスを返せないことを示す。
+   * これにより、クライアントがタイムアウトして、リクエストが失われたと判断するのを防ぐ。
    */
   PROCESSING_102: 102,
 
   /**
-   * Standard response for successful HTTP requests.
-   * The actual response will depend on the request method used.
-   * In a GET request, the response will contain an entity corresponding to the requested resource.
-   * In a POST request, the response will contain an entity describing or containing the result of the action.
+   * 成功した HTTP リクエストに対する標準のレスポンス。
+   * 実際のレスポンスは、使われたリクエストメソッドによって異なる。
+   * GET リクエストでは、レスポンスにはリクエストされたリソースに対応するエンティティが含まれる。
+   * POST リクエストでは、レスポンスにはアクションの結果を説明する、または含むエンティティが含まれる。
    */
   OK_200: 200,
 
   /**
-   * The request has been fulfilled, resulting in the creation of a new resource.
+   * リクエストが完了し、その結果として新しいリソースが作成された。
    */
   CREATED_201: 201,
 
   /**
-   * The request has been accepted for processing, but the processing has not been completed.
-   * The request might or might not be eventually acted upon, and may be disallowed when processing occurs.
+   * リクエストは処理のために受け付けられたが、処理はまだ完了していない。
+   * リクエストは最終的に実行されることもされないこともあり、処理の時点で拒否されることもある。
    */
   ACCEPTED_202: 202,
 
   /**
-   * SINCE HTTP/1.1
-   * The server is a transforming proxy that received a 200 OK from its origin,
-   * but is returning a modified version of the origin's response.
+   * HTTP/1.1 以降
+   * サーバーは変換を行うプロキシであり、オリジンから 200 OK を受け取ったが、
+   * オリジンのレスポンスを変更したものを返している。
    */
   NON_AUTHORITATIVE_INFORMATION_203: 203,
 
   /**
-   * The server successfully processed the request and is not returning any content.
+   * サーバーはリクエストの処理に成功し、コンテンツを返さない。
    */
   NO_CONTENT_204: 204,
 
   /**
-   * The server successfully processed the request, but is not returning any content.
-   * Unlike a 204 response, this response requires that the requester reset the document view.
+   * サーバーはリクエストの処理に成功したが、コンテンツを返さない。
+   * 204 のレスポンスとは異なり、このレスポンスはリクエストした側がドキュメントビューをリセットすることを求める。
    */
   RESET_CONTENT_205: 205,
 
   /**
-   * The server is delivering only part of the resource (byte serving) due to a range header sent by the client.
-   * The range header is used by HTTP clients to enable resuming of interrupted downloads,
-   * or split a download into multiple simultaneous streams.
+   * クライアントが送った range ヘッダーにより、サーバーはリソースの一部だけを返している（バイトサービング）。
+   * range ヘッダーは、HTTP クライアントが、中断されたダウンロードを再開したり、
+   * ダウンロードを複数の同時ストリームに分割したりするために使う。
    */
   PARTIAL_CONTENT_206: 206,
 
   /**
-   * The message body that follows is an XML message and can contain a number of separate response codes,
-   * depending on how many sub-requests were made.
+   * 続くメッセージボディは XML メッセージであり、行われたサブリクエストの数に応じて、
+   * 複数の別々のレスポンスコードを含むことがある。
    */
   MULTI_STATUS_207: 207,
 
   /**
-   * The members of a DAV binding have already been enumerated in a preceding part of the (multistatus) response,
-   * and are not being included again.
+   * DAV バインディングのメンバーは、（multistatus）レスポンスの前の部分ですでに列挙されており、
+   * 再び含められることはない。
    */
   ALREADY_REPORTED_208: 208,
 
   /**
-   * The server has fulfilled a request for the resource,
-   * and the response is a representation of the result of one or more instance-manipulations applied to the current instance.
+   * サーバーはリソースに対するリクエストを完了した。
+   * レスポンスは、現在のインスタンスに 1 つ以上の instance-manipulation を適用した結果の表現である。
    */
   IM_USED_226: 226,
 
   /**
-   * Indicates multiple options for the resource from which the client may choose (via agent-driven content negotiation).
-   * For example, this code could be used to present multiple video format options,
-   * to list files with different filename extensions, or to suggest word-sense disambiguation.
+   * リソースに複数の選択肢があり、クライアントが（エージェント駆動のコンテントネゴシエーションで）その中から選べることを示す。
+   * たとえばこのコードは、動画の形式の選択肢を複数提示したり、
+   * 拡張子の異なるファイルを一覧にしたり、語義の曖昧さ回避の候補を示したりするのに使える。
    */
   MULTIPLE_CHOICES_300: 300,
 
   /**
-   * This and all future requests should be directed to the given URI.
+   * このリクエストと今後のすべてのリクエストは、指定された URI に向けるべきである。
    */
   MOVED_PERMANENTLY_301: 301,
 
   /**
-   * This is an example of industry practice contradicting the standard.
-   * The HTTP/1.0 specification (RFC 1945) required the client to perform a temporary redirect
-   * (the original describing phrase was "Moved Temporarily"), but popular browsers implemented 302
-   * with the functionality of a 303 See Other. Therefore, HTTP/1.1 added status codes 303 and 307
-   * to distinguish between the two behaviours. However, some Web applications and frameworks
-   * use the 302 status code as if it were the 303.
+   * これは、業界の慣行が標準と食い違っている例である。
+   * HTTP/1.0 の仕様（RFC 1945）は、クライアントが一時的なリダイレクトを行うことを求めていた
+   * （元の説明の文言は "Moved Temporarily"）。しかし、普及したブラウザーは 302 を
+   * 303 See Other の機能として実装した。そのため HTTP/1.1 では、2 つの動作を区別するために
+   * ステータスコード 303 と 307 が追加された。それでも、一部の Web アプリケーションやフレームワークは、
+   * 302 のステータスコードを 303 であるかのように使っている。
    */
   FOUND_302: 302,
 
   /**
-   * SINCE HTTP/1.1
-   * The response to the request can be found under another URI using a GET method.
-   * When received in response to a POST (or PUT/DELETE), the client should presume that
-   * the server has received the data and should issue a redirect with a separate GET message.
+   * HTTP/1.1 以降
+   * リクエストに対するレスポンスは、GET メソッドを使って別の URI から取得できる。
+   * POST（または PUT/DELETE）へのレスポンスとして受け取った場合、クライアントは、
+   * サーバーがデータを受け取ったと見なし、別の GET メッセージでリダイレクトを行うべきである。
    */
   SEE_OTHER_303: 303,
 
   /**
-   * Indicates that the resource has not been modified since the version specified by the request headers If-Modified-Since or If-None-Match.
-   * In such case, there is no need to retransmit the resource since the client still has a previously-downloaded copy.
+   * リクエストヘッダーの If-Modified-Since または If-None-Match で指定されたバージョン以降、リソースが変更されていないことを示す。
+   * この場合、クライアントは以前にダウンロードしたコピーをまだ持っているので、リソースを再送する必要はない。
    */
   NOT_MODIFIED_304: 304,
 
   /**
-   * SINCE HTTP/1.1
-   * The requested resource is available only through a proxy, the address for which is provided in the response.
-   * Many HTTP clients (such as Mozilla and Internet Explorer) do not correctly handle responses with this status code, primarily for security reasons.
+   * HTTP/1.1 以降
+   * リクエストされたリソースはプロキシ経由でしか利用できず、そのアドレスがレスポンスで示される。
+   * 多くの HTTP クライアント（Mozilla や Internet Explorer など）は、主にセキュリティ上の理由から、このステータスコードのレスポンスを正しく処理しない。
    */
   USE_PROXY_305: 305,
 
   /**
-   * No longer used. Originally meant "Subsequent requests should use the specified proxy."
+   * 現在は使われていない。元々は「以降のリクエストは指定されたプロキシを使うべきである」という意味だった。
    */
   SWITCH_PROXY_306: 306,
 
   /**
-   * SINCE HTTP/1.1
-   * In this case, the request should be repeated with another URI; however, future requests should still use the original URI.
-   * In contrast to how 302 was historically implemented, the request method is not allowed to be changed when reissuing the original request.
-   * For example, a POST request should be repeated using another POST request.
+   * HTTP/1.1 以降
+   * この場合、リクエストは別の URI でやり直すべきである。ただし、今後のリクエストでは引き続き元の URI を使うべきである。
+   * 302 の歴史的な実装とは異なり、元のリクエストを再発行するときにリクエストメソッドを変更することは許されない。
+   * たとえば POST リクエストは、別の POST リクエストでやり直すべきである。
    */
   TEMPORARY_REDIRECT_307: 307,
 
   /**
-   * The request and all future requests should be repeated using another URI.
-   * 307 and 308 parallel the behaviors of 302 and 301, but do not allow the HTTP method to change.
-   * So, for example, submitting a form to a permanently redirected resource may continue smoothly.
+   * このリクエストと今後のすべてのリクエストは、別の URI でやり直すべきである。
+   * 307 と 308 は 302 と 301 の動作に対応するが、HTTP メソッドの変更を許さない。
+   * そのため、たとえば恒久的にリダイレクトされたリソースへのフォームの送信が、問題なく続けられる。
    */
   PERMANENT_REDIRECT_308: 308,
 
   /**
-   * The server cannot or will not process the request due to an apparent client error
-   * (e.g., malformed request syntax, too large size, invalid request message framing, or deceptive request routing).
+   * 明らかなクライアント側のエラー（リクエストの構文の誤り、大きすぎるサイズ、
+   * 無効なリクエストメッセージのフレーミング、不正なリクエストのルーティングなど）のために、サーバーがリクエストを処理できない、または処理しない。
    */
   BAD_REQUEST_400: 400,
 
   /**
-   * Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet
-   * been provided. The response must include a WWW-Authenticate header field containing a challenge applicable to the
-   * requested resource. See Basic access authentication and Digest access authentication. 401 semantically means
-   * "unauthenticated",i.e. the user does not have the necessary credentials.
+   * 403 Forbidden に似ているが、特に、認証が必要であり、それが失敗したか、まだ提供されていない
+   * 場合に使う。レスポンスには、リクエストされたリソースに適用できるチャレンジを含む
+   * WWW-Authenticate ヘッダーフィールドを含めなければならない。Basic 認証と Digest 認証を参照。401 は意味の上では
+   * 「未認証」、つまりユーザーが必要な資格情報を持っていないことを表す。
    */
   UNAUTHORIZED_401: 401,
 
   /**
-   * Reserved for future use. The original intention was that this code might be used as part of some form of digital
-   * cash or micro payment scheme, but that has not happened, and this code is not usually used.
-   * Google Developers API uses this status if a particular developer has exceeded the daily limit on requests.
+   * 将来の使用のために予約されている。当初は、何らかのデジタルキャッシュやマイクロペイメントの仕組みの
+   * 一部としてこのコードを使うことが想定されていたが、そうはならず、このコードは通常は使われない。
+   * Google Developers API は、特定の開発者が 1 日あたりのリクエスト数の上限を超えた場合に、このステータスを使う。
    */
   PAYMENT_REQUIRED_402: 402,
 
   /**
-   * The request was valid, but the server is refusing action.
-   * The user might not have the necessary permissions for a resource.
+   * リクエストは有効だったが、サーバーが実行を拒否している。
+   * ユーザーがリソースに対する必要な権限を持っていない可能性がある。
    */
   FORBIDDEN_403: 403,
 
   /**
-   * The requested resource could not be found but may be available in the future.
-   * Subsequent requests by the client are permissible.
+   * リクエストされたリソースは見つからなかったが、将来は利用できるようになるかもしれない。
+   * クライアントがその後にリクエストすることは許される。
    */
   NOT_FOUND_404: 404,
 
   /**
-   * A request method is not supported for the requested resource;
-   * for example, a GET request on a form that requires data to be presented via POST, or a PUT request on a read-only resource.
+   * リクエストされたリソースが、そのリクエストメソッドに対応していない。
+   * たとえば、データを POST で送る必要があるフォームに対する GET リクエストや、読み取り専用のリソースに対する PUT リクエスト。
    */
   METHOD_NOT_ALLOWED_405: 405,
 
   /**
-   * The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request.
+   * リクエストされたリソースは、リクエストで送られた Accept ヘッダーでは受け入れられないコンテンツしか生成できない。
    */
   NOT_ACCEPTABLE_406: 406,
 
   /**
-   * The client must first authenticate itself with the proxy.
+   * クライアントは、まずプロキシに対して自分を認証しなければならない。
    */
   PROXY_AUTHENTICATION_REQUIRED_407: 407,
 
   /**
-   * The server timed out waiting for the request.
-   * According to HTTP specifications:
+   * サーバーがリクエストを待っている間にタイムアウトした。
+   * HTTP の仕様によると:
    * "The client did not produce a request within the time that the server was prepared to wait. The client MAY repeat the request without modifications at any later time."
    */
   REQUEST_TIMEOUT_408: 408,
 
   /**
-   * Indicates that the request could not be processed because of conflict in the request,
-   * such as an edit conflict between multiple simultaneous updates.
+   * 複数の同時更新の間での編集の競合など、リクエストに競合があるために、
+   * リクエストを処理できなかったことを示す。
    */
   CONFLICT_409: 409,
 
   /**
-   * Indicates that the resource requested is no longer available and will not be available again.
-   * This should be used when a resource has been intentionally removed and the resource should be purged.
-   * Upon receiving a 410 status code, the client should not request the resource in the future.
-   * Clients such as search engines should remove the resource from their indices.
-   * Most use cases do not require clients and search engines to purge the resource, and a "404 Not Found" may be used instead.
+   * リクエストされたリソースがもう利用できず、今後も利用できるようにならないことを示す。
+   * リソースが意図的に削除されており、リソースを消去すべき場合に使う。
+   * 410 のステータスコードを受け取ったクライアントは、今後そのリソースをリクエストすべきではない。
+   * 検索エンジンなどのクライアントは、そのリソースをインデックスから削除すべきである。
+   * ほとんどの用途では、クライアントや検索エンジンにリソースを消去させる必要はなく、代わりに "404 Not Found" を使ってよい。
    */
   GONE_410: 410,
 
   /**
-   * The request did not specify the length of its content, which is required by the requested resource.
+   * リクエストがコンテンツの長さを指定していないが、リクエストされたリソースはそれを必要とする。
    */
   LENGTH_REQUIRED_411: 411,
 
   /**
-   * The server does not meet one of the preconditions that the requester put on the request.
+   * リクエストした側がリクエストに付けた前提条件の 1 つを、サーバーが満たしていない。
    */
   PRECONDITION_FAILED_412: 412,
 
   /**
-   * The request is larger than the server is willing or able to process. Previously called "Request Entity Too Large".
+   * リクエストが、サーバーが処理しようとする、または処理できる大きさを超えている。以前は "Request Entity Too Large" と呼ばれていた。
    */
   PAYLOAD_TOO_LARGE_413: 413,
 
   /**
-   * The URI provided was too long for the server to process. Often the result of too much data being encoded as a query-string of a GET request,
-   * in which case it should be converted to a POST request.
-   * Called "Request-URI Too Long" previously.
+   * 指定された URI が長すぎて、サーバーが処理できない。多くの場合、GET リクエストのクエリ文字列として大量のデータがエンコードされた結果であり、
+   * その場合は POST リクエストに変えるべきである。
+   * 以前は "Request-URI Too Long" と呼ばれていた。
    */
   URI_TOO_LONG_414: 414,
 
   /**
-   * The request entity has a media type which the server or resource does not support.
-   * For example, the client uploads an image as image/svg+xml, but the server requires that images use a different format.
+   * リクエストのエンティティが、サーバーまたはリソースが対応していないメディアタイプである。
+   * たとえば、クライアントが画像を image/svg+xml としてアップロードしたが、サーバーは画像に別の形式を要求している場合。
    */
   UNSUPPORTED_MEDIA_TYPE_415: 415,
 
   /**
-   * The client has asked for a portion of the file (byte serving), but the server cannot supply that portion.
-   * For example, if the client asked for a part of the file that lies beyond the end of the file.
-   * Called "Requested Range Not Satisfiable" previously.
+   * クライアントがファイルの一部を要求した（バイトサービング）が、サーバーはその部分を提供できない。
+   * たとえば、クライアントがファイルの終端より先の部分を要求した場合。
+   * 以前は "Requested Range Not Satisfiable" と呼ばれていた。
    */
   RANGE_NOT_SATISFIABLE_416: 416,
 
   /**
-   * The server cannot meet the requirements of the Expect request-header field.
+   * サーバーが Expect リクエストヘッダーフィールドの要求を満たせない。
    */
   EXPECTATION_FAILED_417: 417,
 
   /**
-   * This code was defined in 1998 as one of the traditional IETF April Fools' jokes, in RFC 2324, Hyper Text Coffee Pot Control Protocol,
-   * and is not expected to be implemented by actual HTTP servers. The RFC specifies this code should be returned by
-   * teapots requested to brew coffee. This HTTP status is used as an Easter egg in some websites, including Google.com.
+   * このコードは、IETF の恒例のエイプリルフールのジョークの 1 つとして、1998 年に RFC 2324（Hyper Text Coffee Pot Control Protocol）で定義されたもので、
+   * 実際の HTTP サーバーが実装することは想定されていない。この RFC は、コーヒーを淹れるよう求められた
+   * ティーポットがこのコードを返すべきだと定めている。この HTTP ステータスは、Google.com を含む一部のウェブサイトでイースターエッグとして使われている。
    */
   I_AM_A_TEAPOT_418: 418,
 
   /**
-   * The request was directed at a server that is not able to produce a response (for example because a connection reuse).
+   * レスポンスを生成できないサーバーにリクエストが送られた（たとえば接続の再利用のため）。
    */
   MISDIRECTED_REQUEST_421: 421,
 
   /**
-   * The request was well-formed but was unable to be followed due to semantic errors.
+   * リクエストの形式は正しかったが、意味上のエラーのために従うことができなかった。
    */
   UNPROCESSABLE_ENTITY_422: 422,
 
   /**
-   * The resource that is being accessed is locked.
+   * アクセスしようとしているリソースはロックされている。
    */
   LOCKED_423: 423,
 
   /**
-   * The request failed due to failure of a previous request (e.g., a PROPPATCH).
+   * 前のリクエスト（PROPPATCH など）が失敗したために、このリクエストも失敗した。
    */
   FAILED_DEPENDENCY_424: 424,
 
   /**
-   * The client should switch to a different protocol such as TLS/1.0, given in the Upgrade header field.
+   * クライアントは、Upgrade ヘッダーフィールドで示された TLS/1.0 などの別のプロトコルに切り替えるべきである。
    */
   UPGRADE_REQUIRED_426: 426,
 
   /**
-   * The origin server requires the request to be conditional.
-   * Intended to prevent "the 'lost update' problem, where a client
+   * オリジンサーバーは、リクエストが条件付きであることを要求している。
+   * 次の問題を防ぐためのものである。"the 'lost update' problem, where a client
    * GETs a resource's state, modifies it, and PUTs it back to the server,
    * when meanwhile a third party has modified the state on the server, leading to a conflict."
    */
   PRECONDITION_REQUIRED_428: 428,
 
   /**
-   * The user has sent too many requests in a given amount of time. Intended for use with rate-limiting schemes.
+   * ユーザーが一定の時間内に送ったリクエストが多すぎる。レート制限の仕組みと一緒に使うためのものである。
    */
   TOO_MANY_REQUESTS_429: 429,
 
   /**
-   * The server is unwilling to process the request because either an individual header field,
-   * or all the header fields collectively, are too large.
+   * 個々のヘッダーフィールド、またはすべてのヘッダーフィールドの合計が大きすぎるため、
+   * サーバーがリクエストの処理を拒んでいる。
    */
   REQUEST_HEADER_FIELDS_TOO_LARGE_431: 431,
 
   /**
-   * A server operator has received a legal demand to deny access to a resource or to a set of resources
-   * that includes the requested resource. The code 451 was chosen as a reference to the novel Fahrenheit 451.
+   * サーバーの運営者が、あるリソース、またはリクエストされたリソースを含むリソースの集合へのアクセスを拒否するよう、
+   * 法的な要求を受けた。451 というコードは、小説 Fahrenheit 451（華氏 451 度）にちなんで選ばれた。
    */
   UNAVAILABLE_FOR_LEGAL_REASONS_451: 451,
 
   /**
-   * A generic error message, given when an unexpected condition was encountered and no more specific message is suitable.
+   * 汎用のエラーメッセージ。予期しない状況が起き、より具体的なメッセージが当てはまらない場合に返される。
    */
   INTERNAL_SERVER_ERROR_500: 500,
 
   /**
-   * The server either does not recognize the request method, or it lacks the ability to fulfill the request.
-   * Usually this implies future availability (e.g., a new feature of a web-service API).
+   * サーバーがリクエストメソッドを認識しないか、リクエストを完了する能力を持っていない。
+   * 通常は、将来利用できるようになることを意味する（たとえば Web サービス API の新機能）。
    */
   NOT_IMPLEMENTED_501: 501,
 
   /**
-   * The server was acting as a gateway or proxy and received an invalid response from the upstream server.
+   * サーバーがゲートウェイまたはプロキシとして動作しており、上流のサーバーから無効なレスポンスを受け取った。
    */
   BAD_GATEWAY_502: 502,
 
   /**
-   * The server is currently unavailable (because it is overloaded or down for maintenance).
-   * Generally, this is a temporary state.
+   * サーバーは現在利用できない（過負荷、またはメンテナンスで停止しているため）。
+   * 一般的には、これは一時的な状態である。
    */
   SERVICE_UNAVAILABLE_503: 503,
 
   /**
-   * The server was acting as a gateway or proxy and did not receive a timely response from the upstream server.
+   * サーバーがゲートウェイまたはプロキシとして動作しており、上流のサーバーから時間内にレスポンスを受け取れなかった。
    */
   GATEWAY_TIMEOUT_504: 504,
 
   /**
-   * The server does not support the HTTP protocol version used in the request
+   * サーバーが、リクエストで使われた HTTP プロトコルのバージョンに対応していない
    */
   HTTP_VERSION_NOT_SUPPORTED_505: 505,
 
   /**
-   * Transparent content negotiation for the request results in a circular reference.
+   * リクエストに対する透過的なコンテントネゴシエーションが、循環参照になっている。
    */
   VARIANT_ALSO_NEGOTIATES_506: 506,
 
   /**
-   * The server is unable to store the representation needed to complete the request.
+   * サーバーが、リクエストの完了に必要な表現を保存できない。
    */
   INSUFFICIENT_STORAGE_507: 507,
 
   /**
-   * The server detected an infinite loop while processing the request.
+   * サーバーが、リクエストの処理中に無限ループを検出した。
    */
   LOOP_DETECTED_508: 508,
 
   /**
-   * Further extensions to the request are required for the server to fulfill it.
+   * サーバーがリクエストを完了するには、リクエストへのさらなる拡張が必要である。
    */
   NOT_EXTENDED_510: 510,
 
   /**
-   * The client needs to authenticate to gain network access.
-   * Intended for use by intercepting proxies used to control access to the network (e.g., "captive portals" used
-   * to require agreement to Terms of Service before granting full Internet access via a Wi-Fi hotspot).
+   * クライアントは、ネットワークへのアクセスを得るために認証する必要がある。
+   * ネットワークへのアクセスを制御するために使われる、通信に割り込むプロキシ（たとえば、Wi-Fi ホットスポットで完全な
+   * インターネットアクセスを許可する前に、利用規約への同意を求める「キャプティブポータル」）での使用を意図している。
    */
   NETWORK_AUTHENTICATION_REQUIRED_511: 511,
 } as const

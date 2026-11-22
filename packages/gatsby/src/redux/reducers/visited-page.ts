@@ -6,7 +6,7 @@ import {
 
 type StateMap = Map<"server", Set<string>>
 
-// The develop server always wants these page components.
+// develop サーバーは、これらのページコンポーネントを常に必要とする。
 const createDefault = (): StateMap => {
   const defaults = new Set<string>()
   defaults.add(`component---cache-dev-404-page-js`)
