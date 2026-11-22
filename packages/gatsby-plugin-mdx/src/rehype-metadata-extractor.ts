@@ -1,8 +1,8 @@
 import type { Plugin } from "unified"
 
 /**
- * This plugin extracts metadata from the file and stores it
- * within the unified processor data for later extraction.
+ * このプラグインは、ファイルからメタデータを取り出し、
+ * 後で取り出せるよう unified のプロセッサーのデータに保存する。
  */
 const rehypeMdxMetadataExtractor: Plugin = function () {
   const metadata = {}

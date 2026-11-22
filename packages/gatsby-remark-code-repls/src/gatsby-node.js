@@ -42,7 +42,7 @@ exports.createPages = async (
       return
     }
 
-    // escape backslashes for windows
+    // windows 用にバックスラッシュをエスケープする
     const resolvedDirectory = resolve(directory)
     files.forEach(file => {
       if (extname(file) === `.js` || extname(file) === `.jsx`) {
@@ -62,14 +62,14 @@ exports.createPages = async (
               `utf8`
             )
           } catch (err) {
-            // If the file doesn't exist, we gracefully ignore the error
+            // ファイルが存在しない場合は、エラーを無視して処理を続ける
             if (err.code !== `ENOENT`) {
               throw err
             }
           }
         }
 
-        // Codepen configuration.
+        // Codepen の設定。
         // https://blog.codepen.io/documentation/api/prefill/
         const action = `https://codepen.io/pen/define`
         const payload = JSON.stringify({

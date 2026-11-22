@@ -3,7 +3,7 @@ const Promise = require(`bluebird`)
 const PDFParser = require(`pdf2json`)
 
 function shouldOnCreateNode({ node }) {
-  // Filter out non-pdf content
+  // pdf 以外の内容を取り除く
   return node.extension === `pdf`
 }
 

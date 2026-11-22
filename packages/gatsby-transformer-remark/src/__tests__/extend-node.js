@@ -53,7 +53,7 @@ jest.mock(`gatsby/reporter`, () => {
   }
 })
 
-// given a set of nodes and a query, return the result of the query
+// ノードの集合とクエリを受け取り、クエリの結果を返す
 async function queryResult(
   nodes,
   fragment,
@@ -135,7 +135,7 @@ const bootstrapTest = (
       mediaType: `text/markdown`,
     },
   }
-  // Make some fake functions its expecting.
+  // 期待されるダミーの関数をいくつか用意する。
   const loadNodeContent = node => Promise.resolve(node.content)
 
   itAsyncDone(label, async done => {
@@ -163,7 +163,7 @@ const bootstrapTest = (
     const createNodeId = jest.fn()
     createNodeId.mockReturnValue(`uuid-from-gatsby`)
 
-    // Used to verify that console.warn is called when field not found
+    // フィールドが見つからないときに console.warn が呼び出されることを検証するために使う
     jest.spyOn(global.console, `warn`)
 
     await onCreateNode(
@@ -360,7 +360,7 @@ In quis lectus sed eros efficitur luctus. Morbi tempor, nisl eget feugiat tincid
     `excerpt(pruneLength: 19, format: MARKDOWN)`,
     node => {
       expect(node).toMatchSnapshot()
-      // we want the pruning to preserve markdown chars and not count them in the length
+      // 切り詰めの際に markdown の文字を保持し、それらを長さに数えないようにしたい
       expect(node.excerpt.length).toBe(23)
       expect(node.excerpt).toBe(`Where oh where **is**…\n`)
     }
@@ -682,7 +682,7 @@ date: "2017-09-18T23:19:51.246Z"
 
 If my pony ain't broke,${`  `}
 don't fix it.`,
-    // ^ Explicit syntax for trailing spaces to not get accidentally trimmed.
+    // ^ 末尾の空白が誤って取り除かれないよう、明示的な構文にしている。
     `excerpt`,
     node => {
       expect(node.excerpt).toBe(`If my pony ain't broke, don't fix it.`)
@@ -1363,9 +1363,9 @@ describe(`Headings are generated correctly from schema`, () => {
     {
       pluginOptions: {
         plugins: [
-          // to pass subplugin we need to use object with `resolve` and `pluginOptions`
-          // (this is what gatsby core internally turns plugin entries to + gatsby core always set empty object {}
-          // if options were not provided and lot of plugins rely on this and are not checking for options existence)
+          // サブプラグインを渡すには、`resolve` と `pluginOptions` を持つオブジェクトを使う必要がある
+          // （gatsby コアは内部でプラグインのエントリーをこの形に変換する。また、オプションが指定されていない場合、
+          // gatsby コアは必ず空のオブジェクト {} を設定する。多くのプラグインがこれに依存していて、オプションの有無を確認していない）
           {
             resolve: require.resolve(`gatsby-remark-autolink-headers/src`),
             pluginOptions: {},

@@ -3,7 +3,7 @@ const { pluginOptionsSchema } = require(`../gatsby-node`)
 
 describe(`pluginOptionsSchema`, () => {
   it(`should validate a valid config`, async () => {
-    // Only the "toVerify" key of the schema will be verified in this test
+    // このテストでは、スキーマの "toVerify" キーだけを検証する
     const { isValid, errors } = await testPluginOptionsSchema(
       pluginOptionsSchema,
       {
@@ -22,7 +22,7 @@ describe(`pluginOptionsSchema`, () => {
   })
 
   it(`should validate a boolean icon`, async () => {
-    // Only the "toVerify" key of the schema will be verified in this test
+    // このテストでは、スキーマの "toVerify" キーだけを検証する
     const { isValid, errors } = await testPluginOptionsSchema(
       pluginOptionsSchema,
       {
@@ -46,7 +46,7 @@ describe(`pluginOptionsSchema`, () => {
       `"elements[1]" must be a string`,
     ]
 
-    // Only the "toVerify" key of the schema will be verified in this test
+    // このテストでは、スキーマの "toVerify" キーだけを検証する
     const { isValid, errors } = await testPluginOptionsSchema(
       pluginOptionsSchema,
       {

@@ -15,16 +15,16 @@ module.exports = (
   noInlineHighlight = false,
   diffLanguage = null
 ) => {
-  // (Try to) load languages on demand.
+  // 言語を必要に応じて読み込む（ことを試みる）。
   if (!Prism.languages[language]) {
     try {
       loadPrismLanguage(language)
     } catch (e) {
-      // Language wasn't loaded so let's bail.
+      // 言語が読み込まれなかったので、処理を打ち切る。
       let message = null
       switch (language) {
         case `none`:
-          return code // Don't escape if set to none.
+          return code // none に設定されている場合はエスケープしない。
         case `text`:
           message = noInlineHighlight
             ? `code block language not specified in markdown.`
@@ -43,7 +43,7 @@ module.exports = (
     }
   }
 
-  // (Try to) load diffLanguage on demand.
+  // diffLanguage を必要に応じて読み込む（ことを試みる）。
   if (diffLanguage && !Prism.languages[diffLanguage]) {
     try {
       loadPrismLanguage(diffLanguage)
@@ -55,7 +55,7 @@ module.exports = (
         console.warn(message, `applying generic code block`)
         unsupportedLanguages.add(lang)
       }
-      // Ignore diffLanguage when it does not exist.
+      // diffLanguage が存在しない場合は無視する。
       diffLanguage = null
     }
   }
@@ -69,8 +69,8 @@ module.exports = (
   const codeSplits = handleDirectives(highlighted, lineNumbersHighlight)
 
   let finalCode = ``
-  const lastIdx = codeSplits.length - 1 // Don't add back the new line character after highlighted lines
-  // as they need to be display: block and full-width.
+  const lastIdx = codeSplits.length - 1 // ハイライトされた行の後には、改行文字を付け直さない
+  // それらの行は display: block かつ全幅にする必要があるためである。
 
   codeSplits.forEach((split, idx) => {
     finalCode += split.highlight

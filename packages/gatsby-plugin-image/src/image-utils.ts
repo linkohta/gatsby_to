@@ -16,7 +16,7 @@ export type Layout = "fixed" | "fullWidth" | "constrained"
 export type ImageFormat = "jpg" | "png" | "webp" | "avif" | "auto" | ""
 
 /**
- * The minimal required reporter, as we don't want to import it from gatsby-cli
+ * 最低限必要な reporter。gatsby-cli から import したくないためである
  */
 export interface IReporter {
   warn(message: string): void
@@ -113,16 +113,16 @@ const sortNumeric = (a: number, b: number): number => a - b
 
 export const getSizes = (width: number, layout: Layout): string | undefined => {
   switch (layout) {
-    // If screen is wider than the max size, image width is the max size,
-    // otherwise it's the width of the screen
+    // 画面が最大サイズより広い場合、画像の幅は最大サイズになり、
+    // そうでなければ画面の幅になる
     case `constrained`:
       return `(min-width: ${width}px) ${width}px, 100vw`
 
-    // Image is always the same width, whatever the size of the screen
+    // 画面のサイズにかかわらず、画像は常に同じ幅になる
     case `fixed`:
       return `${width}px`
 
-    // Image is always the width of the screen
+    // 画像は常に画面の幅になる
     case `fullWidth`:
       return `100vw`
 
@@ -196,8 +196,8 @@ export function setDefaultDimensions(
 }
 
 /**
- * Use this for getting an image for the blurred placeholder. This ensures the
- * aspect ratio and crop match the main image
+ * ぼかしたプレースホルダー用の画像を取得するときに使う。アスペクト比と
+ * 切り抜きがメインの画像と一致することを保証する
  */
 export function getLowResolutionImageURL(
   args: IGatsbyImageHelperArgs,
@@ -246,7 +246,7 @@ export function generateImageData(
   }
 
   if (!sourceMetadata || (!sourceMetadata.width && !sourceMetadata.height)) {
-    // No metadata means we let the CDN handle max size etc, aspect ratio etc
+    // メタデータがない場合は、最大サイズやアスペクト比などの扱いを CDN に任せる
     sourceMetadata = {
       width,
       height,
@@ -375,7 +375,7 @@ export function calculateImageSizes(args: IImageSizeArgs): IImageSizes {
     breakpoints = DEFAULT_BREAKPOINTS,
   } = args
 
-  // check that all dimensions provided are positive
+  // 指定された寸法がすべて正の値であることを確認する
   const userDimensions = { width, height }
   const erroneousUserDimensions = Object.entries(userDimensions).filter(
     ([_, size]) => typeof size === `number` && size < 1
@@ -417,10 +417,10 @@ export function fixedImageSizes({
   reporter = { warn },
 }: IImageSizeArgs): IImageSizes {
   let aspectRatio = imgDimensions.width / imgDimensions.height
-  // Sort, dedupe and ensure there's a 1
+  // ソートして重複を除き、1 が含まれるようにする
   const densities = dedupeAndSortDensities(outputPixelDensities)
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = getDimensionsAndAspectRatio(imgDimensions, {
       width,
@@ -442,12 +442,12 @@ export function fixedImageSizes({
     height = Math.round(width / aspectRatio)
   }
 
-  const originalWidth = width // will use this for presentationWidth, don't want to lose it
+  const originalWidth = width // presentationWidth に使うので、失わないようにする
   const isTopSizeOverriden =
     imgDimensions.width < width || imgDimensions.height < (height as number)
 
-  // If the image is smaller than requested, warn the user that it's being processed as such
-  // print out this message with the necessary information before we overwrite it for sizing
+  // 画像が要求より小さい場合は、そのまま処理されることをユーザーに警告する
+  // サイズ計算のために上書きする前に、必要な情報を含めてこのメッセージを出力する
   if (isTopSizeOverriden) {
     const fixedDimension = imgDimensions.width < width ? `width` : `height`
     reporter.warn(`
@@ -467,7 +467,7 @@ The requested ${fixedDimension} "${
   }
 
   const sizes = densities
-    .filter(size => size >= 1) // remove smaller densities because fixed images don't need them
+    .filter(size => size >= 1) // fixed の画像には不要なので、小さい密度を取り除く
     .map(density => Math.round(density * (width as number)))
     .filter(size => size <= imgDimensions.width)
 
@@ -491,10 +491,10 @@ export function responsiveImageSizes({
 }: IImageSizeArgs): IImageSizes {
   let sizes
   let aspectRatio = imgDimensions.width / imgDimensions.height
-  // Sort, dedupe and ensure there's a 1
+  // ソートして重複を除き、1 が含まれるようにする
   const densities = dedupeAndSortDensities(outputPixelDensities)
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = getDimensionsAndAspectRatio(imgDimensions, {
       width,
@@ -506,18 +506,18 @@ export function responsiveImageSizes({
     aspectRatio = calculated.aspectRatio
   }
 
-  // Case 1: width of height were passed in, make sure it isn't larger than the actual image
+  // ケース 1: width か height が渡された場合。実際の画像より大きくならないようにする
   width = width && Math.min(width, imgDimensions.width)
   height = height && Math.min(height, imgDimensions.height)
 
-  // Case 2: neither width or height were passed in, use default size
+  // ケース 2: width も height も渡されなかった場合。デフォルトのサイズを使う
   if (!width && !height) {
     width = Math.min(DEFAULT_FLUID_WIDTH, imgDimensions.width)
     height = width / aspectRatio
   }
 
-  // if it still hasn't been found, calculate width from the derived height.
-  // TS isn't smart enough to realise the type for height has been narrowed here
+  // それでも見つからない場合は、導出した height から width を計算する。
+  // TS は、ここで height の型が絞り込まれていることを認識できない
   if (!width) {
     width = (height as number) * aspectRatio
   }
@@ -535,7 +535,7 @@ export function responsiveImageSizes({
   if (breakpoints?.length > 0) {
     sizes = breakpoints.filter(size => size <= imgDimensions.width)
 
-    // If a larger breakpoint has been filtered-out, add the actual image width instead
+    // より大きいブレークポイントが取り除かれた場合は、代わりに実際の画像の幅を追加する
     if (
       sizes.length < breakpoints.length &&
       !sizes.includes(imgDimensions.width)
@@ -547,7 +547,7 @@ export function responsiveImageSizes({
     sizes = sizes.filter(size => size <= imgDimensions.width)
   }
 
-  // ensure that the size passed in is included in the final output
+  // 渡されたサイズが最終的な出力に含まれるようにする
   if (layout === `constrained` && !sizes.includes(width)) {
     sizes.push(width)
   }
@@ -565,7 +565,7 @@ export function getDimensionsAndAspectRatio(
   dimensions,
   options
 ): { width: number; height: number; aspectRatio: number } {
-  // Calculate the eventual width/height of the image.
+  // 画像の最終的な幅と高さを計算する。
   const imageAspectRatio = dimensions.width / dimensions.height
 
   let width = options.width

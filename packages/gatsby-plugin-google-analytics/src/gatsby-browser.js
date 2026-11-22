@@ -24,12 +24,12 @@ function sendWebVitals() {
 
   return import(`web-vitals/base`).then(({ getLCP, getFID, getCLS }) => {
     const debouncedCLS = debounce(sendData, 3000)
-    // we don't need to debounce FID - we send it when it happens
+    // FID はデバウンスする必要がない。発生した時点で送信する
     const debouncedFID = sendData
-    // LCP can occur multiple times so we debounce it
+    // LCP は複数回発生することがあるので、デバウンスする
     const debouncedLCP = debounce(sendData, 3000)
 
-    // With the true flag, we measure all previous occurences too, in case we start listening to late.
+    // true フラグを付けると、リッスンの開始が遅れた場合に備えて、それ以前の発生分もすべて計測する。
     getCLS(debouncedCLS, true)
     getFID(debouncedFID, true)
     getLCP(debouncedLCP, true)
@@ -40,18 +40,18 @@ function sendToGoogleAnalytics({ name, value, id }) {
   window.ga(`send`, `event`, {
     eventCategory: `Web Vitals`,
     eventAction: name,
-    // The `id` value will be unique to the current page load. When sending
-    // multiple values from the same page (e.g. for CLS), Google Analytics can
-    // compute a total by grouping on this ID (note: requires `eventLabel` to
-    // be a dimension in your report).
+    // `id` の値は、現在のページ読み込みに固有のものになる。同じページから
+    // 複数の値を送る場合（CLS など）、Google Analytics はこの ID で
+    // グループ化して合計を計算できる（注: レポートのディメンションに
+    // `eventLabel` を含める必要がある）。
     eventLabel: id,
-    // Google Analytics metrics must be integers, so the value is rounded.
-    // For CLS the value is first multiplied by 1000 for greater precision
-    // (note: increase the multiplier for greater precision if needed).
+    // Google Analytics の指標は整数でなければならないので、値を丸めている。
+    // CLS は精度を上げるため、先に値を 1000 倍している
+    // （注: さらに精度が必要な場合は、倍率を上げること）。
     eventValue: Math.round(name === `CLS` ? value * 1000 : value),
-    // Use a non-interaction event to avoid affecting bounce rate.
+    // 直帰率に影響しないよう、非インタラクションイベントを使う。
     nonInteraction: true,
-    // Use `sendBeacon()` if the browser supports it.
+    // ブラウザが対応していれば `sendBeacon()` を使う。
     transport: `beacon`,
   })
 }
@@ -69,8 +69,8 @@ export const onRouteUpdate = ({ location }, pluginOptions = {}) => {
 
   if (pathIsExcluded) return null
 
-  // wrap inside a timeout to make sure react-helmet is done with it's changes (https://github.com/gatsbyjs/gatsby/issues/9139)
-  // reactHelmet is using requestAnimationFrame: https://github.com/nfl/react-helmet/blob/5.2.0/src/HelmetUtils.js#L296-L299
+  // react-helmet の変更が終わってから実行されるよう、timeout で包む (https://github.com/gatsbyjs/gatsby/issues/9139)
+  // reactHelmet は requestAnimationFrame を使っている: https://github.com/nfl/react-helmet/blob/5.2.0/src/HelmetUtils.js#L296-L299
   const sendPageView = () => {
     const pagePath = location
       ? location.pathname + location.search + location.hash
@@ -79,7 +79,7 @@ export const onRouteUpdate = ({ location }, pluginOptions = {}) => {
     ga(`send`, `pageview`)
   }
 
-  // Minimum delay for reactHelmet's requestAnimationFrame
+  // reactHelmet の requestAnimationFrame に合わせた最小の遅延
   const delay = Math.max(32, pluginOptions.pageTransitionDelay || 0)
   setTimeout(sendPageView, delay)
 

@@ -1,4 +1,4 @@
-// This custom error should help us debug sharp errors when occurring.
+// このカスタムエラーは、sharp のエラーが発生したときのデバッグに役立てるためのものである。
 
 export class SharpError extends Error {
   /**

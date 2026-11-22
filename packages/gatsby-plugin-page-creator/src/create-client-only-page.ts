@@ -6,10 +6,10 @@ import {
 } from "gatsby-page-utils"
 import { getMatchPath } from "gatsby-core-utils"
 
-// Create a client side page with a matchPath
-// based on the `[]` existing in it's file path.
-// e.g., a file named `src/pages/foo/[bar].js`
-// gets created at the url: `foo/:bar`
+// ファイルパスに含まれる `[]` をもとに、matchPath を持つ
+// クライアントサイドのページを作成する。
+// たとえば、`src/pages/foo/[bar].js` という名前のファイルは、
+// `foo/:bar` という URL で作成される
 export function createClientOnlyPage(
   filePath: string,
   absolutePath: string,

@@ -1,5 +1,5 @@
 exports.pluginOptionsSchema = ({ Joi }) =>
-  // TODO: make sure that trackingId gets required() when releasing a major version
+  // TODO: メジャーバージョンをリリースするときに、trackingId を必ず required() にする
   Joi.object({
     trackingId: Joi.string()
       .description(

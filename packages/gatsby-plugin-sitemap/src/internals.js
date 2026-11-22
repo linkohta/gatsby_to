@@ -13,13 +13,13 @@ export const withoutTrailingSlash = path =>
 /**
  * @name prefixPath
  *
- * Properly handles prefixing relative path with site domain, Gatsby pathPrefix and AssetPrefix
+ * 相対パスに、サイトのドメイン、Gatsby の pathPrefix、AssetPrefix を正しく付ける
  *
- * @param {string} url - string containing relative path
- * @param {string} siteUrl - results of the resolveSiteUrl function
+ * @param {string} url - 相対パスを含む文字列
+ * @param {string} siteUrl - resolveSiteUrl 関数の結果
  * @returns {string}
  */
-// TODO: Update for v3 - Fix janky path/asset prefixing
+// TODO: v3 向けに更新する - 不安定なパスとアセットのプレフィックス処理を修正する
 export function prefixPath({ url, siteUrl, pathPrefix = `` }) {
   return new URL(pathPrefix + url, siteUrl).toString()
 }
@@ -27,8 +27,8 @@ export function prefixPath({ url, siteUrl, pathPrefix = `` }) {
 /**
  * @name resolveSiteUrl
  *
- * @param {object} data - results of the GraphQL query
- * @returns {string} - site URL, this can come from thegraphql query or another scope
+ * @param {object} data - GraphQL クエリの結果
+ * @returns {string} - サイトの URL。graphql クエリから得ることも、別のスコープから得ることもできる
  */
 export function resolveSiteUrl(data) {
   if (!data?.site?.siteMetadata?.siteUrl) {
@@ -45,11 +45,11 @@ https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap/#api-reference
 /**
  * @name resolvePagePath
  *
- * if you don't want to place the URI in "path" then resolvePagePath
- * are needed.
+ * URI を "path" に置きたくない場合は、resolvePagePath が
+ * 必要になる。
  *
- * @param {object} page - Array Item returned from resolvePages
- * @returns {string} - uri of the page without domain or protocol
+ * @param {object} page - resolvePages が返した配列の要素
+ * @returns {string} - ドメインとプロトコルを除いたページの uri
  */
 
 export function resolvePagePath(page) {
@@ -67,12 +67,12 @@ https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap/#api-reference
 /**
  * @name resolvePages
  *
- * This allows custom resolution of the array of pages.
- * This also where user's could merge multiple sources into
- * a single array if needed.
+ * ページの配列を独自の方法で解決できるようにする。
+ * 必要であれば、ユーザーはここで複数のソースを
+ * 1 つの配列にまとめることもできる。
  *
- * @param {object} data - results of the GraphQL query
- * @returns {Array} - Array of objects representing each page
+ * @param {object} data - GraphQL クエリの結果
+ * @returns {Array} - 各ページを表すオブジェクトの配列
  */
 export function resolvePages(data) {
   if (!data?.allSitePage?.nodes) {
@@ -90,14 +90,14 @@ https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap/#api-reference
 /**
  * @name defaultFilterPages
  *
- * This allows filtering any data in any way.
+ * 任意のデータを任意の方法で絞り込めるようにする。
  *
- * This Function is executed via allPages.filter((page) => !excludes.some((excludedRoute) => thisFunc(page, ecludedRoute, tools)))
- * allPages is the results of the resolvePages
+ * この関数は allPages.filter((page) => !excludes.some((excludedRoute) => thisFunc(page, ecludedRoute, tools))) の形で実行される
+ * allPages は resolvePages の結果である
  *
  * @param {object} page
- * @param {string} excludedRoute - Array from plugin config `options.exclude`
- * @param {object} tools - contains required tools for filtering
+ * @param {string} excludedRoute - プラグイン設定の `options.exclude` の配列
+ * @param {object} tools - 絞り込みに必要なツールを含む
  *
  * @returns {boolean}
  */
@@ -115,8 +115,8 @@ https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap/#api-reference
     )
   }
 
-  // Minimatch is always scary without an example
-  // TODO add example
+  // minimatch は、例がないとどうしても分かりにくい
+  // TODO: 例を追加する
   return minimatch(
     withoutTrailingSlash(resolvePagePath(page)),
     withoutTrailingSlash(excludedRoute)
@@ -126,12 +126,11 @@ https://www.gatsbyjs.com/plugins/gatsby-plugin-sitemap/#api-reference
 /**
  * @name serialize
  *
- * This function is executed by allPages.map(page => thisFunc(page, siteUrl, tools))
- * allpages is the result of the filter process
+ * この関数は allPages.map(page => thisFunc(page, siteUrl, tools)) の形で実行される
+ * allpages は絞り込み処理の結果である
  *
- * @param {object[]} page - results of the resolvePages function
- * @param {object} tools - contains tools for serializing
- *
+ * @param {object[]} page - resolvePages 関数の結果
+ * @param {object} tools - シリアライズ用のツールを含む
  */
 export function serialize(page, { resolvePagePath }) {
   return {
@@ -159,7 +158,7 @@ export function pageFilter({ allPages, filterPages, excludes }) {
     throw new Error(`Invalid options passed to page Filter function`)
   }
 
-  // TODO we should optimize these loops
+  // TODO: これらのループを最適化すべきである
   const filteredPages = allPages.filter(page => {
     const defaultFilterMatches = defaultExcludes.some(exclude => {
       try {
@@ -183,7 +182,7 @@ export function pageFilter({ allPages, filterPages, excludes }) {
       )
     }
 
-    // If page is marked to be excluded via defaults there's no need to check page for custom excludes
+    // ページがデフォルトの設定で除外対象になっている場合は、カスタムの除外設定を確認する必要はない
     if (defaultFilterMatches) {
       return !defaultFilterMatches
     }

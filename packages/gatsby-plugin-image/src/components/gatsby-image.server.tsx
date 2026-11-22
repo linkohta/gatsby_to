@@ -109,7 +109,7 @@ export const GatsbyImage: FunctionComponent<GatsbyImageProps> =
             MainImageProps,
             "images" | "fallback" | "onError" | "onLoad"
           >)}
-          // When eager is set we want to start the isLoading state on true (we want to load the img without react)
+          // eager が設定されている場合は、isLoading の state を true で始める（react を使わずに img を読み込みたい）
           {...getMainProps(
             loading === `eager`,
             false,

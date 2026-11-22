@@ -2,7 +2,7 @@
 import { graphql } from "gatsby"
 
 /**
- * The simplest set of fields for fixed sharp images
+ * fixed の sharp 画像用の、最も単純なフィールド一式
  * @type {Fragment}
  * @example
  * childImageSharp {
@@ -28,7 +28,7 @@ export const GatsbyImageSharpFixed = graphql`
 `
 
 /**
- * Traced SVG fixed images
+ * トレースした SVG を使う fixed の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFixed_tracedSVG = graphql`
@@ -42,7 +42,7 @@ export const GatsbyImageSharpFixed_tracedSVG = graphql`
 `
 
 /**
- * Images using Webp for fixed images
+ * fixed の画像に Webp を使う画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFixed_withWebp = graphql`
@@ -58,7 +58,7 @@ export const GatsbyImageSharpFixed_withWebp = graphql`
 `
 
 /**
- * Traced SVG images using Webp for fixed images
+ * fixed の画像に Webp を使い、トレースした SVG を使う画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFixed_withWebp_tracedSVG = graphql`
@@ -74,7 +74,7 @@ export const GatsbyImageSharpFixed_withWebp_tracedSVG = graphql`
 `
 
 /**
- * Fixed images without the blurred base64 image
+ * ぼかした base64 画像を含まない fixed の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFixed_noBase64 = graphql`
@@ -87,7 +87,7 @@ export const GatsbyImageSharpFixed_noBase64 = graphql`
 `
 
 /**
- * Fixed images without the blurred base64 image preferring Webp
+ * ぼかした base64 画像を含まず、Webp を優先する fixed の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFixed_withWebp_noBase64 = graphql`
@@ -102,7 +102,7 @@ export const GatsbyImageSharpFixed_withWebp_noBase64 = graphql`
 `
 
 /**
- * The simplest set of fields for fluid images
+ * fluid の画像用の、最も単純なフィールド一式
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid = graphql`
@@ -116,7 +116,7 @@ export const GatsbyImageSharpFluid = graphql`
 `
 
 /**
- * Presentation sizes to make sure a fluid container does not overflow
+ * fluid のコンテナからはみ出さないようにするための presentation サイズ
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluidLimitPresentationSize = graphql`
@@ -127,7 +127,7 @@ export const GatsbyImageSharpFluidLimitPresentationSize = graphql`
 `
 
 /**
- * Traced SVG fluid images
+ * トレースした SVG を使う fluid の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid_tracedSVG = graphql`
@@ -141,7 +141,7 @@ export const GatsbyImageSharpFluid_tracedSVG = graphql`
 `
 
 /**
- * Fluid images that prefer Webp
+ * Webp を優先する fluid の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid_withWebp = graphql`
@@ -157,7 +157,7 @@ export const GatsbyImageSharpFluid_withWebp = graphql`
 `
 
 /**
- * Traced SVG fluid images that prefer Webp
+ * トレースした SVG を使い、Webp を優先する fluid の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid_withWebp_tracedSVG = graphql`
@@ -173,7 +173,7 @@ export const GatsbyImageSharpFluid_withWebp_tracedSVG = graphql`
 `
 
 /**
- * Traced SVG fluid images without the blurred base64 image
+ * トレースした SVG を使い、ぼかした base64 画像を含まない fluid の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid_noBase64 = graphql`
@@ -186,7 +186,7 @@ export const GatsbyImageSharpFluid_noBase64 = graphql`
 `
 
 /**
- * Traced SVG fluid images without the blurred base64 image that prefer Webp
+ * トレースした SVG を使い、ぼかした base64 画像を含まず、Webp を優先する fluid の画像
  * @type {Fragment}
  */
 export const GatsbyImageSharpFluid_withWebp_noBase64 = graphql`

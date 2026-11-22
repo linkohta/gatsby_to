@@ -10,8 +10,8 @@ export async function createPagesFromChangedNodes(
   },
   pluginOptions: IOptions
 ): Promise<void> {
-  // Loop over deleted/created nodes and delete nodes and create nodes
-  // we haven't seen before and then reset arrays.
+  // 削除または作成されたノードをループして、ノードを削除し、まだ見ていない
+  // ノードを作成してから、配列をリセットする。
   const pluginInstance = getPluginInstance(pluginOptions)
 
   if (pluginInstance.trackedTypes.size === 0) {
@@ -100,7 +100,7 @@ export async function createPagesFromChangedNodes(
     }
   }
 
-  // clear changed nodes
+  // 変更されたノードを消去する
   pluginInstance.changedNodesSinceLastPageCreation = {
     created: new Map(),
     deleted: new Map(),

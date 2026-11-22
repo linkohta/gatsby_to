@@ -12,7 +12,7 @@ import type {
   ImageFormat,
 } from "../image-utils"
 
-// Native lazy-loading support: https://addyosmani.com/blog/lazy-loading/
+// ネイティブの遅延読み込みへの対応: https://addyosmani.com/blog/lazy-loading/
 export const hasNativeLazyLoadSupport = (): boolean =>
   typeof HTMLImageElement !== `undefined` &&
   `loading` in HTMLImageElement.prototype
@@ -35,7 +35,7 @@ const isGatsbyImageData = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: IGatsbyImageData | any
 ): node is IGatsbyImageData =>
-  // 🦆 check for a deep prop to be sure this is a valid gatsbyImageData object
+  // 🦆 深い階層の prop を調べ、有効な gatsbyImageData オブジェクトであることを確かめる
   Boolean(node?.images?.fallback?.src)
 
 const isGatsbyImageDataParent = <T>(
@@ -57,15 +57,15 @@ export type ImageDataLike =
 export const getImage = (
   node: ImageDataLike | null
 ): IGatsbyImageData | undefined => {
-  // This checks both for gatsbyImageData and gatsbyImage
+  // gatsbyImageData と gatsbyImage の両方を確認する
   if (isGatsbyImageData(node)) {
     return node
   }
-  // gatsbyImageData GraphQL field
+  // GraphQL の gatsbyImageData フィールド
   if (isGatsbyImageDataParent(node)) {
     return node.gatsbyImageData
   }
-  // gatsbyImage GraphQL field for Gatsby's Image CDN service
+  // Gatsby の Image CDN サービス用の GraphQL の gatsbyImage フィールド
   if (isGatsbyImageParent(node)) {
     return node.gatsbyImage
   }
@@ -89,7 +89,7 @@ export function getWrapperProps(
 
   let className = `gatsby-image-wrapper`
 
-  // If the plugin isn't installed we need to apply the styles inline
+  // プラグインがインストールされていない場合は、スタイルをインラインで適用する必要がある
   if (!gatsbyImageIsInstalled()) {
     wrapperStyle.position = `relative`
     wrapperStyle.overflow = `hidden`
@@ -123,50 +123,50 @@ export interface IUrlBuilderArgs<OptionsType> {
 export interface IGetImageDataArgs<OptionsType = Record<string, unknown>> {
   baseUrl: string
   /**
-   * For constrained and fixed images, the size of the image element
+   * constrained と fixed の画像での、画像要素のサイズ
    */
   width?: number
   height?: number
   /**
-   * If available, pass the source image width and height
+   * 分かる場合は、元画像の幅と高さを渡す
    */
   sourceWidth?: number
   sourceHeight?: number
   /**
-   * If only one dimension is passed, then this will be used to calculate the other.
+   * 片方の寸法だけを渡した場合は、それを使ってもう片方を計算する。
    */
   aspectRatio?: number
   layout?: Layout
   /**
-   * Returns a URL based on the passed arguments. Should be a pure function
+   * 渡された引数をもとに URL を返す。純粋関数であること
    */
   urlBuilder: (args: IUrlBuilderArgs<OptionsType>) => string
 
   /**
-   * Should be a data URI
+   * data URI であること
    */
   placeholderURL?: string
   backgroundColor?: string
   /**
-   * Used in error messages etc
+   * エラーメッセージなどで使う
    */
   pluginName?: string
 
   /**
-   * If you do not support auto-format, pass an array of image types here
+   * フォーマットの自動選択に対応していない場合は、ここに画像の種類の配列を渡す
    */
   formats?: Array<ImageFormat>
 
   breakpoints?: Array<number>
 
   /**
-   * Passed to the urlBuilder function
+   * urlBuilder 関数に渡される
    */
   options?: OptionsType
 }
 
 /**
- * Use this hook to generate gatsby-plugin-image data in the browser.
+ * ブラウザで gatsby-plugin-image のデータを生成するには、このフックを使う。
  */
 export function getImageData<OptionsType>({
   baseUrl,
@@ -224,7 +224,7 @@ export function getMainProps(
   loading?: "eager" | "lazy",
   style: CSSProperties = {}
 ): Partial<MainImageProps> {
-  // fallback when it's not configured in gatsby-config.
+  // gatsby-config で設定されていない場合のフォールバック。
   if (!gatsbyImageIsInstalled()) {
     style = {
       height: `100%`,
@@ -311,7 +311,7 @@ export function getPlaceholderProps(
     },
   }
 
-  // fallback when it's not configured in gatsby-config.
+  // gatsby-config で設定されていない場合のフォールバック。
   if (!gatsbyImageIsInstalled()) {
     result.style = {
       height: `100%`,
@@ -331,15 +331,15 @@ export interface IArtDirectedImage {
 }
 
 /**
- * Generate a Gatsby image data object with multiple, art-directed images that display at different
- * resolutions.
+ * 異なる解像度で表示する、アートディレクション用の複数の画像を持つ Gatsby の画像データオブジェクトを
+ * 生成する。
  *
- * @param defaultImage The image displayed when no media query matches.
- * It is also used for all other settings applied to the image, such as width, height and layout.
- * You should pass a className to the component with media queries to adjust the size of the container,
- * as this cannot be adjusted automatically.
- * @param artDirected Array of objects which each contains a `media` string which is a media query
- * such as `(min-width: 320px)`, and the image object to use when that query matches.
+ * @param defaultImage どのメディアクエリにも一致しないときに表示する画像。
+ * 幅、高さ、レイアウトなど、画像に適用するその他すべての設定にも使われる。
+ * コンテナのサイズは自動では調整できないため、メディアクエリを含む className を
+ * コンポーネントに渡して調整すること。
+ * @param artDirected オブジェクトの配列。各オブジェクトは、メディアクエリの文字列 `media`
+ * （`(min-width: 320px)` など）と、そのクエリに一致したときに使う画像オブジェクトを持つ。
  */
 export function withArtDirection(
   defaultImage: IGatsbyImageData,

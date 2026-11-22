@@ -19,7 +19,7 @@ describe(`returns the line numbers container`, () => {
     expect(numberOfLineNumbers).toEqual(3)
   })
   it(`should return as many <span></span> children as there are code lines and highlight classes`, () => {
-    // Expect 6 internal spans
+    // 内部の span が 6 つあることを期待する
     const highlightedCode =
       `line1\n` +
       `<span class=\\"gatsby-highlight-code-line\\"></span>` +

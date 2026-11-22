@@ -42,7 +42,7 @@ const getImageSizeAsync = async file => {
   imageSizeCache.set(file.internal.contentDigest, dimensions)
   return dimensions
 }
-// Remove in next major as it's really slow
+// 非常に遅いので、次のメジャーで削除する
 const getImageSize = file => {
   if (
     process.env.NODE_ENV !== `test` &&
@@ -64,11 +64,11 @@ const getImageSize = file => {
   }
 }
 
-// Actions should be set when passed to onPreInit in gatsby-node.
-// ** It is NOT safe to just directly require the gatsby module **.
-// There is no guarantee that the module resolved is the module executing!
-// This can occur in mono repos depending on how dependencies have been hoisted.
-// The direct require has been left only to avoid breaking changes.
+// actions は、gatsby-node の onPreInit に渡されたときに設定されるべきである。
+// ** gatsby モジュールを直接 require するのは安全ではない **。
+// 解決されたモジュールが、実行中のモジュールと同じである保証はない！
+// モノレポでは、依存の巻き上げ方によってこれが起こりうる。
+// 直接の require は、破壊的変更を避けるためだけに残してある。
 let actions
 exports.setActions = _actions => {
   actions = _actions
@@ -83,8 +83,8 @@ function calculateImageDimensionsAndAspectRatio(file, options) {
 
 function prepareQueue({ file, args }) {
   const { pathPrefix, duotone, ...rest } = args
-  // Duotone is a nested object inside transformOptions and has a [Object: Null Prototype]
-  // So it's flattened into a new object so that createArgsDigest also takes duotone into account
+  // duotone は transformOptions の中の入れ子のオブジェクトで、[Object: Null Prototype] を持つ
+  // そのため、createArgsDigest が duotone も考慮するよう、新しいオブジェクトへ平坦化している
   const digestArgs = Object.assign(rest, duotone)
   const argsDigestShort = createArgsDigest(digestArgs)
   const imgSrc = `/${file.name}.${args.toFormat}`
@@ -96,7 +96,7 @@ function prepareQueue({ file, args }) {
   )
   const outputFilePath = path.join(argsDigestShort, imgSrc)
 
-  // make sure outputDir is created
+  // outputDir が確実に作成されているようにする
   fs.ensureDirSync(outputDir)
 
   const { width, height, aspectRatio } = calculateImageDimensionsAndAspectRatio(
@@ -104,10 +104,10 @@ function prepareQueue({ file, args }) {
     args
   )
 
-  // encode the file name for URL
+  // ファイル名を URL 用にエンコードする
   const encodedImgSrc = `/${encodeURIComponent(file.name)}.${args.toFormat}`
 
-  // Prefix the image src.
+  // 画像の src にプレフィックスを付ける。
   const digestDirPrefix = `${file.internal.contentDigest}/${argsDigestShort}`
   const prefixedSrc =
     (pathPrefix ? pathPrefix : ``) +
@@ -132,13 +132,13 @@ function createJob(job, { reporter }) {
     )
   }
 
-  // Jobs can be duplicates and usually are long running tasks.
-  // Because of that we shouldn't use async/await and instead opt to use
-  // .then() /.catch() handlers, because this allows V8 to release
-  // duplicate jobs from memory quickly (as job is not referenced
-  // in resolve / reject handlers). If we would use async/await
-  // entire closure would keep duplicate job in memory until
-  // initial job finish.
+  // ジョブは重複することがあり、たいていは長時間かかるタスクである。
+  // そのため、async/await は使わず、.then() と .catch() の
+  // ハンドラーを使う。こうすると、V8 が重複したジョブを
+  // メモリーからすぐに解放できる（resolve と reject のハンドラーが
+  // ジョブを参照しないため）。async/await を使うと、
+  // 最初のジョブが終わるまで、クロージャ全体が重複したジョブを
+  // メモリーに保持してしまう。
   const promise = actions.createJobV2(job).catch(err => {
     reporter.panic(`error converting image`, err)
   })
@@ -162,7 +162,7 @@ function queueImageResizing({ file, args = {}, reporter }) {
   const { src, width, height, aspectRatio, relativePath, outputDir, options } =
     prepareQueue({ file, args: createTransformObject(fullOptions) })
 
-  // Create job and add it to the queue, the queue will be processed inside gatsby-node.js
+  // ジョブを作成してキューに追加する。キューは gatsby-node.js の中で処理される
   const finishedPromise = createJob(
     {
       name: IMAGE_PROCESSING_JOB_NAME,
@@ -197,7 +197,7 @@ function batchQueueImageResizing({ file, transforms = [], reporter }) {
   const operations = []
   const images = []
 
-  // loop through all transforms to set correct variables
+  // すべての変換をループして、正しい変数を設定する
   transforms.forEach(transform => {
     const {
       src,
@@ -208,13 +208,13 @@ function batchQueueImageResizing({ file, transforms = [], reporter }) {
       outputDir,
       options,
     } = prepareQueue({ file, args: transform })
-    // queue operations of an image
+    // 画像の操作をキューに入れる
     operations.push({
       outputPath: relativePath,
       args: options,
     })
 
-    // create output results
+    // 出力結果を作成する
     images.push({
       src,
       absolutePath: path.join(outputDir, relativePath),
@@ -255,8 +255,8 @@ function batchQueueImageResizing({ file, transforms = [], reporter }) {
 async function generateBase64({ file, args = {}, reporter }) {
   const pluginOptions = getPluginOptions()
   const options = healOptions(pluginOptions, args, file.extension, {
-    // Should already be set to base64Width by `fluid()`/`fixed()` methods
-    // calling `generateBase64()`. Useful in Jest tests still.
+    // `generateBase64()` を呼び出す `fluid()` と `fixed()` のメソッドによって、すでに
+    // base64Width に設定されているはずである。Jest のテストではまだ役に立つ。
     width: args.base64Width || pluginOptions.base64Width,
   })
   let pipeline
@@ -374,7 +374,7 @@ const cachifiedProcess = async ({ cache, ...arg }, genKey, processFn) => {
 
 async function base64(arg) {
   if (arg.cache) {
-    // Not all transformer plugins are going to provide cache
+    // すべてのトランスフォーマープラグインがキャッシュを提供するわけではない
     return await cachifiedProcess(arg, generateCacheKey, generateBase64)
   }
 
@@ -438,7 +438,7 @@ async function fluid({ file, args = {}, reporter, cache }) {
 
   const { width, height, density, format } = metadata
 
-  // if no maxWidth is passed, we need to resize the image based on the passed maxHeight
+  // maxWidth が渡されていない場合は、渡された maxHeight をもとに画像をリサイズする必要がある
   const fixedDimension =
     options.maxWidth === undefined ? `maxHeight` : `maxWidth`
   const maxWidth = options.maxWidth
@@ -454,18 +454,18 @@ async function fluid({ file, args = {}, reporter, cache }) {
     )
   }
 
-  // Create sizes (in width) for the image if no custom breakpoints are
-  // provided. If the max width of the container for the rendered markdown file
-  // is 800px, the sizes would then be: 200, 400, 800, 1200, 1600.
+  // カスタムのブレークポイントが指定されていない場合に、画像のサイズ（幅）を
+  // 作成する。レンダリングされる markdown ファイルのコンテナの最大幅が
+  // 800px であれば、サイズは 200、400、800、1200、1600 になる。
   //
-  // This is enough sizes to provide close to the optimal image size for every
-  // device size / screen resolution while (hopefully) not requiring too much
-  // image processing time (Sharp has optimizations thankfully for creating
-  // multiple sizes of the same input file)
+  // これだけのサイズがあれば、あらゆるデバイスのサイズと画面解像度に対して
+  // 最適に近い画像サイズを提供でき、（おそらく）画像処理の時間も
+  // かかりすぎない（ありがたいことに、Sharp は同じ入力ファイルから
+  // 複数のサイズを作成する処理を最適化している）
   const fluidSizes = [
-    options[fixedDimension], // ensure maxWidth (or maxHeight) is added
+    options[fixedDimension], // maxWidth（または maxHeight）が確実に追加されるようにする
   ]
-  // use standard breakpoints if no custom breakpoints are specified
+  // カスタムのブレークポイントが指定されていない場合は、標準のブレークポイントを使う
   if (!options.srcSetBreakpoints || !options.srcSetBreakpoints.length) {
     fluidSizes.push(options[fixedDimension] / 4)
     fluidSizes.push(options[fixedDimension] / 2)
@@ -478,7 +478,7 @@ async function fluid({ file, args = {}, reporter, cache }) {
           `All ints in srcSetBreakpoints should be positive ints larger than zero (> 0), found ${breakpoint}`
         )
       }
-      // ensure no duplicates are added
+      // 重複が追加されないようにする
       if (fluidSizes.includes(breakpoint)) {
         return
       }
@@ -489,13 +489,13 @@ async function fluid({ file, args = {}, reporter, cache }) {
     size => size < (fixedDimension === `maxWidth` ? width : height)
   )
 
-  // Add the original image to ensure the largest image possible
-  // is available for small images. Also so we can link to
-  // the original image.
+  // 小さい画像でも可能な限り大きい画像を使えるよう、
+  // 元の画像を追加する。元の画像へリンクできるように
+  // するためでもある。
   filteredSizes.push(fixedDimension === `maxWidth` ? width : height)
   filteredSizes = _.sortBy(filteredSizes)
 
-  // Queue sizes for processing.
+  // 各サイズを処理のキューに入れる。
   const dimensionAttr = fixedDimension === `maxWidth` ? `width` : `height`
   const otherDimensionAttr = fixedDimension === `maxWidth` ? `height` : `width`
 
@@ -503,7 +503,7 @@ async function fluid({ file, args = {}, reporter, cache }) {
     size => size === (fixedDimension === `maxWidth` ? maxWidth : maxHeight)
   )
 
-  // Sort sizes for prettiness.
+  // 見やすいようサイズをソートする。
   const transforms = filteredSizes.map(size => {
     const arrrgs = createTransformObject(options)
     if (arrrgs[otherDimensionAttr]) {
@@ -511,7 +511,7 @@ async function fluid({ file, args = {}, reporter, cache }) {
     }
     arrrgs[dimensionAttr] = Math.round(size)
 
-    // we need pathPrefix to calculate the correct outputPath
+    // 正しい outputPath を計算するために pathPrefix が必要である
     if (options.pathPrefix) {
       arrrgs.pathPrefix = options.pathPrefix
     }
@@ -564,11 +564,11 @@ async function fluid({ file, args = {}, reporter, cache }) {
       width: base64Width,
       height: base64Height,
     }
-    // Get base64 version
+    // base64 版を取得する
     base64Image = await base64({ file, args: base64Args, reporter, cache })
   }
 
-  // Construct src and srcSet strings.
+  // src と srcSet の文字列を組み立てる。
   const originalImg = _.maxBy(images, image => image.width).src
   const fallbackSrc = _.minBy(images, image =>
     Math.abs(options[fixedDimension] - image[dimensionAttr])
@@ -579,7 +579,7 @@ async function fluid({ file, args = {}, reporter, cache }) {
     .join(`,\n`)
   const originalName = file.base
 
-  // figure out the srcSet format
+  // srcSet のフォーマットを決める
   let srcSetType = `image/${format}`
 
   if (options.toFormat) {
@@ -603,12 +603,12 @@ async function fluid({ file, args = {}, reporter, cache }) {
     }
   }
 
-  // calculate presentationSizes
+  // presentationSizes を計算する
   const imageWithDensityOne = images[imageWithDensityOneIndex]
   const presentationWidth = imageWithDensityOne.width
   const presentationHeight = imageWithDensityOne.height
 
-  // If the users didn't set default sizes, we'll make one.
+  // ユーザーがデフォルトの sizes を設定していない場合は、こちらで作成する。
   const sizes =
     options.sizes ||
     `(max-width: ${presentationWidth}px) 100vw, ${presentationWidth}px`
@@ -638,10 +638,10 @@ let didShowTraceSVGRemovalWarningFixed = false
 async function fixed({ file, args = {}, reporter, cache }) {
   const options = healOptions(getPluginOptions(), args, file.extension)
 
-  // if no width is passed, we need to resize the image based on the passed height
+  // width が渡されていない場合は、渡された height をもとに画像をリサイズする必要がある
   const fixedDimension = options.width === undefined ? `height` : `width`
 
-  // Create sizes for different resolutions — we do 1x, 1.5x, and 2x.
+  // 異なる解像度用のサイズを作成する。1x、1.5x、2x を用意する。
   const sizes = []
   sizes.push(options[fixedDimension])
   sizes.push(options[fixedDimension] * 1.5)
@@ -650,8 +650,8 @@ async function fixed({ file, args = {}, reporter, cache }) {
 
   const filteredSizes = sizes.filter(size => size <= dimensions[fixedDimension])
 
-  // If there's no fluid images after filtering (e.g. image is smaller than what's
-  // requested, add back the original so there's at least something)
+  // 絞り込んだ結果 fluid の画像が残らない場合（画像が要求より
+  // 小さい場合など）は、少なくとも何かがあるよう、元の画像を戻す
   if (filteredSizes.length === 0) {
     filteredSizes.push(dimensions[fixedDimension])
     console.warn(
@@ -664,16 +664,16 @@ async function fixed({ file, args = {}, reporter, cache }) {
     )
   }
 
-  // Sort images for prettiness.
+  // 見やすいよう画像をソートする。
   const transforms = _.sortBy(filteredSizes).map(size => {
     const arrrgs = createTransformObject(options)
     arrrgs[fixedDimension] = Math.round(size)
 
-    // Queue images for processing.
+    // 画像を処理のキューに入れる。
     if (options.width !== undefined && options.height !== undefined) {
       arrrgs.height = Math.round(size * (options.height / options.width))
     }
-    // we need pathPrefix to calculate the correct outputPath
+    // 正しい outputPath を計算するために pathPrefix が必要である
     if (options.pathPrefix) {
       arrrgs.pathPrefix = options.pathPrefix
     }
@@ -716,7 +716,7 @@ async function fixed({ file, args = {}, reporter, cache }) {
       width: base64Width,
       height: base64Height,
     }
-    // Get base64 version
+    // base64 版を取得する
     base64Image = await base64({
       file,
       args: base64Args,

@@ -8,7 +8,7 @@ import { GatsbyImage } from "../gatsby-image.server"
 import { IGatsbyImageData } from "../gatsby-image.browser"
 import { SourceProps } from "../picture"
 
-// Prevents terser for bailing because we're not in a babel plugin
+// babel プラグインの中ではないので、terser が bail しないようにする
 jest.mock(
   `../../../macros/terser.macro`,
   () =>
@@ -30,13 +30,13 @@ describe(`GatsbyImage server`, () => {
   })
 
   it(`shows nothing when the image props is not passed`, () => {
-    // Allows to get rid of typescript error when not passing image
-    // This is helpful for user using JavaScript and not getting advent of
-    // TS types
+    // image を渡さないときの typescript のエラーを消せるようにする
+    // JavaScript を使っていて TS の型の恩恵を受けられない
+    // ユーザーに役立つ
     const GatsbyImageAny = GatsbyImage as React.FC
     const { container } = render(<GatsbyImageAny />)
 
-    // Verifying implementation details but it's for the UX, acceptable tradeoffs
+    // 実装の詳細を検証しているが、UX のためなので許容できるトレードオフである
     expect(console.warn).toBeCalledWith(
       `[gatsby-plugin-image] Missing image prop`
     )
@@ -129,7 +129,7 @@ describe(`GatsbyImage server`, () => {
 
   describe(`fallback verifications`, () => {
     it(`doesn't have an src or srcSet when fallback is not provided in images`, () => {
-      // no fallback provided
+      // fallback が指定されていない
       const images = {}
 
       const image: IGatsbyImageData = {
@@ -236,7 +236,7 @@ icon.svg`,
 
   describe(`sources verifications`, () => {
     it(`doesn't have an src or srcSet when sources is not provided in images`, () => {
-      // no fallback provided
+      // fallback が指定されていない
       const images = {}
 
       const image: IGatsbyImageData = {

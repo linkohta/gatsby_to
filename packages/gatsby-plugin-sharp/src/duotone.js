@@ -98,7 +98,7 @@ async function overlayDuotone(
     .flatten()
     .metadata()
     .then(info => info)
-  // see https://github.com/lovell/sharp/issues/859#issuecomment-311319149
+  // https://github.com/lovell/sharp/issues/859#issuecomment-311319149 を参照
   const percentGrey = Math.round((opacity / 100) * 255)
   const percentTransparency = Buffer.alloc(
     info.width * info.height,

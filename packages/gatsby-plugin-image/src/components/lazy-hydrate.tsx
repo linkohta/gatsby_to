@@ -63,7 +63,7 @@ function startLoading(
     img.src = target.currentSrc
 
     if (img.decode) {
-      // Decode the image through javascript to support our transition
+      // トランジションに対応するため、javascript で画像をデコードする
       img
         .decode()
         .then(() => {
@@ -107,8 +107,8 @@ function startLoading(
 
   imageCache.add(cacheKey)
 
-  // Load times not always fires - mostly when it's a 304
-  // We check if the image is already completed and if so we trigger onload.
+  // load イベントは発火しないことがある（主に 304 のとき）
+  // 画像の読み込みがすでに完了しているかを確認し、完了していれば onload を呼び出す。
   if (mainImage.complete) {
     onImageLoaded.call(mainImage, {
       currentTarget: mainImage,
@@ -145,7 +145,7 @@ export function swapPlaceholderImage(
     })
     const unobserve = io(element)
 
-    // Polyfill "object-fit" if unsupported (mostly IE)
+    // "object-fit" に対応していない場合（主に IE）はポリフィルする
     if (!(`objectFit` in document.documentElement.style)) {
       element.dataset.objectFit = style.objectFit ?? `cover`
       element.dataset.objectPosition = `${style.objectPosition ?? `50% 50%`}`

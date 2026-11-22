@@ -71,7 +71,7 @@ exports.onCreateWebpackConfig = (
     })
   }
 
-  // add sass loaders
+  // sass のローダーを追加する
   sassRule.use.push(sassLoader)
   sassRuleModules.use.push(sassLoader)
 
@@ -122,7 +122,7 @@ exports.pluginOptionsSchema = function ({ Joi }) {
       .description(`This plugin resolves url() paths relative to the entry SCSS/Sass file not – as might be expected – the location relative to the declaration. Under the hood, it makes use of sass-loader and this is documented in the readme.
 
         Using resolve-url-loader provides a workaround, if you want to use relative url just install the plugin and then add it to your Sass plugin options configuration.`),
-    // TODO: Use alternatives() to also allow function. Currently some bug in our schema validation (test)
+    // TODO: 関数も許可できるよう alternatives() を使う。現在はスキーマの検証（テスト）に何らかのバグがある
     sassOptions: Joi.object({
       file: Joi.string()
         .allow(null)

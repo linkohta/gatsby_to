@@ -3,7 +3,7 @@ import { withPrefix as fallbackWithPrefix, withAssetPrefix } from "gatsby"
 import { defaultIcons, addDigestToPath, favicons } from "./common.js"
 import getManifestForPathname from "./get-manifest-pathname"
 
-// TODO: remove for v3
+// TODO: v3 で削除する
 const withPrefix = withAssetPrefix || fallbackWithPrefix
 
 exports.onRenderBody = (
@@ -21,14 +21,14 @@ exports.onRenderBody = (
     crossOrigin = `anonymous`,
   }
 ) => {
-  // We use this to build a final array to pass as the argument to setHeadComponents at the end of onRenderBody.
+  // onRenderBody の最後に setHeadComponents の引数として渡す、最終的な配列を組み立てるために使う。
   const headComponents = []
 
   const srcIconExists = !!icon
   const icons = pluginIcons || defaultIcons
   const manifestFileName = getManifestForPathname(pathname, localize)
 
-  // If icons were generated, also add a favicon link.
+  // アイコンが生成されていれば、favicon の link も追加する。
   if (srcIconExists) {
     if (insertFaviconLinkTag) {
       favicons.forEach(favicon => {
@@ -58,7 +58,7 @@ exports.onRenderBody = (
     }
   }
 
-  // Add manifest link tag.
+  // manifest の link タグを追加する。
   headComponents.push(
     <link
       key={`gatsby-plugin-manifest-link`}
@@ -68,7 +68,7 @@ exports.onRenderBody = (
     />
   )
 
-  // The user has an option to opt out of the theme_color meta tag being inserted into the head.
+  // ユーザーは、head への theme_color の meta タグの挿入を無効にできる。
   if (themeColor && insertMetaTag) {
     headComponents.push(
       <meta

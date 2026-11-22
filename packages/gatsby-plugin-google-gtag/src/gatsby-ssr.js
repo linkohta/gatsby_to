@@ -13,13 +13,13 @@ exports.onRenderBody = (
 
   const origin = pluginConfig.origin || `https://www.googletagmanager.com`
 
-  // Lighthouse recommends pre-connecting to google tag manager
+  // Lighthouse は google tag manager への preconnect を推奨している
   setHeadComponents([
     <link rel="preconnect" key="preconnect-google-gtag" href={origin} />,
     <link rel="dns-prefetch" key="dns-prefetch-google-gtag" href={origin} />,
   ])
 
-  // Prevent duplicate or excluded pageview events being emitted on initial load of page by the `config` command
+  // ページの初回読み込み時に、`config` コマンドによって重複した、または除外対象の pageview イベントが送られるのを防ぐ
   // https://developers.google.com/analytics/devguides/collection/gtagjs/#disable_pageview_tracking
 
   gtagConfig.send_page_view = false

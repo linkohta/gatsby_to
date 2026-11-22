@@ -4,15 +4,15 @@ const fs = require(`fs`)
 const _ = require(`lodash`)
 
 module.exports = (htmlPath, pathPrefix) => {
-  // load index.html to pull scripts/links necessary for proper offline reload
+  // オフラインで正しくリロードするために必要な script と link を取り出すため、index.html を読み込む
   let html
   try {
-    // load index.html to pull scripts/links necessary for proper offline reload
+    // オフラインで正しくリロードするために必要な script と link を取り出すため、index.html を読み込む
     html = fs.readFileSync(path.resolve(htmlPath))
   } catch (err) {
-    // ENOENT means the file doesn't exist, which is to be expected when trying
-    // to open 404.html if the user hasn't created a custom 404 page -- return
-    // an empty array.
+    // ENOENT はファイルが存在しないことを意味する。ユーザーがカスタムの 404 ページを
+    // 作成していない場合、404.html を開こうとするとこうなるのは想定どおりなので、
+    // 空の配列を返す。
     if (err.code === `ENOENT`) {
       return []
     } else {
@@ -20,10 +20,10 @@ module.exports = (htmlPath, pathPrefix) => {
     }
   }
 
-  // party like it's 2006
+  // 2006 年のようなやり方でいく
   const $ = cheerio.load(html)
 
-  // holds any paths for scripts and links
+  // script と link のパスを保持する
   const criticalFilePaths = []
 
   $(`
@@ -38,18 +38,18 @@ module.exports = (htmlPath, pathPrefix) => {
     const url =
       $elem.attr(`src`) || $elem.attr(`href`) || $elem.attr(`data-href`)
 
-    // Don't cache XML files, or external resources (beginning with // or http)
+    // XML ファイルと外部リソース（// または http で始まるもの）はキャッシュしない
     const blackListRegex = /(\.xml$|^\/\/|^http)/
 
-    // check resource URLs from header tags start with the correct prefix
-    // (these are not page URLs)
+    // ヘッダーのタグから得たリソースの URL が、正しいプレフィックスで始まることを確認する
+    // （これらはページの URL ではない）
     if (url && !blackListRegex.test(url) && url.startsWith(`${pathPrefix}/`)) {
       criticalFilePaths.push(url.replace(/^\//, ``))
     }
   })
 
-  // Remove the custom prefix (if any) so Workbox can find the files.
-  // This is added back at runtime (see modifyUrlPrefix in gatsby-node.js) in
-  // order to serve from the correct location.
+  // Workbox がファイルを見つけられるよう、カスタムのプレフィックスを（あれば）取り除く。
+  // 正しい場所から配信するため、実行時に付け直される
+  // （gatsby-node.js の modifyUrlPrefix を参照）。
   return _.uniq(criticalFilePaths).map(url => url.slice(pathPrefix.length))
 }

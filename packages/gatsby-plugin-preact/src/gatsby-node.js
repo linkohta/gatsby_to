@@ -8,7 +8,7 @@ const FRAMEWORK_BUNDLES_PREACT = [
   `prop-types`,
 ]
 
-// This regex ignores nested copies of framework libraries so they're bundled with their issuer
+// この正規表現は、フレームワークのライブラリの入れ子になったコピーを無視し、それらが issuer と一緒にバンドルされるようにする
 const FRAMEWORK_BUNDLES_REGEX_PREACT = new RegExp(
   `(?<!node_modules.*)[\\\\/]node_modules[\\\\/](${FRAMEWORK_BUNDLES_PREACT.join(
     `|`
@@ -17,7 +17,7 @@ const FRAMEWORK_BUNDLES_REGEX_PREACT = new RegExp(
 
 export function onCreateBabelConfig({ actions, stage }) {
   if (stage === `develop`) {
-    // enable react-refresh babel plugin to enable hooks
+    // フックを有効にするため、react-refresh の babel プラグインを有効にする
     // @see https://github.com/JoviDeCroock/prefresh/tree/master/packages/webpack#using-hooks
     actions.setBabelPlugin({
       name: `@prefresh/babel-plugin`,
@@ -44,23 +44,23 @@ export function onCreateWebpackConfig({ stage, actions, getConfig }) {
       })
     )
 
-    // remove React refresh plugin, we want to add preact refresh instead.
+    // React の refresh プラグインを取り除く。代わりに preact の refresh を追加したい。
     webpackConfig.plugins = webpackConfig.plugins.filter(
       plugin => plugin.constructor.name !== `ReactRefreshPlugin`
     )
 
-    // add webpack-hot-middleware/client to the commons entry
+    // webpack-hot-middleware/client を commons エントリーに追加する
     webpackConfig.entry.commons.unshift(
       `@gatsbyjs/webpack-hot-middleware/client`
     )
   }
 
-  // add preact to the framework bundle
+  // preact を framework バンドルに追加する
   if (stage === `build-javascript` || stage === `develop`) {
     if (
       webpackConfig?.optimization?.splitChunks?.cacheGroups?.framework?.test
     ) {
-      // replace react libs with preact
+      // react のライブラリを preact に置き換える
       webpackConfig.optimization.splitChunks.cacheGroups.framework.test =
         FRAMEWORK_BUNDLES_REGEX_PREACT
     }

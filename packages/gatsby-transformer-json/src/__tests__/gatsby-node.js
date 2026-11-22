@@ -3,7 +3,7 @@ const os = require(`os`)
 
 const { onCreateNode } = require(`../gatsby-node`)
 
-// Make some fake functions its expecting.
+// 期待されるダミーの関数をいくつか用意する。
 const loadNodeContent = node => Promise.resolve(node.content)
 
 const bootstrapTest = async (node, pluginOptions = {}) => {

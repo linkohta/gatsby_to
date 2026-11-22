@@ -38,9 +38,9 @@ async function onCreateNode(
 ) {
   const { createNode, createParentChildLink } = actions
 
-  // accept *all* options to pass to the sheet_to_json function
+  // sheet_to_json 関数に渡す「すべての」オプションを受け付ける
   const xlsxOptions = options
-  // alias legacy `rawOutput` to correct `raw` attribute if raw isn't already defined
+  // raw がまだ定義されていなければ、レガシーな `rawOutput` を正しい `raw` 属性の別名として扱う
   if (!_.has(xlsxOptions, `raw`) && _.has(xlsxOptions, `rawOutput`)) {
     xlsxOptions.raw = xlsxOptions.rawOutput
   }
@@ -51,7 +51,7 @@ async function onCreateNode(
   delete xlsxOptions.defaultValue
   delete xlsxOptions.plugins
 
-  // Parse
+  // パースする
   const readOptions = { cellDates: true }
   const wb = node.absolutePath
     ? XLSX.readFile(node.absolutePath, readOptions)

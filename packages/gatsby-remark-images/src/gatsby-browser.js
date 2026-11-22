@@ -11,7 +11,7 @@ exports.onRouteUpdate = (apiCallbackContext, pluginOptions) => {
   const imageWrappers = document.querySelectorAll(`.${imageWrapperClass}`)
 
   // https://css-tricks.com/snippets/javascript/loop-queryselectorall-matches/
-  // for cross-browser looping through NodeList without polyfills
+  // ポリフィルなしで、ブラウザを問わず NodeList をループするためである
   for (let i = 0; i < imageWrappers.length; i++) {
     const imageWrapper = imageWrappers[i]
 

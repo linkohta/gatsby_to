@@ -49,7 +49,7 @@ const PARSER_OPTIONS: ParserOptions = {
 }
 
 export function getBabelParserOptions(filePath: string): ParserOptions {
-  // Flow and TypeScript plugins can't be enabled simultaneously
+  // Flow と TypeScript のプラグインは同時に有効にできない
   if (/\.tsx?/.test(filePath)) {
     const { plugins } = PARSER_OPTIONS
     return {
@@ -70,8 +70,8 @@ export function babelParseToAst(
 }
 
 /**
- * Traverses the parsed source, looking for StaticImage components.
- * Extracts and returns the props from any that are found
+ * パース済みのソースを走査して、StaticImage コンポーネントを探す。
+ * 見つかったものから props を取り出して返す
  */
 export const extractStaticImageProps = (
   ast: babel.types.File,
@@ -82,7 +82,7 @@ export const extractStaticImageProps = (
 
   traverse(ast, {
     JSXOpeningElement(nodePath) {
-      // Is this a StaticImage?
+      // これは StaticImage か？
       if (
         !nodePath
           .get(`name`)
@@ -91,13 +91,13 @@ export const extractStaticImageProps = (
         return
       }
       const image = evaluateImageAttributes(
-        // There's a conflict between the definition of NodePath in @babel/core and @babel/traverse
+        // NodePath の定義が @babel/core と @babel/traverse とで食い違っている
         nodePath as unknown as NodePath<JSXOpeningElement>,
         onError
       ) as unknown as IStaticImageProps
-      // When the image props are the same for multiple StaticImage but they are in different locations
-      // the hash will be the same then. We need to make sure that the hash is unique.
-      // The filename should already be normalized but better safe than sorry.
+      // 複数の StaticImage で画像の props が同じで、置かれている場所だけが異なる場合、
+      // ハッシュも同じになる。ハッシュが一意になるようにする必要がある。
+      // ファイル名はすでに正規化されているはずだが、念のためである。
       image.filename = slash(filename)
 
       images.set(hashOptions(image), image)

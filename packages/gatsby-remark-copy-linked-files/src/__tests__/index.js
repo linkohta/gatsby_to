@@ -255,9 +255,9 @@ describe(`gatsby-remark-copy-linked-files`, () => {
       markdownNode,
       getNode,
     }).then(() => {
-      // we expect the resulting markdownAST to consist
-      // of a paragraph with three children:
-      // openingTag, text, and closing tag
+      // 結果の markdownAST は、3 つの子を持つ paragraph で
+      // 構成されることを期待する:
+      // 開始タグ、テキスト、終了タグ
       expect(markdownAST.children[0].children[0].value).toBe(openingTag)
     })
   })
@@ -294,7 +294,7 @@ describe(`gatsby-remark-copy-linked-files`, () => {
     const imageRelativePath = `images/${imageName}.svg`
     const imagePath = parentDir + imageRelativePath
 
-    // pathPrefix passed to plugins already combine pathPrefix and assetPrefix
+    // プラグインに渡される pathPrefix は、すでに pathPrefix と assetPrefix を結合したものである
     it(`relative pathPrefix (no assetPrefix)`, async () => {
       const pathPrefix = `/path-prefix`
       const markdownAST = remark.parse(`![some image](${imageRelativePath})`)

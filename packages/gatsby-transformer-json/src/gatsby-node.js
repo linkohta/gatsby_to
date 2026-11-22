@@ -2,7 +2,7 @@ const _ = require(`lodash`)
 const path = require(`path`)
 
 function shouldOnCreateNode({ node }) {
-  // We only care about JSON content.
+  // JSON の内容だけを対象にする。
   return node.internal.mediaType === `application/json`
 }
 

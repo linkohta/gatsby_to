@@ -21,7 +21,7 @@ class Screenshot {
 }
 
 /**
- * put / get a screenshot to the local filesystem
+ * スクリーンショットをローカルのファイルシステムに保存、またはそこから取得する
  */
 class FSScreenshot extends Screenshot {
   constructor(opts) {
@@ -32,7 +32,7 @@ class FSScreenshot extends Screenshot {
   }
 
   async getFile() {
-    // check if file exists
+    // ファイルが存在するかを確認する
     try {
       let expires
       await fsPromises.access(this.fileUrl)
@@ -50,17 +50,17 @@ class FSScreenshot extends Screenshot {
 }
 
 /**
- * put / get a screenshot to S3
+ * スクリーンショットを S3 に保存、またはそこから取得する
  */
 class S3Screenshot extends Screenshot {
   constructor(opts) {
     super(opts)
-    // async jiggery pokery
+    // 非同期処理のための小細工
     return (async () => {
       const region = await s3GetBucketLocation(process.env.S3_BUCKET)
       if (!region) throw new Error(`invalid bucket ${process.env.S3_BUCKET}`)
       this.fileUrl = `https://s3-${region}.amazonaws.com/${process.env.S3_BUCKET}/${this.key}`
-      return this // when done
+      return this // 完了したら返す
     })()
   }
 

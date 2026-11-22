@@ -16,9 +16,9 @@ exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {
   ])
 }
 
-// Move Typography.js styles to the top of the head section so they're loaded first
-// and don't accidentally overwrite other styles. Typography.js is meant to
-// be a configurable CSS reset so should always load first.
+// Typography.js のスタイルを head セクションの先頭へ移動し、最初に読み込まれて
+// 他のスタイルを誤って上書きしないようにする。Typography.js は
+// 設定可能な CSS リセットとして作られているので、常に最初に読み込むべきである。
 exports.onPreRenderHTML = ({ getHeadComponents, replaceHeadComponents }) => {
   const headComponents = getHeadComponents()
   headComponents.sort((x, y) => {

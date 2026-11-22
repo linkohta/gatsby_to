@@ -72,7 +72,7 @@ OutboundLink.propTypes = {
 }
 
 /**
- * This allows the user to create custom events within their Gatsby projects.
+ * ユーザーが Gatsby プロジェクトの中でカスタムイベントを作成できるようにする。
  *
  * @param {import('gatsby-plugin-google-analytics').CustomEventArgs} args
  * @see https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#events

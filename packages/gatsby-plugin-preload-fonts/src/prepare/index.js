@@ -37,8 +37,8 @@ export async function main() {
     endpoint: endpoint(GRAPHQL_PATH),
   })
 
-  // When we haven't found any routes we don't do anything
-  // Routes can be empty when we're running in CI or the user didn't want to update
+  // ルートが 1 つも見つからなかった場合は何もしない
+  // CI で実行している場合や、ユーザーが更新を望まなかった場合は、ルートが空になることがある
   if (!routes.length) {
     return
   }
@@ -88,15 +88,15 @@ export async function main() {
   })
 
   for (const route of routes) {
-    // wait until there are no more than 2 network connections for 500ms
-    // to allow for dynamically inserted <link> and <script> tags to load
-    // (there will always be one active connection since the dev server
-    // keeps a connection open for hot module reloading so we can't wait
-    // for networkidle0)
+    // 動的に挿入された <link> と <script> のタグが読み込まれるよう、
+    // ネットワーク接続が 2 本以下の状態が 500ms 続くまで待つ
+    // （開発サーバーはホットモジュールリロードのために接続を
+    // 1 本開いたままにするので、有効な接続が必ず 1 本あり、
+    // networkidle0 は待てない）
     //
-    // unfortunately, this increases the minimum load time per route to
-    // ~500ms, which adds up quickly on large sites; there may be room
-    // for optimization here
+    // 残念ながら、これによりルートごとの最小の読み込み時間が
+    // 約 500ms に増え、大きなサイトではすぐに積み上がる。ここには
+    // 最適化の余地があるかもしれない
     logger.info(`visit`, route)
     await page.goto(endpoint(route), { waitUntil: `networkidle2` })
     bar.tick()

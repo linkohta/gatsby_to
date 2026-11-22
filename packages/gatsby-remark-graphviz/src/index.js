@@ -11,7 +11,7 @@ module.exports = async ({ markdownAST }, pluginOptions = {}) => {
   const codeNodes = []
 
   visit(markdownAST, `code`, node => {
-    // Only act on languages supported by graphviz
+    // graphviz が対応している言語だけを処理する
     if (validLanguages.includes(node.lang)) {
       codeNodes.push({ node, attrString: node.meta })
     }
@@ -23,21 +23,21 @@ module.exports = async ({ markdownAST }, pluginOptions = {}) => {
       const { value, lang } = node
 
       try {
-        // Perform actual render
+        // 実際のレンダリングを行う
         const svgString = await viz.renderString(value, { engine: lang })
 
-        // Add default inline styling
+        // デフォルトのインラインスタイルを追加する
         const $ = cheerio.load(svgString)
         $(`svg`).attr(`style`, `max-width: 100%; height: auto;`)
 
-        // Merge custom attributes if provided by user (adds and overwrites)
+        // ユーザーがカスタムの属性を指定していればマージする（追加と上書き）
         if (attrString) {
           const attrElement = cheerio.load(`<element ${attrString}></element>`)
           $(`svg`).attr(attrElement(`element`).attr())
         }
 
-        // Mutate the current node. Converting from a code block to
-        // HTML (with svg content)
+        // 現在のノードを書き換える。コードブロックから
+        // （svg を内容とする）HTML へ変換する
         node.type = `html`
         node.value = $.html(`svg`)
       } catch (error) {

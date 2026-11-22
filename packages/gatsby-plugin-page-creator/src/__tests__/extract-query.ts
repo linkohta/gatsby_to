@@ -1,9 +1,9 @@
 import { generateQueryFromString, reverseLookupParams } from "../extract-query"
 import path from "path"
 
-// windows and mac have different seperators, all code is written with unix-like
-// file systems, but the underlying code uses `path.sep`. So when running tests
-// on windows, they would fail without us swapping the seperators.
+// windows と mac では区切り文字が異なる。コードはすべて unix 系のファイルシステムを
+// 前提に書かれているが、内部のコードは `path.sep` を使っている。そのため、区切り文字を
+// 入れ替えないと、windows でテストを実行したときに失敗する。
 const compatiblePath = (filepath: string): string =>
   filepath.replace(/\//g, path.sep)
 
@@ -281,7 +281,7 @@ describe(`reverseLookupParams`, () => {
   it(`handles graphql unions`, () => {
     expect(
       reverseLookupParams(
-        // Unions are not present in the resulting structure
+        // 結果の構造にユニオンは含まれない
         { parent: { relativePath: `foo` } },
         compatiblePath(`/{Model.parent__(File)__relativePath}.js`)
       )
@@ -291,7 +291,7 @@ describe(`reverseLookupParams`, () => {
     })
     expect(
       reverseLookupParams(
-        // Unions are not present in the resulting structure
+        // 結果の構造にユニオンは含まれない
         { parent: { relativePath: `foo` } },
         compatiblePath(`/{model123.parent__(File)__relativePath}.js`)
       )

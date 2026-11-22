@@ -28,7 +28,7 @@ module.exports = (
   slugs.reset()
 
   visit(markdownAST, `heading`, node => {
-    // If elements array exists, do not create links for heading types not included in array
+    // elements の配列がある場合は、配列に含まれない見出しの種類にはリンクを作成しない
     if (Array.isArray(elements) && !elements.includes(`h${node.depth}`)) {
       return
     }
@@ -36,12 +36,12 @@ module.exports = (
     let id
     if (enableCustomId && node.children.length > 0) {
       const last = node.children[node.children.length - 1]
-      // This regex matches to preceding spaces and {#custom-id} at the end of a string.
-      // Also, checks the text of node won't be empty after the removal of {#custom-id}.
+      // この正規表現は、文字列の末尾にある {#custom-id} と、その前の空白に一致する。
+      // また、{#custom-id} を取り除いた後にノードのテキストが空にならないことも確認する。
       const match = /^(.*?)\s*\{#([\w-]+)\}$/.exec(toString(last))
       if (match && (match[1] || node.children.length > 1)) {
         id = match[2]
-        // Remove the custom ID from the original text.
+        // 元のテキストからカスタム ID を取り除く。
         if (match[1]) {
           last.value = match[1]
         } else {
@@ -78,7 +78,7 @@ module.exports = (
           hChildren: [
             {
               type: `raw`,
-              // The Octicon link icon is the default. But users can set their own icon via the "icon" option.
+              // デフォルトは Octicon の link アイコンである。ただし、ユーザーは "icon" オプションで独自のアイコンを設定できる。
               value: icon,
             },
           ],

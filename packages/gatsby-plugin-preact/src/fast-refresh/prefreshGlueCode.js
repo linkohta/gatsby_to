@@ -21,7 +21,7 @@ function messageHandler(message) {
       break
     }
     default: {
-      // Do nothing.
+      // 何もしない。
     }
   }
 }
@@ -59,8 +59,8 @@ module.exports = function setupPrefresh() {
       return
     }
 
-    // A non-error was thrown, we don't have a trace. :(
-    // Look in your browser's devtools for more information
+    // エラー以外のものが throw されたので、トレースがない。:(
+    // 詳しくはブラウザの devtools を確認すること
     __prefresh_errors__.handleRuntimeError(new Error(e.error))
   })
 
@@ -75,8 +75,8 @@ module.exports = function setupPrefresh() {
       return
     }
 
-    // A non-error was rejected, we don't have a trace :(
-    // Look in your browser's devtools for more information
+    // エラー以外のもので reject されたので、トレースがない :(
+    // 詳しくはブラウザの devtools を確認すること
     __prefresh_errors__.handleRuntimeError(new Error(e.reason))
   })
 }

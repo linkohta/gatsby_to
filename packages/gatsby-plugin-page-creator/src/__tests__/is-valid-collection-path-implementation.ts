@@ -8,9 +8,9 @@ jest.mock(`gatsby/reporter`, () => {
   }
 })
 
-// windows and mac have different seperators, all code is written with unix-like
-// file systems, but the underlying code uses `path.sep`. So when running tests
-// on windows, they would fail without us swapping the seperators.
+// windows と mac では区切り文字が異なる。コードはすべて unix 系のファイルシステムを
+// 前提に書かれているが、内部のコードは `path.sep` を使っている。そのため、区切り文字を
+// 入れ替えないと、windows でテストを実行したときに失敗する。
 const compatiblePath = (filepath: string): string =>
   filepath.replace(/\//g, syspath.sep)
 
@@ -53,7 +53,7 @@ describe(`isValidCollectionPathImplementation`, () => {
     expect(isValid).toBe(true)
   })
 
-  // Error in second part
+  // 2 つ目の部分にエラーがある
   it.each([
     `/products/{bar}.js`,
     `/products/{Model.}.js`,
@@ -97,7 +97,7 @@ describe(`isValidCollectionPathImplementation`, () => {
     })
   })
 
-  // Error in first part
+  // 1 つ目の部分にエラーがある
   it.each([
     `/Model.test}/{Model.id}.js`,
     `/{Model.test/{Model.id}.js`,

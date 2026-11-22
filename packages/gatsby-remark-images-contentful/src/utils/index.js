@@ -1,7 +1,7 @@
 const { URL } = require(`url`)
 const axios = require(`axios`)
 
-// This should be replaced with the solution for https://github.com/gatsbyjs/gatsby/issues/24220
+// https://github.com/gatsbyjs/gatsby/issues/24220 の解決策ができたら、それに置き換えるべきである
 const getBase64Img = async (url, reporter) => {
   try {
     const response = await axios({
@@ -66,7 +66,7 @@ const buildResponsiveSizes = async (
 
   const webpSrcSet = filteredSizes.map(getSrcSetUrl).join(`,\n`)
 
-  // TODO think about a better structure to save srcset types instead of adding them to the root
+  // TODO: srcset の種類をルートに追加するのではなく、より良い構造で保存する方法を考える
   return {
     base64: base64Img,
     aspectRatio,

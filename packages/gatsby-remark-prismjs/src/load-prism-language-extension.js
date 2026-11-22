@@ -3,7 +3,7 @@ const loadPrismLanguage = require(`./load-prism-language`)
 const replaceStringWithRegex = require(`./replace-string-with-regexp`)
 
 module.exports = languageExtensions => {
-  // Create array of languageExtensions (if input is object)
+  // languageExtensions の配列を作成する（入力がオブジェクトの場合）
   languageExtensions = [].concat(languageExtensions)
 
   languageExtensions.forEach(l => {
@@ -28,23 +28,23 @@ const loadLanguageExtension = languageExtension => {
     )
   }
 
-  // If only 'extend' property is given, we extend the given extend language.
+  // 'extend' プロパティだけが指定されている場合は、指定された extend の言語を拡張する。
   if (!languageExtension.language) {
     languageExtension.language = languageExtension.extend
   }
 
-  // To allow RegEx as 'string' in the config, we replace all strings with a regex object.
+  // 設定で RegEx を 'string' として書けるよう、すべての文字列を正規表現オブジェクトに置き換える。
   if (languageExtension.definition) {
     languageExtension.definition = replaceStringWithRegex(
       languageExtension.definition
     )
   }
 
-  // If 'extend' property is given we start from that language, otherwise we add a language from scratch.
+  // 'extend' プロパティが指定されている場合はその言語から始め、そうでなければ言語を一から追加する。
   if (!languageExtension.extend) {
     Prism.languages[languageExtension.language] = languageExtension.definition
   } else {
-    // Loads language if not already loaded.
+    // 言語がまだ読み込まれていなければ読み込む。
     loadPrismLanguage(languageExtension.extend)
 
     Prism.languages[languageExtension.language] = Prism.languages.extend(
@@ -54,7 +54,7 @@ const loadLanguageExtension = languageExtension => {
   }
 
   if (languageExtension.hasOwnProperty(`insertBefore`)) {
-    // To allow RegEx as 'string' in the config, we replace all strings with a regex object.
+    // 設定で RegEx を 'string' として書けるよう、すべての文字列を正規表現オブジェクトに置き換える。
     languageExtension.insertBefore = replaceStringWithRegex(
       languageExtension.insertBefore
     )
@@ -66,21 +66,21 @@ const loadLanguageExtension = languageExtension => {
 }
 
 const isObjectAndNotArray = extension =>
-  // Array is an Object in javascript
+  // javascript では Array も Object である
   !Array.isArray(extension) && typeof extension === `object`
 
 const containsMandatoryProperties = languageExtension => {
-  // 'language' or 'extend' is mandatory
+  // 'language' か 'extend' が必須である
   if (!(languageExtension.language || languageExtension.extend)) {
     return false
   }
 
-  // 'definition' or 'insertBefore' is mandatory
+  // 'definition' か 'insertBefore' が必須である
   if (!(languageExtension.definition || languageExtension.insertBefore)) {
     return false
   }
 
-  // 'insertBefore' is not possible without 'extend' or 'definition'. There is nothing to insert before then.
+  // 'insertBefore' は、'extend' か 'definition' がなければ使えない。その場合、前に挿入する対象がない。
   if (
     languageExtension.insertBefore &&
     !(languageExtension.definition || languageExtension.extend)

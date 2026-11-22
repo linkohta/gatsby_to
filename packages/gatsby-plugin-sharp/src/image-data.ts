@@ -42,7 +42,7 @@ export async function getImageMetadata(
   cache?: GatsbyCache
 ): Promise<IImageMetadata> {
   if (!getDominantColor) {
-    // If we don't need the dominant color we can use the cheaper size function
+    // ドミナントカラーが不要な場合は、より低コストな size 関数を使える
     const { width, height, type } = await getImageSizeAsync(file)
     return { width, height, format: type }
   }
@@ -51,10 +51,10 @@ export async function getImageMetadata(
   const METADATA_KEY = `metadata-${file.internal.contentDigest}`
 
   if (cache) {
-    // Use plugin cache
+    // プラグインのキャッシュを使う
     metadata = await cache.get(METADATA_KEY)
   } else {
-    // Use in-memory cache instead
+    // 代わりにインメモリーのキャッシュを使う
     metadata = metadataCache.get(METADATA_KEY)
   }
   if (metadata && process.env.NODE_ENV !== `test`) {
@@ -68,7 +68,7 @@ export async function getImageMetadata(
 
     const { width, height, density, format } = await pipeline.metadata()
 
-    // Downsize the image before calculating the dominant color
+    // ドミナントカラーを計算する前に画像を縮小する
     const buffer = await pipeline
       .resize(DOMINANT_COLOR_IMAGE_SIZE, DOMINANT_COLOR_IMAGE_SIZE, {
         fit: `inside`,
@@ -78,7 +78,7 @@ export async function getImageMetadata(
 
     const { dominant } = await sharp(buffer).stats()
 
-    // Fallback in case sharp doesn't support dominant
+    // sharp が dominant に対応していない場合のフォールバック
     const dominantColor = dominant
       ? rgbToHex(dominant.r, dominant.g, dominant.b)
       : `#000000`
@@ -283,7 +283,7 @@ export async function generateImageData({
 
   const primaryIndex =
     layout === `fullWidth`
-      ? imageSizes.sizes.length - 1 // The largest image
+      ? imageSizes.sizes.length - 1 // 最も大きい画像
       : imageSizes.sizes.findIndex(
           size => size === Math.round(imageSizes.unscaledWidth)
         )

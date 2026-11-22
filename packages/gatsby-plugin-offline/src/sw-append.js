@@ -6,7 +6,7 @@ const { NavigationRoute } = workbox.routing
 let lastNavigationRequest = null
 let offlineShellEnabled = true
 
-// prefer standard object syntax to support more browsers
+// より多くのブラウザに対応するため、標準的なオブジェクトの構文を使う
 const MessageAPI = {
   setPathResources: (event, { path, resources }) => {
     event.waitUntil(idbKeyval.set(`resources:${path}`, resources))
@@ -15,10 +15,10 @@ const MessageAPI = {
   clearPathResources: event => {
     event.waitUntil(idbKeyval.clear())
 
-    // We detected compilation hash mismatch
-    // we should clear runtime cache as data
-    // files might be out of sync and we should
-    // do fresh fetches for them
+    // コンパイルハッシュの不一致を検出した
+    // データファイルが同期していない可能性があるので、
+    // ランタイムキャッシュを消去して、
+    // あらためて fetch する必要がある
     event.waitUntil(
       caches.keys().then(function (keyList) {
         return Promise.all(
@@ -80,8 +80,8 @@ function handleAPIRequest({ event }) {
 }
 
 const navigationRoute = new NavigationRoute(async ({ event }) => {
-  // handle API requests separately to normal navigation requests, so do this
-  // check first
+  // API リクエストは通常のナビゲーションリクエストとは別に扱うので、
+  // この確認を先に行う
   if (event.request.url.match(/\/.gatsby-plugin-offline:.+/)) {
     return handleAPIRequest({ event })
   }
@@ -95,17 +95,17 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
   let { pathname } = new URL(event.request.url)
   pathname = pathname.replace(new RegExp(`^%pathPrefix%`), ``)
 
-  // Check for resources + the app bundle
-  // The latter may not exist if the SW is updating to a new version
+  // リソースと app バンドルを確認する
+  // 後者は、SW が新しいバージョンへ更新中の場合には存在しないことがある
   const resources = await idbKeyval.get(`resources:${pathname}`)
   if (!resources || !(await caches.match(`%pathPrefix%/%appFile%`))) {
     return await fetch(event.request)
   }
 
   for (const resource of resources) {
-    // As soon as we detect a failed resource, fetch the entire page from
-    // network - that way we won't risk being in an inconsistent state with
-    // some parts of the page failing.
+    // リソースの失敗を検出したら、すぐにページ全体をネットワークから
+    // 取得する。こうすれば、ページの一部だけが失敗して
+    // 不整合な状態になるおそれがない。
     if (!(await caches.match(resource))) {
       return await fetch(event.request)
     }
@@ -118,5 +118,5 @@ const navigationRoute = new NavigationRoute(async ({ event }) => {
 
 workbox.routing.registerRoute(navigationRoute)
 
-// this route is used when performing a non-navigation request (e.g. fetch)
+// このルートは、ナビゲーション以外のリクエスト（fetch など）を行うときに使われる
 workbox.routing.registerRoute(/\/.gatsby-plugin-offline:.+/, handleAPIRequest)

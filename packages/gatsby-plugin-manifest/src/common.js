@@ -8,7 +8,7 @@ exports.favicons = [
   },
 ]
 
-// default icons for generating icons
+// アイコンの生成に使うデフォルトのアイコン一覧
 exports.defaultIcons = [
   {
     src: `icons/icon-48x48.png`,
@@ -53,8 +53,8 @@ exports.defaultIcons = [
 ]
 
 /**
- * @param {string} path The generic path to an icon
- * @param {string} digest The digest of the icon provided in the plugin's options.
+ * @param {string} path アイコンへの汎用的なパス
+ * @param {string} digest プラグインのオプションで指定されたアイコンのダイジェスト。
  */
 exports.addDigestToPath = function (path, digest, method) {
   if (method === `name`) {

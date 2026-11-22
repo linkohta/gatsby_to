@@ -1,12 +1,12 @@
 /**
- * Usage:
+ * 使い方:
  *
  * // gatsby-config.js
  * plugins: [
  *  `gatsby-plugin-stylus`,
  * ],
  *
- * // Usage with options:
+ * // オプション付きの使い方:
  *
  * // gatsby-config.js
  * plugins: [

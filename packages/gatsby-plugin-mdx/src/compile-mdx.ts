@@ -6,10 +6,10 @@ import { enhanceMdxOptions, IMdxPluginOptions } from "./plugin-options"
 import { ERROR_CODES } from "./error-utils"
 import { cachedImport, createFileToMdxCacheKey } from "./cache-helpers"
 
-// Compiles MDX into JS
-// Differences to original @mdx-js/loader:
-// * We pass the MDX node and a metadata object to the processor
-// * We inject the path to the original mdx file into the VFile which is used by the processor
+// MDX を JS にコンパイルする
+// 元の @mdx-js/loader との違い:
+// * MDX ノードとメタデータオブジェクトをプロセッサーに渡す
+// * 元の mdx ファイルのパスを、プロセッサーが使う VFile に注入する
 export async function compileMDX(
   { absolutePath, source }: { absolutePath: string; source: string | Buffer },
   options: ProcessorOptions,
@@ -24,7 +24,7 @@ export async function compileMDX(
 
     const processor = createProcessor(options)
 
-    // Pass required custom data into the processor
+    // 必要なカスタムデータをプロセッサーに渡す
     processor.data(
       `mdxNodeId`,
       await cache.get(createFileToMdxCacheKey(absolutePath))
@@ -32,11 +32,11 @@ export async function compileMDX(
     processor.data(`mdxMetadata`, {})
 
     const result = await processor.process(
-      // Inject path to original file for remark plugins. See: https://github.com/gatsbyjs/gatsby/issues/26914
+      // remark プラグインのために、元のファイルのパスを注入する。参照: https://github.com/gatsbyjs/gatsby/issues/26914
       new VFile({ value: source, path: absolutePath })
     )
 
-    // Clone metadata so ensure it won't be overridden by later processings
+    // 後続の処理で上書きされないよう、メタデータを複製する
     const clonedMetadata = Object.assign(
       {},
       processor.data(`mdxMetadata`) as IMdxMetadata
@@ -57,9 +57,9 @@ export async function compileMDX(
 }
 
 /**
- * This helper function allows you to inject additional plugins and configuration into the MDX
- * compilation pipeline. Very useful to create your own resolvers that return custom metadata.
- * Internally used to generate the tables of contents and the excerpts.
+ * このヘルパー関数を使うと、MDX のコンパイルパイプラインに追加のプラグインや設定を
+ * 注入できる。カスタムのメタデータを返す独自のリゾルバーを作るときにとても役立つ。
+ * 内部では、目次と抜粋の生成に使っている。
  */
 export const compileMDXWithCustomOptions = async (
   { absolutePath, source }: { absolutePath: string; source: string | Buffer },
@@ -91,7 +91,7 @@ export const compileMDXWithCustomOptions = async (
     customOptions
   )
 
-  // Prepare MDX compile
+  // MDX のコンパイルを準備する
   const mdxOptions = await enhanceMdxOptions(customPluginOptions, {
     getNode,
     getNodesByType,
@@ -101,7 +101,7 @@ export const compileMDXWithCustomOptions = async (
     store,
   })
 
-  // Compile MDX and extract metadata
+  // MDX をコンパイルしてメタデータを取り出す
   return compileMDX(
     {
       source: source,

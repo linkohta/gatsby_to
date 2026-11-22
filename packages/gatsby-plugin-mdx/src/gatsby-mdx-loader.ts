@@ -13,7 +13,7 @@ export interface IGatsbyMDXLoaderOptions {
   reporter: NodePluginArgs["reporter"]
 }
 
-// Custom MDX Loader that compiles MDX to JSX
+// MDX を JSX にコンパイルするカスタムの MDX ローダー
 const gatsbyMDXLoader: LoaderDefinition = async function (source) {
   const { options, getNode, cache, reporter } =
     this.getOptions() as IGatsbyMDXLoaderOptions
@@ -30,7 +30,7 @@ const gatsbyMDXLoader: LoaderDefinition = async function (source) {
   }
 
   const compileRes = await compileMDX(
-    // We want to work with the transformed source from our layout plugin
+    // レイアウトプラグインが変換した後のソースを扱いたい
     {
       absolutePath: resourcePath,
       source: mdxNode.body as string,

@@ -12,8 +12,8 @@ exports.pluginOptionsSchema = pluginOptionsSchema
 
 exports.onPostBuild = async ({ graphql, reporter }, pluginOptions) => {
   /*
-   * Run the site settings query to gather context, then
-   * then run the corresponding feed for each query.
+   * サイト設定のクエリを実行してコンテキストを集め、
+   * その後、クエリごとに対応するフィードを生成する。
    */
   const options = {
     ...defaultOptions,

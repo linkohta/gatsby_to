@@ -6,7 +6,7 @@ export const onRenderBody = ({
   setBodyAttributes,
 }) => {
   const helmet = Helmet.renderStatic()
-  // These action functions were added partway through the Gatsby 1.x cycle.
+  // これらのアクション関数は、Gatsby 1.x の途中で追加された。
   if (setHtmlAttributes) {
     setHtmlAttributes(helmet.htmlAttributes.toComponent())
   }

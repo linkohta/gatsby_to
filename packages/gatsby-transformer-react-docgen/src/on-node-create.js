@@ -7,7 +7,7 @@ function canParse(node) {
   return (
     node &&
     (node.internal.mediaType === `application/javascript` ||
-      // TypeScript doesn't really have a mime type and .ts files are a media file :/
+      // TypeScript には実質的に mime タイプがなく、.ts ファイルはメディアファイルと判定される :/
       node.internal.mediaType === `application/typescript` ||
       node.internal.mediaType === `text/jsx` ||
       node.internal.mediaType === `text/tsx` ||
@@ -127,7 +127,7 @@ export async function onCreateNode(
 
     let metadataNode = {
       ...component,
-      props: null, // handled by the prop node creation
+      props: null, // prop ノードの作成時に処理される
       id: createNodeId(nodeId),
       children: [],
       parent: node.id,

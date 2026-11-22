@@ -1,7 +1,7 @@
 const Prism = require(`prismjs`)
 const prismComponents = require(`prismjs/components`)
 
-// Get the real name of a language given it or an alias
+// 言語名またはエイリアスから、言語の実際の名前を取得する
 const getBaseLanguageName = (nameOrAlias, components = prismComponents) => {
   if (components.languages[nameOrAlias]) {
     return nameOrAlias
@@ -25,19 +25,19 @@ module.exports = function loadPrismLanguage(language) {
   }
 
   if (Prism.languages[baseLanguage]) {
-    // Don't load already loaded language
+    // 読み込み済みの言語は読み込まない
     return
   }
 
   const languageData = prismComponents.languages[baseLanguage]
 
   if (languageData.option === `default`) {
-    // Default language has already been loaded by Prism
+    // デフォルトの言語は、すでに Prism によって読み込まれている
     return
   }
 
   if (languageData.require) {
-    // Load the required language first
+    // 必要な言語を先に読み込む
     if (Array.isArray(languageData.require)) {
       languageData.require.forEach(loadPrismLanguage)
     } else {
@@ -48,5 +48,5 @@ module.exports = function loadPrismLanguage(language) {
   require(`prismjs/components/prism-${baseLanguage}.js`)
 }
 
-/* Exposed for unit testing */
+/* ユニットテスト用に公開している */
 module.exports.getBaseLanguageName = getBaseLanguageName

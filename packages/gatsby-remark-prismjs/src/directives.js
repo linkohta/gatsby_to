@@ -1,14 +1,14 @@
 const rangeParser = require(`parse-numeric-range`)
 
 /**
- * As code has already been prism-highlighted at this point,
- * a JSX opening comment:
+ * この時点でコードはすでに prism でハイライトされているので、
+ * JSX の開始コメント:
  *     {/*
- * would look like this:
+ * は次のようになる:
  *     <span class="token punctuation">{</span><span class="token comment">/*
- * And a HTML opening comment:
+ * また、HTML の開始コメント:
  *     <!--
- * would look like this:
+ * は次のようになる:
  *     &lt;!--
  */
 const HIGHLIGHTED_JSX_COMMENT_START = `<span class="token punctuation">\\{<\\/span><span class="token comment">\\/\\*`
@@ -38,10 +38,10 @@ const MULTILINE_TOKEN_SPAN = /<span class="token ([^"]+)">[^<]*\n[^<]*<\/span>/g
 
 const stripComment = line =>
   /**
-   * This regexp does the following:
-   * 1. Match a comment start, along with the accompanying PrismJS opening comment span tag;
-   * 2. Match one of the directives;
-   * 3. Match a comment end, along with the accompanying PrismJS closing span tag.
+   * この正規表現は次のことを行う:
+   * 1. コメントの開始と、それに伴う PrismJS のコメント開始の span タグに一致する。
+   * 2. いずれかのディレクティブに一致する。
+   * 3. コメントの終了と、それに伴う PrismJS の終了の span タグに一致する。
    */
   line.replace(
     new RegExp(
@@ -67,7 +67,7 @@ const parseLine = (line, code, index, actions) => {
       actions.hide(index)
       break
     case `start`: {
-      // find the next `${feature}-end` directive, starting from next line
+      // 次の行から始めて、次の `${feature}-end` ディレクティブを見つける
       const endIndex = code.findIndex(
         (line, idx) => idx > index && END_DIRECTIVE[feature].test(line)
       )
@@ -107,11 +107,11 @@ const parseLine = (line, code, index, actions) => {
 
 module.exports = function highlightLineRange(code, highlights = []) {
   if (highlights.length > 0 || HIGHLIGHT_DIRECTIVE.test(code)) {
-    // HACK split multiline spans with line separators inside into multiple spans
-    // separated by line separator - this fixes line highlighting behaviour for
-    //  - plain-text in jsx,
-    //  - tripple-quoted-string in python,
-    //  - comment in c-like languages (including javascript), etc.
+    // HACK: 行区切りを含む複数行の span を、行区切りで区切った複数の span に
+    // 分割する。これにより、次のものに対する行のハイライトの挙動が直る
+    //  - jsx の plain-text、
+    //  - python の tripple-quoted-string、
+    //  - c 系の言語（javascript を含む）の comment など。
     code = code.replace(MULTILINE_TOKEN_SPAN, (match, token) =>
       match.replace(/\n/g, `</span>\n<span class="token ${token}">`)
     )
@@ -163,9 +163,9 @@ module.exports = function highlightLineRange(code, highlights = []) {
         return line
       })
 
-  // If a highlight range is passed with the language declaration, e.g.
+  // 言語の宣言と一緒にハイライトの範囲が渡された場合、たとえば
   // ``jsx{1, 3-4}
-  // we only use that and do not try to parse highlight directives
+  // の場合は、それだけを使い、ハイライトのディレクティブはパースしない
   if (highlights.length > 0) {
     highlights.forEach(lineNumber => {
       actions.highlight(lineNumber - 1)

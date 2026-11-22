@@ -2,7 +2,7 @@ import React from "react"
 import { JssProvider, SheetsRegistry, ThemeProvider } from "react-jss"
 
 /**
- * Keep track of SheetRegistry for each page
+ * ページごとの SheetRegistry を保持する
  */
 const sheetsRegistryManager = new Map()
 

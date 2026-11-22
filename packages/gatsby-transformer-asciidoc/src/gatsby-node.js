@@ -4,7 +4,7 @@ const _ = require(`lodash`)
 function shouldOnCreateNode({ node }, pluginOptions = {}) {
   const extensionsConfig = pluginOptions.fileExtensions
 
-  // make extensions configurable and use adoc and asciidoc as default
+  // 拡張子を設定可能にし、デフォルトでは adoc と asciidoc を使う
   const supportedExtensions =
     extensionsConfig instanceof Array ? extensionsConfig : [`adoc`, `asciidoc`]
 
@@ -23,7 +23,7 @@ async function onCreateNode(
   },
   pluginOptions
 ) {
-  // register custom converter if given
+  // カスタムのコンバーターが指定されていれば登録する
   if (pluginOptions.converterFactory) {
     asciidoc.ConverterFactory.register(
       new pluginOptions.converterFactory(asciidoc),
@@ -31,15 +31,15 @@ async function onCreateNode(
     )
   }
 
-  // changes the incoming imagesdir option to take the
+  // 渡された imagesdir オプションを変更する
   const asciidocOptions = processPluginOptions(pluginOptions, pathPrefix)
 
   const { createNode, createParentChildLink } = actions
-  // Load Asciidoc contents
+  // Asciidoc の内容を読み込む
   const content = await loadNodeContent(node)
-  // Load Asciidoc file for extracting
+  // 抽出のために Asciidoc ファイルを読み込む
   // https://asciidoctor-docs.netlify.app/asciidoctor.js/processor/extract-api/
-  // We use a `let` here as a warning: some operations, like .convert() mutate the document
+  // ここで `let` を使っているのは注意喚起のためである。.convert() などの一部の操作は document を変更する
   const doc = await asciidoc.load(content, {
     base_dir: node.dir,
     ...asciidocOptions,
@@ -47,7 +47,7 @@ async function onCreateNode(
 
   try {
     const html = doc.convert()
-    // Use "partition" option to be able to get title, subtitle, combined
+    // title、subtitle、combined を取得できるよう、"partition" オプションを使う
     const title = doc.getDocumentTitle({ partition: true })
 
     let revision = null

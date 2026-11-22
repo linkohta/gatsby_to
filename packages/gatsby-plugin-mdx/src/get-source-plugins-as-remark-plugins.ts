@@ -37,7 +37,7 @@ export async function getSourcePluginsAsRemarkPlugins({
       const mdxNode = getNode(this.data(`mdxNodeId`) as string)
 
       return async function transformer(markdownAST): Promise<any> {
-        // Execute gatsby-remark-* plugin
+        // gatsby-remark-* プラグインを実行する
         await requiredPlugin(
           {
             markdownAST,

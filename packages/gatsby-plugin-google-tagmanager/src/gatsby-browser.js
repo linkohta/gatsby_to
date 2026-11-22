@@ -26,12 +26,12 @@ function sendWebVitals(dataLayerName = `dataLayer`) {
 
   return import(`web-vitals/base`).then(({ getLCP, getFID, getCLS }) => {
     const debouncedCLS = debounce(sendData, 3000)
-    // we don't need to debounce FID - we send it when it happens
+    // FID はデバウンスする必要がない。発生した時点で送信する
     const debouncedFID = sendData
-    // LCP can occur multiple times so we debounce it
+    // LCP は複数回発生することがあるので、デバウンスする
     const debouncedLCP = debounce(sendData, 3000)
 
-    // With the true flag, we measure all previous occurences too, in case we start listening to late.
+    // true フラグを付けると、リッスンの開始が遅れた場合に備えて、それ以前の発生分もすべて計測する。
     getCLS(debouncedCLS, true)
     getFID(debouncedFID, true)
     getLCP(debouncedLCP, true)
@@ -43,14 +43,14 @@ function sendToGTM({ name, value, id }, dataLayer) {
     event: `core-web-vitals`,
     webVitalsMeasurement: {
       name: name,
-      // The `id` value will be unique to the current page load. When sending
-      // multiple values from the same page (e.g. for CLS), Google Analytics can
-      // compute a total by grouping on this ID (note: requires `eventLabel` to
-      // be a dimension in your report).
+      // `id` の値は、現在のページ読み込みに固有のものになる。同じページから
+      // 複数の値を送る場合（CLS など）、Google Analytics はこの ID で
+      // グループ化して合計を計算できる（注: レポートのディメンションに
+      // `eventLabel` を含める必要がある）。
       id,
-      // Google Analytics metrics must be integers, so the value is rounded.
-      // For CLS the value is first multiplied by 1000 for greater precision
-      // (note: increase the multiplier for greater precision if needed).
+      // Google Analytics の指標は整数でなければならないので、値を丸めている。
+      // CLS は精度を上げるため、先に値を 1000 倍している
+      // （注: さらに精度が必要な場合は、倍率を上げること）。
       value: Math.round(name === `CLS` ? value * 1000 : value),
     },
   })
@@ -61,7 +61,7 @@ export function onRouteUpdate(_, pluginOptions) {
     process.env.NODE_ENV === `production` ||
     pluginOptions.includeInDevelopment
   ) {
-    // wrap inside a timeout to ensure the title has properly been changed
+    // タイトルが確実に変更されてから実行されるよう、timeout で包む
     setTimeout(() => {
       const data = pluginOptions.dataLayerName
         ? window[pluginOptions.dataLayerName]
@@ -76,7 +76,7 @@ export function onRouteUpdate(_, pluginOptions) {
 }
 
 export function onInitialClientRender(_, pluginOptions) {
-  // we only load the polyfill in production so we can't enable it in development
+  // polyfill は本番でしか読み込まないので、開発時には有効にできない
   if (
     process.env.NODE_ENV === `production` &&
     pluginOptions.enableWebVitalsTracking

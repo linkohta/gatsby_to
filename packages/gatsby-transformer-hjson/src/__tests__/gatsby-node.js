@@ -17,7 +17,7 @@ describe(`Process HJSON nodes correctly`, () => {
     },
   }
 
-  // Make some fake functions its expecting.
+  // 期待されるダミーの関数をいくつか用意する。
   const loadNodeContent = node => Promise.resolve(node.content)
 
   it(`correctly creates nodes from HJSON which is an array of objects`, async () => {

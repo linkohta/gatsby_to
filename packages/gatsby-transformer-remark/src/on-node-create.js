@@ -46,14 +46,14 @@ module.exports.onCreateNode = async function onCreateNode(
     }
 
     markdownNode.frontmatter = {
-      title: ``, // always include a title
+      title: ``, // 常に title を含める
       ...data.data,
     }
 
     markdownNode.excerpt = data.excerpt
     markdownNode.rawMarkdownBody = data.content
 
-    // Add path to the markdown file path
+    // markdown ファイルのパスを追加する
     if (node.internal.type === `File`) {
       markdownNode.fileAbsolutePath = node.absolutePath
     }
@@ -72,7 +72,7 @@ module.exports.onCreateNode = async function onCreateNode(
       ${err.message}`
     )
 
-    return {} // eslint
+    return {} // ESLint 対策
   }
 }
 

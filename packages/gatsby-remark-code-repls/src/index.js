@@ -18,13 +18,13 @@ const {
   OPTION_DEFAULT_CODESANDBOX,
 } = require(`./constants`)
 
-// Matches compression used in Babel and CodeSandbox REPLs
+// Babel と CodeSandbox の REPL で使われている圧縮方式に合わせている
 // https://github.com/babel/website/blob/master/js/repl/UriUtils.js
 const compress = string =>
   LZString.compressToBase64(string)
-    .replace(/\+/g, `-`) // Convert '+' to '-'
-    .replace(/\//g, `_`) // Convert '/' to '_'
-    .replace(/=+$/, ``) // Remove ending '='
+    .replace(/\+/g, `-`) // '+' を '-' に変換する
+    .replace(/\//g, `_`) // '/' を '_' に変換する
+    .replace(/=+$/, ``) // 末尾の '=' を取り除く
 
 function convertNodeToLink(node, text, href, target) {
   target = target ? `target="${target}" rel="noreferrer"` : ``
@@ -75,8 +75,8 @@ module.exports = (
         }
 
         return {
-          url, // filename itself
-          filePath: normalizePath(join(directory, url)), // absolute path
+          url, // ファイル名そのもの
+          filePath: normalizePath(join(directory, url)), // 絶対パス
         }
       })
 
@@ -129,7 +129,7 @@ module.exports = (
         )
         verifyMultipleFiles(filesPaths, PROTOCOL_CODE_SANDBOX)
 
-        // CodeSandbox GET API requires a list of "files" keyed by name
+        // CodeSandbox の GET API には、名前をキーにした "files" の一覧が必要である
         let parameters = {
           files: {
             "package.json": {
@@ -159,7 +159,7 @@ module.exports = (
           }
         })
 
-        // This config JSON must then be lz-string compressed
+        // この設定の JSON は、さらに lz-string で圧縮する必要がある
         parameters = compress(JSON.stringify(parameters))
 
         const href = `https://codesandbox.io/api/v1/sandboxes/define?parameters=${parameters}`
@@ -172,8 +172,8 @@ module.exports = (
 
         verifyFile(filePath, PROTOCOL_RAMDA)
 
-        // Don't use `compress()` as the Ramda REPL won't understand the output.
-        // It uses URI to encode the code for its urls, so we do the same.
+        // `compress()` は使わないこと。Ramda の REPL がその出力を解釈できないためである。
+        // Ramda の REPL は URL 用のコードを URI でエンコードするので、ここでも同じようにする。
         const code = URI.encode(fs.readFileSync(filePath, `utf8`))
         const href = `http://ramdajs.com/repl/#?${code}`
         const text =
@@ -182,7 +182,7 @@ module.exports = (
       }
     }
 
-    // No change
+    // 変更なし
     return node
   })
 

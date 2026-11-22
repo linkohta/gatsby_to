@@ -31,7 +31,7 @@ module.exports = (
     return aliases[lower] || lower
   }
 
-  // Load language extension if defined
+  // 言語の拡張が定義されていれば読み込む
   loadLanguageExtension(languageExtensions)
 
   visit(markdownAST, `code`, node => {
@@ -60,10 +60,10 @@ module.exports = (
       language = splitLanguage
     }
 
-    // PrismJS's theme styles are targeting pre[class*="language-"]
-    // to apply its styles. We do the same here so that users
-    // can apply a PrismJS theme and get the expected, ready-to-use
-    // outcome without any additional CSS.
+    // PrismJS のテーマのスタイルは、pre[class*="language-"] を対象に
+    // スタイルを適用する。ここでも同じようにして、ユーザーが
+    // PrismJS のテーマを適用するだけで、追加の CSS なしに、期待どおりの
+    // すぐに使える結果を得られるようにする。
     //
     // @see https://github.com/PrismJS/prism/blob/1d5047df37aacc900f8270b1c6215028f6988eb1/themes/prism.css#L49-L54
     let languageName = `text`
@@ -71,18 +71,18 @@ module.exports = (
       languageName = normalizeLanguage(language)
     }
 
-    // Allow users to specify a custom class prefix to avoid breaking
-    // line highlights if Prism is required by any other code.
-    // This supports custom user styling without causing Prism to
-    // re-process our already-highlighted markup.
+    // Prism が他のコードから require されている場合に行のハイライトが
+    // 壊れないよう、ユーザーがカスタムのクラスプレフィックスを指定できるようにする。
+    // これにより、Prism がハイライト済みのマークアップを再処理することなく、
+    // ユーザー独自のスタイル指定に対応できる。
     //
     // @see https://github.com/gatsbyjs/gatsby/issues/1486
     const className = `${classPrefix}${languageName}${
       diffLanguage ? `-${diffLanguage}` : ``
     }`
 
-    // Replace the node with the markup we need to make
-    // 100% width highlighted code lines work
+    // コードのハイライト行を幅 100% で表示するために必要な
+    // マークアップに、ノードを置き換える
     node.type = `html`
 
     let highlightClassName = `gatsby-highlight`

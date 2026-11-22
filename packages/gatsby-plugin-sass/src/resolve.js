@@ -1,2 +1,2 @@
-// Split out to allow jest mocking
+// jest でモックできるよう分離している
 module.exports = module => require.resolve(module)

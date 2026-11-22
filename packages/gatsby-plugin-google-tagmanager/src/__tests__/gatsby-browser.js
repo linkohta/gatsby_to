@@ -148,7 +148,7 @@ describe(`onRouteUpdate`, () => {
     })
     onInitialClientRender({}, { enableWebVitalsTracking: true })
 
-    // wait 2 ticks to wait for dynamic import to resolve
+    // 動的 import の解決を待つため、2 ティック待つ
     await Promise.resolve()
     await Promise.resolve()
 
@@ -187,7 +187,7 @@ describe(`onRouteUpdate`, () => {
     })
     onInitialClientRender({}, { enableWebVitalsTracking: false })
 
-    // wait 2 ticks to wait for dynamic import to resolve
+    // 動的 import の解決を待つため、2 ティック待つ
     await Promise.resolve()
     await Promise.resolve()
 

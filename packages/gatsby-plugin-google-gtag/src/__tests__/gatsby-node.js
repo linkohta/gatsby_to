@@ -4,7 +4,7 @@ import { pluginOptionsSchema } from "../gatsby-node"
 describe(`pluginOptionsSchema`, () => {
   it(`should invalidate incorrect options`, async () => {
     const options = {
-      trackingIds: undefined, // Is required
+      trackingIds: undefined, // 必須である
       gtagConfig: `test`,
       pluginConfig: {
         head: `test`,

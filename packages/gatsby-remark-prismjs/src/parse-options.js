@@ -12,19 +12,19 @@ module.exports = language => {
     let numberLinesStartAt
     let promptUserLocal
     let promptHostLocal
-    // Options can be given in any order and are optional
+    // オプションは任意の順序で指定でき、省略もできる
 
     options.forEach(option => {
       option = option.slice(0, -1)
       const splitOption = option.replace(/ /g, ``).split(`:`)
 
-      // Test if the option is for line highlighting
+      // オプションが行のハイライト用かを判定する
       if (splitOption.length === 1 && rangeParser(option).length > 0) {
         highlightLines = rangeParser(option).filter(n => n > 0)
       }
-      // Test if the option is for line numbering
-      // Option must look like `numberLines: true` or `numberLines: <integer>`
-      // Otherwise we disable line numbering
+      // オプションが行番号用かを判定する
+      // オプションは `numberLines: true` か `numberLines: <integer>` の形でなければならない
+      // それ以外の場合は行番号を無効にする
 
       if (
         splitOption.length === 2 &&

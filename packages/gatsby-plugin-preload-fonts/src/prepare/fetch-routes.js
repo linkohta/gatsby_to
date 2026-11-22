@@ -36,10 +36,10 @@ ${red(`err`)} could not establish a connection with the dev server
   }
 
   const routesHash = createContentDigest(routes)
-  // We can't detect all new routes so to make sure we are up to date
-  // we ask the user if they wants to recrawl or not.
+  // 新しいルートをすべて検出することはできないので、最新の状態を保つために、
+  // 再クロールするかどうかをユーザーに尋ねる。
   if (cache.hash === routesHash) {
-    // In CI we can't ask the user anything so we will bail as if the user said no.
+    // CI ではユーザーに尋ねることができないので、ユーザーが no と答えたものとして処理を打ち切る。
     if (isCI()) {
       return []
     }

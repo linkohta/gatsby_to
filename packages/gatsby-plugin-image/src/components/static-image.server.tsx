@@ -14,7 +14,7 @@ export interface IStaticImageProps
   filename?: string
 }
 
-// These values are added by Babel. Do not add them manually
+// これらの値は Babel が追加する。手動で追加しないこと
 interface IPrivateProps {
   __imageData?: IGatsbyImageData
   __error?: string
@@ -27,7 +27,7 @@ export function _getStaticImage(
     src,
     __imageData: imageData,
     __error,
-    // We extract these because they're not meant to be passed-down to GatsbyImage
+    // GatsbyImage へ渡すためのものではないので、ここで取り出している
     /* eslint-disable @typescript-eslint/no-unused-vars */
     width,
     height,

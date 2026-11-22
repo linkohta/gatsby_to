@@ -13,13 +13,13 @@ import { SharpError } from "./sharp-error"
 
 const log = debug(`gatsby:gatsby-plugin-sharp`)
 
-// Try to enable the use of SIMD instructions. Seems to provide a smallish
-// speedup on resizing heavy loads (~10%). Sharp disables this feature by
-// default as there's been problems with segfaulting in the past but we'll be
-// adventurous and see what happens with it on.
+// SIMD 命令の使用を有効にしてみる。リサイズの多い負荷では、わずかに
+// 高速化されるようである（約 10%）。過去にセグメンテーション違反の問題が
+// あったため、Sharp はこの機能をデフォルトで無効にしているが、ここでは
+// あえて有効にして様子を見る。
 sharp.simd(true)
 
-// Concurrency is handled in gatsby-worker queue instead
+// 並列数は、代わりに gatsby-worker のキューで制御する
 sharp.concurrency(1)
 
 interface ITransform {
@@ -37,7 +37,7 @@ export const processFile = async (
     const inputBuffer = await fs.readFile(file)
     pipeline = sharp(inputBuffer, { failOn: options.failOn })
 
-    // Keep Metadata
+    // メタデータを保持する
     if (!options.stripMetadata) {
       pipeline = pipeline.withMetadata()
     }
@@ -67,8 +67,8 @@ export const processFile = async (
           clonedPipeline = clonedPipeline.rotate()
         }
 
-        // Sharp only allows ints as height/width. Since both aren't always
-        // set, check first before trying to round them.
+        // Sharp は height と width に整数しか受け付けない。両方が常に
+        // 設定されているとは限らないので、丸める前に確認する。
         let roundedHeight = transformArgs.height
         if (roundedHeight) {
           roundedHeight = Math.round(roundedHeight)
@@ -139,7 +139,7 @@ export const processFile = async (
         }
       } catch (err) {
         if (err instanceof SharpError) {
-          // rethrow
+          // 再度 throw する
           throw err
         }
 

@@ -12,7 +12,7 @@ jest.mock(`readline`, () => {
   }
 })
 
-// our mocked version persists the same interface between `createInterface` calls
+// このモック版は、`createInterface` の呼び出しをまたいで同じインターフェースを保持する
 const getReadlineInterface = () => createInterface()
 
 const answer = a =>
@@ -73,7 +73,7 @@ describe(`logger`, () => {
 
     const logger = createLogger(`info`)
 
-    // preemptively answer each call to `confirm` so the `await` won't hang forever
+    // `await` が永久に待ち続けないよう、`confirm` の各呼び出しにあらかじめ応答しておく
     answer(``)
     answer(`blah`)
     answer(`yes`)

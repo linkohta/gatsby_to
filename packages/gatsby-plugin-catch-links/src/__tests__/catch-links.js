@@ -9,12 +9,12 @@ import * as catchLinks from "../catch-links"
 
 beforeAll(() => {
   global.__BASE_PATH__ = ``
-  // Set the base URL we will be testing against to http://localhost:8000/blog
+  // テスト対象のベース URL を http://localhost:8000/blog に設定する
   window.history.pushState({}, `APP Url`, `${pathPrefix}`)
 })
 
 afterAll(() => {
-  // Set history back to http://localhost:8000
+  // history を http://localhost:8000 に戻す
   window.history.back()
 })
 
@@ -121,7 +121,7 @@ describe(`the clicked element`, () => {
     const testAnchor = document.createElement(`a`)
     document.body.appendChild(testAnchor)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -147,7 +147,7 @@ describe(`the clicked element`, () => {
     testAnchor.appendChild(clickTarget)
     document.body.appendChild(testAnchor)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -258,7 +258,7 @@ describe(`anchor target attribute looks like _self if`, () => {
 })
 
 describe(`navigation is routed through Gatsby if the destination href`, () => {
-  // We're going to manually set up the event listener here
+  // ここではイベントリスナーを手動で設定する
   let hrefHandler
   let eventDestroyer
 
@@ -279,7 +279,7 @@ describe(`navigation is routed through Gatsby if the destination href`, () => {
     )
     document.body.appendChild(sameOriginAndTopPath)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -307,7 +307,7 @@ describe(`navigation is routed through Gatsby if the destination href`, () => {
     )
     document.body.appendChild(withAnchor)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -335,7 +335,7 @@ describe(`navigation is routed through Gatsby if the destination href`, () => {
     )
     document.body.appendChild(withSearch)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -358,7 +358,7 @@ describe(`navigation is routed through Gatsby if the destination href`, () => {
 })
 
 describe(`navigation is routed through browser if resources have failed and the destination href`, () => {
-  // We're going to manually set up the event listener here
+  // ここではイベントリスナーを手動で設定する
   let hrefHandler
   let eventDestroyer
 
@@ -381,7 +381,7 @@ describe(`navigation is routed through browser if resources have failed and the 
     )
     document.body.appendChild(sameOriginAndTopPath)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
@@ -402,7 +402,7 @@ describe(`navigation is routed through browser if resources have failed and the 
 })
 
 describe(`pathPrefix is handled if caught link to ${pathPrefix}/article navigates to ${pathPrefix}/article`, () => {
-  // We're going to manually set up the event listener here
+  // ここではイベントリスナーを手動で設定する
   let hrefHandler
   let eventDestroyer
 
@@ -417,76 +417,76 @@ describe(`pathPrefix is handled if caught link to ${pathPrefix}/article navigate
   })
 
   test(`on sites with pathPrefix '${pathPrefix}'`, done => {
-    // simulate case with --prefix-paths and prefix /blog
+    // --prefix-paths を指定し、プレフィックスが /blog の場合を再現する
     global.__BASE_PATH__ = pathPrefix
 
-    // create the element with href /blog/article
+    // href が /blog/article の要素を作成する
     const clickElement = document.createElement(`a`)
     clickElement.setAttribute(`href`, `${window.location.href}/article`)
     document.body.appendChild(clickElement)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
       view: window,
     })
 
-    // fake module handler
+    // ダミーのモジュールハンドラー
     hrefHandler.mockImplementation(path => {
-      // place a mock where processing exits gatsby-link
+      // 処理が gatsby-link から抜ける箇所にモックを置く
       const checkPoint = (global.___navigate = jest.fn())
-      // call gatsby-link.navigate as the default handler does
+      // デフォルトのハンドラーと同じように gatsby-link.navigate を呼び出す
       navigate(path)
-      // compare href past gatsby-link against our clickElement
+      // gatsby-link を通った後の href を clickElement と比較する
       expect(checkPoint).toHaveBeenCalledWith(
         `${pathPrefix}/article`,
         undefined
       )
 
-      // cleanup
+      // 後片付け
       clickElement.remove()
       done()
     })
 
-    // and trigger click
+    // click を発火させる
     clickElement.dispatchEvent(clickEvent)
   })
 
   test(`on sites without pathPrefix`, done => {
-    // simulate default case without --prefix-paths
+    // --prefix-paths を指定しないデフォルトの場合を再現する
     global.__BASE_PATH__ = ``
 
-    // create the element with href /blog/article
+    // href が /blog/article の要素を作成する
     const clickElement = document.createElement(`a`)
     clickElement.setAttribute(`href`, `${window.location.href}/article`)
     document.body.appendChild(clickElement)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
       view: window,
     })
 
-    // fake module handler
+    // ダミーのモジュールハンドラー
     hrefHandler.mockImplementation(path => {
-      // place a mock where processing exits gatsby-link
+      // 処理が gatsby-link から抜ける箇所にモックを置く
       const checkPoint = (global.___navigate = jest.fn())
-      // call gatsby-link.navigate as the default handler does
+      // デフォルトのハンドラーと同じように gatsby-link.navigate を呼び出す
       navigate(path)
-      // compare href past gatsby-link against our clickElement
+      // gatsby-link を通った後の href を clickElement と比較する
       expect(checkPoint).toHaveBeenCalledWith(
         `${pathPrefix}/article`,
         undefined
       )
 
-      // cleanup
+      // 後片付け
       clickElement.remove()
       done()
     })
 
-    // and trigger click
+    // click を発火させる
     clickElement.dispatchEvent(clickEvent)
   })
 })
@@ -508,19 +508,19 @@ describe(`navigation is routed through browser without SVGAnimatedString support
   })
 
   test(`works without throwing an error`, () => {
-    // create a click element to use for testing
+    // テストで使う click 用の要素を作成する
     const clickElement = document.createElement(`a`)
     clickElement.setAttribute(`href`, `${window.location.href}/article`)
     document.body.appendChild(clickElement)
 
-    // create the click event we'll be using for testing
+    // テストで使う click イベントを作成する
     const clickEvent = new MouseEvent(`click`, {
       bubbles: true,
       cancelable: true,
       view: window,
     })
 
-    // and trigger click
+    // click を発火させる
     clickElement.dispatchEvent(clickEvent)
 
     expect(() =>

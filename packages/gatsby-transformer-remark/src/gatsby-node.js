@@ -4,7 +4,7 @@ exports.shouldOnCreateNode = shouldOnCreateNode
 exports.createSchemaCustomization = require(`./create-schema-customization`)
 exports.setFieldsOnGraphQLNodeType = require(`./extend-node-type`)
 
-// Dedupe warning
+// 警告の重複を防ぐ
 let warnedAboutJSFrontmatterEngine = false
 
 exports.pluginOptionsSchema = function ({ Joi }) {
@@ -21,7 +21,7 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     plugins: Joi.subPlugins().description(
       `A list of remark plugins. See also: https://github.com/gatsbyjs/gatsby/tree/master/examples/using-remark for examples`
     ),
-    // TODO(v6): Remove and disallow any custom engines (including JS)
+    // TODO(v6): 削除し、カスタムのエンジン（JS を含む）を一切許可しないようにする
     jsFrontmatterEngine: Joi.boolean()
       .default(false)
       .description(
@@ -31,7 +31,7 @@ exports.pluginOptionsSchema = function ({ Joi }) {
     const { jsFrontmatterEngine, engines = {} } = value || {}
 
     if (jsFrontmatterEngine) {
-      // show this warning only once in main process
+      // この警告は、メインプロセスで 1 回だけ表示する
       if (!process.env.GATSBY_WORKER_ID) {
         console.warn(
           `JS frontmatter engine is enabled in gatsby-transformer-remark (via jsFrontmatterEngine: true). This can cause a security risk, see https://github.com/gatsbyjs/gatsby/security/advisories/GHSA-7ch4-rr99-cqcw. If you are not relying on this feature we strongly suggest disabling it via the "jsFrontmatterEngine: false" plugin option. If you rely on this feature make sure to properly secure or sanitize your content source.`
@@ -47,7 +47,7 @@ exports.pluginOptionsSchema = function ({ Joi }) {
         )
         warnedAboutJSFrontmatterEngine = true
       }
-      // we still have to return a frontmatter, so we just stub it with empty object
+      // それでも frontmatter を返す必要があるので、空のオブジェクトで代用する
       return {}
     }
 
