@@ -386,7 +386,7 @@ describe(`NodeModel`, () => {
           query,
           type,
         })
-        return expect(result).rejects.toThrowError(
+        return expect(result).rejects.toThrow(
           `Querying GraphQLUnion types is not supported.`
         )
       })
@@ -1359,7 +1359,7 @@ describe(`NodeModel`, () => {
       await Promise.all([query1Promise, query2Promise])
 
       // マテリアライズがまとめられなかったこと（テストのセットアップが正しいこと）を確認する
-      expect(materializationSpy).toBeCalledTimes(2)
+      expect(materializationSpy).toHaveBeenCalledTimes(2)
 
       const resolvedFieldsForTestNodes = store
         .getState()

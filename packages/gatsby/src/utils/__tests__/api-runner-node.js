@@ -94,10 +94,10 @@ describe(`api-runner-node`, () => {
     })
     await apiRunnerNode(`testAPIHook`)
 
-    expect(start).toBeCalledTimes(6)
+    expect(start).toHaveBeenCalledTimes(6)
     // プラグイン自身が end/done を呼ばなくても、start を呼んだのと
     // 同じ回数だけ end を呼んでいる
-    expect(end).toBeCalledTimes(6)
+    expect(end).toHaveBeenCalledTimes(6)
   })
 
   it(`Doesn't initialize cache in onPreInit API`, async () => {
@@ -121,7 +121,7 @@ describe(`api-runner-node`, () => {
     })
     await apiRunnerNode(`onPreInit`)
     expect(getCache).not.toHaveBeenCalled()
-    expect(reporter.panicOnBuild).toBeCalledTimes(1)
+    expect(reporter.panicOnBuild).toHaveBeenCalledTimes(1)
     expect(reporter.panicOnBuild.mock.calls[0][0]).toMatchObject({
       context: {
         api: `onPreInit`,
@@ -150,7 +150,7 @@ describe(`api-runner-node`, () => {
       }
     })
     await apiRunnerNode(`onPreInit`)
-    expect(reporter.panicOnBuild).toBeCalledTimes(3)
+    expect(reporter.panicOnBuild).toHaveBeenCalledTimes(3)
     expect(reporter.panicOnBuild.mock.calls).toMatchInlineSnapshot(`
     Array [
       Array [
@@ -187,8 +187,8 @@ describe(`api-runner-node`, () => {
       }
     })
     await apiRunnerNode(`onPreInit`)
-    expect(reporter.panicOnBuild).toBeCalledTimes(1)
-    expect(reporter.setErrorMap).toBeCalledTimes(1)
+    expect(reporter.panicOnBuild).toHaveBeenCalledTimes(1)
+    expect(reporter.setErrorMap).toHaveBeenCalledTimes(1)
     expect(reporter.panicOnBuild.mock.calls[0]).toEqual([
       {
         id: `1337`,
@@ -223,8 +223,8 @@ describe(`api-runner-node`, () => {
       }
     })
     await apiRunnerNode(`onPreInit`)
-    expect(reporter.setErrorMap).toBeCalledTimes(1)
-    expect(panicOnBuild).toBeCalledTimes(1)
+    expect(reporter.setErrorMap).toHaveBeenCalledTimes(1)
+    expect(panicOnBuild).toHaveBeenCalledTimes(1)
     expect(reporter.activityTimer.mock.calls[3]).toEqual([
       `Test Activity`,
       {},
@@ -251,8 +251,8 @@ describe(`api-runner-node`, () => {
       }
     })
     await apiRunnerNode(`onPreInit`)
-    expect(reporter.setErrorMap).toBeCalledTimes(1)
-    expect(reporter.createProgress).toBeCalledTimes(4)
+    expect(reporter.setErrorMap).toHaveBeenCalledTimes(1)
+    expect(reporter.createProgress).toHaveBeenCalledTimes(4)
     expect(reporter.createProgress.mock.calls[3]).toEqual([
       `Test Progress`,
       0,

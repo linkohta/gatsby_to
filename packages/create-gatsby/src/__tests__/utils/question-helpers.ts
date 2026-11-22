@@ -45,7 +45,7 @@ describe(`question-helpers`, () => {
     it(`should warn if no dir name`, () => {
       const valid = validateProjectName(``)
       expect(valid).toBeFalsy()
-      expect(reporter.warn).toBeCalledWith(
+      expect(reporter.warn).toHaveBeenCalledWith(
         expect.stringContaining(
           `You have not provided a directory name for your site. Please do so when running with the 'y' flag.`
         )
@@ -56,7 +56,7 @@ describe(`question-helpers`, () => {
       const name = `<hello:"world`
       const valid = validateProjectName(name)
       expect(valid).toBeFalsy()
-      expect(reporter.warn).toBeCalledWith(
+      expect(reporter.warn).toHaveBeenCalledWith(
         expect.stringContaining(
           `The destination "${name}" is not a valid filename. Please try again, avoiding special characters.`
         )
@@ -68,7 +68,7 @@ describe(`question-helpers`, () => {
       const name = `hello-world`
       const valid = validateProjectName(name)
       expect(valid).toBeFalsy()
-      expect(reporter.warn).toBeCalledWith(
+      expect(reporter.warn).toHaveBeenCalledWith(
         expect.stringContaining(
           `The destination "${name}" already exists. Please choose a different name`
         )
@@ -95,7 +95,7 @@ describe(`question-helpers`, () => {
         const name = `aux`
         const valid = validateProjectName(name)
         expect(valid).toBeFalsy()
-        expect(reporter.warn).toBeCalledWith(
+        expect(reporter.warn).toHaveBeenCalledWith(
           expect.stringContaining(
             `The destination "${name}" is not a valid Windows filename. Please try another name`
           )

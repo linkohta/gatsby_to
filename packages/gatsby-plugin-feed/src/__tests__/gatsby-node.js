@@ -163,7 +163,7 @@ describe(`Test plugin feed`, () => {
     const [filePath, contents] = fs.writeFile.mock.calls[0]
     expect(filePath).toEqual(path.join(`public`, `rss_new.xml`))
     expect(contents).toMatchSnapshot()
-    expect(graphql).toBeCalledWith(customQuery)
+    expect(graphql).toHaveBeenCalledWith(customQuery)
   })
 
   it(`does not mutate base query when merging`, async () => {

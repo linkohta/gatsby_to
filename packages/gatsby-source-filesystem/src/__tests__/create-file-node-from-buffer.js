@@ -77,7 +77,7 @@ describe(`create-file-node-from-buffer`, () => {
       const buffer = createMockBuffer(`buffer-content`)
       await setup({ buffer, hash: `some-hash` })
 
-      expect(ensureDir).toBeCalledTimes(1)
+      expect(ensureDir).toHaveBeenCalledTimes(1)
       expect(bufferEq(buffer, output)).toBe(true)
     })
 
@@ -89,9 +89,9 @@ describe(`create-file-node-from-buffer`, () => {
       await setup({ getCache: () => cache, hash: `same-hash` })
       await setup({ getCache: () => cache, hash: `same-hash` })
 
-      expect(cache.get).toBeCalledTimes(1)
-      expect(cache.set).toBeCalledTimes(1)
-      expect(writeFile).toBeCalledTimes(1)
+      expect(cache.get).toHaveBeenCalledTimes(1)
+      expect(cache.set).toHaveBeenCalledTimes(1)
+      expect(writeFile).toHaveBeenCalledTimes(1)
     })
 
     it(`uses cached file from previous run with a matching hash`, async () => {
@@ -102,9 +102,11 @@ describe(`create-file-node-from-buffer`, () => {
 
       await setup({ getCache: () => cache, hash: `cached-hash` })
 
-      expect(cache.get).toBeCalledWith(expect.stringContaining(`cached-hash`))
-      expect(cache.set).not.toBeCalled()
-      expect(createFileNode).toBeCalledWith(
+      expect(cache.get).toHaveBeenCalledWith(
+        expect.stringContaining(`cached-hash`)
+      )
+      expect(cache.set).not.toHaveBeenCalled()
+      expect(createFileNode).toHaveBeenCalledWith(
         expect.stringContaining(`cached-file-path`),
         expect.any(Function),
         expect.any(Object)

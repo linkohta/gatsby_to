@@ -78,7 +78,7 @@ describe(`pluginOptionsSchema`, () => {
 
     expect(isValid).toBe(true)
 
-    expect(warnSpy).toBeCalledWith(
+    expect(warnSpy).toHaveBeenCalledWith(
       `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
     )
     expect(errors).toEqual([])
@@ -174,7 +174,7 @@ describe(`pluginOptionsSchema`, () => {
         expect(isValid).toBe(true)
 
         if (booleanValue) {
-          expect(warnSpy).toBeCalledWith(
+          expect(warnSpy).toHaveBeenCalledWith(
             `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
           )
         }
@@ -203,7 +203,7 @@ describe(`pluginOptionsSchema`, () => {
 
         expect(isValid).toBe(true)
 
-        expect(warnSpy).toBeCalledWith(
+        expect(warnSpy).toHaveBeenCalledWith(
           `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
         )
         expect(errors).toEqual([])
@@ -229,7 +229,7 @@ describe(`pluginOptionsSchema`, () => {
 
         expect(isValid).toBe(true)
 
-        expect(warnSpy).toBeCalledWith(
+        expect(warnSpy).toHaveBeenCalledWith(
           `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
         )
         expect(errors).toEqual([])
@@ -269,7 +269,7 @@ describe(`pluginOptionsSchema`, () => {
 
           expect(isValid).toBe(true)
 
-          expect(warnSpy).toBeCalledWith(
+          expect(warnSpy).toHaveBeenCalledWith(
             `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
           )
           expect(errors).toEqual([])
@@ -292,7 +292,7 @@ describe(`pluginOptionsSchema`, () => {
 
           expect(isValid).toBe(true)
 
-          expect(warnSpy).toBeCalledWith(
+          expect(warnSpy).toHaveBeenCalledWith(
             `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
           )
           expect(errors).toEqual([])
@@ -358,7 +358,7 @@ describe(`pluginOptionsSchema`, () => {
 
           expect(isValid).toBe(true)
 
-          expect(warnSpy).toBeCalledWith(
+          expect(warnSpy).toHaveBeenCalledWith(
             `"tracedSVG" plugin option for "gatsby-remark-images" is no longer supported. Blurred placeholder will be used. See https://gatsby.dev/tracesvg-removal/`
           )
           expect(errors).toEqual([])

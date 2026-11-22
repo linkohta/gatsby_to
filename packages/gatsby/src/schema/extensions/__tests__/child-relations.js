@@ -171,7 +171,7 @@ describe(`Define parent-child relationships with field extensions`, () => {
       `)
     )
     await buildSchema()
-    expect(report.warn).toBeCalledTimes(0)
+    expect(report.warn).toHaveBeenCalledTimes(0)
   })
 
   it(`adds children[Field] field to parent type with childOf extension`, async () => {
@@ -215,7 +215,7 @@ describe(`Define parent-child relationships with field extensions`, () => {
       `)
     )
     await buildSchema()
-    expect(report.error).toBeCalledWith(
+    expect(report.error).toHaveBeenCalledWith(
       `The \`childOf\` extension can only be used on types that implement the \`Node\` interface.\n` +
         `Check the type definition of \`Wrong\`.`
     )
@@ -828,7 +828,7 @@ describe(`Define parent-child relationships with field extensions`, () => {
       `)
     )
     await buildSchema()
-    expect(report.error).toBeCalledWith(
+    expect(report.error).toHaveBeenCalledWith(
       `With the \`childOf\` extension, children fields can only be added to ` +
         `interfaces which implement the \`Node\` interface.\n` +
         `Check the type definition of \`Ancestors\`.`
@@ -851,7 +851,7 @@ describe(`Define parent-child relationships with field extensions`, () => {
       `)
     )
     await buildSchema()
-    expect(report.error).toBeCalledWith(
+    expect(report.error).toHaveBeenCalledWith(
       `The \`childOf\` extension can only be used on types that implement the \`Node\` interface.\n` +
         `Check the type definition of \`NextGeneration\`.`
     )

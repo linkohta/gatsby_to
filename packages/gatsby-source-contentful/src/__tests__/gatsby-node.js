@@ -1240,7 +1240,7 @@ describe(`gatsby-node`, () => {
       localeFilter: () => false,
     })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: `Please check if your localeFilter is configured properly. Locales '${locales.join(
@@ -1324,7 +1324,7 @@ describe(`gatsby-node`, () => {
       contentTypeFilter: () => false,
     })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: `Please check if your contentTypeFilter is configured properly. Content types were filtered down to none.`,
@@ -1345,7 +1345,7 @@ describe(`gatsby-node`, () => {
 
     await simulateGatsbyBuild()
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: `Restricted ContentType name found. The name "reference" is not allowed.`,
@@ -1374,7 +1374,7 @@ describe(`gatsby-node`, () => {
       useNameForId: true,
     })
 
-    expect(reporter.panic).toBeCalledWith(
+    expect(reporter.panic).toHaveBeenCalledWith(
       expect.objectContaining({
         context: {
           sourceMessage: `Restricted ContentType name found. The name "tag" is not allowed.`,

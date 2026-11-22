@@ -61,7 +61,7 @@ describe(`gatsby-transformer-javascript-frontmatter`, () => {
             createContentDigest,
           })
         }
-        expect(loadNodeContent).toBeCalled()
+        expect(loadNodeContent).toHaveBeenCalled()
       }
     )
 
@@ -84,7 +84,7 @@ describe(`gatsby-transformer-javascript-frontmatter`, () => {
           createContentDigest,
         })
       }
-      expect(loadNodeContent).not.toBeCalled()
+      expect(loadNodeContent).not.toHaveBeenCalled()
     })
 
     it(`should load frontmatter data with exported object`, async () => {
@@ -98,7 +98,7 @@ describe(`gatsby-transformer-javascript-frontmatter`, () => {
           createContentDigest,
         })
       }
-      expect(actions.createNode).toBeCalled()
+      expect(actions.createNode).toHaveBeenCalled()
       expect(actions.createNode.mock.calls[0]).toMatchSnapshot()
     })
 
@@ -123,7 +123,7 @@ describe(`gatsby-transformer-javascript-frontmatter`, () => {
           createContentDigest,
         })
       }
-      expect(actions.createNode).toBeCalled()
+      expect(actions.createNode).toHaveBeenCalled()
       expect(actions.createNode.mock.calls[0]).toMatchSnapshot()
     })
 

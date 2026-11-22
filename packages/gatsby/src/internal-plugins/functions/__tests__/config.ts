@@ -50,7 +50,7 @@ describe(`createConfigAndPrintWarnings`, () => {
         },
       }
     `)
-    expect(reporterWarnSpy).toBeCalledTimes(0)
+    expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
   })
 
   describe(`input not matching schema (fallback to default and warnings)`, () => {
@@ -76,7 +76,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-      expect(reporterWarnSpy).toBeCalledTimes(1)
+      expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
       expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
         "\`bodyParser\` property of exported config in \`a-directory/function.js\` is misconfigured.
         Expected object:
@@ -134,7 +134,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-      expect(reporterWarnSpy).toBeCalledTimes(1)
+      expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
       expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
         "\`bodyParser\` property of exported config in \`a-directory/function.js\` is misconfigured.
         Expected object:
@@ -192,7 +192,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-      expect(reporterWarnSpy).toBeCalledTimes(1)
+      expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
       expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
         "Exported config in \`a-directory/function.js\` is misconfigured.
         Expected object:
@@ -253,7 +253,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-      expect(reporterWarnSpy).toBeCalledTimes(1)
+      expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
       expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
         "\`bodyParser\` property of exported config in \`a-directory/function.js\` is misconfigured.
         Expected object:
@@ -309,7 +309,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "limit": "1mb",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`type`, () => {
@@ -329,7 +329,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "type": "lorem/*",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`input not matching schema (fallback to default) - not an config object`, () => {
@@ -347,7 +347,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "limit": "100kb",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.text\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -384,7 +384,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "limit": "100kb",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.text\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -426,7 +426,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`type`, () => {
@@ -446,7 +446,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "type": "lorem/*",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`input not matching schema (fallback to default) - not an config object`, () => {
@@ -465,7 +465,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.json\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -503,7 +503,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.json\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -544,7 +544,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "limit": "1mb",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`type`, () => {
@@ -564,7 +564,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                     "type": "lorem/*",
                   }
               `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`input not matching schema (fallback to default) - not an config object`, () => {
@@ -583,7 +583,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.raw\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -621,7 +621,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.raw\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -664,7 +664,7 @@ describe(`createConfigAndPrintWarnings`, () => {
             "limit": "1mb",
           }
         `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`type`, () => {
@@ -686,7 +686,7 @@ describe(`createConfigAndPrintWarnings`, () => {
             "type": "lorem/*",
           }
         `)
-        expect(reporterWarnSpy).toBeCalledTimes(0)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(0)
       })
 
       it(`input not matching schema (fallback to default) - not an config object`, () => {
@@ -706,7 +706,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.urlencoded\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -747,7 +747,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.urlencoded\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:
@@ -788,7 +788,7 @@ describe(`createConfigAndPrintWarnings`, () => {
                   }
               `)
 
-        expect(reporterWarnSpy).toBeCalledTimes(1)
+        expect(reporterWarnSpy).toHaveBeenCalledTimes(1)
         expect(reporterWarnSpy.mock.calls[0][0]).toMatchInlineSnapshot(`
           "\`bodyParser.urlencoded\` property of exported config in \`a-directory/function.js\` is misconfigured.
           Expected object:

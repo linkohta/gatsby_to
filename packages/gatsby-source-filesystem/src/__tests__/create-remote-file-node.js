@@ -44,7 +44,7 @@ describe(`create-remote-file-node`, () => {
         ...defaultArgs,
         url: ``,
       })
-    ).toThrowError(
+    ).toThrow(
       `url passed to createRemoteFileNode is either missing or not a proper web uri: `
     )
   })

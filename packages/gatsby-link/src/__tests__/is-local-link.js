@@ -13,12 +13,12 @@ describe(`isLocalLink`, () => {
   })
   // TODO(v5): テストのスキップを解除する
   it.skip(`throws TypeError if input is undefined`, () => {
-    expect(() => isLocalLink(undefined)).toThrowError(
+    expect(() => isLocalLink(undefined)).toThrow(
       `Expected a \`string\`, got \`undefined\``
     )
   })
   it.skip(`throws TypeError if input is not a string`, () => {
-    expect(() => isLocalLink(-1)).toThrowError(
+    expect(() => isLocalLink(-1)).toThrow(
       `Expected a \`string\`, got \`number\``
     )
   })

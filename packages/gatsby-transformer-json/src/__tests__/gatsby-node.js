@@ -136,14 +136,14 @@ describe(`Process JSON nodes correctly`, () => {
 
         return bootstrapTest(node, { typeName }).then(
           ({ createNode, createParentChildLink }) => {
-            expect(createNode).toBeCalledWith(
+            expect(createNode).toHaveBeenCalledWith(
               expect.objectContaining({
                 internal: expect.objectContaining({
                   type: expectedOne,
                 }),
               })
             )
-            expect(createNode).toBeCalledWith(
+            expect(createNode).toHaveBeenCalledWith(
               expect.objectContaining({
                 internal: expect.objectContaining({
                   type: expectedTwo,
@@ -180,7 +180,7 @@ describe(`Process JSON nodes correctly`, () => {
 
       return bootstrapTest(node, { typeName }).then(
         ({ createNode, createParentChildLink }) => {
-          expect(createNode).toBeCalledWith(
+          expect(createNode).toHaveBeenCalledWith(
             expect.objectContaining({
               internal: expect.objectContaining({
                 type: expectedNodeType,

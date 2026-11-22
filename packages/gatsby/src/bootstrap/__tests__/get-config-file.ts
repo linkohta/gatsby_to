@@ -86,7 +86,7 @@ describe(`getConfigFile with cjs files`, () => {
   it(`should handle user require errors found in compiled gatsby-config.js`, async () => {
     await getConfigFile(configDir.cjs.userRequireCompiled, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `11902`,
       error: expect.toBeObject(),
       context: {
@@ -99,7 +99,7 @@ describe(`getConfigFile with cjs files`, () => {
   it(`should handle user require errors found in uncompiled gatsby-config.js`, async () => {
     await getConfigFile(configDir.cjs.userRequire, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10123`,
       error: expect.toBeObject(),
       context: {
@@ -112,7 +112,7 @@ describe(`getConfigFile with cjs files`, () => {
   it(`should handle near matches`, async () => {
     await getConfigFile(configDir.cjs.nearMatch, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10124`,
       error: expect.toBeObject(),
       context: {
@@ -126,7 +126,7 @@ describe(`getConfigFile with cjs files`, () => {
   it(`should handle gatsby config incorrectly located in src dir`, async () => {
     await getConfigFile(configDir.cjs.src, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10125`,
       context: {
         configName: `gatsby-config`,
@@ -152,7 +152,7 @@ describe(`getConfigFile with esm files`, () => {
   it(`should handle user require errors found in uncompiled gatsby-config.mjs`, async () => {
     await getConfigFile(configDir.esm.userImport, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10123`,
       error: expect.toBeObject(),
       context: {
@@ -165,7 +165,7 @@ describe(`getConfigFile with esm files`, () => {
   it(`should handle near matches`, async () => {
     await getConfigFile(configDir.esm.nearMatch, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10124`,
       error: expect.toBeObject(),
       context: {
@@ -179,7 +179,7 @@ describe(`getConfigFile with esm files`, () => {
   it(`should handle gatsby config incorrectly located in src dir`, async () => {
     await getConfigFile(configDir.esm.src, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10125`,
       context: {
         configName: `gatsby-config`,
@@ -197,7 +197,7 @@ describe(`getConfigFile with ts/tsx files`, () => {
 
     await getConfigFile(configDir.ts, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10127`,
       error: expect.toBeObject(),
       context: {
@@ -209,7 +209,7 @@ describe(`getConfigFile with ts/tsx files`, () => {
   it(`should handle .tsx extension`, async () => {
     await getConfigFile(configDir.tsx, `gatsby-config`)
 
-    expect(reporterPanicMock).toBeCalledWith({
+    expect(reporterPanicMock).toHaveBeenCalledWith({
       id: `10124`,
       error: expect.toBeObject(),
       context: {

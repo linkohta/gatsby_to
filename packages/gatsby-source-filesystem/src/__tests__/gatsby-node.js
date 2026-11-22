@@ -90,14 +90,14 @@ describe(`tests`, () => {
       await emitChokidarEvent(`add`, `test.md`)
 
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
       await expect(sourceNodesPromise).resolves.toBeDefined()
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`queues node creation from changed files`, async () => {
@@ -108,14 +108,14 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`change`, `test.md`)
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
       await expect(sourceNodesPromise).resolves.toBeDefined()
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`queues node creation from added directories`, async () => {
@@ -127,14 +127,14 @@ describe(`tests`, () => {
       await emitChokidarEvent(`addDir`, `test`)
 
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
       await expect(sourceNodesPromise).resolves.toBeDefined()
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`queues node deletion from deleted files`, async () => {
@@ -146,13 +146,13 @@ describe(`tests`, () => {
       await emitChokidarEvent(`unlink`, `test.md`)
 
       // ready は発行されていないので、ノードは削除されないはずである
-      expect(api.actions.deleteNode).not.toBeCalled()
+      expect(api.actions.deleteNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
       await expect(sourceNodesPromise).resolves.toBeDefined()
 
-      expect(api.actions.deleteNode).toBeCalled()
+      expect(api.actions.deleteNode).toHaveBeenCalled()
     })
 
     it(`queues node deletion from deleted directories`, async () => {
@@ -164,13 +164,13 @@ describe(`tests`, () => {
       await emitChokidarEvent(`unlinkDir`, `test`)
 
       // ready は発行されていないので、ノードは削除されないはずである
-      expect(api.actions.deleteNode).not.toBeCalled()
+      expect(api.actions.deleteNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
       await expect(sourceNodesPromise).resolves.toBeDefined()
 
-      expect(api.actions.deleteNode).toBeCalled()
+      expect(api.actions.deleteNode).toHaveBeenCalled()
     })
   })
 
@@ -182,8 +182,8 @@ describe(`tests`, () => {
       await tick()
 
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
@@ -191,7 +191,7 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`add`, `test.md`)
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`creates nodes from changed files`, async () => {
@@ -201,8 +201,8 @@ describe(`tests`, () => {
       await tick()
 
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
@@ -210,7 +210,7 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`change`, `test.md`)
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`creates nodes from added directories`, async () => {
@@ -220,8 +220,8 @@ describe(`tests`, () => {
       await tick()
 
       // ready は発行されていないので、ノードは作成されないはずである
-      expect(createFileNode).not.toBeCalled()
-      expect(api.actions.createNode).not.toBeCalled()
+      expect(createFileNode).not.toHaveBeenCalled()
+      expect(api.actions.createNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
@@ -229,7 +229,7 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`addDir`, `test`)
 
-      expect(api.actions.createNode).toBeCalled()
+      expect(api.actions.createNode).toHaveBeenCalled()
     })
 
     it(`delete nodes from deleted files`, async () => {
@@ -239,7 +239,7 @@ describe(`tests`, () => {
       await tick()
 
       // ready は発行されていないので、ノードは削除されないはずである
-      expect(api.actions.deleteNode).not.toBeCalled()
+      expect(api.actions.deleteNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
@@ -247,7 +247,7 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`unlink`, `test.md`)
 
-      expect(api.actions.deleteNode).toBeCalled()
+      expect(api.actions.deleteNode).toHaveBeenCalled()
     })
 
     it(`delete nodes from deleted directories`, async () => {
@@ -257,7 +257,7 @@ describe(`tests`, () => {
       await tick()
 
       // ready は発行されていないので、ノードは削除されないはずである
-      expect(api.actions.deleteNode).not.toBeCalled()
+      expect(api.actions.deleteNode).not.toHaveBeenCalled()
 
       await emitChokidarEvent(`ready`)
 
@@ -265,7 +265,7 @@ describe(`tests`, () => {
 
       await emitChokidarEvent(`unlinkDir`, `test`)
 
-      expect(api.actions.deleteNode).toBeCalled()
+      expect(api.actions.deleteNode).toHaveBeenCalled()
     })
   })
 })

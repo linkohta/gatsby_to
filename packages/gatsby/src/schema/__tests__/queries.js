@@ -1271,7 +1271,7 @@ describe(`Query schema`, () => {
             return mockActualOrderBy(...args)
           })
 
-          expect(orderBySpy).not.toBeCalled()
+          expect(orderBySpy).not.toHaveBeenCalled()
 
           // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
           // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
@@ -1297,7 +1297,7 @@ describe(`Query schema`, () => {
           const results = await runQuery(query)
 
           // 実行の途中ですべてのノードをメモリーから解放したことを確認する
-          expect(orderBySpy).toBeCalled()
+          expect(orderBySpy).toHaveBeenCalled()
 
           const expected = {
             allMarkdown: {
@@ -1460,7 +1460,7 @@ describe(`Query schema`, () => {
             return mockActualOrderBy(...args)
           })
 
-          expect(orderBySpy).not.toBeCalled()
+          expect(orderBySpy).not.toHaveBeenCalled()
 
           // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
           // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
@@ -1476,7 +1476,7 @@ describe(`Query schema`, () => {
           const results = await runQuery(query)
 
           // 実行の途中ですべてのノードをメモリーから解放したことを確認する
-          expect(orderBySpy).toBeCalled()
+          expect(orderBySpy).toHaveBeenCalled()
 
           const expected = {
             allMarkdown: {
@@ -1564,7 +1564,7 @@ describe(`Query schema`, () => {
               return mockActualOrderBy(...args)
             })
 
-            expect(orderBySpy).not.toBeCalled()
+            expect(orderBySpy).not.toHaveBeenCalled()
 
             // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
             // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
@@ -1580,7 +1580,7 @@ describe(`Query schema`, () => {
             const results = await runQuery(query)
 
             // 実行の途中ですべてのノードをメモリーから解放したことを確認する
-            expect(orderBySpy).toBeCalled()
+            expect(orderBySpy).toHaveBeenCalled()
 
             expect(results.errors).toBeUndefined()
             expect(results.data.allMarkdown.max).toEqual(399)
@@ -1662,7 +1662,7 @@ describe(`Query schema`, () => {
               return mockActualOrderBy(...args)
             })
 
-            expect(orderBySpy).not.toBeCalled()
+            expect(orderBySpy).not.toHaveBeenCalled()
 
             // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
             // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
@@ -1678,7 +1678,7 @@ describe(`Query schema`, () => {
             const results = await runQuery(query)
 
             // 実行の途中ですべてのノードをメモリーから解放したことを確認する
-            expect(orderBySpy).toBeCalled()
+            expect(orderBySpy).toHaveBeenCalled()
 
             expect(results.errors).toBeUndefined()
             expect(results.data.allMarkdown.min).toEqual(199)
@@ -1759,7 +1759,7 @@ describe(`Query schema`, () => {
               return mockActualOrderBy(...args)
             })
 
-            expect(orderBySpy).not.toBeCalled()
+            expect(orderBySpy).not.toHaveBeenCalled()
 
             // sort は、`orderBy` を使うコードパスを通すためだけに追加している。
             // そこで GC を強制して、ノードがメモリーから「ランダムに」解放される
@@ -1775,7 +1775,7 @@ describe(`Query schema`, () => {
             const results = await runQuery(query)
 
             // 実行の途中ですべてのノードをメモリーから解放したことを確認する
-            expect(orderBySpy).toBeCalled()
+            expect(orderBySpy).toHaveBeenCalled()
 
             expect(results.errors).toBeUndefined()
             expect(results.data.allMarkdown.sum).toEqual(199 + 399)
@@ -2438,7 +2438,7 @@ describe(`Query schema`, () => {
           },
         }
       `)
-      expect(datastoreRunQuerySpy).toBeCalledTimes(0)
+      expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(0)
     })
 
     it(`skips running datastore runQuery (there is no node that satisfies filters)`, async () => {
@@ -2450,7 +2450,7 @@ describe(`Query schema`, () => {
           },
         }
       `)
-      expect(datastoreRunQuerySpy).toBeCalledTimes(0)
+      expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(0)
     })
 
     it(`respect node type`, async () => {
@@ -2465,7 +2465,7 @@ describe(`Query schema`, () => {
             },
           }
         `)
-        expect(datastoreRunQuerySpy).toBeCalledTimes(0)
+        expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(0)
       }
 
       {
@@ -2491,7 +2491,7 @@ describe(`Query schema`, () => {
             },
           }
         `)
-        expect(datastoreRunQuerySpy).toBeCalledTimes(0)
+        expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(0)
       }
     })
 
@@ -2552,7 +2552,7 @@ describe(`Query schema`, () => {
             },
           }
         `)
-        expect(datastoreRunQuerySpy).toBeCalledTimes(1)
+        expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -2580,7 +2580,7 @@ describe(`Query schema`, () => {
           },
         }
       `)
-      expect(datastoreRunQuerySpy).toBeCalledTimes(1)
+      expect(datastoreRunQuerySpy).toHaveBeenCalledTimes(1)
     })
   })
 })

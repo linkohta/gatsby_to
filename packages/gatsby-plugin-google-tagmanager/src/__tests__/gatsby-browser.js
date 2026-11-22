@@ -193,8 +193,8 @@ describe(`onRouteUpdate`, () => {
 
     jest.runAllTimers()
 
-    expect(getLCP).not.toBeCalled()
-    expect(getFID).not.toBeCalled()
-    expect(getCLS).not.toBeCalled()
+    expect(getLCP).not.toHaveBeenCalled()
+    expect(getFID).not.toHaveBeenCalled()
+    expect(getCLS).not.toHaveBeenCalled()
   })
 })

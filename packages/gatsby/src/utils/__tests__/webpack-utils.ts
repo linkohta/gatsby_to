@@ -194,8 +194,8 @@ describe(`webpack utils`, () => {
       })
       it(`initialises autoprefixer with defaults`, () => {
         postcss.options.postcssOptions(postcss.loader)
-        expect(autoprefixer).toBeCalled()
-        expect(autoprefixer).toBeCalledWith({
+        expect(autoprefixer).toHaveBeenCalled()
+        expect(autoprefixer).toHaveBeenCalledWith({
           flexbox: `no-2009`,
           overrideBrowserslist: [],
         })
@@ -215,8 +215,8 @@ describe(`webpack utils`, () => {
       })
       it(`initialises autoprefixer with overrides`, () => {
         postcss.options.postcssOptions(postcss.loader)
-        expect(autoprefixer).toBeCalled()
-        expect(autoprefixer).toBeCalledWith({
+        expect(autoprefixer).toHaveBeenCalled()
+        expect(autoprefixer).toHaveBeenCalledWith({
           flexbox: `no-2009`,
           grid: `no-autoplace`,
           overrideBrowserslist: [],

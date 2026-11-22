@@ -25,7 +25,7 @@ describe(`install-plugins`, () => {
     await installPlugins([], {}, `not-existing-path`, [])
 
     // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
-    expect(reporter.error).toBeCalledWith(
+    expect(reporter.error).toHaveBeenCalledWith(
       `Could not find "gatsby" in not-existing-path. Perhaps it wasn't installed properly?`
     )
   })
@@ -44,7 +44,7 @@ describe(`install-plugins`, () => {
     await installPlugins([], {}, `not-existing-path`, [])
 
     // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
-    expect(reporter.error).toBeCalledWith(
+    expect(reporter.error).toHaveBeenCalledWith(
       `Could not find a suitable version of gatsby-cli. Please report this issue at https://www.github.com/gatsbyjs/gatsby/issues`
     )
   })
@@ -57,7 +57,7 @@ describe(`install-plugins`, () => {
     await installPlugins([], {}, `not-existing-path`, [])
 
     // 関数の挙動をテストしているが、DX が向上するので、おそらくその価値はある
-    expect(reporter.error).toBeCalledWith(
+    expect(reporter.error).toHaveBeenCalledWith(
       `Something went wrong when trying to add the plugins to the project: addPlugins is not a function`
     )
   })

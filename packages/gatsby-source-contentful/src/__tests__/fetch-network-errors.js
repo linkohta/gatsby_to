@@ -69,7 +69,7 @@ describe(`fetch-retry`, () => {
 
     await fetchContent({ pluginConfig, reporter, syncToken: null })
 
-    expect(reporter.panic).not.toBeCalled()
+    expect(reporter.panic).not.toHaveBeenCalled()
     expect(scope.isDone()).toBeTruthy()
   })
 
@@ -114,7 +114,7 @@ describe(`fetch-retry`, () => {
       msg.toEqual(expect.stringContaining(`Request ID: 123abc`))
       msg.toEqual(expect.stringContaining(`Attempts: 3`))
     }
-    expect(reporter.panic).toBeCalled()
+    expect(reporter.panic).toHaveBeenCalled()
     expect(scope.isDone()).toBeTruthy()
   })
 })
@@ -143,7 +143,7 @@ describe(`fetch-network-errors`, () => {
       )
     }
 
-    expect(reporter.panic).toBeCalled()
+    expect(reporter.panic).toHaveBeenCalled()
     expect(scope.isDone()).toBeTruthy()
   })
 
@@ -182,7 +182,7 @@ describe(`fetch-network-errors`, () => {
       msg.toEqual(expect.stringContaining(`Request ID: 123abc`))
     }
 
-    expect(reporter.panic).toBeCalled()
+    expect(reporter.panic).toHaveBeenCalled()
     expect(scope.isDone()).toBeTruthy()
   })
 })

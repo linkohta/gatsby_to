@@ -297,6 +297,6 @@ describe(`Resolve module exports`, () => {
       mode: `import`,
     })
 
-    expect(reporter.panic).toBeCalled()
+    expect(reporter.panic).toHaveBeenCalled()
   })
 })

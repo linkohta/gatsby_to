@@ -219,21 +219,21 @@ describe(`<Link />`, () => {
       jest.spyOn(global.console, `warn`)
       const to = `/courses?sort=name`
       setup({ linkProps: { to } })
-      expect(console.warn).not.toBeCalled()
+      expect(console.warn).not.toHaveBeenCalled()
     })
 
     it(`does not warn when relative`, () => {
       jest.spyOn(global.console, `warn`)
       const to = `./courses?sort=name`
       setup({ linkProps: { to } })
-      expect(console.warn).not.toBeCalled()
+      expect(console.warn).not.toHaveBeenCalled()
     })
 
     it(`warns when not internal`, () => {
       jest.spyOn(global.console, `warn`)
       const to = `https://gatsby.org`
       setup({ linkProps: { to } })
-      expect(console.warn).toBeCalled()
+      expect(console.warn).toHaveBeenCalled()
     })
   })
 

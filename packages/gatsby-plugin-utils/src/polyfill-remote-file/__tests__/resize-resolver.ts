@@ -154,15 +154,13 @@ describe(`resizeResolver`, () => {
         },
         actions
       )
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       `Unknown format "unknown" was given to resize ${portraitSource.url}`
     )
   })
 
   it(`should fail when no height or width is given`, async () => {
-    await expect(
-      resizeResolver(portraitSource, {}, actions)
-    ).rejects.toThrowError(
+    await expect(resizeResolver(portraitSource, {}, actions)).rejects.toThrow(
       `No width or height is given to resize "${portraitSource.url}"`
     )
   })

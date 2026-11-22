@@ -171,7 +171,7 @@ describe(`redux db`, () => {
 
     await saveState()
 
-    expect(writeToCache).toBeCalled()
+    expect(writeToCache).toHaveBeenCalled()
 
     // メモリー上の状態をリセットする
     store.dispatch({
@@ -204,7 +204,7 @@ describe(`redux db`, () => {
 
       await saveState()
 
-      expect(writeToCache).not.toBeCalled()
+      expect(writeToCache).not.toHaveBeenCalled()
     })
   })
 
@@ -316,11 +316,11 @@ describe(`redux db`, () => {
         await saveState()
 
         if (expectedPageContextSizeWarning) {
-          expect(reporterWarn).toBeCalledWith(
+          expect(reporterWarn).toHaveBeenCalledWith(
             `The size of at least one page context chunk exceeded 500kb, which could lead to degraded performance. Consider putting less data in the page context.`
           )
         } else {
-          expect(reporterWarn).not.toBeCalled()
+          expect(reporterWarn).not.toHaveBeenCalled()
         }
 
         const shardsWritten = {
@@ -337,7 +337,7 @@ describe(`redux db`, () => {
           }
         }
 
-        expect(writeToCache).toBeCalled()
+        expect(writeToCache).toHaveBeenCalled()
 
         expect(shardsWritten.rest).toEqual(1)
         expect(shardsWritten.page).toEqual(expectedNumberOfPageShards)
@@ -431,7 +431,7 @@ describe(`redux db`, () => {
     // 常にダミーのノードを 1 つ永続化する
     expect(persistedState.nodes?.size ?? 0).toEqual(1)
     expect(persistedState.pages?.size ?? 0).toEqual(1)
-    expect(reporterInfo).not.toBeCalled()
+    expect(reporterInfo).not.toHaveBeenCalled()
     const nodes = Array.from(persistedState.nodes.values())
     expect(nodes[0]).toMatchObject({ id: `dummy-node-id` })
   })
@@ -461,7 +461,7 @@ describe(`redux db`, () => {
     it(`saves correct slice of state`, () => {
       savePartialStateToDisk([`pages`])
 
-      expect(writeToCache).toBeCalledWith(
+      expect(writeToCache).toHaveBeenCalledWith(
         { pages: expect.anything() },
         [`pages`],
         undefined
@@ -497,7 +497,7 @@ describe(`redux db`, () => {
 
       savePartialStateToDisk([`pages`], undefined, customTransform)
 
-      expect(writeToCache).toBeCalledWith(
+      expect(writeToCache).toHaveBeenCalledWith(
         { pages: expect.anything(), hello: `world` },
         [`pages`],
         undefined

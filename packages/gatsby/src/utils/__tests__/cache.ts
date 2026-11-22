@@ -124,14 +124,14 @@ describe(`cache`, () => {
 
     it(`throws if set is called without initting`, () => {
       const cache = new Cache({ name: `__test__` })
-      return expect(cache.set(`a`, `b`)).rejects.toThrowError(
+      return expect(cache.set(`a`, `b`)).rejects.toThrow(
         `Cache wasn't initialised yet, please run the init method first`
       )
     })
 
     it(`throws if get is called without initting`, () => {
       const cache = new Cache({ name: `__test__` })
-      return expect(cache.get(`a`)).rejects.toThrowError(
+      return expect(cache.get(`a`)).rejects.toThrow(
         `Cache wasn't initialised yet, please run the init method first`
       )
     })

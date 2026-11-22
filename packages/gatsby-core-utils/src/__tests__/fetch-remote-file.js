@@ -320,7 +320,7 @@ describe(`fetch-remote-file`, () => {
     })
 
     expect(path.basename(filePath)).toBe(`logo.svg`)
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a gzip file`, async () => {
@@ -333,7 +333,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/gatsby-logo.svg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a jpg file`, async () => {
@@ -346,7 +346,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a jpg file for file with non-ascii url`, async () => {
@@ -359,7 +359,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a jpg file for file with non-ascii filename`, async () => {
@@ -373,7 +373,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a jpg file for unknown extension`, async () => {
@@ -386,7 +386,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`downloads and create a jpg file that has invalid characters`, async () => {
@@ -399,7 +399,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`doesn't retry when no content-length is given`, async () => {
@@ -412,7 +412,7 @@ describe(`fetch-remote-file`, () => {
     expect(getFileSize(filePath)).resolves.not.toBe(
       await getFileSize(path.join(__dirname, `./fixtures/gatsby-logo.svg`))
     )
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`does not request same url during the same build`, async () => {
@@ -427,7 +427,7 @@ describe(`fetch-remote-file`, () => {
 
     expect(filePath).toBe(cachedFilePath)
     expect(path.basename(filePath)).toBe(`logo.svg`)
-    expect(gotStream).toBeCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(1)
   })
 
   it(`handles 304 responses correctly`, async () => {
@@ -445,8 +445,8 @@ describe(`fetch-remote-file`, () => {
     })
 
     expect(filePathCached).toBe(filePath)
-    expect(fsMove).toBeCalledTimes(1)
-    expect(gotStream).toBeCalledTimes(2)
+    expect(fsMove).toHaveBeenCalledTimes(1)
+    expect(gotStream).toHaveBeenCalledTimes(2)
     global.__GATSBY = currentGlobal
   })
 
@@ -467,8 +467,8 @@ describe(`fetch-remote-file`, () => {
     })
 
     expect(filePathCached).toBe(filePath)
-    expect(fsMove).toBeCalledTimes(2)
-    expect(gotStream).toBeCalledTimes(2)
+    expect(fsMove).toHaveBeenCalledTimes(2)
+    expect(gotStream).toHaveBeenCalledTimes(2)
     global.__GATSBY = currentGlobal
   })
 
@@ -535,9 +535,9 @@ Fetch details:
       })
 
       expect(filePath).toBe(cachedFilePath)
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(1)
-      expect(fs.copy).not.toBeCalled()
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(1)
+      expect(fs.copy).not.toHaveBeenCalled()
     })
 
     it(`should not re-download and use same path if ouputDir is not inside public folder`, async () => {
@@ -555,9 +555,9 @@ Fetch details:
       })
 
       expect(filePath).toBe(cachedFilePath)
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(1)
-      expect(fs.copy).not.toBeCalled()
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(1)
+      expect(fs.copy).not.toHaveBeenCalled()
     })
 
     it(`should not re-download but copy file to public folder`, async () => {
@@ -581,9 +581,9 @@ Fetch details:
 
       expect(filePath).not.toBe(cachedFilePath)
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(1)
-      expect(fs.copy).toBeCalledTimes(1)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(1)
+      expect(fs.copy).toHaveBeenCalledTimes(1)
       expect(await fs.pathExists(cachedFilePath)).toBe(true)
       global.__GATSBY = currentGlobal
     })
@@ -609,9 +609,9 @@ Fetch details:
 
       expect(filePath).not.toBe(cachedFilePath)
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(1)
-      expect(fs.copy).toBeCalledTimes(1)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(1)
+      expect(fs.copy).toHaveBeenCalledTimes(1)
       expect(await fs.pathExists(cachedFilePath)).toBe(true)
       global.__GATSBY = currentGlobal
     })
@@ -642,9 +642,9 @@ Fetch details:
 
       expect(filePath).not.toBe(cachedFilePath)
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(0)
-      expect(fs.copy).toBeCalledTimes(1)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(0)
+      expect(fs.copy).toHaveBeenCalledTimes(1)
       global.__GATSBY = currentGlobal
     })
 
@@ -674,9 +674,9 @@ Fetch details:
 
       expect(filePath).not.toBe(cachedFilePath)
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(0)
-      expect(fs.copy).toBeCalledTimes(1)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(0)
+      expect(fs.copy).toHaveBeenCalledTimes(1)
       global.__GATSBY = currentGlobal
     })
 
@@ -705,9 +705,9 @@ Fetch details:
       ])
 
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(1)
-      expect(fs.copy).toBeCalledTimes(excludeDigest ? 0 : 1)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(1)
+      expect(fs.copy).toHaveBeenCalledTimes(excludeDigest ? 0 : 1)
       global.__GATSBY = currentGlobal
     })
 
@@ -737,9 +737,9 @@ Fetch details:
 
       expect(filePath).toBe(cachedFilePath)
       expect(cachedFilePath).toStartWith(path.join(cache.directory, `public`))
-      expect(gotStream).toBeCalledTimes(1)
-      expect(fs.pathExists).toBeCalledTimes(0)
-      expect(fs.copy).toBeCalledTimes(0)
+      expect(gotStream).toHaveBeenCalledTimes(1)
+      expect(fs.pathExists).toHaveBeenCalledTimes(0)
+      expect(fs.copy).toHaveBeenCalledTimes(0)
       global.__GATSBY = currentGlobal
     })
   })
@@ -755,7 +755,7 @@ Fetch details:
       expect(getFileSize(filePath)).resolves.toBe(
         await getFileSize(path.join(__dirname, `./fixtures/gatsby-logo.svg`))
       )
-      expect(gotStream).toBeCalledTimes(2)
+      expect(gotStream).toHaveBeenCalledTimes(2)
     })
 
     it(`Retries when binary file is incomplete`, async () => {
@@ -768,7 +768,7 @@ Fetch details:
       expect(getFileSize(filePath)).resolves.toBe(
         await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
       )
-      expect(gotStream).toBeCalledTimes(2)
+      expect(gotStream).toHaveBeenCalledTimes(2)
     })
 
     it(`Retries when server returns 503 error till server returns 200`, async () => {
@@ -783,7 +783,7 @@ Fetch details:
       expect(getFileSize(filePath)).resolves.toBe(
         await getFileSize(path.join(__dirname, `./fixtures/gatsby-logo.svg`))
       )
-      expect(gotStream).toBeCalledTimes(3)
+      expect(gotStream).toHaveBeenCalledTimes(3)
     })
 
     it(`Stops retry when maximum attempts is reached`, async () => {
@@ -818,7 +818,7 @@ Fetch details:
 ---"
 `)
 
-      expect(gotStream).toBeCalledTimes(3)
+      expect(gotStream).toHaveBeenCalledTimes(3)
     })
     // @todo ネットワークエラーのときにリトライする
     it(`Retries on network errors`, async () => {
@@ -846,7 +846,7 @@ Fetch details:
 ---"
 `)
 
-      expect(gotStream).toBeCalledTimes(3)
+      expect(gotStream).toHaveBeenCalledTimes(3)
     })
   })
 })

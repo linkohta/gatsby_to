@@ -206,7 +206,7 @@ describe(`Resolver context`, () => {
 
     it(`shows error when no context value passed`, () => {
       dispatch(createResolverContext())
-      expect(report.error).toBeCalledWith(
+      expect(report.error).toHaveBeenCalledWith(
         `Expected context value passed to \`createResolverContext\` to be an ` +
           `object. Received "undefined".`
       )
@@ -214,7 +214,7 @@ describe(`Resolver context`, () => {
 
     it(`shows error when context value is not an object`, () => {
       dispatch(createResolverContext(() => {}))
-      expect(report.error).toBeCalledWith(
+      expect(report.error).toHaveBeenCalledWith(
         `Expected context value passed to \`createResolverContext\` to be an ` +
           `object. Received "() => {}".`
       )

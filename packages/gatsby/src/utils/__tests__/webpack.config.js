@@ -161,7 +161,7 @@ describe(`build-html`, () => {
           expect.stringContaining(`.env.staging`),
           expect.anything()
         )
-        expect(DefinePlugin).toBeCalledTimes(1)
+        expect(DefinePlugin).toHaveBeenCalledTimes(1)
         expect(DefinePlugin.mock.calls[0][0]).toMatchObject({
           [`process.env.NODE_ENV`]: JSON.stringify(process.env.NODE_ENV),
         })

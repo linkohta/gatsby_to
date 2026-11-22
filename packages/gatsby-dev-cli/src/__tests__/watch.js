@@ -391,7 +391,7 @@ describe(`dependency changes`, () => {
 
   const assertPublish = ({ include = [], exclude = [] }) => {
     include.forEach(includedPackage => {
-      expect(publishPackage).toBeCalledWith(
+      expect(publishPackage).toHaveBeenCalledWith(
         expect.objectContaining({
           packageName: includedPackage,
         })
@@ -399,7 +399,7 @@ describe(`dependency changes`, () => {
     })
 
     exclude.forEach(excludedPackage => {
-      expect(publishPackage).not.toBeCalledWith(
+      expect(publishPackage).not.toHaveBeenCalledWith(
         expect.objectContaining({
           packageName: excludedPackage,
         })
@@ -409,7 +409,7 @@ describe(`dependency changes`, () => {
 
   const assertInstall = ({ include = [], exclude = [] }) => {
     include.forEach(includedPackage => {
-      expect(installPackages).toBeCalledWith(
+      expect(installPackages).toHaveBeenCalledWith(
         expect.objectContaining({
           packagesToInstall: expect.arrayContaining([includedPackage]),
         })
@@ -417,7 +417,7 @@ describe(`dependency changes`, () => {
     })
 
     exclude.forEach(excludedPackage => {
-      expect(installPackages).not.toBeCalledWith(
+      expect(installPackages).not.toHaveBeenCalledWith(
         expect.objectContaining({
           packagesToInstall: expect.arrayContaining([excludedPackage]),
         })
@@ -427,7 +427,7 @@ describe(`dependency changes`, () => {
 
   const assertCopy = packages => {
     packages.forEach(pkgName => {
-      expect(fs.copy).toBeCalledWith(
+      expect(fs.copy).toHaveBeenCalledWith(
         expect.stringContaining(path.join(`packages`, pkgName)),
         expect.stringContaining(path.join(`node_modules`, pkgName)),
         expect.anything()
@@ -771,8 +771,8 @@ describe(`dependency changes`, () => {
       await callReadyCallback()
 
       expect(installWasCalledAfterFsCopy).toBe(false)
-      expect(installPackages).toBeCalled()
-      expect(fs.copy).toBeCalled()
+      expect(installPackages).toHaveBeenCalled()
+      expect(fs.copy).toHaveBeenCalled()
     })
 
     it(`installs from npm before copying files`, async () => {
@@ -814,8 +814,8 @@ describe(`dependency changes`, () => {
       await callReadyCallback()
 
       expect(installWasCalledAfterFsCopy).toBe(false)
-      expect(promisifiedSpawn).toBeCalled()
-      expect(fs.copy).toBeCalled()
+      expect(promisifiedSpawn).toHaveBeenCalled()
+      expect(fs.copy).toHaveBeenCalled()
     })
   })
 })
