@@ -1,6 +1,6 @@
 const nodeFetch = require(`node-fetch`).default
 
-// this is passed to the Apollo Link
+// これは Apollo Link に渡される
 // https://www.apollographql.com/docs/link/links/http/#fetch-polyfill
 
 exports.fetchWrapper = async (uri, options) => {

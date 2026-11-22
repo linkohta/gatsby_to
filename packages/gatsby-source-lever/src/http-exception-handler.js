@@ -1,5 +1,5 @@
 /**
- * Handles HTTP Exceptions (axios)
+ * HTTP の例外（axios）を処理する
  *
  * @param {any} e
  */

@@ -87,7 +87,7 @@ function createNodes(
       query[collectionName] ? query[collectionName] : {}
     )
 
-    // Execute the each command, triggers for each document
+    // each コマンドを実行する。ドキュメントごとに呼び出される
     cursor.toArray((err, documents) => {
       if (err) {
         reject(err)
@@ -96,7 +96,7 @@ function createNodes(
       documents.forEach(({ _id, ...item }) => {
         const id = idToString(_id)
 
-        // only call recursive function to preserve relations represented by objectids if pluginoption set.
+        // プラグインオプションが設定されている場合にだけ、objectid で表されるリレーションを保持するための再帰関数を呼び出す。
         if (preserveObjectIds) {
           for (const key in item) {
             item[key] = stringifyObjectIds(item[key])
@@ -104,7 +104,7 @@ function createNodes(
         }
 
         const node = {
-          // Data for the node.
+          // ノードのデータ。
           ...item,
           id: createNodeId(`${id}`),
           mongodb_id: id,
@@ -124,7 +124,7 @@ function createNodes(
           if (pluginOptions.map[collectionName]) {
             mapObj = pluginOptions.map[collectionName]
           }
-          // We need to map certain fields to a contenttype.
+          // 特定のフィールドを contenttype に対応付ける必要がある。
           Object.keys(mapObj).forEach(mediaItemFieldKey => {
             if (
               node[mediaItemFieldKey] &&

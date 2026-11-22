@@ -13,24 +13,24 @@ const Prefix = {
 }
 
 /**
- * Merge multiple queries into a single query in such a way that query results
- * can be split and transformed as if they were obtained by running original queries.
+ * 複数のクエリを 1 つのクエリにマージする。クエリの結果を、元のクエリを実行して
+ * 得たかのように分割して変換できる形にする。
  *
- * Merging algorithm involves several transformations:
- *  1. Replace top-level fragment spreads with inline fragments (... on Query {})
- *  2. Add unique aliases to all top-level query fields (including those on inline fragments)
- *  3. Prefix all variable definitions and variable usages
- *  4. Prefix names (and spreads) of fragments with variables
- *  5. Dedupe repeating fragments
+ * マージのアルゴリズムは、いくつかの変換からなる:
+ *  1. トップレベルのフラグメントスプレッドをインラインフラグメントに置き換える (... on Query {})
+ *  2. トップレベルのすべてのクエリフィールド（インラインフラグメント上のものを含む）に一意なエイリアスを付ける
+ *  3. すべての変数定義と変数の使用箇所に接頭辞を付ける
+ *  4. 変数を持つフラグメントの名前（とスプレッド）に接頭辞を付ける
+ *  5. 繰り返し現れるフラグメントの重複を取り除く
  *
- * i.e transform:
+ * つまり、次のものを:
  *   [
  *     `query Foo($id: ID!) { foo, bar(id: $id), ...FooQuery }
  *     fragment FooQuery on Query { baz }`,
  *
  *    `query Bar($id: ID!) { foo: baz, bar(id: $id), ... on Query { baz } }`
  *   ]
- * to:
+ * 次のように変換する:
  *   query (
  *     $gatsby1_id: ID!
  *     $gatsby2_id: ID!
@@ -63,10 +63,10 @@ export function merge(queries) {
         mergedVariableDefinitions.push(...(def.variableDefinitions ?? []))
       }
       if (isFragmentDefinition(def)) {
-        // Theoretically it is possible to have fragments with the same name but different content
-        // in different queries. But Gatsby validation doesn't allow this and we rely on this here
-        // One example where this can occur is in gatsby-node or GraphiQL queries
-        // (but those are usually not batched)
+        // 理論上は、名前が同じで内容が異なるフラグメントが、別々のクエリに存在することもあり得る。
+        // しかし Gatsby の検証はこれを許可しておらず、ここではそれを前提にしている
+        // これが起こり得る例の 1 つは、gatsby-node や GraphiQL のクエリである
+        // （ただし、それらは通常バッチ処理されない）
         mergedFragmentMap.set(def.name.value, def)
       }
     })
@@ -93,7 +93,7 @@ export function merge(queries) {
 }
 
 /**
- * Split and transform result of the query produced by the `merge` function
+ * `merge` 関数が作成したクエリの結果を分割して変換する
  */
 export function resolveResult(mergedQueryResult) {
   const data = mergedQueryResult.data
@@ -153,16 +153,16 @@ function prefixQueryParts(prefix, query) {
   document = visit(
     document,
     visitInParallel([
-      // Note: the sequence is important due to how visitInParallel deals with node edits
+      // Note: visitInParallel によるノード編集の扱い方のため、順序が重要である
       Visitors.detectFragmentsWithVariables(fragmentsWithVariables),
       Visitors.prefixVariables(prefix),
     ])
   )
 
   if (fragmentsWithVariables.size > 0) {
-    // Prefix all fragments and spreads having variables
-    // Sadly, have to do another pass as fragment spreads may occur at any level
-    // (fragments with variables are relatively rare though)
+    // 変数を持つすべてのフラグメントとスプレッドに接頭辞を付ける
+    // フラグメントスプレッドはどの階層にも現れ得るので、残念ながらもう 1 回走査する必要がある
+    // （ただし、変数を持つフラグメントは比較的まれである）
     document = visit(
       document,
       Visitors.prefixFragmentNames(prefix, fragmentsWithVariables),
@@ -189,9 +189,9 @@ function prefixQueryParts(prefix, query) {
 }
 
 /**
- * Adds prefixed aliases to top-level fields of the query.
+ * クエリのトップレベルのフィールドに、接頭辞付きのエイリアスを追加する。
  *
- * @see aliasFieldsInSelection for implementation details
+ * @see 実装の詳細は aliasFieldsInSelection を参照
  */
 function aliasTopLevelFields(prefix, doc) {
   const transformer = {
@@ -210,19 +210,19 @@ function aliasTopLevelFields(prefix, doc) {
 }
 
 /**
- * Add aliases to fields of the selection, including top-level fields of inline fragments.
- * Fragment spreads are converted to inline fragments and their top-level fields are also aliased.
+ * セレクションのフィールドにエイリアスを追加する。インラインフラグメントのトップレベルのフィールドも含む。
+ * フラグメントスプレッドはインラインフラグメントに変換され、そのトップレベルのフィールドにもエイリアスが付く。
  *
- * Note that this method is shallow. It adds aliases only to the top-level fields and doesn't
- * descend to field sub-selections.
+ * このメソッドは浅い処理である点に注意。エイリアスを追加するのはトップレベルのフィールドだけで、
+ * フィールドのサブセレクションには降りていかない。
  *
- * For example, transforms:
+ * たとえば、次のものを:
  *   {
  *     foo
  *     ... on Query { foo }
  *     ...FragmentWithBarField
  *   }
- * To:
+ * 次のように変換する:
  *   {
  *     gatsby1_foo: foo
  *     ... on Query { gatsby1_foo: foo }
@@ -267,12 +267,12 @@ function addSkipDirective(node) {
 }
 
 /**
- * Add aliases to top-level fields of the inline fragment.
- * Returns new inline fragment node.
+ * インラインフラグメントのトップレベルのフィールドにエイリアスを追加する。
+ * 新しいインラインフラグメントのノードを返す。
  *
- * For Example, transforms:
+ * たとえば、次のものを:
  *   ... on Query { foo, ... on Query { bar: foo } }
- * To
+ * 次のように変換する:
  *   ... on Query { gatsby1_foo: foo, ... on Query { gatsby1_bar: foo } }
  */
 function aliasFieldsInInlineFragment(prefix, fragment, document) {
@@ -287,13 +287,13 @@ function aliasFieldsInInlineFragment(prefix, fragment, document) {
 }
 
 /**
- * Replaces fragment spread with inline fragment
+ * フラグメントスプレッドをインラインフラグメントに置き換える
  *
- * Example:
+ * 例:
  *   query { ...Spread }
  *   fragment Spread on Query { bar }
  *
- * Transforms to:
+ * 次のように変換される:
  *   query { ... on Query { bar } }
  */
 function inlineFragmentSpread(spread, document) {
@@ -325,9 +325,9 @@ function prefixNodeName(namedNode, prefix) {
 }
 
 /**
- * Returns a new FieldNode with prefixed alias
+ * 接頭辞付きのエイリアスを持つ新しい FieldNode を返す
  *
- * Example. Given prefix === "gatsby1_" transforms:
+ * 例。prefix === "gatsby1_" の場合、次のように変換する:
  *   { foo } -> { gatsby1_foo: foo }
  *   { foo: bar } -> { gatsby1_foo: bar }
  */

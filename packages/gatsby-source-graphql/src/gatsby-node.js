@@ -91,7 +91,7 @@ exports.createSchemaCustomization = async (
     await cache.set(cacheKey, sdl)
   }
 
-  // This node is created in `sourceNodes`.
+  // このノードは `sourceNodes` で作成される。
   const nodeId = createSchemaNodeId({ typeName, createNodeId })
 
   const resolver = (parent, args, context) => {

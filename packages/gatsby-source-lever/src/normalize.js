@@ -1,11 +1,11 @@
 const deepMapKeys = require(`deep-map-keys`)
 
 const conflictFieldPrefix = `lever_`
-// restrictedNodeFields from here https://www.gatsbyjs.com/docs/node-interface/
+// restrictedNodeFields の出典は https://www.gatsbyjs.com/docs/node-interface/
 const restrictedNodeFields = [`id`, `children`, `parent`, `fields`, `internal`]
 
 /**
- * Create the Graph QL Node
+ * GraphQL のノードを作成する
  *
  * @param {any} ent
  * @param {any} type
@@ -36,18 +36,18 @@ async function createGraphQLNode(
 exports.createGraphQLNode = createGraphQLNode
 
 /**
- * Add fields recursively
+ * フィールドを再帰的に追加する
  *
  * @param {any} ent
  * @param {any} newEnt
- * @returns the new node
+ * @returns 新しいノード
  */
 function recursiveAddFields(ent, newEnt) {
   for (const k of Object.keys(ent)) {
     if (!newEnt.hasOwnProperty(k)) {
       const key = getValidKey(k)
       newEnt[key] = ent[k]
-      // Nested Objects & Arrays of Objects
+      // ネストしたオブジェクトと、オブジェクトの配列
       if (typeof ent[key] === `object`) {
         if (!Array.isArray(ent[key]) && ent[key] != null) {
           newEnt[key] = recursiveAddFields(ent[key], {})
@@ -66,21 +66,21 @@ function recursiveAddFields(ent, newEnt) {
 exports.recursiveAddFields = recursiveAddFields
 
 /**
- * Validate the GraphQL naming conventions & protect specific fields.
+ * GraphQL の命名規則に合っているかを検証し、特定のフィールドを保護する。
  *
  * @param {any} key
- * @returns the valid name
+ * @returns 有効な名前
  */
 function getValidKey({ key, verbose = false }) {
   let nkey = String(key)
   const NAME_RX = /^[_a-zA-Z][_a-zA-Z0-9]*$/
   let changed = false
-  // Replace invalid characters
+  // 無効な文字を置き換える
   if (!NAME_RX.test(nkey)) {
     changed = true
     nkey = nkey.replace(/-|__|:|\.|\s/g, `_`)
   }
-  // Prefix if first character isn't a letter.
+  // 最初の文字が英字でなければ接頭辞を付ける。
   if (!NAME_RX.test(nkey.slice(0, 1))) {
     changed = true
     nkey = `${conflictFieldPrefix}${nkey}`
@@ -99,12 +99,12 @@ function getValidKey({ key, verbose = false }) {
 
 exports.getValidKey = getValidKey
 
-// Create entities from the few the lever API returns as an object for presumably
-// legacy reasons.
+// lever API が（おそらく過去の経緯で）オブジェクトとして返す一部のものから
+// エンティティを作成する。
 exports.normalizeEntities = entities =>
   entities.reduce((acc, e) => acc.concat(e), [])
 
-// Standardize ids + make sure keys are valid.
+// id を標準化し、キーが有効であることを確認する。
 exports.standardizeKeys = entities =>
   entities.map(e =>
     deepMapKeys(e, key =>
@@ -112,7 +112,7 @@ exports.standardizeKeys = entities =>
     )
   )
 
-// Standardize dates on ISO 8601 version.
+// 日付を ISO 8601 形式に統一する。
 exports.standardizeDates = entities =>
   entities.map(e => {
     if (e.createdAt) {

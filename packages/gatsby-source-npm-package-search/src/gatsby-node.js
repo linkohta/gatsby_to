@@ -101,7 +101,7 @@ exports.sourceNodes = async (
             )
           ).body
         } catch (err) {
-          // carry-on
+          // そのまま続行する
         }
       }
 
@@ -117,7 +117,7 @@ exports.sourceNodes = async (
         },
       }
       readmeNode.internal.contentDigest = createContentDigest(readmeNode)
-      // Remove unneeded data
+      // 不要なデータを取り除く
       delete hit.readme
       delete hit.versions
 

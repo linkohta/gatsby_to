@@ -2,8 +2,8 @@ const axios = require(`axios`)
 const httpExceptionHandler = require(`./http-exception-handler`)
 
 /**
- * High-level function to coordinate fetching data from Lever.co
- * site.
+ * Lever.co のサイトからのデータ取得を取りまとめる
+ * 高レベルの関数。
  */
 async function fetch({ site, verbose, typePrefix }) {
   // return require(`./data.json`)
