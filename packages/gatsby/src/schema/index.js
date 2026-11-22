@@ -22,7 +22,7 @@ const getAllTypeDefinitions = () => {
     }
   })
 
-  // Ensure that user-defined types are processed last
+  // ユーザー定義の型が最後に処理されるようにする
   return [
     ...builtInTypes,
     ...types.filter(
@@ -45,11 +45,11 @@ const getAllFieldExtensions = () => {
   }
 }
 
-// Schema building requires metadata for type inference.
-// Technically it means looping through all type nodes, analyzing node structure
-// and then using this aggregated node structure in related GraphQL type.
-// Actual logic for inference located in inferenceMetadata reducer and ./infer
-// Here we just orchestrate the process via redux actions
+// スキーマのビルドには、型推論のためのメタデータが必要である。
+// 具体的には、型のすべてのノードをループしてノードの構造を解析し、
+// 集約したノードの構造を、対応する GraphQL の型で使うことを意味する。
+// 推論の実際のロジックは、inferenceMetadata レデューサーと ./infer にある
+// ここでは、redux のアクションを通じて処理の流れを調整するだけである
 const buildInferenceMetadata = ({ types }) =>
   new Promise(resolve => {
     if (!types || !types.length) {
@@ -57,9 +57,9 @@ const buildInferenceMetadata = ({ types }) =>
       return
     }
     const typeNames = [...types]
-    // TODO: use async iterators when we switch to node>=10
-    //  or better investigate if we can offload metadata building to worker/Jobs API
-    //  and then feed the result into redux?
+    // TODO: node>=10 に切り替えたら async イテレーターを使う
+    //  あるいは、メタデータの構築をワーカーや Jobs API に任せて、
+    //  その結果を redux に渡せないかを調べるほうがよいか？
     const processNextType = async () => {
       const typeName = typeNames.pop()
 
@@ -71,15 +71,15 @@ const buildInferenceMetadata = ({ types }) =>
             type: `BUILD_TYPE_METADATA`,
             payload: {
               typeName,
-              // only clear metadata on the first chunk for this type
+              // この型の最初のチャンクでだけメタデータを消去する
               clearExistingMetadata: dispatchCount++ === 0,
               nodes: processingNodes,
             },
           })
           setImmediate(() => {
-            // clear this array after BUILD_TYPE_METADATA reducer has synchronously run
+            // BUILD_TYPE_METADATA レデューサーが同期的に実行された後に、この配列を消去する
             processingNodes = []
-            // dont block the event loop. node may decide to free previous processingNodes array from memory if it needs to.
+            // イベントループをブロックしない。node は必要に応じて、前の processingNodes 配列をメモリーから解放するかもしれない。
             setImmediate(() => {
               res(null)
             })
@@ -100,7 +100,7 @@ const buildInferenceMetadata = ({ types }) =>
       }
 
       if (typeNames.length > 0) {
-        // dont block the event loop
+        // イベントループをブロックしない
         setImmediate(() => processNextType())
       } else {
         resolve()
@@ -115,7 +115,7 @@ const build = async ({ parentSpan, fullMetadataBuild = true }) => {
   await getDataStore().ready()
 
   if (fullMetadataBuild) {
-    // Build metadata for type inference and start updating it incrementally
+    // 型推論のためのメタデータを構築し、インクリメンタルな更新を始める
     await buildInferenceMetadata({ types: getTypes() })
     store.dispatch({ type: `START_INCREMENTAL_INFERENCE` })
   }

@@ -1,5 +1,5 @@
-// "bootstrap" must be first import, as it sets up multiple globals that need to be set early
-// see details in that module
+// "bootstrap" は最初の import でなければならない。早い段階で設定する必要がある複数のグローバルをセットアップするためである
+// 詳しくはそのモジュールを参照
 import "./bootstrap"
 
 import { ExecutionResult, Source } from "graphql"
@@ -39,7 +39,7 @@ export class GraphQLEngine {
 
   constructor({ dbPath }: { dbPath: string }) {
     setupLmdbStore({ dbPath })
-    // start initializing runner ASAP
+    // ランナーの初期化をできるだけ早く始める
     this.getRunner()
   }
 
@@ -74,8 +74,8 @@ export class GraphQLEngine {
       // @ts-ignore SCHEMA_SNAPSHOT is being "inlined" by bundler
       store.dispatch(actions.createTypes(SCHEMA_SNAPSHOT))
 
-      // TODO: FLATTENED_PLUGINS needs to be merged with plugin options from gatsby-config
-      //  (as there might be non-serializable options, i.e. functions)
+      // TODO: FLATTENED_PLUGINS は、gatsby-config のプラグインオプションとマージする必要がある
+      //  （シリアライズできないオプション、つまり関数があるかもしれないため）
       store.dispatch({
         type: `SET_SITE_FLATTENED_PLUGINS`,
         payload: flattenedPlugins,
@@ -103,8 +103,8 @@ export class GraphQLEngine {
         parentSpan: wrapActivity.span,
       })
 
-      // Build runs
-      // Note: skipping inference metadata because we rely on schema snapshot
+      // ビルドを実行する
+      // 注: スキーマのスナップショットに頼っているので、推論のメタデータはスキップする
       await build({ fullMetadataBuild: false, parentSpan: wrapActivity.span })
 
       return new GraphQLRunner(store)
@@ -121,9 +121,9 @@ export class GraphQLEngine {
   }
 
   public async ready(): Promise<void> {
-    // We don't want to expose internal runner freely. We do expose `runQuery` function already.
-    // The way internal runner works can change, so we should not make it a public API.
-    // Here we just want to expose way to await it being ready
+    // 内部のランナーを自由に公開したくはない。`runQuery` 関数はすでに公開している。
+    // 内部のランナーの仕組みは変わりうるので、公開 API にすべきではない。
+    // ここでは、準備ができるのを待つ手段だけを公開したい
     await this.getRunner()
   }
 
@@ -163,7 +163,7 @@ export class GraphQLEngine {
         }
       }
 
-      // graphqlRunner creates it's own Span as long as we pass `parentSpan`
+      // `parentSpan` を渡せば、graphqlRunner は自分の Span を作成する
       const result = await graphqlRunner.query(query, context, opts)
 
       let waitingForJobsCreatedByCurrentRequestActivity: MaybePhantomActivity
@@ -187,7 +187,7 @@ export class GraphQLEngine {
     try {
       return await runWithEngineContext(engineContext, doRunQuery)
     } finally {
-      // Reset job-to-request mapping
+      // ジョブからリクエストへの対応付けをリセットする
       store.dispatch({
         type: `CLEAR_JOB_V2_CONTEXT`,
         payload: engineContext,
@@ -196,11 +196,11 @@ export class GraphQLEngine {
   }
 
   /**
-   * @deprecated use findEnginePageByPath exported from page-ssr module instead
+   * @deprecated 代わりに page-ssr モジュールから export されている findEnginePageByPath を使うこと
    */
   public findPageByPath(pathName: string): IGatsbyPage | undefined {
-    // adapter so `findPageByPath` use SitePage nodes in datastore
-    // instead of `pages` redux slice
+    // `findPageByPath` が redux の `pages` スライスの代わりに、
+    // データストアの SitePage ノードを使うようにするためのアダプター
     const state = {
       pages: {
         get(pathName: string): IGatsbyPage | undefined {

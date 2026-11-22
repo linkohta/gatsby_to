@@ -16,7 +16,7 @@ export const schemaCustomizationAPIs = new Set([
 const excludePlugins = new Set([`internal-data-bridge`])
 const includePlugins = new Set([`gatsby-plugin-sharp`])
 
-// Emit file that imports required node APIs
+// 必要な node API を import するファイルを出力する
 const schemaCustomizationPluginsPath =
   process.cwd() + `/.cache/query-engine-plugins.js`
 
@@ -56,7 +56,7 @@ async function render(
   const uniqSubPlugins = uniq(usedSubPlugins)
 
   const sanitizedUsedPlugins = usedPlugins.map((plugin, i) => {
-    // TODO: We don't support functions in pluginOptions here
+    // TODO: ここでは pluginOptions の中の関数には対応していない
     return {
       ...plugin,
       resolve: ``,
@@ -161,7 +161,7 @@ async function filterPluginsWithWorkers(
         filteredPlugins.push(plugin)
       }
     } catch (_) {
-      // Do nothing
+      // 何もしない
     }
   }
 

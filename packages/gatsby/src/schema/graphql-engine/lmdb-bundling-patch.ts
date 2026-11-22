@@ -3,24 +3,24 @@
 import { slash } from "gatsby-core-utils/path"
 import path from "path"
 
-// we need to require this module, we can't use import here
+// このモジュールは require する必要がある。ここでは import を使えない
 const { createRequire } = require(`module`)
 
-// This is hacky webpack loader that does string replacements to
-// allow lmdb@2 to be bundled by webpack for engines.
-// Currently `@vercel/webpack-asset-relocator-loader doesn't handle
-// the way lmdb is loading binaries and dictionary file
-// (can't statically analyze it). So we perform few localized changes
-// and we replace dynamic values with hardcoded ones to allow
-// asset-relocator to pick those assets up and handle them.
+// これは、エンジン向けに lmdb@2 を webpack でバンドルできるように、
+// 文字列の置換を行う、その場しのぎの webpack ローダーである。
+// 現状では、`@vercel/webpack-asset-relocator-loader は、lmdb による
+// バイナリと辞書ファイルの読み込み方を扱えない
+// （静的に解析できない）。そのため、いくつかの局所的な変更を行い、
+// 動的な値をハードコードした値に置き換えて、asset-relocator が
+// それらのアセットを拾って処理できるようにする。
 //
-// Because lmdb code can diverge, we also pin version in gatsby
-// dependencies and will have manually bump it (with renovate most likely).
+// lmdb のコードは変わりうるので、gatsby の依存でもバージョンを固定しており、
+// 手動で（おそらく renovate で）上げる必要がある。
 //
-// To solve this upstream few things would need to change:
+// これを lmdb 本体の側で解決するには、いくつかの点を変更する必要がある。
 //  - https://github.com/DoctorEvidence/lmdb-js/blob/544b3fda402f24a70a0e946921e4c9134c5adf85/node-index.js#L14-L16
 //  - https://github.com/DoctorEvidence/lmdb-js/blob/544b3fda402f24a70a0e946921e4c9134c5adf85/open.js#L77
-// Reliance on `import.meta.url` + usage of `.replace` is what seems to cause problems currently.
+// 現状で問題を起こしているのは、`import.meta.url` への依存と `.replace` の使用のようである。
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function (this: any, source: string): string {
@@ -47,13 +47,13 @@ export default function (this: any, source: string): string {
       try {
         nodeGypBuild = lmdbRequire(`node-gyp-build-optional-packages`)
       } catch (e) {
-        // lmdb@2.3.8 way of loading binaries failed, we will try to fallback to
-        // old way before failing completely
+        // lmdb@2.3.8 の方法でのバイナリの読み込みに失敗したので、完全に失敗とする前に、
+        // 古い方法へのフォールバックを試みる
       }
 
       if (!nodeGypBuild) {
-        // if lmdb@2.3.8 didn't import expected node-gyp-build fork (node-gyp-build-optional-packages)
-        // let's try falling back to upstream package - if that doesn't work, we will fail compilation
+        // lmdb@2.3.8 が、期待する node-gyp-build のフォーク（node-gyp-build-optional-packages）を import していなかった場合は、
+        // フォーク元のパッケージへのフォールバックを試みる。それも動かなければ、コンパイルを失敗させる
         nodeGypBuild = lmdbRequire(`node-gyp-build`)
       }
       absoluteModulePath = nodeGypBuild.path(lmdbRoot)

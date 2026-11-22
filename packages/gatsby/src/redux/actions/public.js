@@ -1167,7 +1167,7 @@ actions.setBabelPreset = (config: Object, plugin?: ?Plugin = null) => {
  * Gatsby は、すべてのジョブが終了するまでプロセスを終了しない。
  * @param {Object} job 少なくとも id が設定されたジョブオブジェクト
  * @param {id} job.id ジョブの ID
- * @deprecated Use "createJobV2" instead
+ * @deprecated 代わりに "createJobV2" を使うこと
  * @example
  * createJob({ id: `write file id: 123`, fileName: `something.jpeg` })
  */
@@ -1228,7 +1228,7 @@ actions.addGatsbyImageSourceUrl = (sourceUrl: string) => {
  *
  * @param {Object} job 少なくとも id が設定されたジョブオブジェクト
  * @param {id} job.id ジョブの ID
- * @deprecated Use "createJobV2" instead
+ * @deprecated 代わりに "createJobV2" を使うこと
  * @example
  * setJob({ id: `write file id: 123`, progress: 50 })
  */
@@ -1255,7 +1255,7 @@ actions.setJob = (job: Job, plugin?: ?Plugin = null) => {
  * Gatsby は、すべてのジョブが終了するまでプロセスを終了しない。
  * @param {Object} job  少なくとも id が設定されたジョブオブジェクト
  * @param {id} job.id ジョブの ID
- * @deprecated Use "createJobV2" instead
+ * @deprecated 代わりに "createJobV2" を使うこと
  * @example
  * endJob({ id: `write file id: 123` })
  */

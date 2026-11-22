@@ -10,7 +10,7 @@ import {
   ITypeConflictExample,
 } from "./type-conflict-reporter"
 
-// See gatsby/src/schema/infer/inference-metadata.ts for the ValueDescriptor structs (-> typeInfo)
+// ValueDescriptor の構造体（-> typeInfo）については、gatsby/src/schema/infer/inference-metadata.ts を参照
 
 const getExampleObject = ({
   fieldMap = {},
@@ -167,8 +167,8 @@ const prepareConflictExamples = (
   const conflictingTypes = possibleTypes(descriptor)
 
   if (isArrayItem) {
-    // Differentiate conflict examples by node they were first seen in.
-    // See Caveats section in the header of the ./inference-metadata.ts
+    // 衝突の例を、最初に見つかったノードによって区別する。
+    // ./inference-metadata.ts の冒頭の 「注意点」の節を参照
     const groups = groupBy(
       conflictingTypes,
       type => descriptor[type]?.first || ``

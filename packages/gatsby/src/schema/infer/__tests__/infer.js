@@ -1,4 +1,4 @@
-// NOTE: Previously `infer-graphql-type-test.js`
+// NOTE: 以前は `infer-graphql-type-test.js` だった
 
 const { graphql } = require(`graphql`)
 const path = require(`path`)
@@ -428,7 +428,7 @@ describe(`GraphQL type inference`, () => {
     expect(edges[0].node.sparse[1].foo).toBe(true)
   })
 
-  // NOTE: Honestly this test does not makes much sense now
+  // NOTE: 正直なところ、このテストは今ではあまり意味がない
   it.skip(`Removes specific root fields`, () => {
     const { addInferredFields } = require(`../infer`)
     const { getExampleValue } = require(`../example-value`)
@@ -1196,7 +1196,7 @@ Object {
       }
     })
 
-    // We can't miss types anymore
+    // 型を取りこぼすことはもうない
     it.skip(`Errors clearly when missing types`, async () => {
       expect(async () => {
         await getInferredFields([
@@ -1275,7 +1275,7 @@ Object {
       })
 
       it.skip(`Uses a different type for the same child node types with a different key`, () => {
-        // NOTE: We don't do that anymore
+        // NOTE: これはもう行っていない
       })
 
       it(`Uses a different type for different child node types with the same key`, async () => {
@@ -1304,11 +1304,11 @@ Object {
       })
 
       it.skip(`Creates a new type after schema updates clear union types`, () => {
-        // NOTE: We don't clear union types anymore
+        // NOTE: union 型はもう消去していない
       })
 
       it.skip(`Uses a reliable naming convention`, () => {
-        // NOTE: We don't postfix union type names anymore
+        // NOTE: union 型の名前にはもう接尾辞を付けていない
       })
     })
   })
@@ -1378,7 +1378,7 @@ Object {
       )
     })
 
-    // FIXME, ignoreFields isn't passable, Do we create type with typedefs and test it?
+    // FIXME: ignoreFields を渡せない。typedefs で型を作成してテストするか？
     it.skip(`does not warn about provided types`, async () => {
       const nodes = [
         { foo: `foo`, number: 1.1, internal: { type: `Test` }, id: `1` },

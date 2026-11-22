@@ -29,7 +29,7 @@ const formatValue = (value: unknown): string => {
   const output: Array<string> = []
 
   if (value.length === 1) {
-    // For arrays usually a single conflicting item is exposed vs. the whole array
+    // 配列の場合は通常、配列全体ではなく、衝突している要素 1 つが示される
     output.push(`...`)
     output.push(formatValue(value[0]))
     output.push(`...`)
@@ -113,9 +113,9 @@ class TypeConflictReporter {
 
   addConflict(selector: string, examples: Array<ITypeConflictExample>): void {
     if (selector.substring(0, 11) === `SitePlugin.`) {
-      // Don't store and print out type conflicts in plugins.
-      // This is out of user control so he/she can't do anything
-      // to hide those.
+      // プラグインの中の型の衝突は、保存も出力もしない。
+      // これはユーザーの手に負えないものであり、ユーザーには
+      // それらを隠す手段がない。
       return
     }
 

@@ -26,11 +26,11 @@ import { getMaybeResolvedValue } from "./resolvers"
 type TypeOrTypeName = string | GraphQLOutputType
 
 /**
- * Optional page dependency information.
+ * 省略可能な、ページの依存の情報。
  *
  * @typedef {Object} PageDependencies
- * @property {string} path The path of the page that depends on the retrieved nodes' data
- * @property {string} [connectionType] Mark this dependency as a connection
+ * @property {string} path 取得したノードのデータに依存するページのパス
+ * @property {string} [connectionType] この依存を connection として印を付ける
  */
 interface PageDependencies {
   path: string;
@@ -102,16 +102,16 @@ class LocalNodeModel {
   }
 
   /**
-   * Replace the cache either with the value passed on (mainly for tests) or
-   * an empty new Map.
+   * キャッシュを、渡された値（主にテスト用）または空の新しい Map に
+   * 置き換える。
    *
    * @param {undefined | null | FiltersCache} map
-   * This cache caches a set of buckets (Sets) of Nodes based on filter and tracks this for each set of types which are
-   * actually queried. If the filter targets `id` directly, only one Node is
-   * cached instead of a Set of Nodes. If null, don't create or use a cache.
+   * このキャッシュは、フィルターに基づくノードのバケット（Set）の集合をキャッシュし、実際にクエリされた
+   * 型の集合ごとにそれを追跡する。フィルターが `id` を直接対象にする場合は、
+   * ノードの Set ではなく 1 つのノードだけをキャッシュする。null の場合は、キャッシュの作成も使用もしない。
    */
   replaceFiltersCache(map = new Map()) {
-    this._filtersCache = map // See redux/nodes.js for usage
+    this._filtersCache = map // 使い方は redux/nodes.js を参照
   }
 
   withContext(context) {
@@ -119,11 +119,11 @@ class LocalNodeModel {
   }
 
   /**
-   * Get a node from the store by ID and optional type.
+   * ID と、省略可能な型を指定して、ストアからノードを取得する。
    *
    * @param {Object} args
-   * @param {string} args.id ID of the requested node
-   * @param {(string|GraphQLOutputType)} [args.type] Optional type of the node
+   * @param {string} args.id 取得するノードの ID
+   * @param {(string|GraphQLOutputType)} [args.type] ノードの型（省略可能）
    * @param {PageDependencies} [pageDependencies]
    * @returns {(Node|null)}
    * @example
@@ -157,11 +157,11 @@ class LocalNodeModel {
   }
 
   /**
-   * Get nodes from the store by IDs and optional type.
+   * 複数の ID と、省略可能な型を指定して、ストアからノードを取得する。
    *
    * @param {Object} args
-   * @param {string[]} args.ids IDs of the requested nodes
-   * @param {(string|GraphQLOutputType)} [args.type] Optional type of the nodes
+   * @param {string[]} args.ids 取得するノードの ID
+   * @param {(string|GraphQLOutputType)} [args.type] ノードの型（省略可能）
    * @param {PageDependencies} [pageDependencies]
    * @returns {Node[]}
    * @example
@@ -199,8 +199,8 @@ class LocalNodeModel {
   async _query(args) {
     let { query = {}, type, stats, tracer } = args || {}
 
-    // We don't support querying union types (yet?), because the combined types
-    // need not have any fields in common.
+    // union 型のクエリには（まだ？）対応していない。組み合わされた型どうしに、
+    // 共通のフィールドがあるとは限らないためである。
     const gqlType = typeof type === `string` ? this.schema.getType(type) : type
     invariant(
       !(gqlType instanceof GraphQLUnionType),
@@ -211,8 +211,8 @@ class LocalNodeModel {
 
     let runQueryActivity
 
-    // check if we can get node by id and skip
-    // more expensive query pipeline
+    // ID でノードを取得できるかを確認し、よりコストの高い
+    // クエリのパイプラインをスキップする
     if (
       typeof query?.filter?.id?.eq !== `undefined` &&
       Object.keys(query.filter).length === 1 &&
@@ -300,7 +300,7 @@ class LocalNodeModel {
     return {
       gqlType,
       entries: entries.map(node => {
-        // With GatsbyIterable it happens lazily as we iterate
+        // GatsbyIterable では、反復処理に合わせて遅延的に行われる
         this.trackInlineObjectsInRootNode(node)
         return node
       }),
@@ -309,16 +309,16 @@ class LocalNodeModel {
   }
 
   /**
-   * Get all nodes in the store, or all nodes of a specified type (optionally with limit/skip).
-   * Returns slice of result as iterable and total count of nodes.
+   * ストアの中のすべてのノード、または指定した型のすべてのノードを取得する（limit/skip も指定できる）。
+   * 結果の一部をイテラブルとして返し、あわせてノードの総数を返す。
    *
-   * You can directly return its `entries` result in your resolver.
+   * その `entries` の結果は、リゾルバーからそのまま返すことができる。
    *
    * @param {*} args
-   * @param {Object} args.query Query arguments (e.g. `limit` and `skip`)
-   * @param {(string|GraphQLOutputType)} args.type Type
+   * @param {Object} args.query クエリの引数（例: `limit` と `skip`）
+   * @param {(string|GraphQLOutputType)} args.type 型
    * @param {PageDependencies} [pageDependencies]
-   * @return {Promise<Object>} Object containing `{ entries: GatsbyIterable, totalCount: () => Promise<number> }`
+   * @return {Promise<Object>} `{ entries: GatsbyIterable, totalCount: () => Promise<number> }` を含むオブジェクト
    * @example
    * // Get all nodes of a type
    * const { entries, totalCount } = await findAll({ type: `MyType` })
@@ -345,7 +345,7 @@ class LocalNodeModel {
   async findAll(args, pageDependencies = {}) {
     const { gqlType, ...result } = await this._query(args, pageDependencies)
 
-    // Tracking connections by default:
+    // デフォルトでは connection を追跡する:
     if (typeof pageDependencies.connectionType === `undefined`) {
       pageDependencies.connectionType = gqlType.name
     }
@@ -357,11 +357,11 @@ class LocalNodeModel {
   }
 
   /**
-   * Get one node in the store. Only returns the first result. When possible, always use this method instead of fetching all nodes and then filtering them. `findOne` is more performant in that regard.
+   * ストアからノードを 1 つ取得する。最初の結果だけを返す。すべてのノードを取得してからフィルターするのではなく、可能な限りこのメソッドを使うこと。その点では `findOne` のほうがパフォーマンスが良い。
    *
    * @param {*} args
-   * @param {Object} args.query Query arguments (e.g. `filter`). Doesn't support `sort`, `limit`, `skip`.
-   * @param {(string|GraphQLOutputType)} args.type Type
+   * @param {Object} args.query クエリの引数（例: `filter`）。`sort`、`limit`、`skip` には対応していない。
+   * @param {(string|GraphQLOutputType)} args.type 型
    * @param {PageDependencies} [pageDependencies]
    * @returns {Promise<Node>}
    * @example
@@ -374,8 +374,8 @@ class LocalNodeModel {
   async findOne(args, pageDependencies = {}) {
     const { query = {} } = args
     if (query.sort?.fields?.length > 0) {
-      // If we support sorting and return the first node based on sorting
-      // we'll have to always track connection not an individual node
+      // ソートに対応して、ソートに基づく最初のノードを返すようにする場合は、
+      // 個別のノードではなく、常に connection を追跡しなければならなくなる
       throw new Error(
         `nodeModel.findOne() does not support sorting. Use nodeModel.findAll({ query: { limit: 1 } }) instead.`
       )
@@ -388,12 +388,12 @@ class LocalNodeModel {
     const first = result[0] ?? null
 
     if (!first) {
-      // Couldn't find matching node.
-      //  This leads to a state where data tracking for this query gets empty.
-      //  It means we will NEVER re-run this query on any data updates
-      //  (even if a new node matching this query is added at some point).
-      //  To workaround this, we have to add a connection tracking to re-run
-      //  the query whenever any node of this type changes.
+      // 一致するノードが見つからなかった。
+      //  これにより、このクエリのデータ追跡が空の状態になる。
+      //  つまり、データが更新されても、このクエリを再実行することは決してない
+      //  （どこかの時点で、このクエリに一致する新しいノードが追加されたとしても）。
+      //  これを回避するには、connection の追跡を追加して、この型のいずれかの
+      //  ノードが変わるたびにクエリを再実行するようにしなければならない。
       pageDependencies.connectionType = gqlType.name
     }
     return wrapNode(this.trackPageDependencies(first, pageDependencies))
@@ -484,7 +484,7 @@ class LocalNodeModel {
   }
 
   /**
-   * Get the names of all node types in the store.
+   * ストアの中のすべてのノードの型の名前を取得する。
    *
    * @returns {string[]}
    */
@@ -493,9 +493,9 @@ class LocalNodeModel {
   }
 
   /**
-   * Adds link between inline objects/arrays contained in Node object
-   * and that Node object.
-   * @param {Node} node Root Node
+   * Node オブジェクトに含まれるインラインのオブジェクトや配列と、
+   * その Node オブジェクトの間のリンクを追加する。
+   * @param {Node} node ルートの Node
    */
   trackInlineObjectsInRootNode(node) {
     if (!this._trackedRootNodes.has(node)) {
@@ -511,11 +511,11 @@ class LocalNodeModel {
   }
 
   /**
-   * Finds top most ancestor of node that contains passed Object or Array
-   * @param {(Object|Array)} obj Object/Array belonging to Node object or Node object
-   * @param {nodePredicate} [predicate] Optional callback to check if ancestor meets defined conditions
-   * @returns {Node} Top most ancestor if predicate is not specified
-   * or first node that meet predicate conditions if predicate is specified
+   * 渡されたオブジェクトまたは配列を含むノードの、最上位の祖先を探す
+   * @param {(Object|Array)} obj Node オブジェクトに属するオブジェクトや配列、または Node オブジェクト
+   * @param {nodePredicate} [predicate] 祖先が指定した条件を満たすかを確認するコールバック（省略可能）
+   * @returns {Node} predicate を指定しない場合は最上位の祖先。
+   * predicate を指定した場合は、predicate の条件を満たす最初のノード
    */
   findRootNodeAncestor(obj, predicate = null) {
     let iterations = 0
@@ -569,9 +569,9 @@ class LocalNodeModel {
   }
 
   /**
-   * Given a result, that's either a single node or an array of them, track them
-   * using pageDependencies. Defaults to tracking according to current resolver
-   * path. Returns the result back.
+   * 1 つのノードまたはノードの配列である結果を受け取り、pageDependencies を
+   * 使ってそれらを追跡する。デフォルトでは、現在のリゾルバーのパスに従って
+   * 追跡する。結果をそのまま返す。
    *
    * @param {Node | Node[]} result
    * @param {PageDependencies} [pageDependencies]
@@ -596,7 +596,7 @@ class LocalNodeModel {
   }
 
   /**
-   * Utility to get a field value from a node, even when that value needs to be materialized first (e.g. nested field that was connected via @link directive)
+   * ノードからフィールドの値を取得するユーティリティ。値を先にマテリアライズする必要がある場合（たとえば @link ディレクティブで接続されたネストしたフィールド）にも使える
    * @param {Node} node
    * @param {string} fieldPath
    * @returns {any}
@@ -849,8 +849,8 @@ async function resolveRecursive(
 
   for (const fieldName of Object.keys(queryFields)) {
     if (!fieldsToResolve[fieldName] && node[fieldName]) {
-      // It is possible that this field still has a custom resolver
-      // See https://github.com/gatsbyjs/gatsby/issues/27368
+      // このフィールドが、まだ独自のリゾルバーを持っていることもありうる
+      // https://github.com/gatsbyjs/gatsby/issues/27368 を参照
       resolvedFields[fieldName] = await resolveField(
         nodeModel,
         schemaComposer,
@@ -879,7 +879,7 @@ function resolveField(
     return node[fieldName]
   }
 
-  // We require this inline as there's a circular dependency from context back to this file.
+  // context からこのファイルへ戻る循環依存があるので、これはインラインで require している。
   // https://github.com/gatsbyjs/gatsby/blob/9d33b107d167e3e9e2aa282924a0c409f6afd5a0/packages/gatsby/src/schema/context.ts#L5
   if (!withResolverContext) {
     withResolverContext = require(`./context`)
@@ -945,8 +945,8 @@ const determineResolvableFields = (
       fieldsToResolve[fieldName] = true
     }
     if (!fieldsToResolve[fieldName] && isNestedAndParentNeedsResolve) {
-      // If parent field needs to be resolved - all nested fields should be added as well
-      // See https://github.com/gatsbyjs/gatsby/issues/26056
+      // 親のフィールドを解決する必要がある場合は、ネストしたすべてのフィールドも追加すべきである
+      // https://github.com/gatsbyjs/gatsby/issues/26056 を参照
       fieldsToResolve[fieldName] = true
     }
   })
@@ -972,7 +972,7 @@ const addRootNodeToInlineObject = (
       }
     })
 
-    // don't need to track node itself
+    // ノード自体を追跡する必要はない
     if (!isNode) {
       let nodeIds = rootNodeMap.get(data)
       if (!nodeIds) {

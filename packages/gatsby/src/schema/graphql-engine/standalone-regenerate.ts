@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 
 /*
-This is used mostly for development purposes, but can be attempted to be used
-to regenerate just engines for local platform/arch if previous full build
-was done to deploy on platform with different arch/platform.
+これは主に開発用だが、以前のフルビルドが、アーキテクチャやプラットフォームの異なる
+環境へのデプロイ用に行われていた場合に、ローカルのプラットフォームとアーキテクチャ向けに
+エンジンだけを再生成する目的でも使える。
 
-For development purposes this is used to be able to run `gatsby build` once to
-source data and print schema and then just rebundle graphql-engine
-with source file changes and test re-built engine quickly
+開発用としては、`gatsby build` を一度実行してデータを取得し、スキーマを出力した後に、
+ソースファイルの変更を反映して graphql-engine だけを再バンドルし、
+再ビルドしたエンジンをすばやくテストするために使う
 
-Usage:
-There need to be at least one successful `gatsby build`
-before starting to use this script (warm up datastore,
-generate "page-ssr" bundle). Once that's done you can
-run following command in site directory:
+使い方:
+このスクリプトを使い始める前に、`gatsby build` が少なくとも
+一度成功している必要がある（データストアを準備し、
+"page-ssr" バンドルを生成するため）。それが済んだら、
+サイトのディレクトリで次のコマンドを実行できる:
 
 ```shell
 node node_modules/gatsby/dist/schema/graphql-engine/standalone-regenerate.js
@@ -30,7 +30,7 @@ import { validateEnginesWithActivity } from "../../utils/validate-engines"
 
 async function run(): Promise<void> {
   process.env.GATSBY_SLICES = `1`
-  // load config
+  // config を読み込む
   reporter.verbose(`loading config and plugins`)
   await loadConfigAndPlugins({
     siteDirectory: process.cwd(),
@@ -38,7 +38,7 @@ async function run(): Promise<void> {
 
   try {
     reporter.verbose(`clearing webpack cache`)
-    // get rid of cache if it exist
+    // キャッシュが存在すれば取り除く
     await fs.remove(process.cwd() + `/.cache/webpack/query-engine`)
     await fs.remove(process.cwd() + `/.cache/webpack/page-ssr`)
   } catch (e) {
@@ -47,7 +47,7 @@ async function run(): Promise<void> {
 
   const state = store.getState()
 
-  // recompile
+  // 再コンパイルする
   const buildActivityTimer = reporter.activityTimer(
     `(Re)Building Rendering Engines`
   )
@@ -59,7 +59,7 @@ async function run(): Promise<void> {
         rootDir: process.cwd(),
         components: store.getState().components,
         staticQueriesByTemplate: state.staticQueriesByTemplate,
-        webpackCompilationHash: state.webpackCompilationHash, // we set webpackCompilationHash above
+        webpackCompilationHash: state.webpackCompilationHash, // webpackCompilationHash は上で設定している
         reporter,
         isVerbose: state.program.verbose,
       }),
