@@ -1,4 +1,4 @@
-// needed for fast refresh
+// Fast Refresh に必要
 import "@gatsbyjs/webpack-hot-middleware/client"
 
 import React from "react"
@@ -11,29 +11,29 @@ import { setLoader, publicLoader } from "./loader"
 import { Indicator } from "./loading-indicator/indicator"
 import DevLoader from "./dev-loader"
 import asyncRequires from "$virtual/async-requires"
-// Generated during bootstrap
+// ブートストラップ中に生成される
 import matchPaths from "$virtual/match-paths.json"
 import { LoadingIndicatorEventHandler } from "./loading-indicator"
 import Root from "./root"
 import { init as navigationInit } from "./navigation"
-// ensure in develop we have at least some .css (even if it's empty).
-// this is so there is no warning about not matching content-type when site doesn't include any regular css (for example when css-in-js is used)
-// this also make sure that if all css is removed in develop we are not left with stale commons.css that have stale content
+// develop では、最低でも何らかの .css が（空であっても）存在するようにする。
+// サイトが通常の CSS を一切含まない場合（css-in-js を使っている場合など）に、content-type の不一致の警告が出ないようにするためである
+// また、develop 中にすべての CSS が削除されたときに、古い内容の commons.css が残らないようにする
 import "./blank.css"
 
-// Enable fast-refresh for virtual sync-requires, gatsby-browser & navigation
-// To ensure that our <Root /> component can hot reload in case anything below doesn't
-// satisfy fast-refresh constraints
+// 仮想の sync-requires、gatsby-browser、navigation で Fast Refresh を有効にする。
+// これより下に Fast Refresh の制約を満たさないものがあっても、
+// <Root /> コンポーネントをホットリロードできるようにするためである
 module.hot.accept(
   [`$virtual/async-requires`, `./api-runner-browser`, `./navigation`],
   () => {
-    // asyncRequires should be automatically updated here (due to ESM import and webpack HMR spec),
-    // but loader doesn't know that and needs to be manually nudged
+    // asyncRequires はここで自動的に更新されるはずだが（ESM の import と webpack の HMR の仕様による）、
+    // loader はそれを知らないので、手動で知らせる必要がある
     loader.updateAsyncRequires(asyncRequires)
   }
 )
 
-// Initialize Gatsby events system early for error overlay
+// エラーオーバーレイのために、Gatsby のイベントシステムを早い段階で初期化する
 window._gatsbyEvents = window._gatsbyEvents || []
 
 window.___emitter = emitter
@@ -44,21 +44,21 @@ loader.setApiRunner(apiRunner)
 
 window.___loader = publicLoader
 
-// React 19 error handlers for development error overlay
+// 開発用エラーオーバーレイのための React 19 のエラーハンドラー
 const handleUncaughtError = (error, errorInfo) => {
   console.error(`Uncaught error:`, error, errorInfo)
   window._gatsbyEvents.push([
     `FAST_REFRESH`,
     {
       action: `SHOW_RUNTIME_ERRORS`,
-      payload: [error], // Pass the actual Error object
+      payload: [error], // 実際の Error オブジェクトを渡す
     },
   ])
   apiRunner(`onUncaughtError`, { error, errorInfo })
 }
 
 const handleCaughtError = (error, errorInfo) => {
-  // Also forward caught errors to the overlay system
+  // 捕捉されたエラーもオーバーレイのシステムへ転送する
   window._gatsbyEvents.push([
     `FAST_REFRESH`,
     {
@@ -71,10 +71,10 @@ const handleCaughtError = (error, errorInfo) => {
 
 const reactDomClient = require(`react-dom/client`)
 const reactFirstRenderOrHydrate = (Component, el) => {
-  // we will use hydrate if mount element has any content inside
+  // マウント先の要素に中身がある場合は hydrate を使う
   const useHydrate = el && el.children.length
 
-  // Pass error handler options for React 19+ (React 18 will ignore these options)
+  // React 19 以降向けにエラーハンドラーのオプションを渡す（React 18 はこれらのオプションを無視する）
   const errorHandlerOptions = {
     onUncaughtError: handleUncaughtError,
     onCaughtError: handleCaughtError,
@@ -90,20 +90,19 @@ const reactFirstRenderOrHydrate = (Component, el) => {
   }
 }
 
-// Do dummy dynamic import so the jsonp __webpack_require__.e is added to the commons.js
-// bundle. This ensures hot reloading doesn't break when someone first adds
-// a dynamic import.
+// jsonp の __webpack_require__.e が commons.js バンドルに追加されるように、
+// ダミーの動的 import を行う。これにより、誰かが初めて動的 import を
+// 追加したときにホットリロードが壊れなくなる。
 //
-// Without this, the runtime breaks with a
+// これがないと、ランタイムが次のエラーで壊れる。
 // "TypeError: __webpack_require__.e is not a function"
-// error.
 export function notCalledFunction() {
   return import(`./dummy`)
 }
 
-// Let the site/plugins run code very early.
+// サイトやプラグインが、ごく早い段階でコードを実行できるようにする。
 apiRunnerAsync(`onClientEntry`).then(() => {
-  // Hook up the client to socket.io on server
+  // クライアントをサーバーの socket.io に接続する
   const socket = socketIo()
   if (socket) {
     socket.on(`reload`, () => {
@@ -112,12 +111,12 @@ apiRunnerAsync(`onClientEntry`).then(() => {
   }
 
   /**
-   * Service Workers are persistent by nature. They stick around,
-   * serving a cached version of the site if they aren't removed.
-   * This is especially frustrating when you need to test the
-   * production build on your local machine.
+   * Service Worker は性質上、永続的である。削除しない限り残り続け、
+   * キャッシュされたバージョンのサイトを配信する。
+   * ローカルマシンで本番ビルドをテストする必要があるときには、
+   * これが特に厄介になる。
    *
-   * Let's warn if we find service workers in development.
+   * 開発中に Service Worker を見つけたら警告する。
    */
   if (`serviceWorker` in navigator) {
     navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -156,15 +155,15 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     dismissLoadingIndicator = () => {
       clearTimeout(showIndicatorTimeout)
       if (indicatorMountElement) {
-        // If user defined replaceHydrateFunction themselves the cleanupFn return might not be there
-        // So fallback to unmountComponentAtNode if available
+        // ユーザーが replaceHydrateFunction を自分で定義している場合、cleanupFn が返されないことがある
+        // そのため、利用可能であれば unmountComponentAtNode にフォールバックする
         if (cleanupFn && typeof cleanupFn === `function`) {
           cleanupFn()
         } else {
           if (typeof ReactDOM.unmountComponentAtNode === `function`) {
             ReactDOM.unmountComponentAtNode(indicatorMountElement)
           } else {
-            // This was removed in React 19:
+            // これは React 19 で削除された:
             // https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-unmountcomponentatnode.
             console.warn(
               `You provided a custom replaceHydrateFunction that does not return a cleanup function.`
@@ -186,7 +185,7 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     function onHydrated() {
       apiRunner(`onInitialClientRender`)
 
-      // Render query on demand overlay
+      // クエリのオンデマンド実行用のオーバーレイをレンダリングする
       if (
         process.env.GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR &&
         process.env.GATSBY_QUERY_ON_DEMAND_LOADING_INDICATOR === `true`
@@ -225,7 +224,7 @@ apiRunnerAsync(`onClientEntry`).then(() => {
     }
 
     // https://github.com/madrobby/zepto/blob/b5ed8d607f67724788ec9ff492be297f64d47dfc/src/zepto.js#L439-L450
-    // TODO remove IE 10 support
+    // TODO IE 10 のサポートを削除する
     const doc = document
     if (
       doc.readyState === `complete` ||

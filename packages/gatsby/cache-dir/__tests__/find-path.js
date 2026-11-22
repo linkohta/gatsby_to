@@ -32,7 +32,7 @@ describe(`find-path`, () => {
 
   describe(`findMatchPath`, () => {
     beforeEach(() => {
-      // reset matchPaths
+      // matchPaths をリセットする
       setMatchPaths([])
       global.__BASE_PATH__ = ``
     })
@@ -62,7 +62,7 @@ describe(`find-path`, () => {
 
   describe(`findPath`, () => {
     beforeEach(() => {
-      // reset matchPaths
+      // matchPaths をリセットする
       setMatchPaths([])
       global.__BASE_PATH__ = ``
     })

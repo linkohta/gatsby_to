@@ -1,5 +1,5 @@
-// This is extracted to separate module because it's shared
-// between browser and SSR code
+// ブラウザーと SSR のコードで共有するため、
+// 別モジュールに切り出している
 export const RouteAnnouncerProps = {
   id: `gatsby-announcer`,
   style: {

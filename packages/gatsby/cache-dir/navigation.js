@@ -23,7 +23,7 @@ function maybeRedirect(pathname) {
   }
 }
 
-// Catch unhandled chunk loading errors and force a restart of the app.
+// 処理されなかったチャンク読み込みエラーを捕捉し、アプリを強制的に再起動する。
 let nextRoute = ``
 
 window.addEventListener(`unhandledrejection`, event => {
@@ -54,9 +54,9 @@ const onRouteUpdate = (location, prevLocation) => {
 }
 
 const navigate = (to, options = {}) => {
-  // Support forward/backward navigation with numbers
-  // navigate(-2) (jumps back 2 history steps)
-  // navigate(2)  (jumps forward 2 history steps)
+  // 数値による前後へのナビゲーションに対応する
+  // navigate(-2)（履歴を 2 つ戻る）
+  // navigate(2)（履歴を 2 つ進む）
   if (typeof to === `number`) {
     globalHistory.navigate(to)
     return
@@ -65,21 +65,21 @@ const navigate = (to, options = {}) => {
   const { pathname, search, hash } = parsePath(to)
   const redirect = maybeGetBrowserRedirect(pathname)
 
-  // If we're redirecting, just replace the passed in pathname
-  // to the one we want to redirect to.
+  // リダイレクトする場合は、渡された pathname を
+  // リダイレクト先のものに置き換えるだけでよい。
   if (redirect) {
     to = redirect.toPath + search + hash
   }
 
-  // If we had a service worker update, no matter the path, reload window and
-  // reset the pathname whitelist
+  // Service Worker の更新があった場合は、パスに関係なくウィンドウをリロードし、
+  // pathname のホワイトリストをリセットする
   if (window.___swUpdated) {
     window.location = pathname + search + hash
     return
   }
 
-  // Start a timer to wait for a second before transitioning and showing a
-  // loader in case resources aren't around yet.
+  // リソースがまだ揃っていない場合に備え、遷移してローダーを表示するまで
+  // 1 秒待つタイマーを開始する。
   const timeoutId = setTimeout(() => {
     emitter.emit(`onDelayedLoadPageResources`, { pathname })
     apiRunner(`onRouteUpdateDelayed`, {
@@ -88,12 +88,12 @@ const navigate = (to, options = {}) => {
   }, 1000)
 
   loader.loadPage(pathname + search).then(pageResources => {
-    // If no page resources, then refresh the page
-    // Do this, rather than simply `window.location.reload()`, so that
-    // pressing the back/forward buttons work - otherwise when pressing
-    // back, the browser will just change the URL and expect JS to handle
-    // the change, which won't always work since it might not be a Gatsby
-    // page.
+    // ページリソースがない場合は、ページを再読み込みする
+    // 単に `window.location.reload()` とせずにこうするのは、戻るボタンと
+    // 進むボタンが動作するようにするためである。そうしないと、戻るを
+    // 押したときにブラウザーは URL だけを変更し、JS が変更を処理することを
+    // 期待する。しかし、そこは Gatsby のページではないかもしれないので、
+    // 常にうまくいくとは限らない。
     if (!pageResources || pageResources.status === PageResourceStatus.Error) {
       window.history.replaceState({}, ``, location.href)
       window.location = pathname
@@ -101,14 +101,14 @@ const navigate = (to, options = {}) => {
       return
     }
 
-    // If the loaded page has a different compilation hash to the
-    // window, then a rebuild has occurred on the server. Reload.
+    // 読み込んだページのコンパイルハッシュが window のものと異なる場合、
+    // サーバーで再ビルドが行われている。リロードする。
     if (process.env.NODE_ENV === `production` && pageResources) {
       if (
         pageResources.page.webpackCompilationHash !==
         window.___webpackCompilationHash
       ) {
-        // Purge plugin-offline cache
+        // plugin-offline のキャッシュを消去する
         if (
           `serviceWorker` in navigator &&
           navigator.serviceWorker.controller !== null &&
@@ -131,18 +131,18 @@ function shouldUpdateScroll(prevRouterProps, { location }) {
   const { pathname, hash } = location
   const results = apiRunner(`shouldUpdateScroll`, {
     prevRouterProps,
-    // `pathname` for backwards compatibility
+    // `pathname` は後方互換性のため
     pathname,
     routerProps: { location },
     getSavedScrollPosition: args => [
       0,
-      // FIXME this is actually a big code smell, we should fix this
+      // FIXME これは実のところ大きなコードスメルなので、修正すべきである
       // eslint-disable-next-line @babel/no-invalid-this
       this._stateStorage.read(args, args.key),
     ],
   })
   if (results.length > 0) {
-    // Use the latest registered shouldUpdateScroll result, this allows users to override plugin's configuration
+    // 最後に登録された shouldUpdateScroll の結果を使う。これにより、ユーザーがプラグインの設定を上書きできる
     // @see https://github.com/gatsbyjs/gatsby/issues/12038
     return results[results.length - 1]
   }
@@ -152,8 +152,8 @@ function shouldUpdateScroll(prevRouterProps, { location }) {
       location: { pathname: oldPathname },
     } = prevRouterProps
     if (oldPathname === pathname) {
-      // Scroll to element if it exists, if it doesn't, or no hash is provided,
-      // scroll to top.
+      // 要素が存在する場合はそこへスクロールする。存在しない場合、またはハッシュが
+      // 指定されていない場合は、先頭へスクロールする。
       return hash ? decodeURI(hash.slice(1)) : [0, 0]
     }
   }
@@ -161,8 +161,8 @@ function shouldUpdateScroll(prevRouterProps, { location }) {
 }
 
 function init() {
-  // The "scroll-behavior" package expects the "action" to be on the location
-  // object so let's copy it over.
+  // "scroll-behavior" パッケージは location オブジェクトに "action" があることを
+  // 期待するので、コピーしておく。
   globalHistory.listen(args => {
     args.location.action = args.action
   })
@@ -215,7 +215,7 @@ const compareLocationProps = (prevLocation, nextLocation) => {
   return false
 }
 
-// Fire on(Pre)RouteUpdate APIs
+// on(Pre)RouteUpdate API を実行する
 class RouteUpdates extends React.Component {
   constructor(props) {
     super(props)

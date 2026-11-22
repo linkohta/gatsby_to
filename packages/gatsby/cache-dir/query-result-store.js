@@ -91,9 +91,9 @@ export class PageQueryStore extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    // We want to update this component when:
-    // - location changed
-    // - page data for path changed
+    // このコンポーネントは次の場合に更新したい:
+    // - location が変わった
+    // - パスに対応するページデータが変わった
 
     return (
       this.props.location !== nextProps.location ||
@@ -141,8 +141,8 @@ export class StaticQueryStore extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    // We want to update this component when:
-    // - static query results changed
+    // このコンポーネントは次の場合に更新したい:
+    // - 静的クエリの結果が変わった
 
     return this.state.staticQueryData !== nextState.staticQueryData
   }
@@ -181,8 +181,8 @@ export class SliceDataStore extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    // We want to update this component when:
-    // - slice results changed
+    // このコンポーネントは次の場合に更新したい:
+    // - スライスの結果が変わった
 
     return this.state.slicesData !== nextState.slicesData
   }

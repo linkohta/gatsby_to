@@ -13,7 +13,7 @@ if (
     .then(function (reg) {
       reg.addEventListener(`updatefound`, () => {
         apiRunner(`onServiceWorkerUpdateFound`, { serviceWorker: reg })
-        // The updatefound event implies that reg.installing is set; see
+        // updatefound イベントは reg.installing が設定されていることを意味する。次を参照
         // https://w3c.github.io/ServiceWorker/#service-worker-registration-updatefound-event
         const installingWorker = reg.installing
         console.log(`installingWorker`, installingWorker)
@@ -21,27 +21,27 @@ if (
           switch (installingWorker.state) {
             case `installed`:
               if (navigator.serviceWorker.controller) {
-                // At this point, the old content will have been purged and the fresh content will
-                // have been added to the cache.
+                // この時点で、古いコンテンツは消去され、新しいコンテンツが
+                // キャッシュに追加されている。
 
-                // We set a flag so Gatsby Link knows to refresh the page on next navigation attempt
+                // 次回のナビゲーション時にページを再読み込みすべきことを Gatsby Link が分かるよう、フラグを設定する
                 window.___swUpdated = true
-                // We call the onServiceWorkerUpdateReady API so users can show update prompts.
+                // ユーザーが更新のプロンプトを表示できるよう、onServiceWorkerUpdateReady API を呼ぶ。
                 apiRunner(`onServiceWorkerUpdateReady`, { serviceWorker: reg })
 
-                // If resources failed for the current page, reload.
+                // 現在のページのリソースの読み込みに失敗した場合は、リロードする。
                 if (window.___failedResources) {
                   console.log(`resources failed, SW updated - reloading`)
                   window.location.reload()
                 }
               } else {
-                // At this point, everything has been precached.
-                // It's the perfect time to display a "Content is cached for offline use." message.
+                // この時点で、すべてがプリキャッシュされている。
+                // "Content is cached for offline use." というメッセージを表示するのに最適なタイミングである。
                 console.log(`Content is now available offline!`)
 
-                // Post to service worker that install is complete.
-                // Delay to allow time for the event listener to be added --
-                // otherwise fetch is called too soon and resources aren't cached.
+                // インストールが完了したことを Service Worker へ通知する。
+                // イベントリスナーが追加される時間を確保するために遅延させる。
+                // そうしないと fetch が早く呼ばれすぎて、リソースがキャッシュされない。
                 apiRunner(`onServiceWorkerInstalled`, { serviceWorker: reg })
               }
               break

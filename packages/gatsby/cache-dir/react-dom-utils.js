@@ -6,7 +6,7 @@ export function reactDOMUtils() {
   const render = (Component, el, options = {}) => {
     let root = map.get(el)
     if (!root) {
-      // Only pass options if React 19 error handling options are provided
+      // React 19 のエラー処理のオプションが渡された場合にだけ、オプションを渡す
       const rootOptions =
         options.onUncaughtError || options.onCaughtError
           ? {
@@ -21,7 +21,7 @@ export function reactDOMUtils() {
   }
 
   const hydrate = (Component, el, options = {}) => {
-    // Only pass options if React 19 error handling options are provided
+    // React 19 のエラー処理のオプションが渡された場合にだけ、オプションを渡す
     const hydrateOptions =
       options.onUncaughtError || options.onCaughtError
         ? {

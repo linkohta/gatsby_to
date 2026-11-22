@@ -3,7 +3,7 @@ const { getResourceURLsForPathname, loadPage, loadPageSync } =
   require(`./loader`).publicLoader
 
 exports.apiRunner = (api, args = {}, defaultReturn, argTransform) => {
-  // Hooks for gatsby-cypress's API handler
+  // gatsby-cypress の API ハンドラー用のフック
   if (process.env.CYPRESS_SUPPORT) {
     if (window.___apiHandler) {
       window.___apiHandler(api)
@@ -30,7 +30,7 @@ exports.apiRunner = (api, args = {}, defaultReturn, argTransform) => {
     return result
   })
 
-  // Filter out undefined results.
+  // undefined の結果を取り除く。
   results = results.filter(result => typeof result !== `undefined`)
 
   if (results.length > 0) {

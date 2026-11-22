@@ -17,19 +17,19 @@ const trimPathname = rawPathname => {
 
   const pathname = decodeURIComponent(newRawPathname)
 
-  // Remove the pathPrefix from the pathname.
+  // pathname から pathPrefix を取り除く。
   const trimmedPathname = stripPrefix(
     pathname,
     decodeURIComponent(__BASE_PATH__)
   )
-    // Remove any hashfragment
+    // ハッシュフラグメントを取り除く
     .split(`#`)[0]
 
   return trimmedPathname
 }
 
 function absolutify(path) {
-  // If it's already absolute, return as-is
+  // すでに絶対パスであれば、そのまま返す
   if (
     path.startsWith(`/`) ||
     path.startsWith(`https://`) ||
@@ -37,8 +37,8 @@ function absolutify(path) {
   ) {
     return path
   }
-  // Calculate path relative to current location, adding a trailing slash to
-  // match behavior of @reach/router
+  // 現在の location からの相対パスを計算する。@reach/router の挙動に
+  // 合わせて末尾にスラッシュを付ける
   return new URL(
     path,
     window.location.href + (window.location.href.endsWith(`/`) ? `` : `/`)
@@ -46,20 +46,20 @@ function absolutify(path) {
 }
 
 /**
- * Set list of matchPaths
+ * matchPaths の一覧を設定する
  *
- * @param {Array<{path: string, matchPath: string}>} value collection of matchPaths
+ * @param {Array<{path: string, matchPath: string}>} value matchPaths のコレクション
  */
 export const setMatchPaths = value => {
   matchPaths = value
 }
 
 /**
- * Return a matchpath url
- * if `match-paths.json` contains `{ "/foo*": "/page1", ...}`, then
- * `/foo?bar=far` => `/page1`
+ * matchPath の URL を返す
+ * `match-paths.json` に `{ "/foo*": "/page1", ...}` が含まれている場合は
+ * `/foo?bar=far` => `/page1` となる
  *
- * @param {string} rawPathname A raw pathname
+ * @param {string} rawPathname 生のパス名
  * @return {string|null}
  */
 export const findMatchPath = rawPathname => {
@@ -82,12 +82,12 @@ export const findMatchPath = rawPathname => {
 }
 
 /**
- * Return a matchpath params from reach/router rules
- * if `match-paths.json` contains `{ ":bar/*foo" }`, and the path is /baz/zaz/zoo
- * then it returns
+ * reach/router のルールに基づいて matchPath のパラメーターを返す
+ * `match-paths.json` に `{ ":bar/*foo" }` が含まれていて、パスが /baz/zaz/zoo の場合は
+ * 次を返す
  *  { bar: baz, foo: zaz/zoo }
  *
- * @param {string} rawPathname A raw pathname
+ * @param {string} rawPathname 生のパス名
  * @return {object}
  */
 export const grabMatchParams = rawPathname => {
@@ -109,14 +109,14 @@ export const grabMatchParams = rawPathname => {
   return {}
 }
 
-// Given a raw URL path, returns the cleaned version of it (trim off
-// `#` and query params), or if it matches an entry in
-// `match-paths.json`, its matched path is returned
+// 生の URL パスを受け取り、整形したパス（`#` とクエリパラメーターを
+// 取り除いたもの）を返す。`match-paths.json` のエントリーに
+// 一致する場合は、一致したパスを返す
 //
-// E.g. `/foo?bar=far` => `/foo`
+// 例: `/foo?bar=far` => `/foo`
 //
-// Or if `match-paths.json` contains `{ "/foo*": "/page1", ...}`, then
-// `/foo?bar=far` => `/page1`
+// `match-paths.json` に `{ "/foo*": "/page1", ...}` が含まれている場合は
+// `/foo?bar=far` => `/page1` となる
 export const findPath = rawPathname => {
   const trimmedPathname = trimPathname(absolutify(rawPathname))
   if (pathCache.has(trimmedPathname)) {
@@ -140,10 +140,10 @@ export const findPath = rawPathname => {
 }
 
 /**
- * Clean a url and converts /index.html => /
- * E.g. `/foo?bar=far` => `/foo`
+ * URL を整形し、/index.html を / に変換する
+ * 例: `/foo?bar=far` => `/foo`
  *
- * @param {string} rawPathname A raw pathname
+ * @param {string} rawPathname 生のパス名
  * @return {string}
  */
 export const cleanPath = rawPathname => {

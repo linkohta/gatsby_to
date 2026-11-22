@@ -1,8 +1,8 @@
 /**
- * Converts a string of CSS into object syntax
+ * CSS の文字列をオブジェクト記法に変換する
  * @param strings
  * @param keys
- * @returns {Object} CSS in object syntax
+ * @returns {Object} オブジェクト記法の CSS
  * @example
  * const output = css`
  *  html {

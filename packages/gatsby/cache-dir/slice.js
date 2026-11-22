@@ -7,7 +7,7 @@ import { SlicesContext } from "./slice/context"
 
 export function Slice(props) {
   if (process.env.GATSBY_SLICES) {
-    // we use sliceName internally, so remap alias to sliceName
+    // 内部では sliceName を使うので、alias を sliceName に対応付け直す
     const internalProps = {
       ...props,
       sliceName: props.alias,
@@ -17,7 +17,7 @@ export function Slice(props) {
 
     const slicesContext = useContext(SlicesContext)
 
-    // validate props
+    // props を検証する
     const propErrors = validateSliceProps(props)
     if (Object.keys(propErrors).length) {
       throw new SlicePropsError(
@@ -31,25 +31,25 @@ export function Slice(props) {
     if (slicesContext.renderEnvironment === `server`) {
       return <ServerSlice {...internalProps} />
     } else if (slicesContext.renderEnvironment === `browser`) {
-      // in the browser, we'll just render the component as is
+      // ブラウザーでは、コンポーネントをそのままレンダリングする
       return <InlineSlice {...internalProps} />
     } else if (
       slicesContext.renderEnvironment === `engines` ||
       slicesContext.renderEnvironment === `dev-ssr`
     ) {
-      // if we're in SSR, we'll just render the component as is
+      // SSR の場合は、コンポーネントをそのままレンダリングする
       return <InlineSlice {...internalProps} />
     } else if (slicesContext.renderEnvironment === `slices`) {
-      // we are not yet supporting nested slices
+      // ネストしたスライスにはまだ対応していない
 
       let additionalContextMessage = ``
 
-      // just in case generating additional contextual information fails, we still want the base message to show
-      // and not show another cryptic error message
+      // 追加のコンテキスト情報の生成に失敗した場合でも、基本のメッセージは表示したい。
+      // 別の分かりにくいエラーメッセージを表示しないようにする
       try {
         additionalContextMessage = `\n\nSlice component "${slicesContext.sliceRoot.name}" (${slicesContext.sliceRoot.componentPath}) tried to render <Slice alias="${props.alias}"/>`
       } catch {
-        // don't need to handle it, we will just skip the additional context message if we fail to generate it
+        // 処理する必要はない。生成に失敗した場合は、追加のコンテキストメッセージを省くだけである
       }
 
       throw new Error(
@@ -81,9 +81,9 @@ class SlicePropsError extends Error {
     if (inBrowser) {
       let fullStack = ``
 
-      // React 19+ uses captureOwnerStack, React 18 uses ReactDebugCurrentFrame.getCurrentStack
+      // React 19 以降は captureOwnerStack を、React 18 は ReactDebugCurrentFrame.getCurrentStack を使う
       if (React.captureOwnerStack) {
-        // React 19+ approach
+        // React 19 以降の方法
         const ownerStack = React.captureOwnerStack()
         const currentStack = new Error().stack || ``
         fullStack = ownerStack ? `${currentStack}\n${ownerStack}` : currentStack
@@ -91,15 +91,15 @@ class SlicePropsError extends Error {
         React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
           ?.ReactDebugCurrentFrame?.getCurrentStack
       ) {
-        // React 18 approach
+        // React 18 の方法
         fullStack =
           React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactDebugCurrentFrame.getCurrentStack()
       } else {
-        // Fallback if neither API is available
+        // どちらの API も使えない場合のフォールバック
         fullStack = new Error().stack || ``
       }
 
-      // remove the first line of the stack trace
+      // スタックトレースの最初の行を取り除く
       const stackLines = fullStack.trim().split(`\n`).slice(1)
       if (stackLines.length > 0) {
         stackLines[0] = stackLines[0].trim()
@@ -108,7 +108,7 @@ class SlicePropsError extends Error {
 
       message = `Slice "${sliceName}" was passed props that are not serializable (${errors}).`
     } else {
-      // we can't really grab any extra info outside of the browser, so just print what we can
+      // ブラウザーの外では追加の情報を取得できないので、出せるものだけを出力する
       message = `${name}: Slice "${sliceName}" was passed props that are not serializable (${errors}).`
       const stackLines = new Error().stack.trim().split(`\n`).slice(2)
       stack = `${message}\n${stackLines.join(`\n`)}`
@@ -134,7 +134,7 @@ const validateSliceProps = (
   seenObjects = [],
   path = null
 ) => {
-  // recursively validate all props
+  // すべての props を再帰的に検証する
   for (const [name, value] of Object.entries(props)) {
     if (
       value === undefined ||

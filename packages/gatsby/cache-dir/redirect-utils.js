@@ -1,6 +1,6 @@
 import redirects from "./redirects.json"
 
-// Convert to a map for faster lookup in maybeRedirect()
+// maybeRedirect() での検索を速くするために Map へ変換する
 
 const redirectMap = new Map()
 const redirectIgnoreCaseMap = new Map()

@@ -50,7 +50,7 @@ export function AccordionItem({
     setIsOpen(nextValue)
   }
 
-  // If the AccordionItem is open, and the user hits the ESC key, then close it
+  // AccordionItem が開いているときにユーザーが ESC キーを押したら閉じる
   const onKeyDown = event => {
     if (isOpen && match(event, keys.Escape)) {
       setIsOpen(false)

@@ -12,14 +12,14 @@ if (typeof window === `undefined`) {
 
 if (module.hot) {
   module.hot.accept(`$virtual/loading-indicator`, () => {
-    // isLoadingIndicatorEnabled is imported with ES import so no need
-    // for dedicated handling as HMR just replace it in that case
+    // isLoadingIndicatorEnabled は ES の import で読み込んでいるので、専用の処理は不要である。
+    // その場合は HMR が単に置き換える
   })
 }
 
-// HMR can rerun this, so check if it was set before
-// we also set it on window and not just in module scope because of HMR resetting
-// module scope
+// HMR によってこれが再実行されることがあるので、すでに設定済みかを確認する
+// HMR はモジュールスコープをリセットするので、モジュールスコープだけでなく
+// window にも設定する
 if (typeof window.___gatsbyDidShowLoadingIndicatorBefore === `undefined`) {
   window.___gatsbyDidShowLoadingIndicatorBefore = false
 }
@@ -30,7 +30,7 @@ export function Indicator({ visible = true }) {
   }
 
   if (!window.___gatsbyDidShowLoadingIndicatorBefore) {
-    // not ideal to this in render function, but that's just console info
+    // render 関数の中でこれを行うのは理想的ではないが、コンソールへの情報出力にすぎない
     debugLog(
       `A loading indicator is displayed in-browser whenever content is being requested upon navigation (Query On Demand).\n\nYou can disable the loading indicator for your current session by visiting ${window.location.origin}/___loading-indicator/disable`
     )
@@ -42,7 +42,7 @@ export function Indicator({ visible = true }) {
       <Style />
       <div
         data-gatsby-loading-indicator="root"
-        // preact doesn't render data attributes with a literal bool false value to dom
+        // preact は、値がリテラルの false である data 属性を DOM にレンダリングしない
         data-gatsby-loading-indicator-visible={visible.toString()}
         aria-live="assertive"
       >

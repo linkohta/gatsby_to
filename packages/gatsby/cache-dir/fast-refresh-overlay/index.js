@@ -92,9 +92,9 @@ function DevOverlay({ children }) {
 
   const dismiss = () => {
     dispatch({ action: `DISMISS` })
-    // Setting gatsbyEvents = [] is necessary for the runtime errors to correctly clear
-    // However, using this for serverData errors doesn't work and results in the overlay not showing up
-    // again since the component isn't remounted and thus the .push method is not reinitalized
+    // ランタイムエラーを正しくクリアするには gatsbyEvents = [] の設定が必要である
+    // ただし、serverData のエラーにこれを使うとうまく動かず、オーバーレイが二度と表示されなくなる。
+    // コンポーネントが再マウントされず、.push メソッドが再初期化されないためである
     window._gatsbyEvents = []
   }
 
@@ -110,7 +110,7 @@ function DevOverlay({ children }) {
     hasDevSsrError ||
     hasGetServerDataError
 
-  // This component has a deliberate order (priority)
+  // このコンポーネントの順序（優先度）は意図したものである
   const ErrorComponent = () => {
     if (hasBuildError) {
       return <BuildError error={state.buildError} />

@@ -30,7 +30,7 @@ function WrappedAccordionItem({ error, open }) {
 
   const modulePath = codeFrameInformation?.moduleId
   const name = codeFrameInformation?.functionName
-  // With the introduction of Metadata management the modulePath can have a resourceQuery that needs to be removed first
+  // Metadata 管理の導入により、modulePath に resourceQuery が付くことがあるので、先に取り除く必要がある
   const filePath = modulePath?.replace(/(\?|&)export=(default|head)$/, ``)
 
   const res = useStackFrame(codeFrameInformation)
@@ -87,7 +87,7 @@ export function RuntimeErrors({ errors, dismiss }) {
     errors.forEach(error => {
       let cacheKey
       if (error.stack) {
-        // Second line contains the exact location
+        // 2 行目に正確な位置が含まれている
         const secondLine = error.stack?.split(`\n`)[1]
         cacheKey = secondLine
       } else {

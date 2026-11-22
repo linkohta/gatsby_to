@@ -14,14 +14,14 @@ import {
 import EnsureResources from "./ensure-resources"
 import FastRefreshOverlay from "./fast-refresh-overlay"
 
-// In gatsby v2 if Router is used in page using matchPaths
-// paths need to contain full path.
-// For example:
-//   - page have `/app/*` matchPath
-//   - inside template user needs to use `/app/xyz` as path
-// Resetting `basepath`/`baseuri` keeps current behaviour
-// to not introduce breaking change.
-// Remove this in v3
+// gatsby v2 では、matchPath を使うページで Router を使う場合、
+// パスに完全なパスを含める必要がある。
+// 例:
+//   - ページの matchPath が `/app/*` である
+//   - テンプレート内では、ユーザーはパスとして `/app/xyz` を使う必要がある
+// 破壊的変更を持ち込まないよう、`basepath`/`baseuri` をリセットして
+// 現在の挙動を維持する。
+// v3 で削除する
 const RouteHandler = props => (
   <BaseContext.Provider
     value={{
@@ -124,7 +124,7 @@ const Root = () => (
   </Location>
 )
 
-// Let site, plugins wrap the site e.g. for Redux.
+// Redux などのために、サイトやプラグインがサイト全体をラップできるようにする。
 const rootWrappedWithWrapRootElement = apiRunner(
   `wrapRootElement`,
   { element: <Root /> },

@@ -1,33 +1,29 @@
 /**
- * Object containing options defined in `gatsby-config.js`
+ * `gatsby-config.js` で定義されたオプションを持つオブジェクト
  * @typedef {object} pluginOptions
  */
 
 /**
- * Replace the default server renderer. This is useful for integration with
- * Redux, css-in-js libraries, etc. that need custom setups for server
- * rendering.
+ * デフォルトのサーバーレンダラーを置き換える。Redux や css-in-js ライブラリなど、
+ * サーバーレンダリングに独自のセットアップが必要なものと統合するときに役立つ。
  * @param {object} $0
- * @param {string} $0.pathname The pathname of the page currently being rendered.
- * @param {ReactNode} $0.bodyComponent The React element to be rendered as the page body
- * @param {function} $0.replaceBodyHTMLString Call this with the HTML string
- * you render. **WARNING** if multiple plugins implement this API it's the
- * last plugin that "wins". TODO implement an automated warning against this.
- * @param {function} $0.setHeadComponents Takes an array of components as its
- * first argument which are added to the `headComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setHtmlAttributes Takes an object of props which will
- * spread into the `<html>` component.
- * @param {function} $0.setBodyAttributes Takes an object of props which will
- * spread into the `<body>` component.
- * @param {function} $0.setPreBodyComponents Takes an array of components as its
- * first argument which are added to the `preBodyComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setPostBodyComponents Takes an array of components as its
- * first argument which are added to the `postBodyComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setBodyProps Takes an object of data which
- * is merged with other body props and passed to `html.js` as `bodyProps`.
+ * @param {string} $0.pathname 現在レンダリングしているページのパス名。
+ * @param {ReactNode} $0.bodyComponent ページの本文としてレンダリングする React 要素
+ * @param {function} $0.replaceBodyHTMLString レンダリングした HTML 文字列を渡して
+ * 呼び出す。**警告** 複数のプラグインがこの API を実装している場合は、
+ * 最後のプラグインが「勝つ」。TODO これに対する自動の警告を実装する。
+ * @param {function} $0.setHeadComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `headComponents` 配列に追加する。
+ * @param {function} $0.setHtmlAttributes props のオブジェクトを取り、
+ * `<html>` コンポーネントへ展開する。
+ * @param {function} $0.setBodyAttributes props のオブジェクトを取り、
+ * `<body>` コンポーネントへ展開する。
+ * @param {function} $0.setPreBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `preBodyComponents` 配列に追加する。
+ * @param {function} $0.setPostBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `postBodyComponents` 配列に追加する。
+ * @param {function} $0.setBodyProps データのオブジェクトを取り、他の body props と
+ * マージして `bodyProps` として `html.js` へ渡す。
  * @param {pluginOptions} pluginOptions
  * @returns {void | Promise<void>}
  * @example
@@ -45,40 +41,36 @@
 exports.replaceRenderer = true
 
 /**
- * Called after every page Gatsby server renders while building HTML so you can
- * set head and body components to be rendered in your `html.js`.
+ * HTML のビルド中に Gatsby がページをサーバーレンダリングするたびに呼ばれる。
+ * `html.js` でレンダリングする head と body のコンポーネントを設定できる。
  *
- * Gatsby does a two-pass render for HTML. It loops through your pages first
- * rendering only the body and then takes the result body HTML string and
- * passes it as the `body` prop to your `html.js` to complete the render.
+ * Gatsby は HTML を 2 パスでレンダリングする。まず各ページの body だけを
+ * レンダリングし、その結果の body の HTML 文字列を `body` prop として
+ * `html.js` へ渡してレンダリングを完了する。
  *
- * It's often handy to be able to send custom components to your `html.js`.
- * For example, it's a very common pattern for React.js libraries that
- * support server rendering to pull out data generated during the render to
- * add to your HTML.
+ * 独自のコンポーネントを `html.js` へ渡せると便利なことが多い。
+ * たとえば、サーバーレンダリングに対応した React.js のライブラリでは、
+ * レンダリング中に生成したデータを取り出して HTML に追加するパターンが
+ * 非常によく使われる。
  *
- * Using this API over [`replaceRenderer`](#replaceRenderer) is preferable as
- * multiple plugins can implement this API where only one plugin can take
- * over server rendering. However, if your plugin requires taking over server
- * rendering then that's the one to
- * use
+ * [`replaceRenderer`](#replaceRenderer) よりも、この API を使うことが望ましい。
+ * この API は複数のプラグインが実装できるが、サーバーレンダリングを
+ * 引き受けられるプラグインは 1 つだけだからである。ただし、プラグインが
+ * サーバーレンダリングを引き受ける必要がある場合は、そちらを使うこと
  * @param {object} $0
- * @param {string} $0.pathname The pathname of the page currently being rendered.
- * @param {function} $0.setHeadComponents Takes an array of components as its
- * first argument which are added to the `headComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setHtmlAttributes Takes an object of props which will
- * spread into the `<html>` component.
- * @param {function} $0.setBodyAttributes Takes an object of props which will
- * spread into the `<body>` component.
- * @param {function} $0.setPreBodyComponents Takes an array of components as its
- * first argument which are added to the `preBodyComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setPostBodyComponents Takes an array of components as its
- * first argument which are added to the `postBodyComponents` array which is passed
- * to the `html.js` component.
- * @param {function} $0.setBodyProps Takes an object of data which
- * is merged with other body props and passed to `html.js` as `bodyProps`.
+ * @param {string} $0.pathname 現在レンダリングしているページのパス名。
+ * @param {function} $0.setHeadComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `headComponents` 配列に追加する。
+ * @param {function} $0.setHtmlAttributes props のオブジェクトを取り、
+ * `<html>` コンポーネントへ展開する。
+ * @param {function} $0.setBodyAttributes props のオブジェクトを取り、
+ * `<body>` コンポーネントへ展開する。
+ * @param {function} $0.setPreBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `preBodyComponents` 配列に追加する。
+ * @param {function} $0.setPostBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `postBodyComponents` 配列に追加する。
+ * @param {function} $0.setBodyProps データのオブジェクトを取り、他の body props と
+ * マージして `bodyProps` として `html.js` へ渡す。
  * @param {pluginOptions} pluginOptions
  * @example
  * // Import React so that you can use JSX in HeadComponents
@@ -109,26 +101,26 @@ exports.replaceRenderer = true
 exports.onRenderBody = true
 
 /**
- * Called after every page Gatsby server renders while building HTML so you can
- * replace head components to be rendered in your `html.js`. This is useful if
- * you need to reorder scripts or styles added by other plugins.
+ * HTML のビルド中に Gatsby がページをサーバーレンダリングするたびに呼ばれる。
+ * `html.js` でレンダリングする head のコンポーネントを置き換えられる。
+ * 他のプラグインが追加したスクリプトやスタイルを並べ替える必要があるときに役立つ。
  * @param {object} $0
- * @param {string} $0.pathname The pathname of the page currently being rendered.
- * @param {Array<ReactNode>} $0.getHeadComponents Returns the current `headComponents` array.
- * @param {function} $0.replaceHeadComponents Takes an array of components as its
- * first argument which replace the `headComponents` array which is passed
- * to the `html.js` component. **WARNING** if multiple plugins implement this
- * API it's the last plugin that "wins".
- * @param {Array<ReactNode>} $0.getPreBodyComponents Returns the current `preBodyComponents` array.
- *  @param {function} $0.replacePreBodyComponents Takes an array of components as its
- * first argument which replace the `preBodyComponents` array which is passed
- * to the `html.js` component. **WARNING** if multiple plugins implement this
- * API it's the last plugin that "wins".
- * @param {Array<ReactNode>} $0.getPostBodyComponents Returns the current `postBodyComponents` array.
- *  @param {function} $0.replacePostBodyComponents Takes an array of components as its
- * first argument which replace the `postBodyComponents` array which is passed
- * to the `html.js` component. **WARNING** if multiple plugins implement this
- * API it's the last plugin that "wins".
+ * @param {string} $0.pathname 現在レンダリングしているページのパス名。
+ * @param {Array<ReactNode>} $0.getHeadComponents 現在の `headComponents` 配列を返す。
+ * @param {function} $0.replaceHeadComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `headComponents` 配列を置き換える。
+ * **警告** 複数のプラグインがこの API を実装している場合は、
+ * 最後のプラグインが「勝つ」。
+ * @param {Array<ReactNode>} $0.getPreBodyComponents 現在の `preBodyComponents` 配列を返す。
+ *  @param {function} $0.replacePreBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `preBodyComponents` 配列を置き換える。
+ * **警告** 複数のプラグインがこの API を実装している場合は、
+ * 最後のプラグインが「勝つ」。
+ * @param {Array<ReactNode>} $0.getPostBodyComponents 現在の `postBodyComponents` 配列を返す。
+ *  @param {function} $0.replacePostBodyComponents 第 1 引数にコンポーネントの配列を取り、
+ * `html.js` コンポーネントへ渡される `postBodyComponents` 配列を置き換える。
+ * **警告** 複数のプラグインがこの API を実装している場合は、
+ * 最後のプラグインが「勝つ」。
  * @param {pluginOptions} pluginOptions
  * @example
  * // Move Typography.js styles to the top of the head section so they're loaded first.
@@ -148,20 +140,20 @@ exports.onRenderBody = true
 exports.onPreRenderHTML = true
 
 /**
- * Allow a plugin to wrap the page element.
+ * プラグインがページ要素をラップできるようにする。
  *
- * This is useful for setting wrapper components around pages that won't get
- * unmounted on page changes. For setting context providers, use [wrapRootElement](#wrapRootElement).
+ * ページが切り替わってもアンマウントされないラッパーコンポーネントを、
+ * ページの周りに配置するときに役立つ。コンテキストプロバイダーを設定する場合は [wrapRootElement](#wrapRootElement) を使うこと。
  *
- * _Note:_
- * There is an equivalent hook in Gatsby's [Browser API](/docs/browser-apis/#wrapPageElement).
- * It is recommended to use both APIs together.
- * For example usage, check out [Using i18n](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-i18n).
+ * _注:_
+ * Gatsby の [Browser API](/docs/browser-apis/#wrapPageElement) にも同等のフックがある。
+ * 両方の API を併用することを推奨する。
+ * 使用例は [Using i18n](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-i18n) を参照。
  * @param {object} $0
- * @param {ReactNode} $0.element The "Page" React Element built by Gatsby.
- * @param {object} $0.props Props object used by page.
+ * @param {ReactNode} $0.element Gatsby が構築した「Page」の React 要素。
+ * @param {object} $0.props ページが使う props オブジェクト。
  * @param {pluginOptions} pluginOptions
- * @returns {ReactNode} Wrapped element
+ * @returns {ReactNode} ラップした要素
  * @example
  * const React = require("react")
  * const Layout = require("./src/components/layout").default
@@ -175,20 +167,20 @@ exports.onPreRenderHTML = true
 exports.wrapPageElement = true
 
 /**
- * Allow a plugin to wrap the root element.
+ * プラグインがルート要素をラップできるようにする。
  *
- * This is useful to set up any context providers that will wrap your application.
- * For setting persistent UI elements around pages use [wrapPageElement](#wrapPageElement).
+ * アプリケーション全体をラップするコンテキストプロバイダーを設定するときに役立つ。
+ * ページの周りに常駐する UI 要素を配置する場合は [wrapPageElement](#wrapPageElement) を使うこと。
  *
- * _Note:_
- * There is an equivalent hook in Gatsby's [Browser API](/docs/browser-apis/#wrapRootElement).
- * It is recommended to use both APIs together.
- * For example usage, check out [Using redux](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-redux).
+ * _注:_
+ * Gatsby の [Browser API](/docs/browser-apis/#wrapRootElement) にも同等のフックがある。
+ * 両方の API を併用することを推奨する。
+ * 使用例は [Using redux](https://github.com/gatsbyjs/gatsby/tree/master/examples/using-redux) を参照。
  * @param {object} $0
- * @param {string} $0.pathname The pathname of the page currently being rendered.
- * @param {ReactNode} $0.element The "Root" React Element built by Gatsby.
+ * @param {string} $0.pathname 現在レンダリングしているページのパス名。
+ * @param {ReactNode} $0.element Gatsby が構築した「Root」の React 要素。
  * @param {pluginOptions} pluginOptions
- * @returns {ReactNode} Wrapped element
+ * @returns {ReactNode} ラップした要素
  * @example
  * const React = require("react")
  * const { Provider } = require("react-redux")

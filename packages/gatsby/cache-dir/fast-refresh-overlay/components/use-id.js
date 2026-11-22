@@ -28,7 +28,7 @@ function canUseDOM() {
 let serverHandoffCompleted = false
 
 /**
- * Generate a unique ID with an optional prefix prepended to it
+ * 任意の接頭辞を前に付けた一意な ID を生成する
  * @param {string} [prefix]
  * @returns {string}
  */

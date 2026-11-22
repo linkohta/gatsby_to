@@ -19,7 +19,7 @@ function StaticQueryDataRenderer({ staticQueryData, data, query, render }) {
 
 let warnedAboutStaticQuery = false
 
-// TODO(v6): Remove completely
+// TODO(v6): 完全に削除する
 const StaticQuery = props => {
   const { data, query, render, children } = props
 
@@ -56,7 +56,7 @@ const useStaticQuery = query => {
     typeof React.useContext !== `function` &&
     process.env.NODE_ENV === `development`
   ) {
-    // TODO(v5): Remove since we require React >= 18
+    // TODO(v5): React >= 18 を必須にしているので削除する
     throw new Error(
       `You're likely using a version of React that doesn't support Hooks\n` +
         `Please update React and ReactDOM to 16.8.0 or later to use the useStaticQuery hook.`
@@ -65,9 +65,9 @@ const useStaticQuery = query => {
 
   const context = React.useContext(StaticQueryContext)
 
-  // query is a stringified number like `3303882` when wrapped with graphql, If a user forgets
-  // to wrap the query in a grqphql, then casting it to a Number results in `NaN` allowing us to
-  // catch the misuse of the API and give proper direction
+  // graphql でラップされている場合、query は `3303882` のような数値の文字列になる。ユーザーが
+  // クエリを graphql でラップし忘れると、Number へのキャストが `NaN` になるので、
+  // API の誤用を検知して適切な案内を出せる
   if (isNaN(Number(query))) {
     throw new Error(`useStaticQuery was called with a string but expects to be called using \`graphql\`. Try this:
 

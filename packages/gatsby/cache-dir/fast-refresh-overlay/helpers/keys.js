@@ -18,7 +18,7 @@ export const Enter = {
 export const Escape = {
   key: [
     `Escape`,
-    // IE11 Escape
+    // IE11 の Escape
     `Esc`,
   ],
   which: 27,

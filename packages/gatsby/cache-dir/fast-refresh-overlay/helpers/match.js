@@ -4,8 +4,8 @@
 // Entrypoint: packages/react/src/internal/keyboard/match.js
 
 /**
- * Check to see if the given key matches the corresponding keyboard event. Also
- * supports passing in the value directly if you can't used the given event.
+ * 渡されたキーが、対応するキーボードイベントと一致するかどうかを確認する。
+ * イベントを使えない場合に備えて、値を直接渡すこともできる。
  *
  * @example
  * import * as keys from '../keys';

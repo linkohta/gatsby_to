@@ -4,7 +4,7 @@ const { join } = require(`path`)
 
 import developStaticEntry from "../develop-static-entry"
 
-// TODO Move to @testing-library/dom
+// TODO @testing-library/dom へ移行する
 
 jest.mock(`fs`, () => {
   const fs = jest.requireActual(`fs`)

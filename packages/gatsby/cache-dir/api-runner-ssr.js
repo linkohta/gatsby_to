@@ -1,5 +1,5 @@
 /* global plugins */
-// During bootstrap, we write requires at top of this file which looks like:
+// ブートストラップ中に、このファイルの先頭へ次のような require を書き込む:
 // var plugins = [
 //   {
 //     plugin: require("/path/to/plugin1/gatsby-ssr.js"),
@@ -15,8 +15,8 @@ const apis = require(`./api-ssr-docs`)
 
 function augmentErrorWithPlugin(plugin, err) {
   if (plugin.name !== `default-site-plugin`) {
-    // default-site-plugin is user code and will print proper stack trace,
-    // so no point in annotating error message pointing out which plugin is root of the problem
+    // default-site-plugin はユーザーのコードであり、適切なスタックトレースが出力される。
+    // そのため、どのプラグインが問題の原因かをエラーメッセージに付け加える意味はない
     err.message += ` (from plugin: ${plugin.name})`
   }
 
@@ -42,7 +42,7 @@ export function apiRunner(api, args, defaultReturn, argTransform) {
         args = argTransform({ args, result })
       }
 
-      // This if case keeps behaviour as before, we should allow undefined here as the api is defined
+      // この if 分岐は従来の挙動を維持するためのもの。API は定義されているので、ここでは undefined を許容すべきである
       // TODO V4
       if (typeof result !== `undefined`) {
         results.push(result)
@@ -74,7 +74,7 @@ export async function apiRunnerAsync(api, args, defaultReturn, argTransform) {
         args = argTransform({ args, result })
       }
 
-      // This if case keeps behaviour as before, we should allow undefined here as the api is defined
+      // この if 分岐は従来の挙動を維持するためのもの。API は定義されているので、ここでは undefined を許容すべきである
       // TODO V4
       if (typeof result !== `undefined`) {
         results.push(result)

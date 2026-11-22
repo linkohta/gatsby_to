@@ -1,4 +1,4 @@
-// IGatsbyPage, SystemPath and copied/inlined from redux/types so this file is self contained
+// IGatsbyPage と SystemPath は、このファイルが自己完結するように redux/types からコピーしてインライン化した
 type SystemPath = string
 type Identifier = string
 
@@ -18,7 +18,7 @@ interface IGatsbyPage {
   ownerNodeId: Identifier
 }
 
-// also inlined
+// これもインライン化した
 interface IQueryResult {
   errors?: Array<Error>
   data?: any
@@ -26,7 +26,7 @@ interface IQueryResult {
 
 // https://codemix.com/opaque-types-in-javascript/
 type Opaque<K, T> = T & { __TYPE__: K }
-// redacted details as this is meant to be opaque internal type that shouldn't be relied on by integrators (can change any time)
+// 詳細は伏せている。これは不透明な内部の型であり、連携する側が依存すべきではないためである（いつでも変わりうる）
 type ISSRData = Opaque<
   "ISSRData",
   {
@@ -53,7 +53,7 @@ export interface IPageDataWithQueryResult extends IPageData {
 
 export function getData(args: {
   pathName: string
-  // not referencing graphqlEngine type to avoid any relative path problems, so just making sure passed argument implement required APIs
+  // 相対パスの問題を避けるために graphqlEngine の型は参照せず、渡された引数が必要な API を実装していることだけを確認する
   graphqlEngine: {
     runQuery(query: string, context: Record<string, any>): Promise<IQueryResult>
     findPageByPath(pathName: string): IGatsbyPage | undefined

@@ -5,14 +5,14 @@ let socket = null
 export default function socketIo() {
   if (process.env.NODE_ENV !== `production`) {
     if (!socket) {
-      // Try to initialize web socket if we didn't do it already
+      // まだ初期化していない場合は、WebSocket の初期化を試みる
       try {
-        // force websocket as transport
+        // トランスポートとして websocket を強制する
         socket = io({
           transports: [process.env.GATSBY_SOCKET_IO_DEFAULT_TRANSPORT],
         })
 
-        // when websocket fails, we'll try polling
+        // websocket が失敗した場合は、ポーリングを試す
         socket.on(`reconnect_attempt`, () => {
           socket.io.opts.transports = [`polling`, `websocket`]
         })
@@ -28,8 +28,8 @@ export default function socketIo() {
           }
         })
 
-        // Prevents certain browsers spamming XHR 'ERR_CONNECTION_REFUSED'
-        // errors within the console, such as when exiting the develop process.
+        // develop プロセスの終了時などに、一部のブラウザーがコンソールへ
+        // XHR の 'ERR_CONNECTION_REFUSED' エラーを大量に出力するのを防ぐ。
         socket.on(`disconnect`, () => {
           console.warn(`[socket.io] Disconnected from dev server.`)
         })
@@ -43,14 +43,14 @@ export default function socketIo() {
   }
 }
 
-// Tell websocket-manager.js the new path we're on.
-// This will help the backend prioritize queries for this
-// path.
+// 現在いる新しいパスを websocket-manager.js に伝える。
+// これにより、バックエンドがこのパスのクエリを
+// 優先できる。
 function registerPath(path) {
   socket.emit(`registerPath`, path)
 }
 
-// Unregister the former path
+// 以前のパスの登録を解除する
 function unregisterPath(path) {
   socket.emit(`unregisterPath`, path)
 }

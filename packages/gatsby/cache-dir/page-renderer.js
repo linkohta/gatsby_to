@@ -4,7 +4,7 @@ import { apiRunner } from "./api-runner-browser"
 import { grabMatchParams } from "./find-path"
 import { headHandlerForBrowser } from "./head/head-export-handler-for-browser"
 
-// Renders page
+// ページをレンダリングする
 function PageRenderer(props) {
   const pageComponentProps = {
     ...props,
