@@ -9,150 +9,137 @@
 
 <p align="center">
   <strong>
-    The future of web development is here.
+    Web 開発の未来がここに。
   </strong>
 </p>
 <p align="center">
-  Gatsby is a free and open-source framework based on React that helps developers build blazing fast websites and apps. <br /> It combines the control and scalability of dynamically rendered sites with the speed of static-site generation, creating a whole new web of possibilities.
+  Gatsby は React をベースにした無料のオープンソースフレームワークで、驚くほど高速な Web サイトやアプリの構築を支援します。 <br /> 動的にレンダリングされるサイトの制御性とスケーラビリティに、静的サイト生成の速さを組み合わせることで、Web の新しい可能性を切り開きます。
 </p>
 <p align="center">
-  <a href="https://github.com/gatsbyjs/gatsby/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Gatsby is released under the MIT license." />
-  </a>
-  <a href="https://circleci.com/gh/gatsbyjs/gatsby">
-    <img src="https://circleci.com/gh/gatsbyjs/gatsby.svg?style=shield" alt="Current CircleCI build status." />
-  </a>
-  <a href="https://www.npmjs.com/package/gatsby">
-    <img src="https://img.shields.io/npm/v/gatsby.svg" alt="Current npm package version." />
-  </a>
-  <a href="https://npmcharts.com/compare/gatsby?minimal=true">
-    <img src="https://img.shields.io/npm/dm/gatsby.svg" alt="Downloads per month on npm." />
-  </a>
-  <a href="https://npmcharts.com/compare/gatsby?minimal=true">
-    <img src="https://img.shields.io/npm/dt/gatsby.svg" alt="Total downloads on npm." />
-  </a>
-  <a href="https://gatsbyjs.com/contributing/how-to-contribute/">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
+  <a href="https://github.com/linkohta/gatsby_to/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Gatsby は MIT ライセンスで公開されています。" />
   </a>
 </p>
 
 <h2 align="center">
-  <a href="https://www.gatsbyjs.com/docs/quick-start/">Quickstart</a>
+  <a href="https://www.gatsbyjs.com/docs/quick-start/">クイックスタート</a>
   <span> · </span>
-  <a href="https://www.gatsbyjs.com/docs/tutorial/getting-started/">Tutorial</a>
+  <a href="https://www.gatsbyjs.com/docs/tutorial/getting-started/">チュートリアル</a>
   <span> · </span>
-  <a href="https://www.gatsbyjs.com/plugins/">Plugins</a>
+  <a href="https://www.gatsbyjs.com/plugins/">プラグイン</a>
   <span> · </span>
-  <a href="https://www.gatsbyjs.com/starters/">Starters</a>
+  <a href="https://www.gatsbyjs.com/starters/">スターター</a>
   <span> · </span>
-  <a href="https://www.gatsbyjs.com/showcase/">Showcase</a>
+  <a href="https://www.gatsbyjs.com/showcase/">ショーケース</a>
   <span> · </span>
-  <a href="https://www.gatsbyjs.com/contributing/how-to-contribute/">Contribute</a>
-  <br />
-  Support: <a href="https://github.com/gatsbyjs/gatsby/discussions">Discussions</a>
+  <a href="./CLAUDE.md">開発ルール</a>
 </h2>
 
-Gatsby helps professional developers efficiently create maintainable, highly-performant, content-rich websites.
+> **このリポジトリについて**
+>
+> このリポジトリは [gatsbyjs/gatsby](https://github.com/gatsbyjs/gatsby) のフォークです。README とコード内コメントを日本語化し、依存パッケージを更新しながら独自に保守しています。本家の更新は取り込みません。開発ルールは [CLAUDE.md](./CLAUDE.md) を参照してください。
+>
+> この README からリンクしている公式サイト（gatsbyjs.com）のドキュメントは、本家の Gatsby について英語で書かれたものです。
 
-- **Load Data From Anywhere.** Gatsby pulls in data from any data source, whether it’s Markdown files, a headless CMS like Contentful or WordPress, or a REST or GraphQL API. Use source plugins to load your data, then develop using Gatsby’s uniform GraphQL interface.
+Gatsby は、保守しやすく、高性能で、コンテンツが豊富な Web サイトを、プロの開発者が効率よく作れるようにします。
 
-- **Go Beyond Static Websites.** Get all the benefits of static websites with none of the limitations. Gatsby sites are fully functional React apps, so you can create high-quality, dynamic web apps, from blogs to e-commerce sites to user dashboards.
+- **どこからでもデータを読み込めます。** Gatsby は、Markdown ファイル、Contentful や WordPress のようなヘッドレス CMS、REST API や GraphQL API など、あらゆるデータソースからデータを取り込みます。ソースプラグインでデータを読み込み、Gatsby の統一された GraphQL インターフェースを使って開発できます。
 
-- **Choose your Rendering Options.** You can choose alternative [rendering options](https://gatsbyjs.com/docs/conceptual/rendering-options/), namely Deferred Static Generation (DSG) and Server-Side Rendering (SSR), in addition to Static Site Generation (SSG) — on a per-page basis. This type of granular control allows you to optimize for performance and productivity without sacrificing one for the other.
+- **静的サイトの枠を超えられます。** 静的サイトの利点をすべて享受しながら、その制約を受けません。Gatsby のサイトは完全に機能する React アプリなので、ブログから EC サイト、ユーザーダッシュボードまで、高品質で動的な Web アプリを作れます。
 
-- **Performance Is Baked In.** Ace your performance audits by default. Gatsby automates code splitting, image optimization, inlining critical styles, lazy-loading, prefetching resources, and more to ensure your site is fast — no manual tuning required.
+- **レンダリング方式を選べます。** 静的サイト生成（SSG）に加えて、遅延静的生成（DSG）やサーバーサイドレンダリング（SSR）といった別の[レンダリング方式](https://gatsbyjs.com/docs/conceptual/rendering-options/)を、ページ単位で選べます。このきめ細かな制御により、パフォーマンスと生産性のどちらも犠牲にせずに最適化できます。
 
-- **Use a Modern Stack for Every Site.** No matter where the data comes from, Gatsby sites are built using React and GraphQL. Build a uniform workflow for you and your team, regardless of whether the data is coming from the same backend.
+- **パフォーマンスが最初から組み込まれています。** 何もしなくてもパフォーマンス監査で高得点を取れます。Gatsby は、コード分割、画像の最適化、クリティカルなスタイルのインライン化、遅延読み込み、リソースのプリフェッチなどを自動化し、手作業でのチューニングなしにサイトを高速にします。
 
-- **Host at Scale for Pennies.** Gatsby sites don’t require servers, so you can host your entire site on a CDN for a fraction of the cost of a server-rendered site. Many Gatsby sites can be hosted entirely free on [Netlify](https://www.netlify.com/) and other similar services.
+- **すべてのサイトでモダンな技術スタックを使えます。** データの取得元が何であっても、Gatsby のサイトは React と GraphQL で構築します。データが同じバックエンドから来るかどうかにかかわらず、自分とチームのために統一されたワークフローを作れます。
 
-[**Learn how to use Gatsby for your next project.**](https://www.gatsbyjs.com/docs/)
+- **わずかな費用で大規模にホスティングできます。** Gatsby のサイトはサーバーを必要としないため、サーバーでレンダリングするサイトと比べてごくわずかな費用で、サイト全体を CDN でホスティングできます。多くの Gatsby サイトは、[Netlify](https://www.netlify.com/) などのサービスで完全に無料でホスティングできます。
 
-## 🚀 Ship your first Gatsby site in 5 Minutes
+[**次のプロジェクトで Gatsby を使う方法を学ぶ。**](https://www.gatsbyjs.com/docs/)
 
-Click the link below to quickly try the workflow of developing, building, and deploying websites with Gatsby and Netlify.
+## 🚀 最初の Gatsby サイトを 5 分で公開する
+
+下のリンクをクリックすると、Gatsby と Netlify を使った Web サイトの開発、ビルド、デプロイの流れをすぐに試せます。
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-blog&utm_source=github&utm_medium=link&utm_campaign=onboarding&utm_content=oss)
 
-At the end of this process, you'll have
+この手順を終えると、次のものが手に入ります。
 
-1. a site working on Netlify
-2. a new repository that is linked to that new site
-3. as you push changes to your new repository, Netlify will automatically rebuild and redeploy your site!
+1. Netlify 上で動作するサイト
+2. そのサイトに連携された新しいリポジトリ
+3. 新しいリポジトリに変更をプッシュするたびに、Netlify がサイトを自動で再ビルドして再デプロイする仕組み
 
-## 💻 Get started with Gatsby locally in 5 Minutes
+## 💻 ローカル環境で 5 分で Gatsby を始める
 
-You can get a new Gatsby site up and running on your local dev environment in 5 minutes with these four steps:
+次の手順で、新しい Gatsby サイトをローカルの開発環境で 5 分で立ち上げられます。
 
-1. **Initialize a new project.**
+1. **新しいプロジェクトを初期化します。**
 
    ```shell
    npm init gatsby
    ```
 
-   Give it the name "My Gatsby Site".
+   名前は「My Gatsby Site」にします。
 
-2. **Start the site in `develop` mode.**
+2. **`develop` モードでサイトを起動します。**
 
-   Next, move into your new site’s directory and start it up:
+   次に、新しいサイトのディレクトリへ移動して起動します。
 
    ```shell
    cd my-gatsby-site/
    npm run develop
    ```
 
-3. **Open the source code and start editing!**
+3. **ソースコードを開いて編集を始めます。**
 
-   Your site is now running at `http://localhost:8000`. Open the `my-gatsby-site` directory in your code editor of choice and edit `src/pages/index.js`. Save your changes, and the browser will update in real time!
+   サイトは `http://localhost:8000` で動いています。`my-gatsby-site` ディレクトリを好みのコードエディターで開き、`src/pages/index.js` を編集してください。変更を保存すると、ブラウザーにすぐ反映されます。
 
-At this point, you’ve got a fully functional Gatsby website. For additional information on how you can customize your Gatsby site, see our [plugins](https://gatsbyjs.com/plugins/) and [the official tutorial](https://www.gatsbyjs.com/docs/tutorial/getting-started/).
+これで、完全に機能する Gatsby の Web サイトができました。Gatsby サイトをカスタマイズする方法については、[プラグイン](https://gatsbyjs.com/plugins/)と[公式チュートリアル](https://www.gatsbyjs.com/docs/tutorial/getting-started/)を参照してください。
 
-## 🎓 Learning Gatsby
+## 🎓 Gatsby を学ぶ
 
-Full documentation for Gatsby lives [on the website](https://www.gatsbyjs.com/).
+Gatsby の完全なドキュメントは[公式サイト](https://www.gatsbyjs.com/)にあります。
 
-- **For most developers, we recommend starting with our [in-depth tutorial for creating a site with Gatsby](https://www.gatsbyjs.com/docs/tutorial/getting-started/).** It starts with zero assumptions about your level of ability and walks through every step of the process.
+- **ほとんどの開発者には、[Gatsby でサイトを作る詳細なチュートリアル](https://www.gatsbyjs.com/docs/tutorial/getting-started/)から始めることをおすすめします。** スキルレベルについて何も前提を置かず、すべての手順を順を追って説明しています。
 
-- **To dive straight into code samples head [to our documentation](https://www.gatsbyjs.com/docs/).** In particular, check out the “<i>How-to Guides</i>”, “<i>Reference</i>”, and “<i>Conceptual Guides</i>” sections in the sidebar.
+- **コードサンプルをすぐに見たい場合は、[ドキュメント](https://www.gatsbyjs.com/docs/)へ進んでください。** 特に、サイドバーの「<i>How-to Guides</i>」「<i>Reference</i>」「<i>Conceptual Guides</i>」のセクションを確認してください。
 
-We welcome suggestions for improving our docs. See the [“how to contribute”](https://www.gatsbyjs.com/contributing/how-to-contribute/) documentation for more details.
+**Gatsby の学習を始める: [チュートリアルに沿って進める](https://www.gatsbyjs.com/docs/tutorial/getting-started/) · [ドキュメントを読む](https://www.gatsbyjs.com/docs/)**
 
-**Start Learning Gatsby: [Follow the Tutorial](https://www.gatsbyjs.com/docs/tutorial/getting-started/) · [Read the Docs](https://www.gatsbyjs.com/docs/)**
+## 🚢 リリースノート
 
-## 🚢 Release Notes
+本家の Gatsby で最近リリースされた内容は、[リリースノート](https://www.gatsbyjs.com/docs/reference/release-notes)で確認できます。主なハイライト、パフォーマンスの改善、新機能、注目すべきバグ修正がまとめられています。
 
-Wondering what we've shipped recently? Check out our [release notes](https://www.gatsbyjs.com/docs/reference/release-notes) for key highlights, performance improvements, new features, and notable bugfixes.
+Gatsby の各バージョンに対するサポート方針については、[バージョンサポートのドキュメント](https://www.gatsbyjs.com/docs/reference/release-notes/gatsby-version-support/)を参照してください。
 
-Also, read our [documentation on version support](https://www.gatsbyjs.com/docs/reference/release-notes/gatsby-version-support/) to understand our plans for each version of Gatsby.
+## 💼 移行ガイド
 
-## 💼 Migration Guides
+すでに Gatsby サイトをお持ちの場合は、次のガイドを使うと、ゼロから作り直さずに Gatsby v5 の改善点をサイトへ取り入れられます。
 
-Already have a Gatsby site? These handy guides will help you add the improvements of Gatsby v5 to your site without starting from scratch!
+- [v4 から v5 への移行](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v4-to-v5/)
+- [v3 から v4 への移行](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v3-to-v4/)
+- [v2 から v3 への移行](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v2-to-v3/)
 
-- [Migrate from v4 to v5](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v4-to-v5/)
-- [Migrate from v3 to v4](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v3-to-v4/)
-- [Migrate from v2 to v3](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v2-to-v3/)
+## ❗ 行動規範
 
-## ❗ Code of Conduct
+Gatsby は、誰もが歓迎され、多様で、安全なコミュニティを築くことに尽力しています。Gatsby コミュニティに参加するすべての人に、[**行動規範**](https://www.gatsbyjs.com/contributing/code-of-conduct/)を守ることを求めます。
 
-Gatsby is dedicated to building a welcoming, diverse, safe community. We expect everyone participating in the Gatsby community to abide by our [**Code of Conduct**](https://www.gatsbyjs.com/contributing/code-of-conduct/). Please read it. Please follow it. In the Gatsby community, we work hard to build each other up and create amazing things together. 💪💜
+## 🤝 開発に参加する
 
-## 🤝 How to Contribute
+このリポジトリで開発する際は、[**CLAUDE.md**](./CLAUDE.md) の開発ルールに従ってください。セットアップの手順、コードとコメントの書き方、依存パッケージの更新方針、リファクタリング方針、コミットと PR のルールをまとめています。
 
-Whether you're helping us fix bugs, improve the docs, or spread the word, we'd love to have you as part of the Gatsby community!
+本家の Gatsby へコントリビュートする場合は、本家の[**コントリビューションガイド**](https://www.gatsbyjs.com/contributing/)を参照してください。
 
-Check out our [**Contributing Guide**](https://www.gatsbyjs.com/contributing/) for ideas on contributing and setup steps for getting our repositories up and running on your local machine.
+### このリポジトリの構成について
 
-### A note on how this repository is organized
+このリポジトリは、[Lerna](https://github.com/lerna/lerna) で管理している[モノレポ](https://trunkbaseddevelopment.com/monorepos/)です。つまり、このコードベースでは[複数のパッケージ](./packages)をまとめて管理しています。
 
-This repository is a [monorepo](https://trunkbaseddevelopment.com/monorepos/) managed using [Lerna](https://github.com/lerna/lerna). This means there are [multiple packages](https://github.com/gatsbyjs/gatsby/tree/master/packages) managed in this codebase, even though we publish them to NPM as separate packages.
+## 📝 ライセンス
 
-## 📝 License
+[MIT ライセンス](./LICENSE)のもとで公開されています。
 
-Licensed under the [MIT License](./LICENSE).
+## 💜 謝辞
 
-## 💜 Thanks
+プラグイン、スターター、動画、ブログ記事を作ってくださった、本家 Gatsby の多くのコントリビューターの皆さんに感謝します。Issue や PR を手伝い、GitHub Discussions で質問に答えてくださったコミュニティの皆さんにも、特別な感謝を捧げます。
 
-Thanks go out to all our many contributors creating plugins, starters, videos, and blog posts. And a special appreciation for our community members helping with issues and PRs, or answering questions on GitHub Discussions.
-
-A big part of what makes Gatsby great is each and every one of you in the community. Your contributions enrich the Gatsby experience and make it better every day.
+Gatsby を素晴らしいものにしているのは、コミュニティの一人ひとりです。皆さんの貢献が、Gatsby の体験を日々より良いものにしています。
