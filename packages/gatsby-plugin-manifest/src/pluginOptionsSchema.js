@@ -1,8 +1,8 @@
 export default function pluginOptionSchema({ Joi }) {
-  /* Descriptions copied from or based on documentation at https://developer.mozilla.org/en-US/docs/Web/Manifest
+  /* 説明文は https://developer.mozilla.org/en-US/docs/Web/Manifest のドキュメントから引用したもの、またはそれをもとにしたものである
    *
-   * Currently based on https://www.w3.org/TR/2020/WD-appmanifest-20201019/
-   * and the August 4th 2020 version of https://w3c.github.io/manifest-app-info/
+   * 現在は https://www.w3.org/TR/2020/WD-appmanifest-20201019/ と、
+   * https://w3c.github.io/manifest-app-info/ の 2020 年 8 月 4 日版をもとにしている
    */
 
   const platform = Joi.string()
@@ -120,7 +120,7 @@ export default function pluginOptionSchema({ Joi }) {
     .or(`url`, `id`)
 
   /**
-   * This only includes items in the draft, but allows unknown keys in params
+   * 草案にある項目だけを含めているが、params では未知のキーを許可している
    * @see https://w3c.github.io/web-share-target/
    */
   const ShareTarget = Joi.object().keys({
@@ -155,7 +155,7 @@ export default function pluginOptionSchema({ Joi }) {
             `The name of the query parameter used for the URL string referring to a resource being shared`
           ),
       })
-      // Allow unknown keys, because the spec is an unofficial draft and Google already seems to have added support for keys that are not in the spec
+      // 未知のキーを許可する。この仕様は非公式の草案であり、Google は仕様にないキーへの対応をすでに追加しているようである
       .unknown(true),
   })
 
@@ -221,7 +221,7 @@ export default function pluginOptionSchema({ Joi }) {
         `portrait`,
         `portrait-primary`,
         `portrait-secondary`
-      ) // From: https://www.w3.org/TR/screen-orientation/#screenorientation-interface
+      ) // 出典: https://www.w3.org/TR/screen-orientation/#screenorientation-interface
       .description(
         `The orientation member defines the default orientation for all the website's top-level browsing contexts`
       ),

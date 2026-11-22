@@ -64,10 +64,10 @@ interface IGeneralArgs extends ITransformArgs {
   pngCompressionSpeed?: number
 }
 
-// Plugin options are loaded onPreBootstrap in gatsby-node
+// プラグインオプションは、gatsby-node の onPreBootstrap で読み込まれる
 const pluginDefaults = {
   base64Width: 20,
-  forceBase64Format: ``, // valid formats: png,jpg,webp
+  forceBase64Format: ``, // 有効なフォーマット: png,jpg,webp
   useMozJpeg: process.env.GATSBY_JPEG_ENCODER === `MOZJPEG`,
   stripMetadata: true,
   lazyImageGeneration: true,
@@ -82,7 +82,7 @@ const generalArgs: Partial<IGeneralArgs> = {
   webpQuality: undefined,
   jpegProgressive: true,
   pngCompressionLevel: 9,
-  // default is 4 (https://github.com/kornelski/pngquant/blob/4219956d5e080be7905b5581314d913d20896934/rust/bin.rs#L61)
+  // デフォルトは 4 (https://github.com/kornelski/pngquant/blob/4219956d5e080be7905b5581314d913d20896934/rust/bin.rs#L61)
   pngCompressionSpeed: 4,
   base64: true,
   grayscale: false,
@@ -108,7 +108,7 @@ export const getPluginOptionsDefaults = (): ISharpPluginOptions =>
   pluginDefaults
 
 /**
- * Creates a transform object
+ * transform オブジェクトを作成する
  */
 export const createTransformObject = (
   args: ITransformArgs
@@ -133,12 +133,12 @@ export const createTransformObject = (
     background: args.background,
   }
 
-  // get all non falsey values
+  // falsy でない値をすべて取得する
   return pickBy(options, identity)
 }
 
 /**
- * Used for gatsbyImageData and StaticImage only
+ * gatsbyImageData と StaticImage でのみ使う
  */
 export const mergeDefaults = (
   args: ISharpGatsbyImageArgs
@@ -180,7 +180,7 @@ export const healOptions = (
   options.toFormatBase64 = options.toFormatBase64?.toLowerCase()
   options.base64Width = options.base64Width || base64Width
 
-  // when toFormat is not set we set it based on fileExtension
+  // toFormat が設定されていない場合は、fileExtension をもとに設定する
   if (options.toFormat === ``) {
     if (!fileExtension) {
       throw new Error(
@@ -194,7 +194,7 @@ export const healOptions = (
     }
   }
 
-  // only set width to 400 if neither width nor height is passed
+  // width も height も渡されていない場合にだけ、width を 400 に設定する
   if (options.width === undefined && options.height === undefined) {
     options.width = 400
   }
@@ -207,7 +207,7 @@ export const healOptions = (
     options.height = parseInt(options.height, 10)
   }
 
-  // only set maxWidth to 800 if neither maxWidth nor maxHeight is passed
+  // maxWidth も maxHeight も渡されていない場合にだけ、maxWidth を 800 に設定する
   if (options.maxWidth === undefined && options.maxHeight === undefined) {
     options.maxWidth = 800
   } else if (options.maxWidth !== undefined) {
@@ -229,7 +229,7 @@ export const healOptions = (
 }
 
 /**
- * Removes all default values so we have the smallest transform args
+ * デフォルト値をすべて取り除き、transform の引数を最小にする
  */
 export const removeDefaultValues = (
   args: ITransformArgs,

@@ -99,8 +99,8 @@ const fixedNodeType = ({
         srcWebp: {
           type: GraphQLString,
           resolve: ({ file, image, fieldArgs }) => {
-            // If the file is already in webp format or should explicitly
-            // be converted to webp, we do not create additional webp files
+            // ファイルがすでに webp 形式であるか、明示的に webp へ変換する
+            // 指定がある場合は、追加の webp ファイルを作成しない
             if (file.extension === `webp` || fieldArgs.toFormat === `webp`) {
               return null
             }
@@ -553,8 +553,8 @@ const imageNodeType = ({
 }
 
 /**
- * Keeps track of asynchronous file copy to prevent sequence errors in the
- * underlying fs-extra module during parallel copies of the same file
+ * 非同期のファイルコピーを記録し、同じファイルを並行してコピーしたときに
+ * 内部の fs-extra モジュールで順序のエラーが起きるのを防ぐ
  */
 const inProgressCopy = new Set()
 
@@ -605,15 +605,15 @@ const createFields = ({
         )
 
         if (!fs.existsSync(publicPath) && !inProgressCopy.has(publicPath)) {
-          // keep track of in progress copy, we should rely on `existsSync` but
-          // a race condition exists between the exists check and the copy
+          // 進行中のコピーを記録する。本来は `existsSync` に頼るべきだが、
+          // 存在の確認とコピーの間に競合状態がある
           inProgressCopy.add(publicPath)
           fs.copy(
             details.absolutePath,
             publicPath,
             { dereference: true },
             err => {
-              // this is no longer in progress
+              // これはもう進行中ではない
               inProgressCopy.delete(publicPath)
               if (err) {
                 reporter.panic(

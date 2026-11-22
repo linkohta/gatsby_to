@@ -1,7 +1,7 @@
 import { withPrefix } from "gatsby"
 
 /**
- * Get a manifest filename depending on localized pathname
+ * ローカライズされた pathname に応じて、manifest のファイル名を取得する
  *
  * @param {string} pathname
  * @param {Array<{start_url: string, lang: string}>} localizedManifests

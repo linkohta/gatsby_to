@@ -65,9 +65,9 @@ describe(`gatsby-plugin-sharp`, () => {
   const absolutePath = path.join(__dirname, `images/test.png`)
   const file = getFileObject(absolutePath)
 
-  // used to find all breakpoints in a srcSet string
+  // srcSet の文字列からすべてのブレークポイントを見つけるために使う
   const findAllBreakpoints = srcSet => {
-    // RegEx to find all occurrences of 'Xw', where 'X' can be any int
+    // 'Xw' の出現箇所をすべて見つける正規表現。'X' は任意の整数
     const regEx = /[0-9]+w/g
     return srcSet.match(regEx)
   }
@@ -82,21 +82,21 @@ describe(`gatsby-plugin-sharp`, () => {
     })
 
     it(`should round height when auto-calculated createJobV2`, () => {
-      // Resize 144-density.png (281x136) with a 3px width
+      // 144-density.png (281x136) を幅 3px にリサイズする
       const result = queueImageResizing({
         file: getFileObject(path.join(__dirname, `images/144-density.png`)),
         args: { width: 3 },
       })
 
-      // Width should be: w = (3 * 136) / 281 = 1.451957295
-      // We expect value to be rounded to 1
+      // 幅は w = (3 * 136) / 281 = 1.451957295 になるはずである
+      // 値は 1 に丸められることを期待する
       expect(result.height).toBe(1)
       expect(actions.createJobV2).toHaveBeenCalledTimes(1)
       expect(actions.createJobV2).toMatchSnapshot()
     })
 
     it(`file name works with spaces & special characters createJobV2`, async () => {
-      // test name encoding with various characters
+      // さまざまな文字を含む名前のエンコードをテストする
       const testName = `spaces and '"@#$%^&,`
 
       const queueResult = queueImageResizing({
@@ -109,18 +109,18 @@ describe(`gatsby-plugin-sharp`, () => {
 
       const queueResultName = path.parse(queueResult.src).name
 
-      // decoding to check for outputting same name
+      // 同じ名前が出力されることを確認するためにデコードする
       expect(decodeURIComponent(queueResultName)).toBe(testName)
 
-      // regex for special characters above and spaces
-      // testname should match, the queue result should not
+      // 上記の特殊文字と空白に一致する正規表現
+      // testname は一致し、キューの結果は一致しないこと
       expect(testName.match(/[!@#$^&," ]/)).not.toBe(false)
       expect(queueResultName.match(/[!@#$^&," ]/)).not.toBe(true)
       expect(actions.createJobV2).toHaveBeenCalledTimes(1)
       expect(actions.createJobV2).toMatchSnapshot()
     })
 
-    // re-enable when image processing on demand is implemented
+    // オンデマンドの画像処理が実装されたら再度有効にする
     it.skip(`should process immediately when asked`, async () => {
       const result = queueImageResizing({
         file: getFileObject(path.join(__dirname, `images/144-density.png`)),
@@ -261,14 +261,14 @@ describe(`gatsby-plugin-sharp`, () => {
         args,
       })
 
-      // width of the image tested
+      // テスト対象の画像の幅
       const originalWidth = 281
       const expected = srcSetBreakpoints.map(size => `${size}w`)
-      // add the original size of `144-density.png`
+      // `144-density.png` の元のサイズを追加する
       expected.push(`${originalWidth}w`)
 
       const actual = findAllBreakpoints(result.srcSet)
-      // should contain all requested sizes as well as the original size
+      // 要求したすべてのサイズと元のサイズが含まれること
       expect(actual).toEqual(expect.arrayContaining(expected))
       expect(actions.createJobV2).toMatchSnapshot()
     })
@@ -307,9 +307,9 @@ describe(`gatsby-plugin-sharp`, () => {
         70,
         150,
         250,
-        300, // this shouldn't be in the output as it's wider than the original
+        300, // 元の画像より幅が広いので、出力に含まれないこと
       ]
-      const maxWidth = 500 // this also shouldn't be in the output
+      const maxWidth = 500 // これも出力に含まれないこと
       const args = {
         maxWidth,
         srcSetBreakpoints,
@@ -319,19 +319,19 @@ describe(`gatsby-plugin-sharp`, () => {
         args,
       })
 
-      // width of the image tested
+      // テスト対象の画像の幅
       const originalWidth = 281
       const expected = srcSetBreakpoints
-        // filter out the widths that are larger than the source image width
+        // 元画像の幅より大きい幅を取り除く
         .filter(size => size < originalWidth)
         .map(size => `${size}w`)
-      // add the original size of `144-density.png`
+      // `144-density.png` の元のサイズを追加する
       expected.push(`${originalWidth}w`)
 
       const actual = findAllBreakpoints(result.srcSet)
-      // should contain all requested sizes as well as the original size
+      // 要求したすべてのサイズと元のサイズが含まれること
       expect(actual).toEqual(expect.arrayContaining(expected))
-      // should contain no other sizes
+      // 他のサイズが含まれないこと
       expect(actual.length).toEqual(expected.length)
       expect(actions.createJobV2).toMatchSnapshot()
     })
@@ -423,7 +423,7 @@ describe(`gatsby-plugin-sharp`, () => {
       const file1 = getFileObject(absolutePath)
       const file2 = getFileObject(absolutePath)
       const file3 = getFileObject(absolutePath, `test`, `new-image`)
-      // change file of file3
+      // file3 のファイルを変更する
       file3.base = path.join(__dirname, `images/144-density.png`)
 
       const result = await base64({
@@ -439,13 +439,13 @@ describe(`gatsby-plugin-sharp`, () => {
         args,
       })
 
-      // I would like to test sharp being executed but I don't really know how to mock that beast :p
+      // sharp が実行されることをテストしたいが、あの厄介なものをどうモックすればよいのかよく分からない :p
       expect(result).toEqual(result2)
       expect(result).not.toEqual(result3)
     })
 
-    // Matches base64 string in snapshot, converts to jpg to force use of bg
-    // Testing pixel colour for a match would be better
+    // スナップショット内の base64 文字列に一致させる。bg の使用を強制するために jpg へ変換している
+    // ピクセルの色が一致するかをテストするほうが望ましい
     it(`should support option: 'background'`, async () => {
       const result = await generateBase64({
         file: getFileObject(path.join(__dirname, `images/alphatest.png`)),
@@ -459,7 +459,7 @@ describe(`gatsby-plugin-sharp`, () => {
     })
 
     describe(`should support option: 'base64Width'`, () => {
-      // Uses 'generateBase64()` directly to avoid `base64()` caching affecting results.
+      // 結果が `base64()` のキャッシュの影響を受けないよう、'generateBase64()` を直接使う。
       it(`should support a configurable width`, async () => {
         const result = await generateBase64({
           file,
@@ -535,7 +535,7 @@ describe(`gatsby-plugin-sharp`, () => {
   })
 
   describe(`image quirks`, () => {
-    // issue https://github.com/nodeca/probe-image-size/issues/20
+    // issue https://github.com/nodeca/probe-image-size/issues/20 を参照
     it(`handles padding bytes correctly`, () => {
       const result = getImageSize(
         getFileObject(path.join(__dirname, `images/padding-bytes.jpg`))

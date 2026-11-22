@@ -55,7 +55,7 @@ export function evaluateImageAttributes(
   nodePath: NodePath<JSXOpeningElement>,
   onError?: (prop: string, nodePath: NodePath<any>) => void
 ): Record<string, unknown> {
-  // Only get attributes that we need for generating the images
+  // 画像の生成に必要な属性だけを取得する
   return normalizeProps(getAttributeValues(nodePath, onError, SHARP_ATTRIBUTES))
 }
 

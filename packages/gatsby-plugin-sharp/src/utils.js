@@ -16,7 +16,7 @@ const dedupeAndSortDensities = values =>
 export function calculateImageSizes(args) {
   const { width, height, file, layout, reporter } = args
 
-  // check that all dimensions provided are positive
+  // 指定された寸法がすべて正の値であることを確認する
   const userDimensions = { width, height }
   const erroneousUserDimensions = Object.entries(userDimensions).filter(
     ([_, size]) => typeof size === `number` && size < 1
@@ -52,10 +52,10 @@ export function fixedImageSizes({
 }) {
   let aspectRatio = imgDimensions.width / imgDimensions.height
   const { fit = `cover` } = transformOptions
-  // Sort, dedupe and ensure there's a 1
+  // ソートして重複を除き、1 が含まれるようにする
   const densities = dedupeAndSortDensities(outputPixelDensities)
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = getDimensionsAndAspectRatio(imgDimensions, {
       width,
@@ -70,17 +70,17 @@ export function fixedImageSizes({
     width = 400
   }
 
-  // if no width is passed, we need to resize the image based on the passed height
+  // width が渡されていない場合は、渡された height をもとに画像をリサイズする必要がある
   if (!width) {
     width = Math.round(height * aspectRatio)
   }
 
-  const originalWidth = width // will use this for presentationWidth, don't want to lose it
+  const originalWidth = width // presentationWidth に使うので、失わないようにする
   const isTopSizeOverriden =
     imgDimensions.width < width || imgDimensions.height < height
 
-  // If the image is smaller than what's requested, warn the user that it's being processed as such
-  // print out this message with the necessary information before we overwrite it for sizing
+  // 画像が要求より小さい場合は、そのまま処理されることをユーザーに警告する
+  // サイズ計算のために上書きする前に、必要な情報を含めてこのメッセージを出力する
   if (isTopSizeOverriden) {
     const fixedDimension = imgDimensions.width < width ? `width` : `height`
     reporter.warn(`
@@ -104,7 +104,7 @@ export function fixedImageSizes({
   }
 
   const sizes = densities
-    .filter(size => size >= 1) // remove smaller densities because fixed images don't need them
+    .filter(size => size >= 1) // fixed の画像には不要なので、小さい密度を取り除く
     .map(density => Math.round(density * width))
     .filter(size => size <= imgDimensions.width)
 
@@ -130,10 +130,10 @@ export function responsiveImageSizes({
 
   let sizes
   let aspectRatio = imgDimensions.width / imgDimensions.height
-  // Sort, dedupe and ensure there's a 1
+  // ソートして重複を除き、1 が含まれるようにする
   const densities = dedupeAndSortDensities(outputPixelDensities)
 
-  // If both are provided then we need to check the fit
+  // 両方が指定されている場合は、fit を確認する必要がある
   if (width && height) {
     const calculated = getDimensionsAndAspectRatio(imgDimensions, {
       width: width,
@@ -145,17 +145,17 @@ export function responsiveImageSizes({
     aspectRatio = calculated.aspectRatio
   }
 
-  // Case 1: width or height were passed in, make sure it isn't larger than the actual image
+  // ケース 1: width か height が渡された場合。実際の画像より大きくならないようにする
   width = width && Math.min(width, imgDimensions.width)
   height = height && Math.min(height, imgDimensions.height)
 
-  // Case 2: neither width or height were passed in, use default size
+  // ケース 2: width も height も渡されなかった場合。デフォルトのサイズを使う
   if (!width && !height) {
     width = Math.min(DEFAULT_FLUID_SIZE, imgDimensions.width)
     height = width / aspectRatio
   }
 
-  // if it still hasn't been found, calculate width from the derived height
+  // それでも見つからない場合は、導出した height から width を計算する
   if (!width) {
     width = height * aspectRatio
   }
@@ -173,7 +173,7 @@ export function responsiveImageSizes({
   if (breakpoints?.length > 0) {
     sizes = breakpoints.filter(size => size <= imgDimensions.width)
 
-    // If a larger breakpoint has been filtered-out, add the actual image width instead
+    // より大きいブレークポイントが取り除かれた場合は、代わりに実際の画像の幅を追加する
     if (
       sizes.length < breakpoints.length &&
       !sizes.includes(imgDimensions.width)
@@ -185,7 +185,7 @@ export function responsiveImageSizes({
     sizes = sizes.filter(size => size <= imgDimensions.width)
   }
 
-  // ensure that the size passed in is included in the final output
+  // 渡されたサイズが最終的な出力に含まれるようにする
   if (layout === `constrained` && !sizes.includes(width)) {
     sizes.push(width)
   }
@@ -201,16 +201,16 @@ export function responsiveImageSizes({
 
 export const getSizes = (width, layout) => {
   switch (layout) {
-    // If screen is wider than the max size, image width is the max size,
-    // otherwise it's the width of the screen
+    // 画面が最大サイズより広い場合、画像の幅は最大サイズになり、
+    // そうでなければ画面の幅になる
     case `constrained`:
       return `(min-width: ${width}px) ${width}px, 100vw`
 
-    // Image is always the same width, whatever the size of the screen
+    // 画面のサイズにかかわらず、画像は常に同じ幅になる
     case `fixed`:
       return `${width}px`
 
-    // Image is always the width of the screen
+    // 画像は常に画面の幅になる
     case `fullWidth`:
       return `100vw`
 
@@ -223,7 +223,7 @@ export const getSrcSet = images =>
   images.map(image => `${image.src} ${image.width}w`).join(`,\n`)
 
 export function getDimensionsAndAspectRatio(dimensions, options) {
-  // Calculate the eventual width/height of the image.
+  // 画像の最終的な幅と高さを計算する。
   const imageAspectRatio = dimensions.width / dimensions.height
 
   let width = options.width
@@ -296,7 +296,7 @@ export const getDominantColor = async absolutePath => {
 
   const { dominant } = await pipeline.stats()
 
-  // Fallback in case sharp doesn't support dominant
+  // sharp が dominant に対応していない場合のフォールバック
   dominantColor = dominant
     ? rgbToHex(dominant.r, dominant.g, dominant.b)
     : `rgba(0,0,0,0.5)`

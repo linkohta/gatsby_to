@@ -15,7 +15,7 @@ exports.IMAGE_PROCESSING_JOB_NAME = `IMAGE_PROCESSING`
  */
 
 /**
- * the queue concurrency is 1 as we only want to transform 1 file at a time.
+ * 一度に変換するファイルは 1 つだけにしたいので、キューの並列数は 1 である。
  * @param {(job: WorkerInput, callback: Function) => undefined} task
  */
 const q = queue(
@@ -30,7 +30,7 @@ const q = queue(
       }),
       args.pluginOptions
     ),
-  // When inside query workers, we only want to use the current core
+  // クエリワーカーの中では、現在のコアだけを使いたい
   process.env.GATSBY_WORKER_POOL_WORKER ? 1 : Math.max(1, cpuCoreCount() - 1)
 )
 

@@ -146,18 +146,18 @@ export async function writeImages({
         return
       }
 
-      // We need our own type, because `File` belongs to the filesystem plugin
+      // `File` は filesystem プラグインのものなので、独自の型が必要である
       file.internal.type = `StaticImage`
       delete (file.internal as any).owner
       createNode(file)
 
       const cacheKey = `ref-${file.id}`
 
-      // This is a cache of file node to static image mappings
+      // file ノードと静的画像の対応を保持するキャッシュ
       const imageRefs: Map<string, IImageMetadata> =
         (await cache.get(cacheKey)) || {}
 
-      // Different cache: this is the one with the image properties
+      // 別のキャッシュ: こちらは画像のプロパティを保持する
       const cacheFilename = path.join(cacheDir, `${hash}.json`)
       imageRefs[hash] = {
         contentDigest: file.internal?.contentDigest,
@@ -169,7 +169,7 @@ export async function writeImages({
       await writeImage(file, args, pathPrefix, reporter, cache, cacheFilename)
 
       if (fullPath && process.env.NODE_ENV === `development`) {
-        // Watch the source image for changes
+        // 元画像の変更を監視する
         watchImage({
           createNode,
           createNodeId,
@@ -206,11 +206,11 @@ export async function writeImage(
       reporter.warn(`Please upgrade gatsby-plugin-sharp`)
       return
     }
-    // get standard set of fields from sharp
+    // sharp から標準的なフィールド一式を取得する
     const sharpData = await generateImageData(options)
 
     if (sharpData) {
-      // Write the image properties to the cache
+      // 画像のプロパティをキャッシュに書き込む
       await fs.writeJSON(filename, sharpData)
     } else {
       reporter.warn(`Could not process image ${file.relativePath}`)

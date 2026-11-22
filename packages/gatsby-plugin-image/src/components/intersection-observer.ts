@@ -10,7 +10,7 @@ const connection =
   (navigator as any).webkitConnection
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-// These match the thresholds used in Chrome's native lazy loading
+// Chrome のネイティブの遅延読み込みで使われているしきい値に合わせている
 // @see https://web.dev/browser-level-image-lazy-loading/#distance-from-viewport-thresholds
 const FAST_CONNECTION_THRESHOLD = `1250px`
 const SLOW_CONNECTION_THRESHOLD = `2500px`
@@ -20,7 +20,7 @@ export function createIntersectionObserver(
 ): (element: HTMLElement) => Unobserver {
   const connectionType = connection?.effectiveType
 
-  // if we don't support intersectionObserver we don't lazy load (Sorry IE 11).
+  // intersectionObserver に対応していない場合は遅延読み込みをしない（IE 11 には申し訳ない）。
   if (!(`IntersectionObserver` in window)) {
     return function observe(): Unobserver {
       callback()
@@ -33,9 +33,9 @@ export function createIntersectionObserver(
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            // Get the matching entry's callback and call it
+            // 一致したエントリーのコールバックを取得して呼び出す
             ioEntryMap.get(entry.target as HTMLElement)?.()
-            // We only need to call it once
+            // 呼び出すのは 1 回だけでよい
             ioEntryMap.delete(entry.target as HTMLElement)
           }
         })
@@ -50,7 +50,7 @@ export function createIntersectionObserver(
   }
 
   return function observe(element: HTMLElement): Unobserver {
-    // Store a reference to the callback mapped to the element being watched
+    // 監視対象の要素に対応付けて、コールバックへの参照を保存する
     ioEntryMap.set(element, callback)
     intersectionObserver.observe(element)
 

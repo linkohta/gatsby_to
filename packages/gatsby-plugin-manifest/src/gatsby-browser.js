@@ -2,7 +2,7 @@
 import { withPrefix } from "gatsby"
 import getManifestForPathname from "./get-manifest-pathname"
 
-// when we don't have localisation in our manifest, we tree shake everything away
+// manifest にローカライズがない場合は、ツリーシェイキングですべて取り除く
 export const onRouteUpdate = function onRouteUpdate(
   { location },
   pluginOptions

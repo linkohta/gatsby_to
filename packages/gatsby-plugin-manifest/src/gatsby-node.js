@@ -1,6 +1,6 @@
 import * as fs from "fs"
 import * as path from "path"
-// TODO(v5): use gatsby/sharp
+// TODO(v5): gatsby/sharp を使う
 import getSharpInstance from "./safe-sharp"
 import { createContentDigest, slash } from "gatsby-core-utils"
 import { defaultIcons, addDigestToPath, favicons } from "./common"
@@ -18,10 +18,10 @@ async function generateIcon(icon, srcIcon) {
   // }
   const size = parseInt(icon.sizes.substring(0, icon.sizes.lastIndexOf(`x`)))
 
-  // For vector graphics, instruct sharp to use a pixel density
-  // suitable for the resolution we're rasterizing to.
-  // For pixel graphics sources this has no effect.
-  // Sharp accept density from 1 to 2400
+  // ベクター画像の場合は、ラスタライズ先の解像度に合ったピクセル密度を
+  // 使うよう sharp に指示する。
+  // ピクセル画像が元の場合は何も影響しない。
+  // sharp は 1 から 2400 までの密度を受け付ける
   const density = Math.min(2400, Math.max(1, size))
 
   const sharp = await getSharpInstance()
@@ -54,8 +54,8 @@ async function checkCache(cache, icon, srcIcon, srcIconDigest, callback) {
 exports.pluginOptionsSchema = pluginOptionsSchema
 
 /**
- * Setup pluginOption defaults
- * TODO: Remove once pluginOptionsSchema is stable
+ * pluginOption のデフォルト値を設定する
+ * TODO: pluginOptionsSchema が安定したら削除する
  */
 exports.onPreInit = (_, pluginOptions) => {
   pluginOptions.cache_busting_mode = pluginOptions.cache_busting_mode ?? `query`
@@ -91,8 +91,8 @@ exports.onPostBootstrap = async (
       locales.map(locale => {
         let cacheModeOverride = {}
 
-        /* localization requires unique filenames for output files if a different src Icon is defined.
-           otherwise one language would override anothers icons in automatic mode.
+        /* src の Icon が異なる場合、ローカライズでは出力ファイルの名前を一意にする必要がある。
+           そうしないと、自動モードで、ある言語のアイコンが別の言語のアイコンで上書きされてしまう。
         */
         if (locale.hasOwnProperty(`icon`) && !locale.hasOwnProperty(`icons`)) {
           // console.debug(`OVERRIDING CACHE BUSTING`, locale)
@@ -117,17 +117,17 @@ exports.onPostBootstrap = async (
 }
 
 /**
- * The complete Triforce, or one or more components of the Triforce.
+ * 完全なトライフォース、またはトライフォースの 1 つ以上の構成要素。
  * @typedef {Object} makeManifestArgs
- * @property {Object} cache - from gatsby-node api
- * @property {Object} reporter - from gatsby-node api
- * @property {Object} pluginOptions - from gatsby-node api/gatsby config
+ * @property {Object} cache - gatsby-node api から渡される
+ * @property {Object} reporter - gatsby-node api から渡される
+ * @property {Object} pluginOptions - gatsby-node api と gatsby config から渡される
  * @property {boolean?} shouldLocalize
- * @property {string?} basePath - string of base path frpvided by gatsby node
+ * @property {string?} basePath - gatsby node から渡される base path の文字列
  */
 
 /**
- * Build manifest
+ * manifest をビルドする
  * @param {makeManifestArgs}
  */
 const makeManifest = async ({
@@ -143,7 +143,7 @@ const makeManifest = async ({
 
   const faviconIsEnabled = pluginOptions.include_favicon ?? true
 
-  // Delete options we won't pass to the manifest.webmanifest.
+  // manifest.webmanifest に渡さないオプションを削除する。
   delete manifest.plugins
   delete manifest.legacy
   delete manifest.theme_color_in_head
@@ -153,12 +153,12 @@ const makeManifest = async ({
   delete manifest.include_favicon
   delete manifest.cacheDigest
 
-  // If icons are not manually defined, use the default icon set.
+  // アイコンが手動で定義されていなければ、デフォルトのアイコン一式を使う。
   if (!manifest.icons) {
     manifest.icons = [...defaultIcons]
   }
 
-  // Specify extra options for each icon (if requested).
+  // （指定があれば）各アイコンに追加のオプションを設定する。
   if (pluginOptions.icon_options) {
     manifest.icons = manifest.icons.map(icon => {
       return {
@@ -168,13 +168,13 @@ const makeManifest = async ({
     })
   }
 
-  // Determine destination path for icons.
+  // アイコンの出力先のパスを決める。
   const paths = {}
   manifest.icons.forEach(icon => {
     const iconPath = path.join(`public`, path.dirname(icon.src))
     if (!paths[iconPath]) {
       const exists = fs.existsSync(iconPath)
-      // create destination directory if it doesn't exist
+      // 出力先のディレクトリがなければ作成する
       if (!exists) {
         fs.mkdirSync(iconPath, { recursive: true })
       }
@@ -182,9 +182,9 @@ const makeManifest = async ({
     }
   })
 
-  // Only auto-generate icons if a src icon is defined.
+  // src のアイコンが定義されている場合にだけ、アイコンを自動生成する。
   if (typeof icon !== `undefined`) {
-    // Check if the icon exists
+    // アイコンが存在するかを確認する
     if (!doesIconExist(icon)) {
       throw new Error(
         `icon (${icon}) does not exist as defined in gatsby-config.js. Make sure the file exists relative to the root of the site.`
@@ -203,7 +203,7 @@ const makeManifest = async ({
       )
     }
 
-    // add cache busting
+    // キャッシュバスティングを追加する
     const cacheMode =
       typeof pluginOptions.cache_busting_mode !== `undefined`
         ? pluginOptions.cache_busting_mode
@@ -212,11 +212,11 @@ const makeManifest = async ({
     const iconDigest = createContentDigest(fs.readFileSync(icon))
 
     /**
-     * Given an array of icon configs, generate the various output sizes from
-     * the source icon image.
+     * アイコンの設定の配列を受け取り、元のアイコン画像から
+     * 各サイズの出力を生成する。
      */
     async function processIconSet(iconSet) {
-      // if cacheBusting is being done via url query icons must be generated before cache busting runs
+      // キャッシュバスティングを URL のクエリで行う場合は、キャッシュバスティングの前にアイコンを生成する必要がある
       if (cacheMode === `query`) {
         for (const dstIcon of iconSet) {
           await checkCache(cache, dstIcon, icon, iconDigest, generateIcon)
@@ -231,7 +231,7 @@ const makeManifest = async ({
         })
       }
 
-      // if file names are being modified by cacheBusting icons must be generated after cache busting runs
+      // キャッシュバスティングでファイル名を変更する場合は、キャッシュバスティングの後にアイコンを生成する必要がある
       if (cacheMode !== `query`) {
         for (const dstIcon of iconSet) {
           await checkCache(cache, dstIcon, icon, iconDigest, generateIcon)
@@ -243,8 +243,8 @@ const makeManifest = async ({
 
     manifest.icons = await processIconSet(manifest.icons)
 
-    // If favicon is enabled, apply the same caching policy and generate
-    // the resized image(s)
+    // favicon が有効な場合は、同じキャッシュポリシーを適用して、
+    // リサイズした画像を生成する
     if (faviconIsEnabled) {
       await processIconSet(favicons)
 
@@ -254,7 +254,7 @@ const makeManifest = async ({
     }
   }
 
-  // Fix #18497 by prefixing paths
+  // パスにプレフィックスを付けて #18497 を修正する
   manifest.icons = manifest.icons.map(icon => {
     return {
       ...icon,
@@ -266,7 +266,7 @@ const makeManifest = async ({
     manifest.start_url = path.posix.join(basePath, manifest.start_url)
   }
 
-  // Write manifest
+  // manifest を書き出す
   fs.writeFileSync(
     path.join(`public`, `manifest${suffix}.webmanifest`),
     JSON.stringify(manifest)

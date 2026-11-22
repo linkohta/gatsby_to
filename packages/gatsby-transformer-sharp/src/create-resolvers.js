@@ -7,7 +7,7 @@ module.exports = ({ createResolvers, reporter }, pluginOptions = {}) => {
     File: {
       childImageSharp: {
         resolve: (parent, args, context, info) => {
-          // TODO: In future when components from GraphQL are possible make sure that we can support both supported & unsupported image formats
+          // TODO: 将来、GraphQL からのコンポーネントが可能になったら、対応している画像フォーマットと対応していない画像フォーマットの両方を扱えるようにする
           if (
             !supportedExtensions[parent.extension] &&
             checkSupportedExtensions

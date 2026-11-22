@@ -11,8 +11,8 @@ import { slash } from "gatsby-core-utils"
 import { stripIndent } from "common-tags"
 
 /**
- * This is a plugin that finds StaticImage components and injects the image props into the component.
- * These props contain the image URLs etc, and were created earlier in the build process
+ * StaticImage コンポーネントを見つけ、画像の props をコンポーネントに注入するプラグイン。
+ * この props には画像の URL などが含まれ、ビルドのより早い段階で作成されている
  */
 
 export default function attrs({
@@ -42,14 +42,14 @@ export default function attrs({
         let error
 
         if (unresolvedProps.length) {
-          // TODO: Add a shortlink to docs on the plugin
+          // TODO: プラグインのドキュメントへの短縮リンクを追加する
           error = `Could not find values for the following props at build time: ${unresolvedProps.join(
             `, `
           )}`
           console.warn(`[gatsby-plugin-image] ${error}`)
         }
 
-        // Adding the filename to the hashing, like in "extractStaticImageProps" function
+        // "extractStaticImageProps" 関数と同じように、ファイル名をハッシュの計算に含める
         if (state.filename) {
           props.filename = slash(state.filename)
         }
@@ -66,12 +66,12 @@ export default function attrs({
         const filename = path.join(cacheDir, `${hash}.json`)
         let data: Record<string, unknown> | undefined
 
-        // If there's no src prop there's no point in checking if it exists
+        // src prop がなければ、存在を確認しても意味がない
         if (!unresolvedProps.includes(`src`)) {
           try {
             data = fs.readJSONSync(filename)
           } catch (e) {
-            // TODO add info about minimum Gatsby version once this is merged
+            // TODO: マージされたら、Gatsby の最低バージョンの情報を追加する
             const msg = stripIndent`
             Could not read image data file "${filename}". 
             This may mean that the images in "${this.filename}" were not processed.
@@ -86,7 +86,7 @@ export default function attrs({
             `[gatsby-plugin-image] No data found for image "${props.src}"`
           )
 
-          // Add the error message to the component so we can show it in the browser
+          // ブラウザに表示できるよう、エラーメッセージをコンポーネントに追加する
           const newProp = t.jsxAttribute(
             t.jsxIdentifier(`__error`),
 
@@ -99,7 +99,7 @@ export default function attrs({
           return
         }
         if (error) {
-          // Add the error message to the component so we can show it in the browser
+          // ブラウザに表示できるよう、エラーメッセージをコンポーネントに追加する
 
           const newProp = t.jsxAttribute(
             t.jsxIdentifier(`__error`),
@@ -108,7 +108,7 @@ export default function attrs({
           nodePath.node.attributes.push(newProp)
         }
 
-        //  `require()` the image data into a component prop
+        //  画像データを `require()` してコンポーネントの prop に渡す
         const makeRequire = template.expression(`require("${slash(filename)}")`)
 
         const newProp = t.jsxAttribute(

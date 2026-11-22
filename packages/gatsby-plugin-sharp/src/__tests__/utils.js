@@ -185,9 +185,9 @@ describe(`calculateImageSizes (fullWidth & constrained)`, () => {
       150,
       250,
       1200,
-      1800, // shouldn't be included, larger than original width
+      1800, // 元の幅より大きいので、含まれないこと
     ]
-    const width = 1500 // also shouldn't be included
+    const width = 1500 // これも含まれないこと
     const args = {
       layout: `fullWidth`,
       width,
@@ -207,7 +207,7 @@ describe(`calculateImageSizes (fullWidth & constrained)`, () => {
       70,
       150,
       250,
-      1800, // shouldn't be included, larger than original width
+      1800, // 元の幅より大きいので、含まれないこと
     ]
     const width = 1300
     const args = {
@@ -224,12 +224,12 @@ describe(`calculateImageSizes (fullWidth & constrained)`, () => {
   })
 
   it(`should ignore outputPixelDensities when breakpoints are passed in`, () => {
-    const breakpoints = [400, 800] // should find these
+    const breakpoints = [400, 800] // これらは見つかること
     const width = 500
     const args = {
       layout: `fullWidth`,
       width,
-      outputPixelDensities: [2, 4], // and ignore these, ie [1000, 2000]
+      outputPixelDensities: [2, 4], // これらは無視すること。つまり [1000, 2000]
       breakpoints,
       file,
       imgDimensions,

@@ -6,7 +6,7 @@ import { render, waitFor } from "@testing-library/react"
 import * as hooks from "../hooks"
 import type { IGatsbyImageData } from "../gatsby-image.browser"
 
-// Prevents terser for bailing because we're not in a babel plugin
+// babel プラグインの中ではないので、terser が bail しないようにする
 jest.mock(
   `../../../macros/terser.macro`,
   () =>
@@ -104,9 +104,9 @@ describe(`GatsbyImage browser`, () => {
 
   it(`shows nothing when the image props is not passed`, async () => {
     process.env.NODE_ENV = `development`
-    // Allows to get rid of typescript error when not passing image
-    // This is helpful for user using JavaScript and not getting advent of
-    // TS types
+    // image を渡さないときの typescript のエラーを消せるようにする
+    // JavaScript を使っていて TS の型の恩恵を受けられない
+    // ユーザーに役立つ
     const GatsbyImageAny = GatsbyImage as React.FC
     const { container } = render(<GatsbyImageAny />)
 
@@ -133,9 +133,9 @@ describe(`GatsbyImage browser`, () => {
   })
 
   it(`does nothing on first server hydration`, async () => {
-    // In this scenario,
-    // hasSSRHtml is true and resolved through "beforeHydrationContent" and hydrate: true
-    // hydrated.current is false and not resolved yet
+    // このシナリオでは、
+    // hasSSRHtml は true で、"beforeHydrationContent" と hydrate: true によって解決されている
+    // hydrated.current は false で、まだ解決されていない
     ;(hooks as any).hasNativeLazyLoadSupport = (): boolean => true
 
     const { container } = render(
@@ -161,8 +161,8 @@ describe(`GatsbyImage browser`, () => {
     const onStartLoadSpy = jest.fn()
     const onLoadSpy = jest.fn()
 
-    // In this scenario,
-    // hasSSRHtml is true and resolved through "beforeHydrationContent" and hydrate: true
+    // このシナリオでは、
+    // hasSSRHtml は true で、"beforeHydrationContent" と hydrate: true によって解決されている
     ;(hooks as any).hasNativeLazyLoadSupport = (): boolean => true
 
     const { container } = render(

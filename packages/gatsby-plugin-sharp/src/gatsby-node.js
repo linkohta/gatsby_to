@@ -13,10 +13,10 @@ const path = require(`path`)
 
 function removeCachedValue(cache, key) {
   if (cache?.del) {
-    // if cache expose ".del" method directly on public interface
+    // キャッシュが公開インターフェースで ".del" メソッドを直接提供している場合
     return cache.del(key)
   } else if (cache?.cache?.del) {
-    // legacy - using internal cache instance and calling ".del" on it directly
+    // レガシー: 内部のキャッシュインスタンスを使い、その ".del" を直接呼び出す
     return cache.cache.del(key)
   }
   return Promise.reject(
@@ -39,18 +39,18 @@ exports.onCreateDevServer = async ({ app, cache, reporter }) => {
       : null
 
     if (!cacheResult) {
-      // this handler is meant to handle lazy images only (images that were registered for
-      // processing, but deffered to be processed only on request in develop server).
-      // If we don't have cache result - it means that this is not lazy image or that
-      // image was already handled in which case `express.static` handler (that is earlier
-      // than this handler) should take care of handling request.
+      // このハンドラーは、遅延画像（処理対象として登録されたが、develop サーバーで
+      // リクエストがあるまで処理を先送りした画像）だけを扱うためのものである。
+      // キャッシュに結果がない場合は、遅延画像ではないか、すでに処理済みの画像である。
+      // その場合は、（このハンドラーより前にある）`express.static` のハンドラーが
+      // リクエストを処理する。
       return next()
     }
 
-    // We are going to run a job for a single operation only
-    // and postpone all other operations
-    // This speeds up the loading of lazy images in the browser and
-    // also helps to free up the browser connection queue earlier.
+    // 1 つの操作だけのジョブを実行し、
+    // 残りの操作はすべて後回しにする
+    // これにより、ブラウザでの遅延画像の読み込みが速くなり、
+    // ブラウザの接続キューも早く空く。
     const { matchingJob, jobWithRemainingOperations } =
       splitOperationsByRequestedFile(cacheResult, pathOnDisk)
 
@@ -58,24 +58,24 @@ exports.onCreateDevServer = async ({ app, cache, reporter }) => {
     await removeCachedValue(cache, decodedURI)
 
     if (jobWithRemainingOperations.args.operations.length > 0) {
-      // There are still some operations pending for this job - replace the cached job
+      // このジョブにはまだ保留中の操作が残っている。キャッシュ済みのジョブを置き換える
       await cache.set(jobContentDigest, jobWithRemainingOperations)
     } else {
-      // No operations left to process - purge the cache
+      // 処理する操作が残っていない。キャッシュを消去する
       await removeCachedValue(cache, jobContentDigest)
     }
 
-    // we reach this point only when this is a lazy image that we just processed
-    // because `express.static` is earlier handler, we do have to manually serve
-    // produced file for current request
+    // ここに到達するのは、たった今処理した遅延画像の場合だけである
+    // `express.static` のほうが前のハンドラーなので、現在のリクエストに対しては
+    // 生成したファイルを手動で配信する必要がある
     return res.sendFile(pathOnDisk)
   })
 }
 
-// Split the job into two jobs:
-//  - first job with a single operation matching requestedPathOnDisk
-//  - second job with all other operations
-// so the two resulting jobs are only different by their operations
+// ジョブを 2 つに分割する:
+//  - 1 つ目は、requestedPathOnDisk に一致する操作 1 つだけを持つジョブ
+//  - 2 つ目は、それ以外のすべての操作を持つジョブ
+// そのため、できあがる 2 つのジョブは操作だけが異なる
 function splitOperationsByRequestedFile(job, requestedPathOnDisk) {
   const matchingJob = {
     ...job,
@@ -102,24 +102,24 @@ function splitOperationsByRequestedFile(job, requestedPathOnDisk) {
   return { matchingJob, jobWithRemainingOperations }
 }
 
-// So something is wrong with the reporter, when I do this in preBootstrap,
-// the progressbar gets not updated
+// reporter に何か問題があるようで、これを preBootstrap で行うと、
+// プログレスバーが更新されない
 exports.onPostBootstrap = async ({ reporter, cache, store }) => {
   if (process.env.gatsby_executing_command !== `develop`) {
-    // recreate jobs that haven't been triggered by develop yet
-    // removing stale jobs has already kicked in so we know these still need to process
+    // develop がまだ起動していないジョブを作り直す
+    // 古いジョブの削除はすでに始まっているので、これらはまだ処理が必要だと分かる
     for (const [contentDigest] of store.getState().jobsV2.complete) {
       const job = await cache.get(contentDigest)
 
       if (job) {
-        // we don't have to await, gatsby does this for us
+        // await する必要はない。gatsby が代わりに行う
         _unstable_createJob(job, { reporter })
       }
     }
   }
 }
 
-// to properly initialize plugin in worker (`onPreBootstrap` won't run in workers)
+// ワーカーでプラグインを正しく初期化するためである（`onPreBootstrap` はワーカーでは実行されない）
 exports.onPluginInit = async ({ actions }, pluginOptions) => {
   setActions(actions)
   setPluginOptions(pluginOptions)
@@ -129,26 +129,26 @@ exports.onPreBootstrap = async ({ actions, emitter, cache }, pluginOptions) => {
   setActions(actions)
   setPluginOptions(pluginOptions)
 
-  // below is a hack / hot fix for confusing progress bar behaviour
-  // that doesn't recognize duplicate jobs, as it's now
-  // in gatsby core internals (if `createJobV2` is available)
-  // we should remove this or make this code path not hit
-  // (we should never use emitter in plugins)
-  // as soon as possible (possibly by moving progress bar handling
-  // inside jobs-manager in core)
+  // 以下は、重複したジョブを認識しないプログレスバーの紛らわしい挙動に対する
+  // ハック、応急処置である。現在は gatsby コアの内部に
+  // あるため（`createJobV2` が利用できる場合）、
+  // これは削除するか、このコードパスに到達しないようにすべきである
+  // （プラグインで emitter を使うべきではない）。
+  // できるだけ早く対応したい（プログレスバーの処理を
+  // コアの jobs-manager の中へ移すことになるだろう）
 
   if (emitter) {
-    // track how many image transformation each job has
-    // END_JOB_V2 doesn't contain that information
-    // so we store it in <JobContentHash, TransformsCount> map
-    // when job is created. Then retrieve that when job finishes
-    // and remove that entry from the map.
+    // 各ジョブが持つ画像変換の数を記録する
+    // END_JOB_V2 にはその情報が含まれないので、
+    // ジョブの作成時に <JobContentHash, TransformsCount> の map へ
+    // 保存しておく。ジョブが終了したらそれを取り出し、
+    // map からそのエントリーを削除する。
     const imageCountInJobsMap = new Map()
 
     emitter.on(`CREATE_JOB_V2`, action => {
       if (action.plugin.name === `gatsby-plugin-sharp`) {
         if (action.payload.job.args.isLazy) {
-          // we have to remove some internal pieces
+          // 内部用の要素をいくつか取り除く必要がある
           const job = {
             name: action.payload.job.name,
             inputPaths: action.payload.job.inputPaths.map(input => input.path),
@@ -184,7 +184,7 @@ exports.onPreBootstrap = async ({ actions, emitter, cache }, pluginOptions) => {
       if (action.plugin.name === `gatsby-plugin-sharp`) {
         const jobContentDigest = action.payload.jobContentDigest
 
-        // when it's lazy we didn't set it
+        // 遅延の場合は設定していない
         if (!imageCountInJobsMap.has(jobContentDigest)) {
           return
         }
@@ -212,7 +212,7 @@ exports.pluginOptionsSchema = ({ Joi }) =>
     ),
     stripMetadata: Joi.boolean().default(true),
     defaultQuality: Joi.number().default(50),
-    // TODO(v6): Remove deprecated failOnError option
+    // TODO(v6): 非推奨の failOnError オプションを削除する
     failOnError: Joi.boolean().default(true),
     failOn: Joi.any()
       .valid(`none`, `truncated`, `error`, `warning`)
@@ -245,7 +245,7 @@ exports.pluginOptionsSchema = ({ Joi }) =>
     const shouldNotFailOnError = !value.failOnError
 
     if (shouldNotFailOnError) {
-      // show this warning only once in main process
+      // この警告は、メインプロセスで 1 回だけ表示する
       if (!process.env.GATSBY_WORKER_ID) {
         console.warn(
           `[gatsby-plugin-sharp]: The "failOnError" option is deprecated. Please use "failOn" instead.`

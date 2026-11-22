@@ -1,9 +1,9 @@
 import * as fs from "fs"
 
 /**
- * Check if the icon exists on the filesystem
+ * アイコンがファイルシステム上に存在するかを確認する
  *
- * @param {String} srcIcon Path of the icon
+ * @param {String} srcIcon アイコンのパス
  */
 export function doesIconExist(srcIcon) {
   try {

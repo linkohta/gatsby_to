@@ -6,7 +6,7 @@ import type { FileSystemNode } from "gatsby-source-filesystem"
 let watcher: FSWatcher | undefined
 
 /**
- * Watch a static source image for changes during develop
+ * develop 中に、静的な元画像の変更を監視する
  */
 export function watchImage({
   fullPath,
@@ -23,7 +23,7 @@ export function watchImage({
   cache: GatsbyCache
   reporter: Reporter
 }): void {
-  // We use a shared watcher, but only create it if needed
+  // 共有の watcher を使うが、必要になったときにだけ作成する
   if (!watcher) {
     watcher = chokidar.watch(fullPath)
     watcher.on(`change`, async (path: string): Promise<void> => {
@@ -41,12 +41,12 @@ export function watchImage({
       await updateImages({ node, cache, pathPrefix, reporter })
     })
   } else {
-    // If we already have a watcher, just add this image to it
+    // watcher がすでにあれば、この画像を追加するだけでよい
     watcher.add(fullPath)
   }
 }
 /**
- * Update any static image instances that use a source image
+ * ある元画像を使っている静的画像のインスタンスをすべて更新する
  */
 async function updateImages({
   cache,
@@ -59,7 +59,7 @@ async function updateImages({
   pathPrefix: string
   reporter: Reporter
 }): Promise<void> {
-  // See if any static image instances use this source image file
+  // この元画像ファイルを使っている静的画像のインスタンスがあるかを調べる
   const imageRefs: Record<string, IImageMetadata> = await cache.get(
     `ref-${node.id}`
   )
@@ -72,10 +72,10 @@ async function updateImages({
     Object.values(imageRefs).map(
       async ({ contentDigest, args, cacheFilename }) => {
         if (contentDigest && contentDigest === node.internal.contentDigest) {
-          // Skipping, because the file is unchanged
+          // ファイルが変更されていないので、スキップする
           return
         }
-        // Update the image
+        // 画像を更新する
         await writeImage(node, args, pathPrefix, reporter, cache, cacheFilename)
       }
     )

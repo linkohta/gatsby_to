@@ -10,9 +10,8 @@ jest.mock(`fs`, () => {
   }
 })
 /*
- * We mock sharp because it depends on fs implementation (which is mocked)
- * this causes test failures, so mock it to avoid
- *
+ * sharp は fs の実装（モックされている）に依存するのでモックする
+ * そのままではテストが失敗するため、モックして回避する
  */
 
 jest.mock(`sharp`, () => {
@@ -90,13 +89,13 @@ const manifestOptions = {
   ],
 }
 
-// Some of these tests check the number of sharp calls to assert that the
-// correct number of images are created.
+// これらのテストの一部は、sharp の呼び出し回数を調べて、
+// 正しい数の画像が作成されることを確認している。
 //
-// As long as an `icon` is defined in the config, there's always an extra
-// call to sharp to check the source icon is square. Therefore the assertions
-// check for N + 1 sharp calls, where N is the expected number of icons
-// generated.
+// 設定で `icon` が定義されていれば、元のアイコンが正方形であることを確認するために
+// 必ず sharp が 1 回余分に呼び出される。そのため、アサーションでは
+// N + 1 回の sharp の呼び出しを確認する。N は生成されるはずのアイコンの
+// 数である。
 describe(`Test plugin manifest options`, () => {
   beforeEach(() => {
     fs.writeFileSync.mockReset()
@@ -158,8 +157,8 @@ describe(`Test plugin manifest options`, () => {
       path.dirname(`other-icons/icon-48x48.png`)
     )
 
-    // No sharp calls because this is manual mode: user provides all icon sizes
-    // rather than the plugin generating them
+    // 手動モードなので sharp は呼び出されない。プラグインが生成するのではなく、
+    // ユーザーがすべてのサイズのアイコンを用意する
     expect(sharp).toHaveBeenCalledTimes(0)
     expect(fs.mkdirSync).toHaveBeenNthCalledWith(1, firstIconPath, {
       recursive: true,
@@ -191,12 +190,12 @@ describe(`Test plugin manifest options`, () => {
       ...pluginSpecificOptions,
     })
 
-    // One call to sharp to check the source icon is square
-    // + another for the favicon (enabled by default)
-    // + another for the single icon in the `icons` config
-    // => 3 total calls
+    // 元のアイコンが正方形であることを確認するための sharp の呼び出しが 1 回
+    // + favicon 用に 1 回（デフォルトで有効）
+    // + `icons` の設定にある 1 つのアイコン用に 1 回
+    // => 合計 3 回の呼び出し
     expect(sharp).toHaveBeenCalledTimes(3)
-    expect(sharp).toHaveBeenCalledWith(icon, { density: 32 }) // the default favicon
+    expect(sharp).toHaveBeenCalledWith(icon, { density: 32 }) // デフォルトの favicon
     expect(sharp).toHaveBeenCalledWith(icon, { density: size })
   })
 
@@ -223,10 +222,10 @@ describe(`Test plugin manifest options`, () => {
       ...pluginSpecificOptions,
     })
 
-    // Only two sharp calls here: one to check the source icon size,
-    // and another to generate the single icon in the config.
-    // By default, there would be a 3rd call for the favicon, but that's
-    // disabled by the `include_favicon` option.
+    // ここでは sharp の呼び出しは 2 回だけである。元のアイコンのサイズの確認に 1 回、
+    // 設定にある 1 つのアイコンの生成に 1 回。
+    // デフォルトでは favicon 用に 3 回目の呼び出しがあるが、
+    // `include_favicon` オプションで無効にしている。
     expect(sharp).toHaveBeenCalledTimes(2)
     expect(sharp).toHaveBeenCalledWith(icon, { density: size })
     expect(fs.copyFileSync).toHaveBeenCalledTimes(0)
@@ -287,11 +286,11 @@ describe(`Test plugin manifest options`, () => {
       ...pluginSpecificOptions,
     })
 
-    // Two icons in the config, plus a favicon, plus one call to check the
-    // source icon size => 4 total calls to sharp.
+    // 設定にあるアイコン 2 つ、favicon、元のアイコンのサイズを確認する
+    // 呼び出し 1 回 => sharp の呼び出しは合計 4 回。
     expect(sharp).toHaveBeenCalledTimes(4)
 
-    // Filenames in the manifest should be suffixed with the content digest
+    // manifest 内のファイル名には、コンテンツのダイジェストが末尾に付く
     expect(fs.writeFileSync).toMatchSnapshot()
   })
 
@@ -308,8 +307,8 @@ describe(`Test plugin manifest options`, () => {
       ...pluginSpecificOptions,
     })
 
-    // Two icons in the config, plus a favicon, plus one call to check the
-    // source icon size => 4 total calls to sharp.
+    // 設定にあるアイコン 2 つ、favicon、元のアイコンのサイズを確認する
+    // 呼び出し 1 回 => sharp の呼び出しは合計 4 回。
     expect(sharp).toHaveBeenCalledTimes(4)
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       expect.anything(),
@@ -331,8 +330,8 @@ describe(`Test plugin manifest options`, () => {
       ...pluginSpecificOptions,
     })
 
-    // Two icons in the config, plus a favicon, plus one call to check the
-    // source icon size => 4 total calls to sharp.
+    // 設定にあるアイコン 2 つ、favicon、元のアイコンのサイズを確認する
+    // 呼び出し 1 回 => sharp の呼び出しは合計 4 回。
     expect(sharp).toHaveBeenCalledTimes(4)
     const content = JSON.parse(fs.writeFileSync.mock.calls[0][1])
     expect(content.icons[0].purpose).toEqual(`all`)

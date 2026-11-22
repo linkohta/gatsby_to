@@ -1,13 +1,13 @@
-// This is very hacky, but this should be temporary hack
-// until we make "sharp" a peerDependency and can be removed afterwards.
-// It's not done yet because it would cause too much friction.
-// Image processing is important part of Gatsby ecosystem
-// and there's lot of guides and tutorials that we don't control
-// that would be outdated. Moving "sharp" to be peerDependency
-// is scheduled for gatsby@3.
+// かなり強引な方法だが、"sharp" を peerDependency にするまでの
+// 一時的な回避策であり、その後は削除できる。
+// まだそうしていないのは、影響が大きすぎるためである。
+// 画像処理は Gatsby のエコシステムの重要な部分であり、
+// こちらで管理していないガイドやチュートリアルが数多くあって、
+// それらが古くなってしまう。"sharp" を peerDependency へ
+// 移すのは gatsby@3 で予定している。
 
-// This file is duplicated in multiple location in this repository,
-// So make sure to apply same changes every "safe-sharp" file.
+// このファイルは、このリポジトリ内の複数の場所に複製されている。
+// 変更するときは、すべての "safe-sharp" ファイルに同じ変更を加えること。
 
 const childProcess = require(`child_process`)
 const path = require(`path`)
@@ -21,9 +21,9 @@ const restoreConsoleError = () => {
 
 const getDetailedMessage = () => {
   try {
-    // `npm list` seems to work in yarn installed projects as long
-    // as there is no package-lock.json, so let's bail out
-    // if both lock files exist
+    // `npm list` は、package-lock.json がなければ yarn でインストールした
+    // プロジェクトでも動作するようである。そのため、両方のロックファイルが
+    // ある場合は処理を打ち切る
 
     if (
       fs.existsSync(path.join(process.cwd(), `package-lock.json`)) &&
@@ -79,7 +79,7 @@ const getDetailedMessage = () => {
     )
 
     const packagesToUpdate = []
-    // list top level dependencies
+    // トップレベルの依存を一覧する
     msg = msg.concat([
       `List of installed packages that depend on sharp:`,
       ...Object.keys(topLevelPackages).map(depName => {
@@ -150,9 +150,9 @@ const handleMessage = msg => {
 
 let sharp
 try {
-  // sharp@0.22.1 uses console.error and then process.exit and doesn't throw
-  // so to capture error and provide meaningful troubleshooting guide
-  // we intercept console.error calls and add special handling.
+  // sharp@0.22.1 は throw せずに、console.error を呼んでから process.exit する
+  // そのため、エラーを捕捉して意味のあるトラブルシューティングの案内を出せるよう、
+  // console.error の呼び出しを横取りして特別な処理を加えている。
   console.error = (msg, ...args) => {
     originalConsoleError(msg, ...args)
     handleMessage(msg)

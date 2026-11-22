@@ -8,7 +8,7 @@ import {
   propTypes,
   IStaticImageProps,
 } from "./static-image.server"
-// These values are added by Babel. Do not add them manually
+// これらの値は Babel が追加する。手動で追加しないこと
 interface IPrivateProps {
   __imageData?: IGatsbyImageData
   __error?: string

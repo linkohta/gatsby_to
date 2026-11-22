@@ -45,7 +45,7 @@ describe(`gatsby-plugin-manifest`, () => {
     const location = {
       pathname: `/es/`,
     }
-    // add default lang
+    // デフォルトの lang を追加する
     pluginOptions.lang = `en`
     onRouteUpdate({ location }, pluginOptions)
     expect(document.head).toMatchInlineSnapshot(`
@@ -62,7 +62,7 @@ describe(`gatsby-plugin-manifest`, () => {
     const location = {
       pathname: `/random-path/`,
     }
-    // add default lang
+    // デフォルトの lang を追加する
     pluginOptions.lang = `en`
     onRouteUpdate({ location }, pluginOptions)
     expect(document.head).toMatchInlineSnapshot(`
@@ -81,7 +81,7 @@ describe(`gatsby-plugin-manifest`, () => {
     const location = {
       pathname: `/test/es/`,
     }
-    // add default lang
+    // デフォルトの lang を追加する
     pluginOptions.lang = `en`
     onRouteUpdate({ location }, pluginOptions)
     expect(document.head).toMatchInlineSnapshot(`

@@ -81,14 +81,14 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
   const root = useRef<HTMLElement>()
   const cacheKey = useMemo(() => JSON.stringify(image.images), [image.images])
 
-  // Preact uses class instead of className so we need to check for both
+  // Preact は className ではなく class を使うので、両方を確認する必要がある
   if (preactClass) {
     className = preactClass
   }
 
   const sizer = getSizer(layout, width, height)
 
-  // Memoize this { __html } object to work around an undocumented behavioral change in React 19:
+  // React 19 でのドキュメント化されていない挙動の変更を回避するため、この { __html } オブジェクトをメモ化する:
   // https://github.com/facebook/react/issues/31660.
   const dangerouslySetInnerHTML = useMemo(() => {
     return {
@@ -110,14 +110,14 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
       )
     }
 
-    // The plugin image component is a bit special where if it's server-side rendered, we add extra script tags to support lazy-loading without
-    // In this case we stop hydration but fire the correct events.
+    // plugin image コンポーネントは少し特殊で、サーバーサイドレンダリングされた場合は、遅延読み込みに対応するための script タグを追加している
+    // この場合はハイドレーションを止めるが、正しいイベントは発火させる。
     const ssrImage = root.current.querySelector(
       `[data-gatsby-image-ssr]`
     ) as HTMLImageElement
     if (ssrImage && hasNativeLazyLoadSupport()) {
       if (ssrImage.complete) {
-        // Trigger onStartload and onLoad events
+        // onStartload と onLoad のイベントを発火させる
         onStartLoad?.({
           wasCached: true,
         })
@@ -125,7 +125,7 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
           wasCached: true,
         })
 
-        // remove ssr key for state updates but add delay to not fight with native code snippt of gatsby-ssr
+        // state の更新のために ssr のキーを取り除くが、gatsby-ssr のネイティブのコードスニペットと競合しないよう遅延を入れる
         setTimeout(() => {
           ssrImage.removeAttribute(`data-gatsby-image-ssr`)
         }, 0)
@@ -140,7 +140,7 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
           onLoad?.({
             wasCached: true,
           })
-          // remove ssr key for state updates but add delay to not fight with native code snippt of gatsby-ssr
+          // state の更新のために ssr のキーを取り除くが、gatsby-ssr のネイティブのコードスニペットと競合しないよう遅延を入れる
           setTimeout(() => {
             ssrImage.removeAttribute(`data-gatsby-image-ssr`)
           }, 0)
@@ -200,7 +200,7 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
     }
   }, [image])
 
-  // useLayoutEffect is ran before React commits to the DOM. This allows us to make sure our HTML is using our cached image version
+  // useLayoutEffect は、React が DOM へコミットする前に実行される。これにより、HTML がキャッシュ済みの画像を使うことを保証できる
   useLayoutEffect(() => {
     if (imageCache.has(cacheKey) && renderImage) {
       root.current.innerHTML = renderImage({
@@ -210,7 +210,7 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
         ...props,
       })
 
-      // Trigger onStartload and onLoad events
+      // onStartload と onLoad のイベントを発火させる
       onStartLoad?.({
         wasCached: true,
       })
@@ -220,7 +220,7 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
     }
   }, [image])
 
-  // By keeping all props equal React will keep the component in the DOM
+  // すべての props を同じに保つことで、React はコンポーネントを DOM に残す
   return createElement(as, {
     ...wrapperProps,
     style: {
