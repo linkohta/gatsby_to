@@ -14,7 +14,7 @@ it(`does not add prefetch for preconnect/prefetch/prerender`, () => {
     return el
   }
 
-  // Should not be prefetched
+  // prefetch されないこと
   addHeadElement(`link`, { rel: `preconnect`, href: `https://gatsbyjs.com` })
   addHeadElement(`link`, { rel: `prefetch`, href: `https://gatsbyjs.com` })
   addHeadElement(`link`, { rel: `prerender`, href: `https://gatsbyjs.com` })
@@ -34,11 +34,11 @@ it(`does not add prefetch for preconnect/prefetch/prerender`, () => {
     serviceWorker: { active: {} },
   })
 
-  // First five link elements should be the actual resources added above
-  // The remaining link elements should be the one added by gatsby-browser as prefetch
+  // 最初の 5 つの link 要素は、上で追加した実際のリソースであること
+  // 残りの link 要素は、gatsby-browser が prefetch として追加したものであること
   const links = [].slice.call(document.querySelectorAll(`head > link`))
 
-  // Should add prefetch for stylesheets, scripts and lazy-loaded styles
+  // スタイルシート、スクリプト、遅延読み込みされるスタイルに prefetch を追加すること
   expect(links[5].href).toBe(`https://gats.by/script.js`)
   expect(links[5].rel).toBe(`prefetch`)
   expect(links[6].href).toBe(`https://gats.by/lazy.css`)

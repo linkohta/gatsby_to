@@ -1,7 +1,7 @@
 const React = require(`react`)
 const ThemeProvider = require(`react-jss`).ThemeProvider
 
-// remove the JSS style tag generated on the server to avoid conflicts with the one added on the client
+// クライアントで追加されるものと衝突しないよう、サーバーで生成された JSS の style タグを取り除く
 exports.onInitialClientRender = () => {
   const ssStyles = window.document.getElementById(`server-side-jss`)
   if (ssStyles) {

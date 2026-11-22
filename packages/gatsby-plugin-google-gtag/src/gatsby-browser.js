@@ -12,7 +12,7 @@ exports.onRouteUpdate = ({ location }, pluginOptions = {}) => {
 
   if (pathIsExcluded) return null
 
-  // wrap inside a timeout to make sure react-helmet is done with its changes (https://github.com/gatsbyjs/gatsby/issues/11592)
+  // react-helmet の変更が終わってから実行されるよう、timeout で包む (https://github.com/gatsbyjs/gatsby/issues/11592)
   const sendPageView = () => {
     const pagePath = location
       ? location.pathname + location.search + location.hash
@@ -27,7 +27,7 @@ exports.onRouteUpdate = ({ location }, pluginOptions = {}) => {
       requestAnimationFrame(() => setTimeout(sendPageView, delayOnRouteUpdate))
     })
   } else {
-    // Delay by 32ms to simulate 2 requestOnAnimationFrame calls
+    // requestOnAnimationFrame の呼び出し 2 回分を再現するため、32ms 遅らせる
     setTimeout(sendPageView, 32 + delayOnRouteUpdate)
   }
 

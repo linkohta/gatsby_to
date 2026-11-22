@@ -15,9 +15,9 @@ const BENCHMARK_REPORTING_URL =
     ? undefined
     : process.env.BENCHMARK_REPORTING_URL
 
-// Track the last received `api` because not all events in this plugin will receive one
+// このプラグインのすべてのイベントが `api` を受け取るわけではないため、最後に受け取ったものを保持する
 let lastApi
-// Current benchmark state, if any. If none then create one on next lifecycle.
+// 現在のベンチマークの状態（あれば）。なければ次のライフサイクルで作成する。
 let benchMeta
 
 let nextBuildType = process.env.BENCHMARK_BUILD_TYPE ?? `initial`
@@ -37,27 +37,27 @@ function execToStr(cmd) {
   ).trim()
 }
 function execToInt(cmd) {
-  // `parseInt` can return `NaN` for unexpected args
-  // `Number` can return undefined for unexpected args
-  // `0 | x` (bitwise or) will always return 0 for unexpected args, or 32bit int
+  // `parseInt` は想定外の引数に対して `NaN` を返すことがある
+  // `Number` は想定外の引数に対して undefined を返すことがある
+  // `0 | x`（ビット OR）は、想定外の引数に対して必ず 0 を返し、それ以外は 32 ビット整数を返す
   return execToStr(cmd) | 0
 }
 
 class BenchMeta {
   constructor() {
-    this.flushing = undefined // Promise of flushing if that has started
-    this.flushed = false // Completed flushing?
+    this.flushing = undefined // フラッシュが始まっていれば、その Promise
+    this.flushed = false // フラッシュが完了したか
     this.localTime = new Date().toISOString()
     this.timestamps = {
-      // TODO: we should also have access to node's timing data and see how long it took before bootstrapping this script
-      bootstrapTime, // Start of this file
-      instantiationTime: performance.now(), // Instantiation time of this class
-      benchmarkStart: 0, // Start of benchmark itself
-      preInit: 0, // Gatsby onPreInit life cycle
-      preBootstrap: 0, // Gatsby onPreBootstrap life cycle
-      preBuild: 0, // Gatsby onPreBuild life cycle
-      postBuild: 0, // Gatsby onPostBuild life cycle
-      benchmarkEnd: 0, // End of benchmark itself
+      // TODO: node のタイミングデータにもアクセスして、このスクリプトの起動までにかかった時間を確認できるようにしたい
+      bootstrapTime, // このファイルの開始時刻
+      instantiationTime: performance.now(), // このクラスのインスタンス化の時刻
+      benchmarkStart: 0, // ベンチマーク自体の開始時刻
+      preInit: 0, // Gatsby の onPreInit ライフサイクル
+      preBootstrap: 0, // Gatsby の onPreBootstrap ライフサイクル
+      preBuild: 0, // Gatsby の onPreBuild ライフサイクル
+      postBuild: 0, // Gatsby の onPostBuild ライフサイクル
+      benchmarkEnd: 0, // ベンチマーク自体の終了時刻
     }
     this.started = false
   }
@@ -65,9 +65,9 @@ class BenchMeta {
   getMetadata() {
     let siteId = ``
     try {
-      // The tags ought to be a json string, but we try/catch it just in case it's not, or not a valid json string
+      // tags は json 文字列のはずだが、そうでない場合や不正な json 文字列である場合に備えて try/catch している
       siteId =
-        JSON.parse(process.env?.GATSBY_TELEMETRY_TAGS ?? `{}`)?.siteId ?? `` // Set by server
+        JSON.parse(process.env?.GATSBY_TELEMETRY_TAGS ?? `{}`)?.siteId ?? `` // サーバーが設定する
     } catch (e) {
       siteId = `error`
       reportInfo(
@@ -76,8 +76,8 @@ class BenchMeta {
     }
 
     /**
-     * If we are running in netlify, environment variables can be attached using the INCOMING_HOOK_BODY
-     * extract the configuration from there
+     * netlify で実行している場合は、INCOMING_HOOK_BODY で環境変数を渡せる
+     * そこから設定を取り出す
      */
 
     let buildType = nextBuildType
@@ -107,7 +107,7 @@ class BenchMeta {
   }
 
   getData() {
-    // Get memory usage snapshot first (just in case)
+    // まずメモリ使用量のスナップショットを取得する（念のため）
     const { rss, heapTotal, heapUsed, external } = process.memoryUsage()
     const memory = {
       rss: rss ?? 0,
@@ -120,18 +120,18 @@ class BenchMeta {
       this.timestamps[key] = Math.floor(this.timestamps[key])
     }
 
-    // For the time being, our target benchmarks are part of the main repo
-    // And we will want to know what version of the repo we're testing with
-    // This won't work as intended when running a site not in our repo (!)
+    // 当面、対象のベンチマークはメインのリポジトリに含まれている
+    // そのため、テストに使っているリポジトリのバージョンを知りたい
+    // このリポジトリの外のサイトを実行する場合は、意図どおりに動作しない（！）
     const gitHash = execToStr(`git rev-parse HEAD`)
-    // Git only supports UTC tz through env var, but the unix time stamp is UTC
+    // Git は環境変数経由でしか UTC のタイムゾーンを指定できないが、unix タイムスタンプは UTC である
     const unixStamp = execToStr(`git show --quiet --date=unix --format="%cd"`)
     const commitTime = new Date(parseInt(unixStamp, 10) * 1000).toISOString()
 
     const nodejsVersion = process.version
 
-    // This assumes the benchmark is started explicitly from `node_modules/.bin/gatsby`, and not a global install
-    // (This is what `gatsby --version` does too, ultimately)
+    // ベンチマークがグローバルインストールではなく、`node_modules/.bin/gatsby` から明示的に起動されることを前提にしている
+    // （`gatsby --version` も最終的には同じことをしている）
     const gatsbyCliVersion = execToStr(`node_modules/.bin/gatsby --version`)
 
     const gatsbyVersion = require(`gatsby/package.json`).version
@@ -266,7 +266,7 @@ class BenchMeta {
         })
       }
       this.flushed = true
-      // Note: res.text returns a promise
+      // Note: res.text は promise を返す
       return res.text()
     })
 
@@ -281,7 +281,7 @@ class BenchMeta {
 function init(lifecycle) {
   if (!benchMeta) {
     benchMeta = new BenchMeta()
-    // This should be set in the gatsby-config of the site when enabling this plugin
+    // このプラグインを有効にするとき、サイトの gatsby-config で設定しておく必要がある
     reportInfo(
       `gatsby-plugin-benchmark-reporting: Will post benchmark data to: ${
         BENCHMARK_REPORTING_URL || `the CLI`
@@ -294,7 +294,7 @@ function init(lifecycle) {
 
 process.on(`exit`, () => {
   if (benchMeta && !benchMeta.flushed && BENCHMARK_REPORTING_URL) {
-    // This is probably already a non-zero exit as otherwise node should wait for the last promise to complete
+    // おそらくすでにゼロ以外の終了コードになっている。そうでなければ、node は最後の promise の完了を待つはずである
     reportError(
       `gatsby-plugin-benchmark-reporting error`,
       new Error(
@@ -325,7 +325,7 @@ async function onPreBuild(api) {
 
 async function onPostBuild(api) {
   if (!benchMeta) {
-    // Ignore. Don't start measuring on this event.
+    // 無視する。このイベントでは計測を始めない。
     return
   }
 

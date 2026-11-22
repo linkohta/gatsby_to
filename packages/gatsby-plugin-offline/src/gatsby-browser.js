@@ -1,6 +1,6 @@
 exports.registerServiceWorker = () => process.env.GATSBY_IS_PREVIEW !== `true`
 
-// only cache relevant resources for this page
+// このページに関係するリソースだけをキャッシュする
 const whiteListLinkRels = /^(stylesheet|preload)$/
 const prefetchedPathnames = []
 
@@ -12,24 +12,24 @@ exports.onServiceWorkerActive = ({
     return
   }
 
-  // if the SW has just updated then clear the path dependencies and don't cache
-  // stuff, since we're on the old revision until we navigate to another page
+  // SW が更新された直後の場合は、パスの依存関係を消去し、何もキャッシュしない。
+  // 別のページへ遷移するまでは古いリビジョンのままだからである
   if (window.___swUpdated) {
     serviceWorker.active.postMessage({ gatsbyApi: `clearPathResources` })
     return
   }
 
-  // grab nodes from head of document
+  // document の head からノードを取得する
   const nodes = document.querySelectorAll(`
     head > script[src],
     head > link[href],
     head > style[data-href]
   `)
 
-  // get all resource URLs
+  // すべてのリソースの URL を取得する
   const headerResources = [].slice
     .call(nodes)
-    // don't include preconnect/prefetch/prerender resources
+    // preconnect/prefetch/prerender のリソースは含めない
     .filter(
       node =>
         node.tagName !== `LINK` ||
@@ -37,8 +37,8 @@ exports.onServiceWorkerActive = ({
     )
     .map(node => node.src || node.href || node.getAttribute(`data-href`))
 
-  // Loop over prefetched pages and add their resources to an array,
-  // plus specify which resources are required for those paths.
+  // prefetch されたページをループしてリソースを配列に追加し、
+  // さらに、それらのパスに必要なリソースを記録する。
   const prefetchedResources = []
   prefetchedPathnames.forEach(path => {
     const resources = getResourceURLsForPathname(path)
@@ -51,11 +51,11 @@ exports.onServiceWorkerActive = ({
     })
   })
 
-  // Loop over all resources and fetch the page component + JSON data
-  // to add it to the SW cache.
+  // すべてのリソースをループして、ページコンポーネントと JSON データを fetch し、
+  // SW のキャッシュに追加する。
   const resources = [...headerResources, ...prefetchedResources]
   resources.forEach(resource => {
-    // Create a prefetch link for each resource, so Workbox runtime-caches them
+    // 各リソースの prefetch 用の link を作成し、Workbox がランタイムキャッシュするようにする
     const link = document.createElement(`link`)
     link.rel = `prefetch`
     link.href = resource
@@ -68,16 +68,16 @@ exports.onServiceWorkerActive = ({
 }
 
 function setPathResources(path, getResourceURLsForPathname) {
-  // do nothing if the SW has just updated, since we still have old pages in
-  // memory which we don't want to be whitelisted
+  // SW が更新された直後の場合は何もしない。メモリー上に古いページが残っていて、
+  // それらをホワイトリストに入れたくないためである
   if (window.___swUpdated) return
 
   if (`serviceWorker` in navigator) {
     const { serviceWorker } = navigator
 
     if (serviceWorker.controller === null) {
-      // if SW is not installed, we need to record any prefetches
-      // that happen so we can then add them to SW cache once installed
+      // SW がインストールされていない場合は、発生した prefetch を記録しておき、
+      // インストール後に SW のキャッシュへ追加できるようにする必要がある
       prefetchedPathnames.push(path)
     } else {
       const resources = getResourceURLsForPathname(path)

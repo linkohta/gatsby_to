@@ -1,4 +1,4 @@
-// Add Babel plugin
+// Babel プラグインを追加する
 try {
   require.resolve(`babel-plugin-styled-components`)
 } catch (e) {

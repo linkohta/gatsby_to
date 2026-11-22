@@ -35,8 +35,8 @@ const embedClasses = [
 ].join(`,`)
 
 exports.onRouteUpdate = () => {
-  // If there's an embedded element, lazy-load the twitter script (if it hasn't
-  // already been loaded), and then run the twitter load function.
+  // 埋め込み要素がある場合は、twitter のスクリプトを（まだ読み込まれて
+  // いなければ）遅延読み込みし、その後 twitter の load 関数を実行する。
   if (document.querySelector(embedClasses) !== null) {
     if (!injectedTwitterScript) {
       injectTwitterScript()

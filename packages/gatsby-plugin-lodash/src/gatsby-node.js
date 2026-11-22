@@ -1,6 +1,6 @@
 const webpackLodashPlugin = require(`lodash-webpack-plugin`)
 
-// Add Lodash webpack plugin
+// Lodash の webpack プラグインを追加する
 exports.onCreateWebpackConfig = (
   { actions, stage },
   { disabledFeatures = [] }
@@ -35,7 +35,7 @@ exports.onCreateWebpackConfig = (
   })
 }
 
-// Add Lodash Babel plugin
+// Lodash の Babel プラグインを追加する
 exports.onCreateBabelConfig = ({ actions }) => {
   actions.setBabelPlugin({
     name: require.resolve(`@sigmacomputing/babel-plugin-lodash`),

@@ -72,7 +72,7 @@ exports.onRenderBody = (
 
     const inlineScripts = []
     if (enableWebVitalsTracking) {
-      // web-vitals/polyfill (necessary for non chromium browsers)
+      // web-vitals/polyfill（chromium 以外のブラウザで必要）
       // @seehttps://www.npmjs.com/package/web-vitals#how-the-polyfill-works
       inlineScripts.push(
         <script

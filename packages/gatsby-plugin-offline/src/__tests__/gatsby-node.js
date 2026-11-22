@@ -26,14 +26,14 @@ describe(`onPostBuild`, () => {
   const componentChunkName = `chunkName`
   const chunks = [`chunk1`, `chunk2`]
 
-  // Mock webpack.stats.json
+  // webpack.stats.json をモックする
   const stats = {
     assetsByChunkName: {
       [componentChunkName]: chunks,
     },
   }
 
-  // Mock out filesystem functions
+  // ファイルシステムの関数をモックする
   const mockFs = {
     ...fs,
 

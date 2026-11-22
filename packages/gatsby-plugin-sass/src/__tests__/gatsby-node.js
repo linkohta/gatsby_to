@@ -8,7 +8,7 @@ describe(`gatsby-plugin-sass`, () => {
     setWebpackConfig: jest.fn(),
   }
 
-  // loaders "mocks"
+  // ローダーの "モック"
   const loaders = {
     miniCssExtract: () => `miniCssExtract`,
     css: args => `css(${JSON.stringify(args)})`,
@@ -110,24 +110,24 @@ describe(`pluginOptionsSchema`, () => {
         sassRuleModulesTest: `This should be a regexp`,
         useResolveUrlLoader: `This should be a boolean`,
         sassOptions: {
-          file: 123, // should be a string
-          data: 123, // should be a string
+          file: 123, // 文字列であるべき
+          data: 123, // 文字列であるべき
           importer: `This should be a function`,
           functions: `This should be an object of { string: function }`,
-          includePaths: 123, // should be an array of string
+          includePaths: 123, // 文字列の配列であるべき
           indentedSyntax: `"useResolveUrlLoader" must be a boolean`,
-          indentType: 123, // this should be a string
+          indentType: 123, // これは文字列であるべき
           indentWidth: 40,
           linefeed: `This should be cr, crlf, lf or lfcr`,
           omitSourceMapUrl: `This should be a boolean`,
-          outFile: 123, // This should be a string
+          outFile: 123, // これは文字列であるべき
           outputStyle: `This should be nested, expanded, compact or compressed`,
           precision: `This should be a number`,
           sourceComments: `This should be a boolean`,
-          sourceMap: 123, // This should be a string or a boolean
+          sourceMap: 123, // これは文字列か真偽値であるべき
           sourceMapContents: `This should be a boolean`,
           sourceMapEmbed: `This should be a boolean`,
-          sourceMapRoot: 123, // This should be a string
+          sourceMapRoot: 123, // これは文字列であるべき
         },
       }
     )

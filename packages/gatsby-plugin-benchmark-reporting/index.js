@@ -1,1 +1,1 @@
-// Dummy file to help resolving
+// モジュール解決を助けるためのダミーファイル

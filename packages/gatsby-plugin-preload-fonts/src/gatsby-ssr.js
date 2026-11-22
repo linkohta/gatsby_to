@@ -19,7 +19,7 @@ exports.onRenderBody = (
   { crossOrigin = `anonymous` } = {}
 ) => {
   const cache = loadCache()
-  // try to load assets from cache. Consider route with and without trailing slash as lookup key
+  // アセットをキャッシュから読み込もうとする。検索キーとして、末尾のスラッシュがあるルートとないルートの両方を考慮する
   const cacheEntry = cache.assets[pathname] || cache.assets[pathname + `/`]
   if (!cacheEntry) return
 
@@ -31,10 +31,10 @@ exports.onRenderBody = (
     assets.map(href => {
       let assetProps
 
-      // External urls should get the props from the plugin configuration.
-      // Local urls will be forced with `crossOrigin: "anonymous"`
+      // 外部の URL は、プラグインの設定から props を受け取る。
+      // ローカルの URL には `crossOrigin: "anonymous"` が強制される
       try {
-        // check if URL is external, if not this constructor throws.
+        // URL が外部のものかを確認する。そうでなければ、このコンストラクターは throw する。
         new URL(href)
         assetProps = props
       } catch (e) {

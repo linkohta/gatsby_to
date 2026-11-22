@@ -66,7 +66,7 @@ module.exports = level => {
         res = await question(`${prompt} ${chalk.bold(`[y/n]`)} `)
       }
 
-      // print newline
+      // 改行を出力する
       adapter()
 
       return /(y|yes)/i.test(res)

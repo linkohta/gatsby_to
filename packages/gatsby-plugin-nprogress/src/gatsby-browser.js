@@ -3,10 +3,10 @@ import NProgress from "accessible-nprogress"
 const defaultOptions = { color: `#29d` }
 
 export const onClientEntry = (_gatsbyApi, pluginOptions = {}) => {
-  // Merge default options with user defined options in `gatsby-config.js`
+  // デフォルトのオプションと、ユーザーが `gatsby-config.js` で定義したオプションをマージする
   const options = { ...defaultOptions, ...pluginOptions }
 
-  // Inject styles.
+  // スタイルを注入する。
   const styles = `
     #nprogress {
      pointer-events: none;

@@ -1,4 +1,4 @@
-// Add babel plugin
+// babel プラグインを追加する
 exports.onCreateBabelConfig = ({ actions }, pluginOptions) => {
   const {
     jsxPlugins: plugins,

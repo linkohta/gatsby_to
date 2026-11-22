@@ -21,7 +21,7 @@ exports.onPostBuild = async (
 ) => {
   const { data: queryRecords, errors } = await graphql(query)
 
-  // resolvePages and resolveSiteUrl are allowed to be sync or async. The Promise.resolve handles each possibility
+  // resolvePages と resolveSiteUrl は、同期でも非同期でもよい。Promise.resolve がどちらの場合も処理する
   const siteUrl = await Promise.resolve(resolveSiteUrl(queryRecords)).catch(
     err => reporter.panic(`${REPORTER_PREFIX} Error resolving Site URL`, err)
   )

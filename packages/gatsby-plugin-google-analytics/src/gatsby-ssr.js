@@ -33,7 +33,7 @@ export const onRenderBody = (
     return null
   }
 
-  // Lighthouse recommends pre-connecting to google analytics
+  // Lighthouse は google analytics への preconnect を推奨している
   setHeadComponents([
     <link
       rel="preconnect"
@@ -69,7 +69,7 @@ export const onRenderBody = (
 
   const inlineScripts = []
   if (pluginOptions.enableWebVitalsTracking) {
-    // web-vitals/polyfill (necessary for non chromium browsers)
+    // web-vitals/polyfill（chromium 以外のブラウザで必要）
     // @seehttps://www.npmjs.com/package/web-vitals#how-the-polyfill-works
     setHeadComponents([
       <script

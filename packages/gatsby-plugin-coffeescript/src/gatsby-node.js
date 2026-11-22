@@ -8,7 +8,7 @@ export function resolvableExtensions() {
 }
 
 export function onCreateWebpackConfig({ loaders, actions }) {
-  // We need to use Babel to get around the ES6 export issue.
+  // ES6 の export の問題を回避するために Babel を使う必要がある。
   actions.setWebpackConfig({
     module: {
       rules: [

@@ -5,7 +5,7 @@ describe(`gatsby-plugin-stylus`, () => {
     setWebpackConfig: jest.fn(),
   }
 
-  // loaders "mocks"
+  // ローダーの "モック"
   const loaders = {
     miniCssExtract: () => `miniCssExtract`,
     css: args => `css(${JSON.stringify(args)})`,

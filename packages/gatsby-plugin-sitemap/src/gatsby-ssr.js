@@ -2,7 +2,7 @@ import * as React from "react"
 import { withPrefix as fallbackWithPrefix, withAssetPrefix } from "gatsby"
 import { posix } from "path"
 
-// TODO: Remove for v3 - Fix janky path/asset prefixing
+// TODO: v3 で削除する - 不安定なパスとアセットのプレフィックス処理を修正する
 const withPrefix = withAssetPrefix || fallbackWithPrefix
 
 exports.onRenderBody = ({ setHeadComponents }, pluginOptions) => {

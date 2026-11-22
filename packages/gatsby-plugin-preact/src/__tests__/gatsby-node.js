@@ -76,7 +76,7 @@ describe(`gatsby-plugin-preact`, () => {
               framework: {
                 chunks: `all`,
                 name: `framework`,
-                // Mirrors what we have in gatsby/../webpack.config.js
+                // gatsby/../webpack.config.js にあるものと同じ内容にしている
                 test: module => {
                   if (
                     module?.rawRequest === `react-dom/server` ||

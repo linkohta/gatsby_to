@@ -66,7 +66,7 @@ describe(`fetch-routes`, () => {
         },
       }
     })
-    // don't crawl routes
+    // ルートをクロールしない
     logger.confirm.mockImplementationOnce(() => Promise.resolve(false))
     createContentDigest.mockReturnValueOnce(cache.hash)
 

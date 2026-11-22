@@ -2,7 +2,7 @@ const fs = require(`fs`)
 const path = require(`path`)
 const os = require(`os`)
 
-// Write out a typography module to .cache.
+// typography のモジュールを .cache に書き出す。
 
 exports.onPreBootstrap = ({ store, cache }, pluginOptions) => {
   const program = store.getState().program

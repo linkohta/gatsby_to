@@ -17,7 +17,7 @@ describe(`gatsby-plugin-google-tagmanager`, () => {
 
     expect(headConfig.props.dangerouslySetInnerHTML.__html).toMatchSnapshot()
     expect(preBodyConfig.props.dangerouslySetInnerHTML.__html).toMatchSnapshot()
-    // check if no newlines were added
+    // 改行が追加されていないことを確認する
     expect(preBodyConfig.props.dangerouslySetInnerHTML.__html).not.toContain(
       `\n`
     )

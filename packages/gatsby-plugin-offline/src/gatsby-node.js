@@ -1,4 +1,4 @@
-// use `let` to workaround https://github.com/jhnns/rewire/issues/144
+// https://github.com/jhnns/rewire/issues/144 を回避するために `let` を使う
 /* eslint-disable prefer-const */
 let fs = require(`fs`)
 let workboxBuild = require(`workbox-build`)
@@ -83,7 +83,7 @@ exports.onPostBuild = (
   const { pathPrefix, reporter } = args
   const rootDir = `public`
 
-  // Get exact asset filenames for app and offline app shell chunks
+  // app と offline app shell のチャンクの正確なアセットファイル名を取得する
   const files = getAssetsForChunks([
     `app`,
     `webpack-runtime`,
@@ -109,7 +109,7 @@ exports.onPostBuild = (
   )
 
   const globPatterns = files.concat([
-    // criticalFilePaths doesn't include HTML pages (we only need this one)
+    // criticalFilePaths には HTML ページが含まれない（必要なのはこの 1 つだけである）
     `offline-plugin-app-shell-fallback/index.html`,
     ...criticalFilePaths,
   ])
@@ -124,16 +124,16 @@ exports.onPostBuild = (
     globDirectory: rootDir,
     globPatterns,
     modifyURLPrefix: {
-      // If `pathPrefix` is configured by user, we should replace
-      // the default prefix with `pathPrefix`.
+      // ユーザーが `pathPrefix` を設定している場合は、
+      // デフォルトのプレフィックスを `pathPrefix` に置き換える。
       "/": `${pathPrefix}/`,
     },
     cacheId: `gatsby-plugin-offline`,
-    // Don't cache-bust JS or CSS files, and anything in the static directory,
-    // since these files have unique URLs and their contents will never change
+    // JS と CSS のファイル、および static ディレクトリ内のものは、キャッシュバスティングしない。
+    // これらのファイルは URL が一意で、内容が変わることがないためである
     dontCacheBustURLsMatching: /(\.js$|\.css$|static\/)/,
     runtimeCaching: [
-      // ignore cypress endpoints (only for testing)
+      // cypress のエンドポイントを無視する（テスト専用）
       process.env.CYPRESS_SUPPORT
         ? {
             urlPattern: /\/__cypress\//,
@@ -141,25 +141,25 @@ exports.onPostBuild = (
           }
         : false,
       {
-        // Use cacheFirst since these don't need to be revalidated (same RegExp
-        // and same reason as above)
+        // 再検証が不要なので cacheFirst を使う（RegExp も理由も
+        // 上と同じ）
         urlPattern: /(\.js$|\.css$|static\/)/,
         handler: `CacheFirst`,
       },
       {
-        // page-data.json files, static query results and app-data.json
-        // are not content hashed
+        // page-data.json ファイル、静的クエリの結果、app-data.json は、
+        // コンテンツハッシュが付かない
         urlPattern: /^https?:.*\/page-data\/.*\.json/,
         handler: `StaleWhileRevalidate`,
       },
       {
-        // Add runtime caching of various other page resources
+        // その他のページリソースのランタイムキャッシュを追加する
         urlPattern:
           /^https?:.*\.(png|jpg|jpeg|webp|avif|svg|gif|tiff|js|woff|woff2|json|css)$/,
         handler: `StaleWhileRevalidate`,
       },
       {
-        // Google Fonts CSS (doesn't end in .css so we need to specify it)
+        // Google Fonts の CSS（末尾が .css ではないので、指定する必要がある）
         urlPattern: /^https?:\/\/fonts\.googleapis\.com\/css/,
         handler: `StaleWhileRevalidate`,
       },
@@ -223,7 +223,7 @@ exports.onPostBuild = (
 
 const MATCH_ALL_KEYS = /^/
 exports.pluginOptionsSchema = function ({ Joi }) {
-  // These are the options of the v3: https://www.gatsbyjs.com/plugins/gatsby-plugin-offline/#available-options
+  // これらは v3 のオプションである: https://www.gatsbyjs.com/plugins/gatsby-plugin-offline/#available-options
   return Joi.object({
     precachePages: Joi.array()
       .items(Joi.string())
