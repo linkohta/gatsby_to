@@ -6,8 +6,8 @@ import { updateStateAndRunQueries } from "../query/query-watcher"
 import report from "gatsby-cli/lib/reporter"
 import { IGatsbyState } from "../redux/types"
 
-type TypeMap = IGatsbyState["inferenceMetadata"]["typeMap"]
-type InferenceMetadata = IGatsbyState["inferenceMetadata"]
+type TypeMap = IGatsbyState[`inferenceMetadata`][`typeMap`]
+type InferenceMetadata = IGatsbyState[`inferenceMetadata`]
 
 const inferredTypesChanged = (
   typeMap: TypeMap,

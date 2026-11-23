@@ -301,7 +301,7 @@ export function getResolvedFieldsForPlugin(
 export function findCompiledLocalPluginModule(
   rootDir: string,
   pluginName: string,
-  moduleName: "gatsby-config" | "gatsby-node"
+  moduleName: `gatsby-config` | `gatsby-node`
 ): string | undefined {
   const compiledPathForPlugin =
     pluginName === `default-site-plugin`

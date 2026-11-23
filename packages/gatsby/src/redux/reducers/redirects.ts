@@ -23,9 +23,9 @@ function add(redirect: IRedirect): void {
 }
 
 export const redirectsReducer = (
-  state: IGatsbyState["redirects"] = [],
+  state: IGatsbyState[`redirects`] = [],
   action: ICreateRedirectAction
-): IGatsbyState["redirects"] => {
+): IGatsbyState[`redirects`] => {
   switch (action.type) {
     case `CREATE_REDIRECT`: {
       const redirect = action.payload

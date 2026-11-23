@@ -131,7 +131,7 @@ class Reporter {
     error?: Error | Array<Error>,
     pluginName?: string
   ): IStructuredError | Array<IStructuredError> => {
-    let details: IConstructError["details"] = {
+    let details: IConstructError[`details`] = {
       context: {},
     }
 

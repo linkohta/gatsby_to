@@ -14,7 +14,7 @@ import { IQueryRunningContext } from "./types"
 export const queryRunningServices: MachineOptions<
   IQueryRunningContext,
   any
->["services"] = {
+>[`services`] = {
   extractQueries,
   writeOutRequires,
   calculateDirtyQueries,

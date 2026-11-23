@@ -386,7 +386,7 @@ function deletePage(page: Partial<IGatsbyPage>): void {
 }
 
 function startPageQuery(page: Partial<IGatsbyPage>): void {
-  const payload: IQueryStartAction["payload"] = {
+  const payload: IQueryStartAction[`payload`] = {
     path: page.path!,
     componentPath: page.componentPath!,
     isPage: true,
@@ -400,7 +400,7 @@ function finishQuery(
   page: Partial<IGatsbyPage>,
   jsonObject: Record<string, unknown>
 ): void {
-  const payload: IPageQueryRunAction["payload"] = {
+  const payload: IPageQueryRunAction[`payload`] = {
     path: page.path!,
     componentPath: page.componentPath!,
     isPage: true,

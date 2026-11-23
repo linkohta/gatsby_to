@@ -143,8 +143,8 @@ export class WorkerPool<
     private workerPath: string,
     private options?: IWorkerOptions
   ) {
-    const single: Partial<WorkerPool<WorkerModuleExports>["single"]> = {}
-    const all: Partial<WorkerPool<WorkerModuleExports>["all"]> = {}
+    const single: Partial<WorkerPool<WorkerModuleExports>[`single`]> = {}
+    const all: Partial<WorkerPool<WorkerModuleExports>[`all`]> = {}
 
     {
       // これらは保持しておく必要がない
@@ -165,17 +165,17 @@ export class WorkerPool<
         single[exportName] = this.scheduleWorkSingle.bind(
           this,
           exportName
-        ) as WorkerPool<WorkerModuleExports>["single"][typeof exportName]
+        ) as WorkerPool<WorkerModuleExports>[`single`][typeof exportName]
 
         all[exportName] = this.scheduleWorkAll.bind(
           this,
           exportName
-        ) as unknown as WorkerPool<WorkerModuleExports>["all"][typeof exportName]
+        ) as unknown as WorkerPool<WorkerModuleExports>[`all`][typeof exportName]
       }
     }
 
-    this.single = single as WorkerPool<WorkerModuleExports>["single"]
-    this.all = all as WorkerPool<WorkerModuleExports>["all"]
+    this.single = single as WorkerPool<WorkerModuleExports>[`single`]
+    this.all = all as WorkerPool<WorkerModuleExports>[`all`]
     this.startAll()
   }
 

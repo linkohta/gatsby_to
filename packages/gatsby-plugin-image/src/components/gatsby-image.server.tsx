@@ -65,7 +65,7 @@ export const GatsbyImage: FunctionComponent<GatsbyImageProps> =
       ...wrapperProps
     } = getWrapperProps(width, height, layout)
 
-    const cleanedImages: IGatsbyImageData["images"] = {
+    const cleanedImages: IGatsbyImageData[`images`] = {
       fallback: undefined,
       sources: [],
     }
@@ -117,7 +117,7 @@ export const GatsbyImage: FunctionComponent<GatsbyImageProps> =
           className={imgClassName}
           {...(props as Omit<
             MainImageProps,
-            "images" | "fallback" | "onError" | "onLoad"
+            `images` | `fallback` | `onError` | `onLoad`
           >)}
           // eager が設定されている場合は、isLoading の state を true で始める（react を使わずに img を読み込みたい）
           {...getMainProps(

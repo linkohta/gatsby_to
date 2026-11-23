@@ -110,7 +110,7 @@ const buildExampleValue = ({
 
 const resolveWinnerType = (
   descriptor: IValueDescriptor
-): [ValueType | "null", boolean?] => {
+): [ValueType | `null`, boolean?] => {
   const candidates = possibleTypes(descriptor)
   if (candidates.length === 1) {
     return [candidates[0]]

@@ -1,6 +1,6 @@
 import type { IHeader } from "../../redux/types"
 
-export const BASE_HEADERS: IHeader["headers"] = [
+export const BASE_HEADERS: IHeader[`headers`] = [
   {
     key: `x-xss-protection`,
     value: `1; mode=block`,
@@ -19,7 +19,7 @@ export const BASE_HEADERS: IHeader["headers"] = [
   },
 ]
 
-export const MUST_REVALIDATE_HEADERS: IHeader["headers"] = [
+export const MUST_REVALIDATE_HEADERS: IHeader[`headers`] = [
   {
     key: `cache-control`,
     value: `public, max-age=0, must-revalidate`,
@@ -27,14 +27,14 @@ export const MUST_REVALIDATE_HEADERS: IHeader["headers"] = [
   ...BASE_HEADERS,
 ]
 
-export const PERMANENT_CACHE_CONTROL_HEADER: IHeader["headers"] = [
+export const PERMANENT_CACHE_CONTROL_HEADER: IHeader[`headers`] = [
   {
     key: `cache-control`,
     value: `public, max-age=31536000, immutable`,
   },
 ]
 
-export const PERMAMENT_CACHING_HEADERS: IHeader["headers"] = [
+export const PERMAMENT_CACHING_HEADERS: IHeader[`headers`] = [
   ...PERMANENT_CACHE_CONTROL_HEADER,
   ...BASE_HEADERS,
 ]

@@ -101,7 +101,7 @@ export async function writePageData(
   publicDir: string,
   pageData: IPageDataInput,
   slicesUsedByTemplates: Map<string, ICollectedSlices>,
-  slices: IGatsbyState["slices"]
+  slices: IGatsbyState[`slices`]
 ): Promise<string> {
   const result = await readPageQueryResult(pageData.path)
 
@@ -187,11 +187,11 @@ const maxManifestIdsToLog = 50
 
 type IDataTask =
   | {
-      type: "page"
+      type: `page`
       pagePath: string
     }
   | {
-      type: "slice"
+      type: `slice`
       sliceName: string
     }
 
@@ -455,14 +455,14 @@ export async function handleStalePageData(parentSpan: Span): Promise<void> {
 
 interface IModifyPageDataForErrorMessage {
   errors: {
-    graphql?: IPageDataWithQueryResult["result"]["errors"]
-    getServerData?: IPageDataWithQueryResult["getServerDataError"]
+    graphql?: IPageDataWithQueryResult[`result`][`errors`]
+    getServerData?: IPageDataWithQueryResult[`getServerDataError`]
   }
-  graphqlExtensions?: IPageDataWithQueryResult["result"]["extensions"]
-  pageContext?: IPageDataWithQueryResult["result"]["pageContext"]
-  path: IPageDataWithQueryResult["path"]
-  matchPath: IPageDataWithQueryResult["matchPath"]
-  slicesMap: IPageDataWithQueryResult["slicesMap"]
+  graphqlExtensions?: IPageDataWithQueryResult[`result`][`extensions`]
+  pageContext?: IPageDataWithQueryResult[`result`][`pageContext`]
+  path: IPageDataWithQueryResult[`path`]
+  matchPath: IPageDataWithQueryResult[`matchPath`]
+  slicesMap: IPageDataWithQueryResult[`slicesMap`]
 }
 
 export function modifyPageDataForErrorMessage(

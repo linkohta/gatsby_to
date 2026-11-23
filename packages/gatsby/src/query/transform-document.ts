@@ -20,7 +20,7 @@ function extractEnumValues(
 
 interface IOldSortObject {
   fields: Array<string>
-  order?: Array<"ASC" | "DESC">
+  order?: Array<`ASC` | `DESC`>
 }
 
 function isOldSortObject(props: unknown): props is IOldSortObject {

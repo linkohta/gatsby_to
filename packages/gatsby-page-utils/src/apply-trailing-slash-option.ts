@@ -1,4 +1,4 @@
-export type TrailingSlash = "always" | "never" | "ignore"
+export type TrailingSlash = `always` | `never` | `ignore`
 
 const endsWithSuffixes = (suffixes: Array<string>, input): boolean => {
   for (const suffix of suffixes) {

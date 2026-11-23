@@ -10,7 +10,7 @@ import {
 interface IJobFailedSerialized {
   type: MESSAGE_TYPES.JOB_FAILED
   payload: {
-    id: InternalJob["id"]
+    id: InternalJob[`id`]
     error: string
     stack?: string
   }

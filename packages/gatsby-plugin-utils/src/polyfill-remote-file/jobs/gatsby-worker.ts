@@ -5,8 +5,8 @@ import Queue from "fastq"
 import { transformImage } from "../transform-images"
 
 interface IImageServiceProps {
-  outputDir: Parameters<typeof transformImage>[0]["outputDir"]
-  args: Parameters<typeof transformImage>[0]["args"] & {
+  outputDir: Parameters<typeof transformImage>[0][`outputDir`]
+  args: Parameters<typeof transformImage>[0][`args`] & {
     contentDigest: string
   }
 }
@@ -51,8 +51,8 @@ export async function FILE_CDN({
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export async function IMAGE_CDN(args: {
-  outputDir: Parameters<typeof transformImage>[0]["outputDir"]
-  args: Parameters<typeof transformImage>[0]["args"] & {
+  outputDir: Parameters<typeof transformImage>[0][`outputDir`]
+  args: Parameters<typeof transformImage>[0][`args`] & {
     contentDigest: string
   }
 }): Promise<void> {

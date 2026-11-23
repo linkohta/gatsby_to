@@ -44,7 +44,7 @@ signalExit(() => {
 
 let cancelDelayedSetStatus: (() => void) | null
 
-let pendingStatus: ActivityStatuses | "" = ``
+let pendingStatus: ActivityStatuses | `` = ``
 
 // "done" のステータスはデバウンスしている。アクティビティは常に重なり合うわけではなく、
 // あるアクティビティが終わってから次が始まるまでのあいだに、厳密には "done"
@@ -52,7 +52,7 @@ let pendingStatus: ActivityStatuses | "" = ``
 // そのような場合に、IN_PROGRESS と SUCCESS/FAILED を短時間で行き来する
 // SET_STATUS イベントを何度も送りたくない。
 export const setStatus =
-  (status: ActivityStatuses | "", force: boolean = false) =>
+  (status: ActivityStatuses | ``, force: boolean = false) =>
   (dispatch: Dispatch<ISetStatus>): void => {
     const currentStatus = getStore().getState().logs.status
 
@@ -112,14 +112,14 @@ export const createLog = ({
   type?: string
   category?: keyof typeof ErrorCategory
   filePath?: string
-  location?: IStructuredError["location"]
+  location?: IStructuredError[`location`]
   docsUrl?: string
   context?: string
   activity_current?: number
   activity_total?: number
   activity_type?: string
   activity_uuid?: string
-  stack?: IStructuredError["stack"]
+  stack?: IStructuredError[`stack`]
   pluginName?: string
 }): ICreateLog => {
   return {

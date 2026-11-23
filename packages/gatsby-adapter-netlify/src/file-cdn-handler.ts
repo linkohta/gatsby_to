@@ -12,14 +12,14 @@ export interface IFunctionManifest {
         function: string
         name?: string
         path: string
-        cache?: "manual"
+        cache?: `manual`
         generator: string
       }
     | {
         function: string
         name?: string
         pattern: string
-        cache?: "manual"
+        cache?: `manual`
         generator: string
       }
   >

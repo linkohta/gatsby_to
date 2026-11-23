@@ -12,7 +12,7 @@ function maybeDropNamedPartOfWildcard(
 }
 
 export function getRoutePathFromPage(
-  page: Pick<IGatsbyPage, "path" | "matchPath">
+  page: Pick<IGatsbyPage, `path` | `matchPath`>
 ): string {
   return maybeDropNamedPartOfWildcard(page.matchPath) ?? page.path
 }

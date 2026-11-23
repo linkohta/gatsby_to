@@ -62,7 +62,7 @@ const noAnonymousExports: Rule.RuleModule = {
     return {
       ExportDefaultDeclaration: (node: Node): void => {
         // @ts-ignore
-        const type = node.declaration.type as ExportDefaultDeclaration["type"]
+        const type = node.declaration.type as ExportDefaultDeclaration[`type`]
         const def = defs[type]
 
         if (def && (!def.forbid || def.forbid(node))) {

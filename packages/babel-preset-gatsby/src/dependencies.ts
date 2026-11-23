@@ -6,7 +6,7 @@ import { loadCachedConfig } from "./index"
 import { CORE_JS_POLYFILL_EXCLUDE_LIST as polyfillsToExclude } from "gatsby-legacy-polyfills/dist/exclude"
 
 interface IPresetOptions {
-  stage?: "build-javascript" | "build-html" | "develop" | "develop-html"
+  stage?: `build-javascript` | `build-html` | `develop` | `develop-html`
 }
 
 // require.resolve 経由で webpack に直接渡されるので、ここでは export default が

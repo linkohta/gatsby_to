@@ -30,13 +30,13 @@ import normalizePath from "normalize-path"
 import { validateComponent } from "../../utils/validate-component"
 
 type RestrictionActionNames =
-  | "createFieldExtension"
-  | "createTypes"
-  | "createResolverContext"
-  | "addThirdPartySchema"
-  | "printTypeDefinitions"
-  | "createSlice"
-  | "addRemoteFileAllowedUrl"
+  | `createFieldExtension`
+  | `createTypes`
+  | `createResolverContext`
+  | `addThirdPartySchema`
+  | `printTypeDefinitions`
+  | `createSlice`
+  | `addRemoteFileAllowedUrl`
 
 type SomeActionCreator =
   | ActionCreator<ActionsUnion>

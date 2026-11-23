@@ -79,7 +79,7 @@ export function getWrapperProps(
   width: number,
   height: number,
   layout: Layout
-): Pick<HTMLAttributes<HTMLElement>, "className" | "style"> & {
+): Pick<HTMLAttributes<HTMLElement>, `className` | `style`> & {
   "data-gatsby-image-wrapper": string
 } {
   const wrapperStyle: CSSProperties = {}
@@ -196,7 +196,7 @@ export function getImageData<OptionsType>({
     }
   }
 
-  const sourceMetadata: IGatsbyImageHelperArgs["sourceMetadata"] = {
+  const sourceMetadata: IGatsbyImageHelperArgs[`sourceMetadata`] = {
     width: sourceWidth,
     height: sourceHeight,
     format: `auto`,
@@ -217,8 +217,8 @@ export function getImageData<OptionsType>({
 export function getMainProps(
   isLoading: boolean,
   isLoaded: boolean,
-  images: IGatsbyImageData["images"],
-  loading?: "eager" | "lazy",
+  images: IGatsbyImageData[`images`],
+  loading?: `eager` | `lazy`,
   style: CSSProperties = {}
 ): Partial<MainImageProps> {
   // gatsby-config で設定されていない場合のフォールバック。
@@ -251,7 +251,7 @@ export function getMainProps(
 }
 
 export type PlaceholderImageAttrs = ImgHTMLAttributes<HTMLImageElement> &
-  Pick<PlaceholderProps, "sources" | "fallback"> & {
+  Pick<PlaceholderProps, `sources` | `fallback`> & {
     "data-placeholder-image"?: string
   }
 
@@ -262,8 +262,8 @@ export function getPlaceholderProps(
   width?: number,
   height?: number,
   backgroundColor?: string,
-  objectFit?: CSSProperties["objectFit"],
-  objectPosition?: CSSProperties["objectPosition"]
+  objectFit?: CSSProperties[`objectFit`],
+  objectPosition?: CSSProperties[`objectPosition`]
 ): PlaceholderImageAttrs {
   const wrapperStyle: CSSProperties = {}
 

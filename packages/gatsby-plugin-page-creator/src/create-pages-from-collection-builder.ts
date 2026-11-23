@@ -15,7 +15,7 @@ interface ICreatePagesFromCollectionBuilderArgs {
   absolutePath: string
   pagesPath: string
   actions: Actions
-  graphql: CreatePagesArgs["graphql"]
+  graphql: CreatePagesArgs[`graphql`]
   reporter: Reporter
   trailingSlash: TrailingSlash
   slugifyOptions?: ISlugifyOptions

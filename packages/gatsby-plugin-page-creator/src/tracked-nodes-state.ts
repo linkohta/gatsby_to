@@ -57,7 +57,7 @@ export interface IStatePerInstance {
 const pluginInstances = new Map<string, IStatePerInstance>()
 
 export function getPluginInstance(
-  pluginOptions: Pick<IOptions, "path">
+  pluginOptions: Pick<IOptions, `path`>
 ): IStatePerInstance {
   let pluginInstance = pluginInstances.get(pluginOptions.path)
   if (!pluginInstance) {

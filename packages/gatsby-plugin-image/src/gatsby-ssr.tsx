@@ -6,7 +6,7 @@ import { RenderBodyArgs } from "gatsby"
 
 const generateHtml = (
   str: string
-): React.DOMAttributes<Element>["dangerouslySetInnerHTML"] => {
+): React.DOMAttributes<Element>[`dangerouslySetInnerHTML`] => {
   return {
     __html: oneLine(str),
   }

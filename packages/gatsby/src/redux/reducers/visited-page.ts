@@ -4,7 +4,7 @@ import {
   ICreateServerVisitedPage,
 } from "../types"
 
-type StateMap = Map<"server", Set<string>>
+type StateMap = Map<`server`, Set<string>>
 
 // develop サーバーは、これらのページコンポーネントを常に必要とする。
 const createDefault = (): StateMap => {
@@ -19,9 +19,9 @@ const createDefault = (): StateMap => {
 }
 
 export const visitedPagesReducer = (
-  state: IGatsbyState["visitedPages"] = createDefault(),
+  state: IGatsbyState[`visitedPages`] = createDefault(),
   action: IDeleteCacheAction | ICreateServerVisitedPage
-): IGatsbyState["visitedPages"] => {
+): IGatsbyState[`visitedPages`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return createDefault()

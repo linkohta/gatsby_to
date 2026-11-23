@@ -1,9 +1,9 @@
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const componentsUsingSlicesReducer = (
-  state: IGatsbyState["componentsUsingSlices"] = new Map(),
+  state: IGatsbyState[`componentsUsingSlices`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["componentsUsingSlices"] => {
+): IGatsbyState[`componentsUsingSlices`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return new Map()

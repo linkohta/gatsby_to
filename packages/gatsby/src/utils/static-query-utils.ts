@@ -29,12 +29,12 @@ export function clearStaticQueryCaches(): void {
 }
 
 export const getStaticQueryContext = async (
-  staticQueryHashes: IPageDataWithQueryResult["staticQueryHashes"]
+  staticQueryHashes: IPageDataWithQueryResult[`staticQueryHashes`]
 ): Promise<{
-  staticQueryContext: IResourcesForTemplate["staticQueryContext"]
+  staticQueryContext: IResourcesForTemplate[`staticQueryContext`]
 }> => {
   const staticQueryResultPromises: Array<Promise<void>> = []
-  const staticQueryContext: IResourcesForTemplate["staticQueryContext"] = {}
+  const staticQueryContext: IResourcesForTemplate[`staticQueryContext`] = {}
 
   for (const staticQueryHash of staticQueryHashes) {
     const memoizedStaticQueryResult =

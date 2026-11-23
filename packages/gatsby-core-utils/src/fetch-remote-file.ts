@@ -265,9 +265,9 @@ async function setInFlightObject(
   buildId: string,
   value: { buildId?: string } & Omit<
     NonNullable<
-      ReturnType<ReturnType<typeof getStorage>["remoteFileInfo"]["get"]>
+      ReturnType<ReturnType<typeof getStorage>[`remoteFileInfo`][`get`]>
     >,
-    "buildId"
+    `buildId`
   >
 ): Promise<void> {
   if (!buildId) {

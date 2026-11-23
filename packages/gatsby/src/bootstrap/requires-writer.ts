@@ -43,8 +43,8 @@ type IBareComponentData = Pick<
 
 export const getComponents = (
   pages: Array<IGatsbyPage>,
-  slices: IGatsbyState["slices"],
-  components: IGatsbyState["components"]
+  slices: IGatsbyState[`slices`],
+  components: IGatsbyState[`components`]
 ): Array<IGatsbyPageComponent> => {
   const pickComponentFields = (
     page: IGatsbyPage | IGatsbySlice

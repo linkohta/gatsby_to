@@ -9,7 +9,7 @@ import { writeModule } from "./gatsby-webpack-virtual-modules"
 // ユーザーが E2E テストを繰り返し調整するときに、問題を起こさないようにするためである
 // この確認は、将来、同様の他の状況にも対応するように
 // 拡張できる。
-let indicatorEnabled: "auto" | true | false | undefined = undefined
+let indicatorEnabled: `auto` | true | false | undefined = undefined
 
 export function writeVirtualLoadingIndicatorModule(): void {
   if (indicatorEnabled === undefined) {

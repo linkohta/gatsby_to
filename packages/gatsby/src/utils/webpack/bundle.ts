@@ -38,7 +38,7 @@ export function watch(
     err: Error | webpack.WebpackError | undefined | null,
     stats: webpack.Stats | undefined
   ) => void,
-  watchOptions: webpack.Watching["watchOptions"] = {}
+  watchOptions: webpack.Watching[`watchOptions`] = {}
 ): {
   watcher: webpack.Watching
   close: () => Promise<void>

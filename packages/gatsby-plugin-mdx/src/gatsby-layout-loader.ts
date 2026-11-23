@@ -19,7 +19,7 @@ import { cachedImport } from "./cache-helpers"
 export interface IGatsbyLayoutLoaderOptions {
   options: IMdxPluginOptions
   nodeExists: (path: string) => Promise<boolean>
-  reporter: NodePluginArgs["reporter"]
+  reporter: NodePluginArgs[`reporter`]
 }
 
 // MDX のコンテンツを Gatsby の Layout コンポーネントで包む

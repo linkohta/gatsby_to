@@ -82,13 +82,13 @@ function setupFsWrapper(): string {
 
     function applyRename<
       T = typeof import("fs") | typeof import("fs").promises,
-    >(fsToRewrite: T, lfs: T, method: "rename" | "renameSync"): void {
+    >(fsToRewrite: T, lfs: T, method: `rename` | `renameSync`): void {
       const original = fsToRewrite[method]
       if (original) {
         // @ts-ignore - complains about __promisify__ which doesn't actually exist in runtime
         lfs[method] = (
-          ...args: Parameters<(typeof import("fs"))["rename" | "renameSync"]>
-        ): ReturnType<(typeof import("fs"))["rename" | "renameSync"]> => {
+          ...args: Parameters<(typeof import("fs"))[`rename` | `renameSync`]>
+        ): ReturnType<(typeof import("fs"))[`rename` | `renameSync`]> => {
           args[0] = mapPathUsingRewrites(args[0])
           args[1] = mapPathUsingRewrites(args[1])
           // @ts-ignore - can't decide which signature this is, but we just preserve the original
@@ -148,7 +148,7 @@ function setupFsWrapper(): string {
     const originalWritesStream = fs.WriteStream
     function LinkedWriteStream(
       this: fs.WriteStream,
-      ...args: Parameters<(typeof fs)["createWriteStream"]>
+      ...args: Parameters<(typeof fs)[`createWriteStream`]>
     ): fs.WriteStream {
       args[0] = mapPathUsingRewrites(args[0])
       args[1] =
@@ -174,7 +174,7 @@ function setupFsWrapper(): string {
     const originalReadStream = fs.ReadStream
     function LinkedReadStream(
       this: fs.ReadStream,
-      ...args: Parameters<(typeof fs)["createReadStream"]>
+      ...args: Parameters<(typeof fs)[`createReadStream`]>
     ): fs.ReadStream {
       args[0] = mapPathUsingRewrites(args[0])
       args[1] =

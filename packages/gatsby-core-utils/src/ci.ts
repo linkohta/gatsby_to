@@ -75,7 +75,7 @@ function envFromCIAndCIName(): string | null {
   return null
 }
 
-function envFromCIWithNoName(): "CI detected without name" | null {
+function envFromCIWithNoName(): `CI detected without name` | null {
   if (process.env.CI) {
     return `CI detected without name`
   }

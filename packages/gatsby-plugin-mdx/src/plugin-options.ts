@@ -14,10 +14,10 @@ export interface IMdxPluginOptions {
   gatsbyRemarkPlugins?: [IPluginInfo]
 }
 interface IHelpers {
-  getNode: NodePluginArgs["getNode"]
-  getNodesByType: NodePluginArgs["getNodesByType"]
-  pathPrefix: NodePluginArgs["pathPrefix"]
-  reporter: NodePluginArgs["reporter"]
+  getNode: NodePluginArgs[`getNode`]
+  getNodesByType: NodePluginArgs[`getNodesByType`]
+  pathPrefix: NodePluginArgs[`pathPrefix`]
+  reporter: NodePluginArgs[`reporter`]
   cache: GatsbyCache
   store: Store
 }

@@ -10,10 +10,10 @@ const DEFAULT_FLUID_WIDTH = 800
 const DEFAULT_FIXED_WIDTH = 800
 const DEFAULT_ASPECT_RATIO = 4 / 3
 
-export type Fit = "cover" | "fill" | "inside" | "outside" | "contain"
+export type Fit = `cover` | `fill` | `inside` | `outside` | `contain`
 
-export type Layout = "fixed" | "fullWidth" | "constrained"
-export type ImageFormat = "jpg" | "png" | "webp" | "avif" | "auto" | ""
+export type Layout = `fixed` | `fullWidth` | `constrained`
+export type ImageFormat = `jpg` | `png` | `webp` | `avif` | `auto` | ``
 
 /**
  * 最低限必要な reporter。gatsby-cli から import したくないためである
@@ -25,7 +25,7 @@ export interface IReporter {
 export interface ISharpGatsbyImageArgs {
   layout?: Layout
   formats?: Array<ImageFormat>
-  placeholder?: "tracedSVG" | "dominantColor" | "blurred" | "none"
+  placeholder?: `tracedSVG` | `dominantColor` | `blurred` | `none`
   tracedSVGOptions?: Record<string, unknown>
   width?: number
   height?: number
@@ -277,7 +277,7 @@ export function generateImageData(
 
   const imageSizes = calculateImageSizes({ ...args, sourceMetadata })
 
-  const result: IGatsbyImageData["images"] = {
+  const result: IGatsbyImageData[`images`] = {
     sources: [],
   }
 

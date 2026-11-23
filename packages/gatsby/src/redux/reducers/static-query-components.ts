@@ -1,9 +1,9 @@
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const staticQueryComponentsReducer = (
-  state: IGatsbyState["staticQueryComponents"] = new Map(),
+  state: IGatsbyState[`staticQueryComponents`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["staticQueryComponents"] => {
+): IGatsbyState[`staticQueryComponents`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return new Map()

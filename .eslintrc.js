@@ -117,7 +117,7 @@ module.exports = {
     {
       files: [`*.ts`, `*.tsx`],
       parser: `@typescript-eslint/parser`,
-      plugins: [`@typescript-eslint/eslint-plugin`],
+      plugins: [`@typescript-eslint/eslint-plugin`, `@stylistic`],
       extends: [`plugin:@typescript-eslint/recommended`],
       rules: {
         // We should absolutely avoid using ts-ignore, but it's not always possible.
@@ -134,15 +134,19 @@ module.exports = {
           `error`,
           { ignoreParameters: true },
         ],
-        "@typescript-eslint/ban-types": [
+        // typescript-eslint 8 で ban-types が廃止されたので、no-restricted-types で同じ型を禁止する。
+        // ban-types が既定で禁止していた型（Function、String など）は、recommended に含まれる
+        // no-unsafe-function-type、no-wrapper-object-types、no-empty-object-type が扱う
+        "@typescript-eslint/no-restricted-types": [
           `error`,
           {
-            extendDefaults: true,
             types: {
               "{}": {
+                message: `Use Record<string, unknown> instead.`,
                 fixWith: `Record<string, unknown>`,
               },
               object: {
+                message: `Use Record<string, unknown> instead.`,
                 fixWith: `Record<string, unknown>`,
               },
             },
@@ -206,6 +210,12 @@ module.exports = {
             format: [`PascalCase`],
             prefix: [`I`],
           },
+          // typescript-eslint 8 では default が import の名前にも適用されるようになった。
+          // これまでどおり import の名前は検査しない
+          {
+            selector: `import`,
+            format: null,
+          },
         ],
         // This rule tries to prevent using `require()`. However in node code,
         // there are times where this makes sense. And it specifically is causing
@@ -213,7 +223,12 @@ module.exports = {
         // mocking. At this point it's easier to have it off and just encourage
         // using top-level imports via code reviews.
         "@typescript-eslint/no-var-requires": `off`,
-        "@typescript-eslint/no-extra-semi": `off`,
+        // typescript-eslint 8 では no-var-requires の代わりに no-require-imports が recommended に入った。
+        // 上と同じ理由で無効にする
+        "@typescript-eslint/no-require-imports": `off`,
+        // typescript-eslint 8 の recommended で error になったルールを、これまでどおり warn にする
+        "@typescript-eslint/no-explicit-any": `warn`,
+        "@typescript-eslint/no-unused-vars": `warn`,
         // This rule ensures that typescript types do not have semicolons
         // at the end of their lines, since our prettier setup is to have no semicolons
         // e.g.,
@@ -221,7 +236,8 @@ module.exports = {
         // -  baz: string;
         // +  baz: string
         // }
-        "@typescript-eslint/member-delimiter-style": [
+        // typescript-eslint 8 で書式のルールが廃止されたので、@stylistic の同じルールを使う
+        "@stylistic/member-delimiter-style": [
           `error`,
           {
             multiline: {
@@ -249,7 +265,7 @@ module.exports = {
         // otherwise eslint will want to switch the strings to backticks,
         // which then crashes the ts compiler
         quotes: `off`,
-        "@typescript-eslint/quotes": [
+        "@stylistic/quotes": [
           2,
           `backtick`,
           {

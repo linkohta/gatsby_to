@@ -20,9 +20,9 @@ const initialTypeMetadata = (): { ignoredFields: Set<string> } => {
 }
 
 const incrementalReducer = (
-  state: IGatsbyState["inferenceMetadata"]["typeMap"] = {},
+  state: IGatsbyState[`inferenceMetadata`][`typeMap`] = {},
   action: ActionsUnion
-): IGatsbyState["inferenceMetadata"]["typeMap"] => {
+): IGatsbyState[`inferenceMetadata`][`typeMap`] => {
   switch (action.type) {
     case `CREATE_TYPES`: {
       const typeDefs = Array.isArray(action.payload)
@@ -118,7 +118,7 @@ enum StepsEnum {
   incrementalBuild = `incrementalBuild`,
 }
 
-const initialState = (): IGatsbyState["inferenceMetadata"] => {
+const initialState = (): IGatsbyState[`inferenceMetadata`] => {
   return {
     step: StepsEnum.initialBuild, // `initialBuild` | `incrementalBuild`
     typeMap: {},
@@ -126,9 +126,9 @@ const initialState = (): IGatsbyState["inferenceMetadata"] => {
 }
 
 export const inferenceMetadataReducer = (
-  state: IGatsbyState["inferenceMetadata"] = initialState(),
+  state: IGatsbyState[`inferenceMetadata`] = initialState(),
   action: ActionsUnion
-): IGatsbyState["inferenceMetadata"] => {
+): IGatsbyState[`inferenceMetadata`] => {
   switch (action.type) {
     case `CREATE_NODE`:
     case `DELETE_NODE`:

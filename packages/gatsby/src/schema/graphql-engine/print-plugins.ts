@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/no-unused-vars: ["error", { "ignoreRestSiblings": true }] */
+/* eslint @typescript-eslint/no-unused-vars: ["error", { "ignoreRestSiblings": true, "caughtErrors": "none" }] */
 import * as fs from "fs-extra"
 import * as path from "path"
 import * as _ from "lodash"
@@ -50,8 +50,8 @@ function relativePluginPath(resolve: string): string {
 }
 
 async function render(
-  usedPlugins: IGatsbyState["flattenedPlugins"],
-  usedSubPlugins: IGatsbyState["flattenedPlugins"]
+  usedPlugins: IGatsbyState[`flattenedPlugins`],
+  usedSubPlugins: IGatsbyState[`flattenedPlugins`]
 ): Promise<string> {
   const uniqSubPlugins = uniq(usedSubPlugins)
 
@@ -150,8 +150,8 @@ export const flattenedPlugins =
 }
 
 async function filterPluginsWithWorkers(
-  plugins: IGatsbyState["flattenedPlugins"]
-): Promise<IGatsbyState["flattenedPlugins"]> {
+  plugins: IGatsbyState[`flattenedPlugins`]
+): Promise<IGatsbyState[`flattenedPlugins`]> {
   const filteredPlugins: Array<any> = []
 
   for (const plugin of plugins) {
@@ -172,9 +172,9 @@ type ArrayElement<ArrayType extends Array<unknown>> =
   ArrayType extends Array<infer ElementType> ? ElementType : never
 
 function getSubpluginsByPluginPath(
-  parentPlugin: ArrayElement<IGatsbyState["flattenedPlugins"]>,
+  parentPlugin: ArrayElement<IGatsbyState[`flattenedPlugins`]>,
   path: string
-): IGatsbyState["flattenedPlugins"] {
+): IGatsbyState[`flattenedPlugins`] {
   const segments = path.split(`.`)
   let roots: Array<any> = [parentPlugin.pluginOptions]
 
@@ -191,14 +191,14 @@ function getSubpluginsByPluginPath(
 }
 
 function findSubPlugins(
-  plugins: IGatsbyState["flattenedPlugins"],
-  allFlattenedPlugins: IGatsbyState["flattenedPlugins"]
-): IGatsbyState["flattenedPlugins"] {
+  plugins: IGatsbyState[`flattenedPlugins`],
+  allFlattenedPlugins: IGatsbyState[`flattenedPlugins`]
+): IGatsbyState[`flattenedPlugins`] {
   const usedSubPluginResolves = new Set<string>(
     plugins
       .flatMap(plugin => {
         if (plugin.subPluginPaths) {
-          const subPlugins: IGatsbyState["flattenedPlugins"] = []
+          const subPlugins: IGatsbyState[`flattenedPlugins`] = []
           for (const subPluginPath of plugin.subPluginPaths) {
             subPlugins.push(...getSubpluginsByPluginPath(plugin, subPluginPath))
           }
@@ -216,7 +216,7 @@ function findSubPlugins(
 }
 
 function uniq(
-  plugins: IGatsbyState["flattenedPlugins"]
-): IGatsbyState["flattenedPlugins"] {
+  plugins: IGatsbyState[`flattenedPlugins`]
+): IGatsbyState[`flattenedPlugins`] {
   return Array.from(new Map(plugins.map(p => [p.resolve, p])).values())
 }

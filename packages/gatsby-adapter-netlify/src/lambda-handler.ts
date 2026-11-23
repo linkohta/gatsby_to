@@ -9,7 +9,7 @@ interface INetlifyFunctionConfig {
   includedFiles?: Array<string>
   includedFilesBasePath?: string
   ignoredNodeModules?: Array<string>
-  nodeBundler?: "esbuild" | "esbuild_zisi" | "nft" | "zisi" | "none"
+  nodeBundler?: `esbuild` | `esbuild_zisi` | `nft` | `zisi` | `none`
   nodeSourcemap?: boolean
   nodeVersion?: string
   processDynamicNodeImports?: boolean
@@ -18,7 +18,7 @@ interface INetlifyFunctionConfig {
   zipGo?: boolean
   name?: string
   generator?: string
-  nodeModuleFormat?: "cjs" | "esm"
+  nodeModuleFormat?: `cjs` | `esm`
 }
 
 interface INetlifyFunctionManifest {

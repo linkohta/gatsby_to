@@ -15,7 +15,7 @@ const FLAG_DIRTY_SSR_COMPILATION_HASH = 0b1000000
 
 type PagePath = string
 
-function initialState(): IGatsbyState["html"] {
+function initialState(): IGatsbyState[`html`] {
   return {
     trackedHtmlFiles: new Map<PagePath, IHtmlFileState>(),
     slicesProps: {
@@ -33,9 +33,9 @@ function initialState(): IGatsbyState["html"] {
 }
 
 export function htmlReducer(
-  state: IGatsbyState["html"] = initialState(),
+  state: IGatsbyState[`html`] = initialState(),
   action: ActionsUnion
-): IGatsbyState["html"] {
+): IGatsbyState[`html`] {
   switch (action.type) {
     case `DELETE_CACHE`: {
       if (action.cacheIsCorrupt) {

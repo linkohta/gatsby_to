@@ -12,7 +12,7 @@ import { createIntersectionObserver } from "./intersection-observer"
 import type { MainImageProps } from "./main-image"
 import type { GatsbyImageProps } from "./gatsby-image.browser"
 
-type LazyHydrateProps = Omit<GatsbyImageProps, "as" | "style" | "className"> & {
+type LazyHydrateProps = Omit<GatsbyImageProps, `as` | `style` | `className`> & {
   isLoading: boolean
   isLoaded: boolean
 }
@@ -42,9 +42,9 @@ function startLoading(
   element: HTMLElement,
   cacheKey: string,
   imageCache: Set<string>,
-  onStartLoad: GatsbyImageProps["onStartLoad"],
-  onLoad: GatsbyImageProps["onLoad"],
-  onError: GatsbyImageProps["onError"]
+  onStartLoad: GatsbyImageProps[`onStartLoad`],
+  onLoad: GatsbyImageProps[`onLoad`],
+  onError: GatsbyImageProps[`onError`]
 ): () => void {
   const mainImage = element.querySelector(
     `[data-main-image]`
@@ -127,9 +127,9 @@ export function swapPlaceholderImage(
   cacheKey: string,
   imageCache: Set<string>,
   style: React.CSSProperties,
-  onStartLoad: GatsbyImageProps["onStartLoad"],
-  onLoad: GatsbyImageProps["onLoad"],
-  onError: GatsbyImageProps["onError"]
+  onStartLoad: GatsbyImageProps[`onStartLoad`],
+  onLoad: GatsbyImageProps[`onLoad`],
+  onError: GatsbyImageProps[`onError`]
 ): () => void {
   if (!hasNativeLazyLoadSupport()) {
     let cleanup
@@ -217,7 +217,7 @@ export function renderImageToString({
       <MainImage
         {...(props as Omit<
           MainImageProps,
-          "images" | "fallback" | "onLoad" | "onError"
+          `images` | `fallback` | `onLoad` | `onError`
         >)}
         width={width}
         height={height}

@@ -2,7 +2,7 @@ import _ from "lodash"
 import semver from "semver"
 
 // この実験的機能がビルドでだけ動くか
-type executingCommand = "build" | "develop" | "all"
+type executingCommand = `build` | `develop` | `all`
 
 export const satisfiesSemvers = (
   semverConstraints: Record<string, string>
@@ -28,7 +28,7 @@ export const satisfiesSemvers = (
   return result
 }
 
-export type fitnessEnum = true | false | "OPT_IN" | "LOCKED_IN"
+export type fitnessEnum = true | false | `OPT_IN` | `LOCKED_IN`
 
 export interface IFlag {
   name: string

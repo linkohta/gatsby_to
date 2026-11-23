@@ -13,8 +13,8 @@ import { cachedImport, createFileToMdxCacheKey } from "./cache-helpers"
 export async function compileMDX(
   { absolutePath, source }: { absolutePath: string; source: string | Buffer },
   options: ProcessorOptions,
-  cache: NodePluginArgs["cache"],
-  reporter: NodePluginArgs["reporter"]
+  cache: NodePluginArgs[`cache`],
+  reporter: NodePluginArgs[`reporter`]
 ): Promise<{ processedMDX: string; metadata: IMdxMetadata } | null> {
   try {
     const { createProcessor } =
@@ -74,12 +74,12 @@ export const compileMDXWithCustomOptions = async (
   }: {
     pluginOptions: PluginOptions
     customOptions: Partial<IMdxPluginOptions>
-    getNode: NodePluginArgs["getNode"]
-    getNodesByType: NodePluginArgs["getNodesByType"]
+    getNode: NodePluginArgs[`getNode`]
+    getNodesByType: NodePluginArgs[`getNodesByType`]
     pathPrefix: string
-    reporter: NodePluginArgs["reporter"]
-    cache: NodePluginArgs["cache"]
-    store: NodePluginArgs["store"]
+    reporter: NodePluginArgs[`reporter`]
+    cache: NodePluginArgs[`cache`]
+    store: NodePluginArgs[`store`]
   }
 ): Promise<{
   processedMDX: string

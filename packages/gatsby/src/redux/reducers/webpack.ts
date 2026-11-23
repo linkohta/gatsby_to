@@ -2,9 +2,9 @@ import merge from "webpack-merge"
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const webpackReducer = (
-  state: IGatsbyState["webpack"] = {},
+  state: IGatsbyState[`webpack`] = {},
   action: ActionsUnion
-): IGatsbyState["webpack"] => {
+): IGatsbyState[`webpack`] => {
   switch (action.type) {
     case `SET_WEBPACK_CONFIG`: {
       const nextConfig = action.payload

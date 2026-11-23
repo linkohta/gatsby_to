@@ -7,7 +7,7 @@ import { GatsbyCLIStore } from "../"
 jest.useFakeTimers()
 
 describe(`setStatus action creator`, () => {
-  let mockStatus: ActivityStatuses | "" = ``
+  let mockStatus: ActivityStatuses | `` = ``
   let setStatus
 
   const dispatchMockFn: Dispatch<ISetStatus> = <T extends ISetStatus>(
@@ -20,7 +20,7 @@ describe(`setStatus action creator`, () => {
   const dispatch = jest.fn(dispatchMockFn)
 
   const setStatusWithDispatch = <T extends ISetStatus>(
-    status: ActivityStatuses | ""
+    status: ActivityStatuses | ``
   ): T => setStatus(status)(dispatch)
 
   beforeAll(async () => {

@@ -2,7 +2,7 @@ import { match } from "@gatsbyjs/reach-router"
 import type { IHeader } from "../../redux/types"
 import { rankRoute } from "../rank-route"
 
-type Headers = IHeader["headers"]
+type Headers = IHeader[`headers`]
 interface IHeaderWithScore extends IHeader {
   score: number
 }

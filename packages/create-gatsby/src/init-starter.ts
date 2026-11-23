@@ -5,7 +5,7 @@ import path from "path"
 import { reporter } from "./utils/reporter"
 import { spin } from "tiny-spin"
 import { getConfigStore } from "./utils/get-config-store"
-type PackageManager = "yarn" | "npm"
+type PackageManager = `yarn` | `npm`
 import colors from "ansi-colors"
 import { clearLine } from "./utils/clear-line"
 

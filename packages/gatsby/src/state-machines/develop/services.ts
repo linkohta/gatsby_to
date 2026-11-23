@@ -15,7 +15,7 @@ import { queryRunningMachine } from "../query-running"
 import { waitingMachine } from "../waiting"
 import { MachineOptions } from "xstate"
 
-export const developServices: MachineOptions<IBuildContext, any>["services"] = {
+export const developServices: MachineOptions<IBuildContext, any>[`services`] = {
   initializeData: initializeDataMachine,
   reloadData: reloadDataMachine,
   recreatePages: recreatePagesMachine,

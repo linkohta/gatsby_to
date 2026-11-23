@@ -5,9 +5,9 @@ import moment from "moment"
 import { IGatsbyState, ActionsUnion } from "../types"
 
 export const jobsReducer = (
-  state: IGatsbyState["jobs"] = { active: [], done: [] },
+  state: IGatsbyState[`jobs`] = { active: [], done: [] },
   action: ActionsUnion
-): IGatsbyState["jobs"] => {
+): IGatsbyState[`jobs`] => {
   switch (action.type) {
     case `CREATE_JOB`:
     case `SET_JOB`: {

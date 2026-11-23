@@ -1,4 +1,4 @@
-type SYMBOLS = " " | "D" | "∞" | "λ"
+type SYMBOLS = ` ` | `D` | `∞` | `λ`
 
 export interface IComponentWithPageModes {
   SSG: Set<string>

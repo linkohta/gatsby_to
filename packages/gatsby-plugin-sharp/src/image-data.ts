@@ -19,7 +19,7 @@ const DOMINANT_COLOR_IMAGE_SIZE = 200
 
 const DEFAULT_BREAKPOINTS = [750, 1080, 1366, 1920]
 
-type ImageFormat = "jpg" | "png" | "webp" | "avif" | "" | "auto"
+type ImageFormat = `jpg` | `png` | `webp` | `avif` | `` | `auto`
 
 export type FileNode = Node & {
   absolutePath: string
@@ -302,9 +302,9 @@ export async function generateImageData({
   }
   const imageProps: Pick<
     IGatsbyImageData,
-    "backgroundColor" | "layout" | "placeholder" | "images"
+    `backgroundColor` | `layout` | `placeholder` | `images`
   > &
-    Partial<Pick<IGatsbyImageData, "width" | "height">> = {
+    Partial<Pick<IGatsbyImageData, `width` | `height`>> = {
     layout,
     placeholder: undefined,
     backgroundColor,

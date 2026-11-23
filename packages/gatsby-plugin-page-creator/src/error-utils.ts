@@ -83,4 +83,4 @@ export const ERROR_MAP = {
     type: `PLUGIN`,
     category: `SYSTEM`,
   },
-} as Reporter["errorMap"]
+} as Reporter[`errorMap`]

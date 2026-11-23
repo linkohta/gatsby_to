@@ -18,8 +18,8 @@ export function watchImage({
 }: {
   fullPath: string
   pathPrefix: string
-  createNodeId: ParentSpanPluginArgs["createNodeId"]
-  createNode: Actions["createNode"]
+  createNodeId: ParentSpanPluginArgs[`createNodeId`]
+  createNode: Actions[`createNode`]
   cache: GatsbyCache
   reporter: Reporter
 }): void {

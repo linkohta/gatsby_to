@@ -122,13 +122,13 @@ export async function mergeWorkerState(
       [`queries`, `telemetry`],
       String(workerId)
     )
-    const queryStateChunk = state.queries as IGatsbyState["queries"]
+    const queryStateChunk = state.queries as IGatsbyState[`queries`]
     const queryStateTelemetryChunk =
-      state.telemetry as IGatsbyState["telemetry"]
+      state.telemetry as IGatsbyState[`telemetry`]
 
     const payload: {
-      queryStateChunk?: IGatsbyState["queries"]
-      queryStateTelemetryChunk?: IGatsbyState["telemetry"]
+      queryStateChunk?: IGatsbyState[`queries`]
+      queryStateTelemetryChunk?: IGatsbyState[`telemetry`]
     } = {}
 
     if (queryStateChunk) {

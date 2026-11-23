@@ -3,7 +3,7 @@ import _ from "lodash"
 import { IGatsbyState, ActionsUnion, IPlugin } from "../types"
 
 export const babelrcReducer = (
-  state: IGatsbyState["babelrc"] = {
+  state: IGatsbyState[`babelrc`] = {
     stages: {
       develop: {
         plugins: [],
@@ -40,7 +40,7 @@ export const babelrcReducer = (
     },
   },
   action: ActionsUnion
-): IGatsbyState["babelrc"] => {
+): IGatsbyState[`babelrc`] => {
   switch (action.type) {
     case `SET_BABEL_PLUGIN`: {
       Object.keys(state.stages).forEach(stage => {

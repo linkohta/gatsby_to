@@ -2,9 +2,9 @@ import merge from "lodash/merge"
 import { IGatsbyState, ActionsUnion } from "../types"
 
 export const resolvedNodesCacheReducer = (
-  state: IGatsbyState["resolvedNodesCache"] = new Map(),
+  state: IGatsbyState[`resolvedNodesCache`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["resolvedNodesCache"] => {
+): IGatsbyState[`resolvedNodesCache`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
     case `CREATE_NODE`:

@@ -43,16 +43,16 @@ interface ISourceMetadata {
 
 type IGatsbyImageDataArgs = Omit<
   CalculateImageSizesArgs,
-  "fit" | "outputPixelDensities"
+  `fit` | `outputPixelDensities`
 > & {
   formats?: Array<ImageFormat>
   backgroundColor?: string
-  placeholder?: PlaceholderType | "none"
+  placeholder?: PlaceholderType | `none`
   aspectRatio?: number
   sizes?: string
   cropFocus?: Array<ImageCropFocus>
-  fit?: CalculateImageSizesArgs["fit"]
-  outputPixelDensities?: CalculateImageSizesArgs["outputPixelDensities"]
+  fit?: CalculateImageSizesArgs[`fit`]
+  outputPixelDensities?: CalculateImageSizesArgs[`outputPixelDensities`]
   quality?: number
 }
 
@@ -156,7 +156,7 @@ export async function gatsbyImageResolver(
     imageSizes.presentationWidth
   )
   const result: Partial<IGatsbyImageData> & {
-    sources: IGatsbyImageData["sources"]
+    sources: IGatsbyImageData[`sources`]
   } = {
     sources: [],
     fallback: undefined,
@@ -472,7 +472,7 @@ function calculateFixedImageSizes({
   fit = `cover`,
   outputPixelDensities,
   aspectRatio: requestedAspectRatio,
-}: Omit<ImageSizeArgs, "layout" | "breakpoints">): IImageSizes {
+}: Omit<ImageSizeArgs, `layout` | `breakpoints`>): IImageSizes {
   let aspectRatio
   if (requestedAspectRatio) {
     aspectRatio = requestedAspectRatio

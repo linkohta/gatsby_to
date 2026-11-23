@@ -9,8 +9,8 @@ import { ISharpGatsbyImageArgs } from "../image-utils"
 
 export interface IStaticImageProps
   extends
-    Omit<GatsbyImageProps, "image">,
-    Omit<ISharpGatsbyImageArgs, "backgroundColor"> {
+    Omit<GatsbyImageProps, `image`>,
+    Omit<ISharpGatsbyImageArgs, `backgroundColor`> {
   src: string
   filename?: string
 }

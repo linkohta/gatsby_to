@@ -52,14 +52,14 @@ export interface IGatsbyGraphQLResolverArgumentConfig<TValue = any> {
 }
 export type IGatsbyImageResolverArgs = Pick<
   ISharpGatsbyImageArgs & IImageSizeArgs,
-  | "aspectRatio"
-  | "backgroundColor"
-  | "breakpoints"
-  | "height"
-  | "layout"
-  | "outputPixelDensities"
-  | "sizes"
-  | "width"
+  | `aspectRatio`
+  | `backgroundColor`
+  | `breakpoints`
+  | `height`
+  | `layout`
+  | `outputPixelDensities`
+  | `sizes`
+  | `width`
 >
 
 export function getGatsbyImageResolver<TSource, TContext, TArgs>(
@@ -142,16 +142,16 @@ export function getGatsbyImageResolver<TSource, TContext, TArgs>(
 
 export type IGatsbyImageFieldArgs = Pick<
   ISharpGatsbyImageArgs & IImageSizeArgs,
-  | "aspectRatio"
-  | "backgroundColor"
-  | "breakpoints"
-  | "formats"
-  | "height"
-  | "layout"
-  | "outputPixelDensities"
-  | "placeholder"
-  | "sizes"
-  | "width"
+  | `aspectRatio`
+  | `backgroundColor`
+  | `breakpoints`
+  | `formats`
+  | `height`
+  | `layout`
+  | `outputPixelDensities`
+  | `placeholder`
+  | `sizes`
+  | `width`
 >
 
 export function getGatsbyImageFieldConfig<TSource, TContext, TArgs>(

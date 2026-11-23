@@ -13,7 +13,7 @@ import { getResolvedFields } from "../../schema/utils"
 // 対応している演算子だけをここに列挙する。"CacheableFilterOp"
 // TODO: DbComparator と統合するか
 export type FilterOp =
-  "$eq" | "$ne" | "$lt" | "$lte" | "$gt" | "$gte" | "$in" | "$nin" | "$regex" // 注: これは $glob を含む
+  `$eq` | `$ne` | `$lt` | `$lte` | `$gt` | `$gte` | `$in` | `$nin` | `$regex` // 注: これは $glob を含む
 
 export type FilterCacheKey = string
 type GatsbyNodeID = string

@@ -82,7 +82,7 @@ function normalizePagePath(path: string): string {
   return path.endsWith(`/`) ? path.slice(0, -1) : path
 }
 
-type PageGenerationAction = "delete" | "regenerate" | "reuse"
+type PageGenerationAction = `delete` | `regenerate` | `reuse`
 const pageGenerationActionPriority: Record<PageGenerationAction, number> = {
   // 数値が大きいほど優先度が高い
   regenerate: 2,

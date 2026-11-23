@@ -33,7 +33,7 @@ let renderImage: typeof renderImageToString | undefined
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface GatsbyImageProps extends Omit<
   ImgHTMLAttributes<HTMLImageElement>,
-  "placeholder" | "onLoad" | "src" | "srcSet" | "width" | "height"
+  `placeholder` | `onLoad` | `src` | `srcSet` | `width` | `height`
 > {
   alt: string
   as?: ElementType
@@ -43,8 +43,8 @@ export interface GatsbyImageProps extends Omit<
   image: IGatsbyImageData
   imgStyle?: CSSProperties
   backgroundColor?: string
-  objectFit?: CSSProperties["objectFit"]
-  objectPosition?: CSSProperties["objectPosition"]
+  objectFit?: CSSProperties[`objectFit`]
+  objectPosition?: CSSProperties[`objectPosition`]
   onLoad?: (props: { wasCached: boolean }) => void
   onError?: ReactEventHandler<HTMLImageElement>
   onStartLoad?: (props: { wasCached: boolean }) => void
@@ -55,8 +55,8 @@ export interface IGatsbyImageData {
   width: number
   height: number
   backgroundColor?: string
-  images: Pick<MainImageProps, "sources" | "fallback">
-  placeholder?: Pick<PlaceholderProps, "sources" | "fallback">
+  images: Pick<MainImageProps, `sources` | `fallback`>
+  placeholder?: Pick<PlaceholderProps, `sources` | `fallback`>
 }
 
 const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({

@@ -11,8 +11,8 @@ import {
 import { isDesc } from "./common"
 
 interface ISelectIndexArgs {
-  filter: IRunQueryArgs["queryArgs"]["filter"]
-  sort: IRunQueryArgs["queryArgs"]["sort"]
+  filter: IRunQueryArgs[`queryArgs`][`filter`]
+  sort: IRunQueryArgs[`queryArgs`][`sort`]
   maxFields?: number
 }
 
@@ -88,7 +88,7 @@ function getQueriesThatCanUseIndex(all: Array<DbQuery>): Array<DbQuery> {
 }
 
 function getSortFieldsThatCanUseIndex(
-  querySortArg: IRunQueryArgs["queryArgs"]["sort"]
+  querySortArg: IRunQueryArgs[`queryArgs`][`sort`]
 ): Array<IndexField> {
   const sort = querySortArg || { fields: [], order: [] }
   const initialOrder = isDesc(sort?.order[0]) ? -1 : 1

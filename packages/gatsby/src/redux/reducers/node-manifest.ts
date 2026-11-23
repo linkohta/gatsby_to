@@ -10,9 +10,9 @@ const ONE_DAY = 1000 * 60 * 60 * 24 // ms * sec * min * hr.
 const DEFAULT_MAX_DAYS_OLD = 30
 
 export const nodeManifestReducer = (
-  state: IGatsbyState["nodeManifests"] = [],
+  state: IGatsbyState[`nodeManifests`] = [],
   action: ICreateNodeManifest | IDeleteNodeManifests
-): IGatsbyState["nodeManifests"] => {
+): IGatsbyState[`nodeManifests`] => {
   switch (action.type) {
     case `CREATE_NODE_MANIFEST`: {
       const { manifestId, pluginName, node, updatedAtUTC } = action.payload

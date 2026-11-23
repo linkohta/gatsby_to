@@ -1,7 +1,7 @@
 import { suggestIndex } from "../suggest-index"
 import { IRunQueryArgs } from "../../../types"
 
-type Sort = IRunQueryArgs["queryArgs"]["sort"]
+type Sort = IRunQueryArgs[`queryArgs`][`sort`]
 
 describe(`suggestIndex`, () => {
   describe(`filter: yes; sort: no`, () => {
@@ -93,7 +93,7 @@ describe(`suggestIndex`, () => {
       [[`desc`], -1],
       [[`DESC`], -1],
       [[false], -1],
-    ] as Array<[Sort["order"], number]>)(
+    ] as Array<[Sort[`order`], number]>)(
       `supports sort order defined as %p`,
       (order, expected) => {
         const sort = { fields: [`a`], order }

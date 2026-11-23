@@ -4,7 +4,7 @@ import { IPluginOptions } from "./gatsby-api"
 import { createModel } from "@rematch/core"
 import { IRootModel } from "."
 
-type ITimerReporter = ReturnType<Reporter["activityTimer"]>
+type ITimerReporter = ReturnType<Reporter[`activityTimer`]>
 
 export interface ILoggerState {
   entityCount: number

@@ -43,7 +43,7 @@ function replaceUnifiedRoutesKeys(
 const chunkNameCache = new Map()
 export function generateComponentChunkName(
   componentPath: string,
-  kind: "component" | "slice" = `component`
+  kind: `component` | `slice` = `component`
 ): string {
   if (chunkNameCache.has(componentPath)) {
     return chunkNameCache.get(componentPath)

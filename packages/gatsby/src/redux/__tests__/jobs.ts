@@ -89,7 +89,7 @@ describe(`Job actions/reducer`, () => {
   })
 
   it(`throws an error if endJob is called for a job that's already ended`, done => {
-    function runReducer(): IGatsbyState["jobs"] {
+    function runReducer(): IGatsbyState[`jobs`] {
       let state = jobsReducer(undefined, actions.createJob({ id: `test job` }))
       state = jobsReducer(state, actions.endJob({ id: `test job` }))
       state = jobsReducer(

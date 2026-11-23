@@ -16,7 +16,7 @@ import { cachedImport, createFileToMdxCacheKey } from "./cache-helpers"
 /**
  * Gatsby のレイアウトコンポーネントの利用を含め、MDX ファイルへの対応を追加する
  */
-export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] =
+export const onCreateWebpackConfig: GatsbyNode[`onCreateWebpackConfig`] =
   async (
     {
       actions,
@@ -97,7 +97,7 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] =
  * MDX の拡張子を解決可能なものとして追加する。page creator はこれをもとに、
  * pages/ ディレクトリのどのファイルをページとしてビルドするかを決める。
  */
-export const resolvableExtensions: GatsbyNode["resolvableExtensions"] = (
+export const resolvableExtensions: GatsbyNode[`resolvableExtensions`] = (
   _data,
   pluginOptions
 ) => defaultOptions(pluginOptions).extensions
@@ -105,7 +105,7 @@ export const resolvableExtensions: GatsbyNode["resolvableExtensions"] = (
 /**
  * Gatsby が GraphQL クエリを抽出してページをレンダリングできるよう、MDX を JSX に変換する。
  */
-export const preprocessSource: GatsbyNode["preprocessSource"] = async (
+export const preprocessSource: GatsbyNode[`preprocessSource`] = async (
   { filename, getNode, getNodesByType, pathPrefix, reporter, cache, store },
   pluginOptions
 ) => {
@@ -150,7 +150,7 @@ export const preprocessSource: GatsbyNode["preprocessSource"] = async (
   return compileRes.processedMDX.toString()
 }
 
-export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] =
+export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] =
   async (
     {
       getNode,
@@ -282,7 +282,7 @@ export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] 
   }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export const shouldOnCreateNode: GatsbyNode["shouldOnCreateNode"] = (
+export const shouldOnCreateNode: GatsbyNode[`shouldOnCreateNode`] = (
   { node }: { node: FileSystemNode },
   pluginOptions
 ) => {
@@ -293,7 +293,7 @@ export const shouldOnCreateNode: GatsbyNode["shouldOnCreateNode"] = (
 /**
  * MDX ファイルから Mdx ノードを作成する。
  */
-export const onCreateNode: GatsbyNode<FileSystemNode>["onCreateNode"] = async ({
+export const onCreateNode: GatsbyNode<FileSystemNode>[`onCreateNode`] = async ({
   node,
   loadNodeContent,
   actions: { createNode, createParentChildLink },
@@ -327,7 +327,7 @@ export const onCreateNode: GatsbyNode<FileSystemNode>["onCreateNode"] = async ({
 /**
  * MDX ページのページコンテキストとして frontmatter を追加する
  */
-export const onCreatePage: GatsbyNode["onCreatePage"] = async (
+export const onCreatePage: GatsbyNode[`onCreatePage`] = async (
   { page, actions, getNodesByType },
   pluginOptions
 ) => {
@@ -368,7 +368,7 @@ export const onCreatePage: GatsbyNode["onCreatePage"] = async (
   }
 }
 
-export const onPluginInit: GatsbyNode["onPluginInit"] = ({ reporter }) => {
+export const onPluginInit: GatsbyNode[`onPluginInit`] = ({ reporter }) => {
   // @ts-ignore - We only expose this type from gatsby-cli and we don't want to import from there
   reporter.setErrorMap(ERROR_MAP)
 }
@@ -376,7 +376,7 @@ export const onPluginInit: GatsbyNode["onPluginInit"] = ({ reporter }) => {
 /**
  * プラグインオプションの検証
  */
-export const pluginOptionsSchema: GatsbyNode["pluginOptionsSchema"] = ({
+export const pluginOptionsSchema: GatsbyNode[`pluginOptionsSchema`] = ({
   Joi,
 }) =>
   Joi.object({
