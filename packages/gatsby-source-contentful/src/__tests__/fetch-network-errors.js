@@ -61,7 +61,9 @@ describe(`fetch-retry`, () => {
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )
       .times(1)
-      .replyWithError({ code: `ETIMEDOUT` })
+      .replyWithError(
+        Object.assign(new Error(`ETIMEDOUT`), { code: `ETIMEDOUT` })
+      )
       .get(
         `/spaces/${options.spaceId}/environments/master/sync?initial=true&limit=1000`
       )
@@ -124,7 +126,9 @@ describe(`fetch-network-errors`, () => {
     const scope = nock(baseURI)
       // スペース
       .get(`/spaces/${options.spaceId}/`)
-      .replyWithError({ code: `ECONNRESET` })
+      .replyWithError(
+        Object.assign(new Error(`ECONNRESET`), { code: `ECONNRESET` })
+      )
     try {
       await fetchContent({
         pluginConfig: createPluginConfig({
