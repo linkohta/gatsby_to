@@ -1,6 +1,6 @@
 const assert = require(`assert`)
 const fs = require(`fs`)
-const removeDir = require(`rimraf`)
+const { rimraf: removeDir } = require(`rimraf`)
 const store = require(`../cache-fs.ts`)
 const cacheDirectory = __dirname + `/cache`
 
@@ -12,16 +12,12 @@ describe(`DiskStore`, function () {
   let cache
   // 各テストの前にテスト用のディレクトリを削除する
   beforeEach(async function () {
-    return new Promise(resolve => {
-      removeDir(cacheDirectory, () => {
-        cache = store.create({ path: cacheDirectory })
-        resolve()
-      })
-    })
+    await removeDir(cacheDirectory)
+    cache = store.create({ path: cacheDirectory })
   })
   // 最後のテストの後にテスト用のディレクトリを削除する
   afterEach(async function () {
-    return new Promise(resolve => removeDir(cacheDirectory, resolve))
+    await removeDir(cacheDirectory)
   })
 
   describe(`construction`, function () {
