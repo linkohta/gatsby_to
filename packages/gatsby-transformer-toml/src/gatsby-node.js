@@ -8,6 +8,21 @@ function shouldOnCreateNode({ node }) {
   return node.extension === `toml`
 }
 
+// toml 5 は、テーブルをプロトタイプのないオブジェクト（`Object.create(null)`）で返す。
+// ノードのフィールドは通常のオブジェクトであることを前提に扱われるため、
+// これまでと同じ通常のオブジェクトに作り直す。
+function toPlainObjects(value) {
+  if (Array.isArray(value)) {
+    return value.map(toPlainObjects)
+  }
+
+  if (_.isPlainObject(value)) {
+    return _.mapValues({ ...value }, toPlainObjects)
+  }
+
+  return value
+}
+
 async function onCreateNode({
   node,
   actions,
@@ -20,7 +35,7 @@ async function onCreateNode({
   // TOML の内容を読み込む
   const content = await loadNodeContent(node)
   // パースする
-  const parsedContent = toml.parse(content)
+  const parsedContent = toPlainObjects(toml.parse(content))
 
   // このバージョンには次の問題がある:
   // 1) TOML ファイルが増えるほど型が増える
