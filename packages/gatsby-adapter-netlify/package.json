@@ -35,8 +35,8 @@
     "@netlify/cache-utils": "^6.0.4",
     "@netlify/config": "^24.4.0",
     "cookie": "^0.6.0",
-    "fastq": "^1.15.0",
-    "fs-extra": "^11.2.0",
+    "fastq": "^1.20.3",
+    "fs-extra": "^11.4.1",
     "gatsby-core-utils": "^4.17.0-next.0"
   },
   "devDependencies": {
@@ -45,7 +45,7 @@
     "@netlify/edge-functions": "^2.2.0",
     "babel-preset-gatsby-package": "^3.17.0-next.0",
     "cross-env": "^10.1.0",
-    "memfs": "^4.6.0",
+    "memfs": "^4.80.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.9.3"
   },

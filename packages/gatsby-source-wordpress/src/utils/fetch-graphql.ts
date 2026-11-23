@@ -482,7 +482,8 @@ ${slackChannelSupportMessage}`
   }
 
   const responseReturnedHtml =
-    !!response?.headers[`content-type`].includes(`text/html;`)
+    !!response &&
+    (response.headers[`content-type`] as string).includes(`text/html;`)
   const limit = pluginOptions?.schema?.requestConcurrency
 
   if (responseReturnedHtml && isFirstRequest) {
@@ -506,7 +507,8 @@ ${slackChannelSupportMessage}`
           requestOptions
         )
 
-      const contentType = response?.headers[`content-type`]
+      const contentType = response?.headers[`content-type`] as
+        string | undefined
 
       if (contentType?.includes(`application/json;`)) {
         const docsLink = `https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-source-wordpress/docs/plugin-options.md#url-string`
@@ -780,7 +782,7 @@ const fetchGraphql = async ({
       throw new Error(`GraphQL request was redirected to ${responsePath}`)
     }
 
-    const contentType: string = response.headers[`content-type`]
+    const contentType: string = response.headers[`content-type`] as string
 
     if (!contentType.includes(`application/json;`)) {
       throw new Error(`Unable to connect to WPGraphQL.`)

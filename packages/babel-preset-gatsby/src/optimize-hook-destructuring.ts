@@ -21,7 +21,7 @@ export default function ({
 }: {
   types: typeof BabelTypes
 }): PluginObj<Program> {
-  const visitor: Visitor = {
+  const visitor: Visitor<IState> = {
     CallExpression(path, state: IState): void {
       const onlyBuiltIns = state.opts?.onlyBuiltIns || false
 
