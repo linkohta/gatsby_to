@@ -1,4 +1,6 @@
-const yargs = require(`yargs`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const yargs = require(`yargs`)(hideBin(process.argv))
 const { getAllPackageNames, regenerateChangelog, updateChangelog } = require(
   `./generate`
 )

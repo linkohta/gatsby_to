@@ -351,10 +351,10 @@ describe(`worker (queries)`, () => {
       expect(action.payload).toContainKeys(expectedActionShapes[action.type])
     }
     // 重要なアクションが実際に含まれていることを念のため確認する
-    expect(result).toContainValue(
+    expect(result).toContainEqual(
       expect.objectContaining({ type: `QUERY_START` })
     )
-    expect(result).toContainValue(
+    expect(result).toContainEqual(
       expect.objectContaining({ type: `PAGE_QUERY_RUN` })
     )
   })
@@ -435,6 +435,6 @@ describe(`worker (queries)`, () => {
     await runQueriesInWorkersQueue(worker, queryIdsSmall)
     emitter.off(`*`, listenActions)
 
-    expect(actualActions).toContainAllValues(expectedActions)
+    expect(actualActions).toIncludeSameMembers(expectedActions)
   })
 })

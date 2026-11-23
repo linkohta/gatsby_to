@@ -1,7 +1,10 @@
 const ignore = require(`ignore`)
 const fs = require(`fs-extra`)
-const yargs = require(`yargs`)
-const chalk = require(`chalk`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const yargs = require(`yargs`)(hideBin(process.argv))
+// chalk 5 以降は ESM のみで、require すると default に chalk が入ったモジュールが返る
+const { default: chalk } = require(`chalk`)
 const collectUpdates = require(`@lerna/collect-updates`)
 const PackageGraph = require(`@lerna/package-graph`)
 const Project = require(`@lerna/project`)

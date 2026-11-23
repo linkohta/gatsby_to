@@ -14,7 +14,9 @@
  */
 const path = require(`path`)
 const { spawn, execSync } = require(`child_process`)
-const yargs = require(`yargs`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const yargs = require(`yargs`)(hideBin(process.argv))
 const glob = require(`glob`)
 
 const gatsbyPKG = require(`../packages/gatsby/package.json`)

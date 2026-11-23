@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // const util = require(`util`)
 // const exec = util.promisify(require(`child_process`).exec)
-const argv = require(`yargs`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const argv = require(`yargs`)(hideBin(process.argv))
   .command(`$0`, `Add new owner to gatsby packages`, {
     user: {
       default: `@gatsbyjs:ink-team`,

@@ -2,7 +2,9 @@
 const path = require(`path`)
 const fs = require(`fs`)
 const { getPackages } = require(`@lerna/project`)
-const yargs = require(`yargs`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const yargs = require(`yargs`)(hideBin(process.argv))
 const _ = require(`lodash`)
 
 const GIT_REPO_URL = `https://github.com/gatsbyjs/gatsby`
