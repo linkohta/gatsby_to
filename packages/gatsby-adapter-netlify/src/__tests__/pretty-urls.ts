@@ -6,7 +6,24 @@ import {
   normalizeDynamicRoutePath,
 } from "../pretty-urls"
 
-jest.mock(`fs`, () => jest.requireActual(`memfs`).fs)
+jest.mock(`fs`, () => {
+  const { fs } = jest.requireActual(`memfs`)
+  // memfs は `ReadStream` などを、シンボルのプロパティを参照するゲッターとして定義している。
+  // `fs-extra` が使う graceful-fs は `fs` を複製するときにシンボルのプロパティを写さないため、
+  // 複製先でゲッターが失敗する。そこで、ゲッターを通常の値のプロパティに置き換えておく。
+  const descriptors = Object.getOwnPropertyDescriptors(fs)
+  for (const [name, descriptor] of Object.entries(descriptors)) {
+    if (descriptor.get) {
+      Object.defineProperty(fs, name, {
+        value: fs[name],
+        writable: true,
+        enumerable: true,
+        configurable: true,
+      })
+    }
+  }
+  return fs
+})
 
 describe(`generatePrettyUrlFilePath`, () => {
   it(`/`, () => {
@@ -51,14 +68,11 @@ describe(`createStaticAssetsPathHandler`, () => {
     const copySpy = jest.spyOn(fse, `copy`)
     const moveSpy = jest.spyOn(fse, `move`)
 
-    vol.fromJSON(
-      {
-        "public/index.html": `index`,
-        "public/_gatsby/slices/slice-1.html": `slice`,
-        "public/index.css": `body {}`,
-      },
-      process.cwd()
-    )
+    vol.fromJSON({
+      "public/index.html": `index`,
+      "public/_gatsby/slices/slice-1.html": `slice`,
+      "public/index.css": `body {}`,
+    })
 
     const { ensureStaticAssetPath, fileMovingDone } =
       createStaticAssetsPathHandler()
@@ -78,7 +92,7 @@ describe(`createStaticAssetsPathHandler`, () => {
 
   describe(`moves or copies file if filepath is incorrect for given route`, () => {
     it(`removes trailing slash`, async () => {
-      vol.fromJSON({ "public/foo/index.html": `foo` }, process.cwd())
+      vol.fromJSON({ "public/foo/index.html": `foo` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -95,7 +109,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`adds path prefix`, async () => {
-      vol.fromJSON({ "public/foo/index.html": `foo` }, process.cwd())
+      vol.fromJSON({ "public/foo/index.html": `foo` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -112,7 +126,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`adds path prefix and removes trailing slash`, async () => {
-      vol.fromJSON({ "public/foo/index.html": `foo` }, process.cwd())
+      vol.fromJSON({ "public/foo/index.html": `foo` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -129,7 +143,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`handles non html assets for path prefix`, async () => {
-      vol.fromJSON({ "public/index.css": `body {}` }, process.cwd())
+      vol.fromJSON({ "public/index.css": `body {}` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -146,7 +160,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`handles dynamic param paths syntax (is not using reserved characters for file paths)`, async () => {
-      vol.fromJSON({ "public/[param]/index.html": `:param` }, process.cwd())
+      vol.fromJSON({ "public/[param]/index.html": `:param` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -163,10 +177,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`handles dynamic named wildcard paths syntax (is not using reserved characters for file paths)`, async () => {
-      vol.fromJSON(
-        { "public/[...wildcard]/index.html": `*wildcard` },
-        process.cwd()
-      )
+      vol.fromJSON({ "public/[...wildcard]/index.html": `*wildcard` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -183,7 +194,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`handles dynamic unnamed wildcard paths syntax (is not using reserved characters for file paths)`, async () => {
-      vol.fromJSON({ "public/[...]/index.html": `*` }, process.cwd())
+      vol.fromJSON({ "public/[...]/index.html": `*` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -200,7 +211,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`keeps 404.html in root`, async () => {
-      vol.fromJSON({ "public/404.html": `404` }, process.cwd())
+      vol.fromJSON({ "public/404.html": `404` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
@@ -218,7 +229,7 @@ describe(`createStaticAssetsPathHandler`, () => {
     })
 
     it(`keeps 500.html in root`, async () => {
-      vol.fromJSON({ "public/500.html": `500` }, process.cwd())
+      vol.fromJSON({ "public/500.html": `500` })
 
       const { ensureStaticAssetPath, fileMovingDone } =
         createStaticAssetsPathHandler()
