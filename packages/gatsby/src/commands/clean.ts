@@ -23,7 +23,7 @@ module.exports = async function clean(program: IProgram): Promise<void> {
     findCacheDir({
       name: `terser-webpack-plugin`,
     }),
-  ].filter(Boolean)
+  ].filter((dir): dir is string => Boolean(dir))
 
   report.info(`Deleting ${directories.join(`, `)}`)
 

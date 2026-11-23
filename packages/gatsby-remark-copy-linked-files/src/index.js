@@ -1,6 +1,7 @@
 /* eslint-disable @babel/no-invalid-this */
 const visit = require(`unist-util-visit`)
-const isRelativeUrl = require(`is-relative-url`)
+// is-relative-url 4 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: isRelativeUrl } = require(`is-relative-url`)
 const fsExtra = require(`fs-extra`)
 const path = require(`path`)
 const _ = require(`lodash`)
