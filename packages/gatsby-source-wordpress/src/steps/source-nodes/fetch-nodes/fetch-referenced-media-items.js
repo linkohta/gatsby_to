@@ -1,7 +1,7 @@
 import chunk from "lodash/chunk"
 import { getStore } from "~/store"
 import atob from "atob"
-import filesize from "filesize"
+import { filesize } from "filesize"
 import PQueue from "p-queue"
 import { createLocalFileNode } from "../create-nodes/create-local-file-node"
 import { paginatedWpNodeFetch, normalizeNode } from "./fetch-nodes-paginated"
@@ -181,7 +181,9 @@ export const createMediaItemNode = async ({
             `Fetching ${
               node.mediaItemUrl
             } is taking a long time time (longer than 15 seconds). This file is ${filesize(
-              node.fileSize
+              node.fileSize,
+              // filesize 7 以降は既定が SI 単位（1 kB = 1000 B）なので、これまでと同じ表記（1 KB = 1024 B）を指定する
+              { standard: `jedec` }
             )}`
           )
         )
