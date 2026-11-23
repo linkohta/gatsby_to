@@ -4,7 +4,7 @@
 
 import { readFileSync, readdirSync } from "fs"
 import { codeFrameColumns } from "@babel/code-frame"
-import stackTrace from "stack-trace"
+import * as stackTrace from "stack-trace"
 import {
   TraceMap,
   originalPositionFor,

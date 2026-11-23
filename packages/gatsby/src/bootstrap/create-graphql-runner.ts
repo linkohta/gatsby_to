@@ -1,4 +1,4 @@
-import stackTrace from "stack-trace"
+import * as stackTrace from "stack-trace"
 import { Span } from "opentracing"
 import { ExecutionResult, Source } from "graphql"
 import { Store } from "redux"
