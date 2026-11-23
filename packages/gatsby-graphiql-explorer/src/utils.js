@@ -1,4 +1,4 @@
-import { createGraphiQLFetcher } from "@graphiql/toolkit"
+import { createTransport } from "@graphiql/toolkit"
 import { GRAPHIQL_URL } from "./constants"
 
 export const fetchFragments = async () =>
@@ -6,7 +6,7 @@ export const fetchFragments = async () =>
     .catch(err => console.error(`Error fetching external fragments: \n${err}`))
     .then(response => response.json())
 
-export const fetcher = createGraphiQLFetcher({ url: GRAPHIQL_URL })
+export const transport = createTransport({ url: GRAPHIQL_URL })
 
 // パラメーターのオブジェクトから Location のクエリ文字列を作る。
 export const locationQuery = params =>

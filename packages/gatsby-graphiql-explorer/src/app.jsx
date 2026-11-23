@@ -1,16 +1,16 @@
 // eslint-disable-next-line no-unused-vars
 import regeneratorRuntime from "regenerator-runtime"
 
+import "graphiql/setup-workers/webpack"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { GraphiQL } from "graphiql"
+import { DEFAULT_PLUGINS, GraphiQL } from "graphiql"
 import { getIntrospectionQuery } from "graphql"
-import { useExplorerPlugin } from "@graphiql/plugin-explorer"
-import { useExporterPlugin } from "@graphiql/plugin-code-exporter"
+import { codeExporterPlugin } from "@graphiql/plugin-code-exporter"
 
 import { snippets } from "./code-exporter/snippets.js"
 import { Logo } from "./logo.jsx"
-import { fetcher, fetchFragments, locationQuery } from "./utils.js"
+import { transport, fetchFragments, locationQuery } from "./utils.js"
 import { RefreshDataSourceButton } from "./toolbar.jsx"
 import {
   FALLBACK_QUERY,
@@ -19,9 +19,11 @@ import {
   REFRESH_URL,
 } from "./constants.js"
 
-import "graphiql/graphiql.css"
-import "@graphiql/plugin-explorer/dist/style.css"
-import "@graphiql/plugin-code-exporter/dist/style.css"
+import "graphiql/style.css"
+// コードエクスポーターは CodeMirror 5 でコードを表示する。graphiql 6 は Monaco に
+// 移行して CodeMirror の CSS を含まなくなったので、ここで読み込む
+import "codemirror/lib/codemirror.css"
+import "@graphiql/plugin-code-exporter/style.css"
 import "./app.css"
 
 const parameters = {}
@@ -92,10 +94,24 @@ const DEFAULT_QUERY =
     window.localStorage.getItem(LOCAL_STORAGE_NAMES.query)) ||
   FALLBACK_QUERY
 
-GraphiQL.Logo = Logo
+// graphiql 6 では、ツールバーにボタンを足す方法がプラグインの `sessionActions` だけに
+// なった。サイドバーにアイコンを増やさないよう、コードエクスポーターのプラグインに持たせる
+const RefreshContext = React.createContext(null)
+
+const RefreshAction = () => {
+  const refreshExternalDataSource = React.useContext(RefreshContext)
+
+  return refreshExternalDataSource ? (
+    <RefreshDataSourceButton onClick={refreshExternalDataSource} />
+  ) : null
+}
+
+const exporterPlugin = {
+  ...codeExporterPlugin({ snippets }),
+  sessionActions: RefreshAction,
+}
 
 const App = ({ initialExternalFragments }) => {
-  const [query, setQuery] = React.useState(DEFAULT_QUERY)
   const [refreshState, setRefreshState] = React.useState({
     enableRefresh: false,
     refreshToken: null,
@@ -130,16 +146,6 @@ const App = ({ initialExternalFragments }) => {
     fetchData()
   }, [])
 
-  const explorerPlugin = useExplorerPlugin({
-    query,
-    onEdit: setQuery,
-  })
-
-  const exporterPlugin = useExporterPlugin({
-    query,
-    snippets,
-  })
-
   const refreshExternalDataSource = () => {
     const options = { method: `POST` }
     if (refreshState.refreshToken) {
@@ -155,27 +161,24 @@ const App = ({ initialExternalFragments }) => {
   }
 
   return (
-    <GraphiQL
-      fetcher={fetcher}
-      query={query}
-      variables={parameters.variables}
-      headers={parameters.headers}
-      onEditQuery={query => {
-        setQuery(query)
-        onEditQuery(query)
-      }}
-      onEditVariables={onEditVariables}
-      onEditOperationName={onEditOperationName}
-      onEditHeaders={onEditHeaders}
-      onTabChange={onTabChange}
-      toolbar={{
-        additionalContent: refreshState.enableRefresh && (
-          <RefreshDataSourceButton onClick={refreshExternalDataSource} />
-        ),
-      }}
-      externalFragments={externalFragments}
-      plugins={[explorerPlugin, exporterPlugin]}
-    />
+    <RefreshContext.Provider
+      value={refreshState.enableRefresh ? refreshExternalDataSource : null}
+    >
+      <GraphiQL
+        transport={transport}
+        brand={<Logo />}
+        initialQuery={DEFAULT_QUERY}
+        initialVariables={parameters.variables}
+        initialHeaders={parameters.headers}
+        onEditQuery={onEditQuery}
+        onEditVariables={onEditVariables}
+        onEditOperationName={onEditOperationName}
+        onEditHeaders={onEditHeaders}
+        onTabChange={onTabChange}
+        externalFragments={externalFragments}
+        plugins={[...DEFAULT_PLUGINS, exporterPlugin]}
+      />
+    </RefreshContext.Provider>
   )
 }
 
