@@ -4,7 +4,7 @@ let fs = require(`fs`)
 let workboxBuild = require(`workbox-build`)
 const path = require(`path`)
 const { slash } = require(`gatsby-core-utils`)
-const glob = require(`glob`)
+const { globSync } = require(`glob`)
 const _ = require(`lodash`)
 
 let getResourcesFromHTML = require(`./get-resources-from-html`)
@@ -49,7 +49,11 @@ function getPrecachePages(globs, base) {
   const precachePages = []
 
   globs.forEach(page => {
-    const matches = glob.sync(base + page)
+    // glob 7 と同じ結果になるようにそろえる。glob 8 以降は結果を並べ替えず、
+    // Windows ではバックスラッシュをエスケープとして扱い、区切りがバックスラッシュのパスを返す
+    const matches = globSync(base + page, { windowsPathsNoEscape: true })
+      .map(match => slash(match))
+      .sort((a, b) => a.localeCompare(b, `en`))
     matches.forEach(path => {
       const isDirectory = fs.lstatSync(path).isDirectory()
       let precachePath
