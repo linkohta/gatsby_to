@@ -102,6 +102,6 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "engines": {
-    "node": ">=18.0.0 <26"
+    "node": "^22.22.2 || ^24.15.0"
   }
 }
