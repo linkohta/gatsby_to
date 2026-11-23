@@ -6,6 +6,7 @@ import { CombinedState } from "redux"
 import { build } from "../../../schema"
 import sourceNodesAndRemoveStaleNodes from "../../source-nodes"
 import { savePartialStateToDisk, store } from "../../../redux"
+import { getWorkerSlicesFolder } from "../../../redux/persist"
 import { loadConfig } from "../../../bootstrap/load-config"
 import { loadPlugins } from "../../../bootstrap/load-plugins"
 import { createTestWorker, GatsbyTestWorkerPool } from "./test-helpers"
@@ -40,8 +41,7 @@ describe(`worker (schema)`, () => {
 
   beforeAll(async () => {
     store.dispatch({ type: `DELETE_CACHE` })
-    const fileDir = path.join(process.cwd(), `.cache/worker`)
-    await fs.emptyDir(fileDir)
+    await fs.emptyDir(getWorkerSlicesFolder())
 
     worker = createTestWorker()
 
