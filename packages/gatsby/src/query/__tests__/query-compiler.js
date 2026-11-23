@@ -1,7 +1,7 @@
 jest.mock(`glob`, () => {
-  const sync = jest.fn().mockImplementation(() => [])
+  const globSync = jest.fn().mockImplementation(() => [])
   return {
-    sync,
+    globSync,
   }
 })
 
@@ -18,7 +18,7 @@ const base = path.resolve(``)
 
 describe(`Runner`, () => {
   beforeEach(() => {
-    glob.sync.mockClear()
+    glob.globSync.mockClear()
   })
 
   describe(`expected directories`, () => {
@@ -34,7 +34,7 @@ describe(`Runner`, () => {
 
       expect(errors).toEqual([])
 
-      expect(glob.sync).toHaveBeenCalledWith(
+      expect(glob.globSync).toHaveBeenCalledWith(
         expect.stringContaining(path.join(base, `src`)),
         expect.any(Object)
       )
@@ -52,7 +52,7 @@ describe(`Runner`, () => {
 
       expect(errors).toEqual([])
 
-      expect(glob.sync).toHaveBeenCalledWith(
+      expect(glob.globSync).toHaveBeenCalledWith(
         expect.stringContaining(path.join(base, `src`)),
         expect.any(Object)
       )
@@ -71,7 +71,7 @@ describe(`Runner`, () => {
 
       expect(errors).toEqual([])
 
-      expect(glob.sync).toHaveBeenCalledWith(
+      expect(glob.globSync).toHaveBeenCalledWith(
         expect.stringContaining(path.join(base, `node_modules`, theme)),
         expect.any(Object)
       )

@@ -62,7 +62,7 @@ jest.mock(`fs-extra`, () => {
 })
 jest.mock(`glob`, () => {
   return {
-    sync: jest.fn(pattern => {
+    globSync: jest.fn(pattern => {
       // ややこしい。
       // スターで終わるパスのプレフィックスを期待している。そうでないと動かない :/
       if (pattern.slice(-1) !== `*`) {
