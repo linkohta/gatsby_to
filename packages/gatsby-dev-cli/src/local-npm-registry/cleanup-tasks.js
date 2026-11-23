@@ -1,4 +1,4 @@
-const signalExit = require(`signal-exit`)
+const { onExit: signalExit } = require(`signal-exit`)
 
 const cleanupTasks = new Set()
 

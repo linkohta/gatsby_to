@@ -1,4 +1,4 @@
-import address from "address"
+import { ip as getLanIp } from "address"
 import chalk from "chalk"
 import url from "url"
 
@@ -38,7 +38,7 @@ export function prepareUrls(
 
     try {
       // これは IPv4 アドレスしか返せない
-      lanUrlForConfig = address.ip()
+      lanUrlForConfig = getLanIp()
       if (lanUrlForConfig) {
         // アドレスがプライベート IP であるかを確認する
         // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
