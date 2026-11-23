@@ -72,4 +72,19 @@ describe(`gatsby-transformer-pdf`, () => {
     })
     expect(actions.createNode.mock.calls[0][0].content).toMatchSnapshot()
   })
+
+  it(`should reject when the file is not a valid pdf`, async () => {
+    node.absolutePath = __filename
+
+    await expect(
+      onCreateNode({
+        node,
+        actions,
+        loadNodeContent,
+        createNodeId,
+        createContentDigest,
+      })
+    ).rejects.toBe(`PDF to JSON conversion failed!`)
+    expect(actions.createNode).not.toHaveBeenCalled()
+  })
 })
