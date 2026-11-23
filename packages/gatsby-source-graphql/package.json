@@ -7,7 +7,7 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.16",
+    "@apollo/client": "^3.14.1",
     "@babel/runtime": "^7.29.15",
     "@graphql-tools/links": "^8.3.36",
     "@graphql-tools/utils": "^8.13.1",
