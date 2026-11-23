@@ -8,7 +8,8 @@ const {
 const visitWithParents = require(`unist-util-visit-parents`)
 const getDefinitions = require(`mdast-util-definitions`)
 const path = require(`path`)
-const queryString = require(`query-string`)
+// query-string 8 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: queryString } = require(`query-string`)
 // is-relative-url 4 以降は ESM 専用で、`require()` では default export が `default` に入る
 const { default: isRelativeUrl } = require(`is-relative-url`)
 const _ = require(`lodash`)

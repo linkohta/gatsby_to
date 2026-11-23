@@ -1,7 +1,8 @@
 const MongoClient = require(`mongodb`).MongoClient
 const prepareMappingChildNode = require(`./mapping`)
 const sanitizeName = require(`./sanitize-name`)
-const queryString = require(`query-string`)
+// query-string 8 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: queryString } = require(`query-string`)
 const stringifyObjectIds = require(`./stringify-object-ids`)
 
 exports.sourceNodes = (
