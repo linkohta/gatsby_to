@@ -94,7 +94,7 @@ yarn check-versions                # パッケージ間の依存バージョン�
 
 ## コーディング規約
 
-ESLint（`.eslintrc.js`）と Prettier（`.prettierrc.js`）の設定が正です。主なルールは次のとおりです。
+ESLint（`eslint.config.js`）と Prettier（`.prettierrc.js`）の設定が正です。主なルールは次のとおりです。
 
 - 文字列はバッククォートで書きます（`quotes: backtick`）。
 - セミコロンは付けません。インデントは半角スペース 2 つ、改行コードは LF です。

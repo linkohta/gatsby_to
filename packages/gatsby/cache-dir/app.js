@@ -160,7 +160,10 @@ apiRunnerAsync(`onClientEntry`).then(() => {
         if (cleanupFn && typeof cleanupFn === `function`) {
           cleanupFn()
         } else {
+          // React 18 以前のための後方互換。関数があるかを確かめてから呼んでいるので、非推奨の警告は無視する
+          // eslint-disable-next-line react/no-deprecated
           if (typeof ReactDOM.unmountComponentAtNode === `function`) {
+            // eslint-disable-next-line react/no-deprecated
             ReactDOM.unmountComponentAtNode(indicatorMountElement)
           } else {
             // これは React 19 で削除された:

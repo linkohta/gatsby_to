@@ -1,5 +1,17 @@
 {
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      // paths はルートの tsconfig.json の設定を上書きするので、ルートの設定も書き写している
+      "@reach/router/*": ["../../node_modules/@gatsbyjs/reach-router/*"],
+      // このパッケージは ESLint 7 に依存している。ルートの ESLint 9 に同梱の型定義ではなく、
+      // これまでどおり @types/eslint で解決されるようにする
+      "eslint": [
+        "./node_modules/@types/eslint",
+        "../../node_modules/@types/eslint"
+      ]
+    }
+  },
   // For now index.d.ts is manually-created, but gatsby/internal is auto-generated
   "include": ["src/**/*.ts"],
   "exclude": ["**/__tests__/**/*"]
