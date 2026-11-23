@@ -137,7 +137,9 @@ module.exports = (
                 dependencies: codesandbox.dependencies.reduce(
                   (map, dependency) => {
                     const { name, fetchSpec } = npa(dependency)
-                    map[name] = fetchSpec
+                    // npm-package-arg 9 以降は、バージョン指定のない名前を `*` として返す。
+                    // これまでと同じく `latest` を渡す
+                    map[name] = dependency === name ? `latest` : fetchSpec
                     return map
                   },
                   {}

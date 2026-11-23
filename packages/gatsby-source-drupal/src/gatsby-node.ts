@@ -114,7 +114,20 @@ async function worker([url, options]) {
 
 const requestQueue = require(`fastq`).promise(worker, 20)
 
-const asyncPool = require(`tiny-async-pool`)
+const tinyAsyncPool = require(`tiny-async-pool`)
+
+// tiny-async-pool 2 は非同期イテレーターを返し、読み進めたぶんだけ処理が進む。
+// 結果は使わないので、最後まで読み切って全件の完了を待つ
+async function asyncPool<T>(
+  concurrency: number,
+  items: Iterable<T>,
+  iteratorFn: (item: T) => Promise<unknown>
+): Promise<void> {
+  const results = tinyAsyncPool(concurrency, items, iteratorFn)
+  while (!(await results.next()).done) {
+    // 何もしない
+  }
+}
 const bodyParser = require(`body-parser`)
 
 function gracefullyRethrow(activity, error) {
