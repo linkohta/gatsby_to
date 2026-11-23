@@ -16,8 +16,9 @@ let WorkerError
 let jobManager = null
 
 // スパイするためのモックが必要である
+// p-defer 3 以降は ES モジュールなので、実体は `default` にある
 jest.mock(`p-defer`, () =>
-  jest.fn().mockImplementation(jest.requireActual(`p-defer`))
+  jest.fn().mockImplementation(jest.requireActual(`p-defer`).default)
 )
 
 jest.mock(`gatsby-cli/lib/reporter`, () => {

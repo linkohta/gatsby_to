@@ -1,6 +1,7 @@
 const got = require(`got`)
 const _ = require(`lodash`)
-const urlJoin = require(`url-join`)
+// url-join 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: urlJoin } = require(`url-join`)
 import HttpAgent from "agentkeepalive"
 
 // const http2wrapper = require(`http2-wrapper`)

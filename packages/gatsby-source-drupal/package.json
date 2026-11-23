@@ -21,7 +21,7 @@
     "opentracing": "^0.14.7",
     "probe-image-size": "^7.5.0",
     "tiny-async-pool": "^2.1.0",
-    "url-join": "^4.0.1"
+    "url-join": "^6.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.29.7",

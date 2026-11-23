@@ -1,5 +1,6 @@
 import { getStore } from "./index"
 import convertHrtime from "convert-hrtime"
+import { elapsedNanoseconds } from "../../util/calc-elapsed-time"
 import { Actions, ActivityTypes, ActivityStatuses } from "../constants"
 import { ActionsUnion, IActivity } from "./types"
 import signalExit from "signal-exit"
@@ -54,10 +55,8 @@ export const getActivity = (id: string): IActivity | null =>
 /**
  * @returns {Number} アクティビティの開始からのミリ秒数
  */
-export const getElapsedTimeMS = (activity: IActivity): number => {
-  const elapsed = process.hrtime(activity.startTime)
-  return convertHrtime(elapsed).milliseconds
-}
+export const getElapsedTimeMS = (activity: IActivity): number =>
+  convertHrtime(elapsedNanoseconds(activity.startTime)).milliseconds
 
 export const isInternalAction = (action: ActionsUnion): boolean => {
   switch (action.type) {
