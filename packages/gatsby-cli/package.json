@@ -44,7 +44,7 @@
     "resolve-cwd": "^3.0.0",
     "semver": "^7.8.6",
     "signal-exit": "^3.0.7",
-    "stack-trace": "^0.0.10",
+    "stack-trace": "^1.0.0",
     "strip-ansi": "^6.0.1",
     "tinyclip": "^0.1.12",
     "yargs": "^15.4.1",

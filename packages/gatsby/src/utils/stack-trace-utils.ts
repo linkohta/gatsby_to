@@ -1,4 +1,5 @@
-import stackTrace, { StackFrame } from "stack-trace"
+import * as stackTrace from "stack-trace"
+import type { StackFrame } from "stack-trace"
 import url from "url"
 import { codeFrameColumns } from "@babel/code-frame"
 import {

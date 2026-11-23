@@ -1,5 +1,5 @@
 import PrettyError from "pretty-error"
-import stackTrace from "stack-trace"
+import * as stackTrace from "stack-trace"
 import { prepareStackTrace, ErrorWithCodeFrame } from "./prepare-stack-trace"
 import { isNodeInternalModulePath } from "gatsby-core-utils"
 import { IStructuredStackFrame } from "../structured-errors/types"
