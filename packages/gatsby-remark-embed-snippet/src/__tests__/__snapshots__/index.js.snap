@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`gatsby-remark-embed-snippet Language detection should set the correct Prism language for CSS files 1`] = `
 Object {

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Process JSON nodes correctly correctly creates a node from JSON which is a single object 1`] = `
 Array [

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`gatsby-plugin-facebook-analytics onRenderBody in production mode sets cookie to false by default 1`] = `
 Array [

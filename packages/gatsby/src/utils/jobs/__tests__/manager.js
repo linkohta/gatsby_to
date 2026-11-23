@@ -296,10 +296,12 @@ describe(`Jobs manager`, () => {
       const { enqueueJob, getInProcessJobPromise } = jobManager
       const internalJob = createInternalMockJob()
       const promise = enqueueJob(internalJob)
+      const inProcessPromise = getInProcessJobPromise(internalJob.contentDigest)
 
-      expect(getInProcessJobPromise(internalJob.contentDigest)).toStrictEqual(
-        promise
-      )
+      // Jest 30 以降は別々の Promise オブジェクトを等しいとみなさないので、
+      // Promise であることと、解決される値が同じであることを確認する
+      expect(inProcessPromise).toBeInstanceOf(Promise)
+      expect(await inProcessPromise).toStrictEqual(await promise)
     })
   })
 

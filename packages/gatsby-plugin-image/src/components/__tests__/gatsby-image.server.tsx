@@ -86,21 +86,14 @@ describe(`GatsbyImage server`, () => {
 
       const wrapper = document.querySelector(`[data-gatsby-image-wrapper=""]`)
       expect((wrapper as HTMLElement).style).toMatchInlineSnapshot(`
-        CSSStyleDeclaration {
+        Object {
           "0": "width",
           "1": "height",
-          "_importants": Object {
-            "height": undefined,
-            "width": undefined,
-          },
-          "_length": 2,
-          "_onChange": [Function],
-          "_values": Object {
-            "height": "100px",
-            "width": "100px",
-          },
         }
       `)
+      // jsdom 26 以降は値がスナップショットに出力されないので、値は個別に確認する
+      expect((wrapper as HTMLElement).style.width).toBe(`100px`)
+      expect((wrapper as HTMLElement).style.height).toBe(`100px`)
     })
 
     it(`has a valid className for constrained layout`, () => {

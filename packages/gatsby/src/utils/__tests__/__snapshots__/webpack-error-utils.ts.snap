@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`structureWebpackErrors stage: build-html Can't resolve (98124) 1`] = `
 Object {

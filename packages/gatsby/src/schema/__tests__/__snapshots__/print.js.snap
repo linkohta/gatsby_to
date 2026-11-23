@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Print type definitions allows explicitly listing types to include without including field types 1`] = `
 "### Type definitions saved at 2019-01-01 ###

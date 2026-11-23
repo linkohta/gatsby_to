@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`babel-plugin-remove-graphql-queries Allow alternative import of useStaticQuery 1`] = `
 "import staticQueryData from \\"public/static/d/426988268.json\\";

@@ -1,4 +1,4 @@
-const ciInfo = jest.genMockFromModule(`ci-info`)
+const ciInfo = jest.createMockFromModule(`ci-info`)
 
 ciInfo.isCI = false
 ciInfo.name = `bad default`

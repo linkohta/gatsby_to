@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`createOperations creates the proper queries and operations with sales channel and with lastBuildTime 1`] = `
 Array [

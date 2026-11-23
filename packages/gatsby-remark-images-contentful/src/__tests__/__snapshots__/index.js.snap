@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`it transforms HTML img tags 1`] = `
 "<a class=\\"gatsby-resp-image-link\\" href=\\"https://images.ctfassets.net/rocybtov1ozk/wtrHxeu3zEoEce2MokCSi/73dce36715f16e27cf5ff0d2d97d7dff/quwowooybuqbl6ntboz3.jpg\\" style=\\"display: block\\" target=\\"_blank\\" rel=\\"noopener\\">
