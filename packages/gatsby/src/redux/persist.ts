@@ -25,9 +25,18 @@ const getReduxCacheFolder = (): string =>
   // 誰かが process.chdir をする場合に備えて、これは関数にしている (#19800)
   path.join(process.cwd(), `.cache/redux`)
 
-const getWorkerSlicesFolder = (): string =>
+export const getWorkerSlicesFolder = (): string =>
   // 誰かが process.chdir をする場合に備えて、これは関数にしている (#19800)
-  path.join(process.cwd(), `.cache/worker`)
+  path.join(
+    process.cwd(),
+    `.cache/worker`,
+    // テストでは、並行して動く jest のワーカーどうしが同じファイルを読み書きしたり、
+    // 互いのファイルを消したりしないよう、テスト用のデータベース（datastore/lmdb/lmdb-datastore.ts）と
+    // 同じくワーカーごとにフォルダーを分ける
+    process.env.NODE_ENV === `test`
+      ? `test-${process.env.FORCE_TEST_DATABASE_ID ?? process.env.JEST_WORKER_ID}`
+      : ``
+  )
 
 function reduxSharedFile(dir: string): string {
   return path.join(dir, `redux.rest.state`)

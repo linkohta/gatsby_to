@@ -41,8 +41,17 @@ it(`worker can access node created in main process`, async () => {
   await getDataStore().ready()
 
   const nodeStoredInMainProcess = getDataStore().getNode(testNodeId)
-  const nodeStoredInWorkerProcess =
+  // lmdb（2.5.3）は、読み取りに使ったスナップショットを、タイマーで解放するまで使い続ける。
+  // ワーカーは上で読み取りを行ったばかりなので、ノードを作成する前のスナップショットが
+  // まだ残っていることがある。その場合は null が返るので、新しいスナップショットに
+  // 切り替わってノードが見えるようになるまで読み直す
+  let nodeStoredInWorkerProcess =
     await worker.single.getNodeFromWorker(testNodeId)
+  for (let retry = 0; retry < 100 && !nodeStoredInWorkerProcess; retry++) {
+    await new Promise(resolve => setTimeout(resolve, 10))
+    nodeStoredInWorkerProcess =
+      await worker.single.getNodeFromWorker(testNodeId)
+  }
 
   expect(nodeStoredInWorkerProcess).toMatchInlineSnapshot(`
     Object {
