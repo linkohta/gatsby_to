@@ -18,7 +18,7 @@ exports.sourceNodes = (
     })
 
     const nodeBase = {
-      id: createNodeId(JSON.stringify(faker.random.number())),
+      id: createNodeId(JSON.stringify(faker.datatype.number())),
       parent: null,
       children: [],
       internal: {
