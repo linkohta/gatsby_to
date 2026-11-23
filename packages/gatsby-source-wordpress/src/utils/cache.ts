@@ -3,7 +3,6 @@ import manager from "cache-manager"
 import fs from "fs-extra"
 import fsStore from "cache-manager-fs-hash"
 import path from "path"
-import rimraf from "rimraf"
 
 import { getStore, withPluginKey } from "~/store"
 import { getGatsbyApi } from "~/utils/get-gatsby-api"
@@ -210,11 +209,10 @@ export const setHardCachedNodes = async ({
 }
 
 export const clearHardCache = async (): Promise<void> => {
-  await new Promise(resolve => {
-    const directory = new Cache().cacheBase
+  const directory = new Cache().cacheBase
 
-    rimraf(directory, resolve)
-  })
+  // 以前ここで使っていた rimraf のコールバックと同じく、削除に失敗しても処理を続ける
+  await fs.remove(directory).catch(() => {})
 }
 
 export const clearHardCachedNodes = async (): Promise<void> => {
