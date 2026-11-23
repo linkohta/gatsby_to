@@ -57,7 +57,7 @@ export default declare(function removeApiCalls(
               } else {
                 // const {x,y} が使われている場合は、プロパティを取り除く
                 if (
-                  t.isVariableDeclarator(ref.path) &&
+                  t.isVariableDeclarator(ref.path.node) &&
                   t.isObjectPattern(
                     (ref.path.parent as t.VariableDeclaration).declarations[0]
                       .id
