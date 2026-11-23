@@ -174,8 +174,9 @@ exports.onPostBuild = (
 
   const combinedOptions = _.merge(options, workboxConfig)
 
-  const idbKeyvalFile = `idb-keyval-iife.min.js`
-  const idbKeyvalSource = require.resolve(`idb-keyval/dist/${idbKeyvalFile}`)
+  // idb-keyval 6 では、`importScripts` で読み込めるビルドが `dist/umd.js` になった。
+  // 出力するファイル名は、これまでと同じ形式のままにする
+  const idbKeyvalSource = require.resolve(`idb-keyval/dist/umd.js`)
   const idbKeyvalPackageJson = require(`idb-keyval/package.json`)
   const idbKeyValVersioned = `idb-keyval-${idbKeyvalPackageJson.version}-iife.min.js`
   const idbKeyvalDest = `public/${idbKeyValVersioned}`
