@@ -9,7 +9,7 @@
   "dependencies": {
     "@babel/core": "^7.29.13",
     "@babel/runtime": "^7.29.15",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.4.1",
     "signal-exit": "^3.0.7"
   },
   "devDependencies": {

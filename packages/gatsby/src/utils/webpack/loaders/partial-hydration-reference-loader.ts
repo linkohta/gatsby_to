@@ -2,7 +2,6 @@
 import { parse } from "acorn-loose"
 import { simple as walk } from "acorn-walk"
 import type { LoaderDefinitionFunction } from "webpack"
-import type { Node } from "acorn-loose"
 import type {
   ExportNamedDeclaration,
   ExportDefaultDeclaration,
@@ -49,14 +48,14 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
   )
 
   walk(parse(content, { ecmaVersion: 2020, sourceType: `module` }), {
-    ExpressionStatement(plainAcornNode: Node) {
+    ExpressionStatement(plainAcornNode) {
       const node = plainAcornNode as unknown as Directive
 
       if (node.directive === `use client`) {
         hasClientExportDirective = true
       }
     },
-    ExportNamedDeclaration(plainAcornNode: Node) {
+    ExportNamedDeclaration(plainAcornNode) {
       const node = plainAcornNode as unknown as ExportNamedDeclaration
 
       if (!hasClientExportDirective) return
@@ -133,7 +132,7 @@ const partialHydrationReferenceLoader: LoaderDefinitionFunction<
         }
       }
     },
-    ExportDefaultDeclaration(plainAcornNode: Node) {
+    ExportDefaultDeclaration(plainAcornNode) {
       const node = plainAcornNode as unknown as ExportDefaultDeclaration
 
       if (!hasClientExportDirective) return

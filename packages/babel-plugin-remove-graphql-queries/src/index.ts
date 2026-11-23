@@ -41,19 +41,6 @@ interface IGraphQLTag {
   isGlobal: boolean
 }
 
-interface INestedJSXVisitor {
-  JSXIdentifier: (path: NodePath<JSXIdentifier>) => void
-  queryHash: string
-  query: string
-}
-
-interface INestedHookVisitor {
-  CallExpression: (path: NodePath<CallExpression>) => void
-  queryHash: string
-  query: string
-  templatePaath: NodePath<TaggedTemplateExpression>
-}
-
 class StringInterpolationNotAllowedError extends Error {
   interpolationStart: ISourcePosition | undefined
   interpolationEnd: ISourcePosition | undefined
@@ -300,7 +287,10 @@ export default function ({ types: t }): PluginObj {
     visitor: {
       Program(path: NodePath<Program>, state: any): void {
         const nestedJSXVistor = {
-          JSXIdentifier(path2: NodePath<JSXIdentifier>): void {
+          JSXIdentifier(
+            this: { queryHash: string },
+            path2: NodePath<JSXIdentifier>
+          ): void {
             if (
               (process.env.NODE_ENV === `test` ||
                 // Storybook の実行中は、クエリを処理する必要がある
@@ -343,10 +333,13 @@ export default function ({ types: t }): PluginObj {
               path.node.body.unshift(importDeclaration)
             }
           },
-        } as INestedJSXVisitor
+        }
 
         const nestedHookVisitor = {
-          CallExpression(path2: NodePath<CallExpression>): void {
+          CallExpression(
+            this: { queryHash: string },
+            path2: NodePath<CallExpression>
+          ): void {
             if (
               (process.env.NODE_ENV === `test` ||
                 state.opts.stage === `develop-html`) &&
@@ -407,7 +400,7 @@ export default function ({ types: t }): PluginObj {
               path.node.body.unshift(importDeclaration)
             }
           },
-        } as INestedHookVisitor
+        }
 
         const tagsToRemoveImportsFrom = new Set<NodePath<Expression>>()
 
