@@ -1,22 +1,23 @@
 import path from "path"
 import fs from "fs-extra"
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { IMAGE_CDN } from "../gatsby-worker"
 import getSharpInstance from "gatsby-sharp"
 
 const server = setupServer(
-  rest.get(`https://example.com/another-file.jpg`, async (req, res, ctx) => {
+  http.get(`https://example.com/another-file.jpg`, async () => {
     const content = await fs.readFile(
       path.join(__dirname, `../../__tests__/__fixtures__/dog-portrait.jpg`)
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/jpg`),
-      ctx.set(`Content-Length`, content.length.toString()),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return new HttpResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: content.length.toString(),
+      },
+    })
   })
 )
 
