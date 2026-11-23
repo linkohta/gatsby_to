@@ -9,8 +9,11 @@
 const fs = require(`fs`)
 const glob = require(`glob`)
 const path = require(`path`)
-const chalk = require(`chalk`)
-const yargs = require(`yargs`)
+// chalk 5 以降は ESM のみで、require すると default に chalk が入ったモジュールが返る
+const { default: chalk } = require(`chalk`)
+// yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const { hideBin } = require(`yargs/helpers`)
+const yargs = require(`yargs`)(hideBin(process.argv))
 const execa = require(`execa`)
 
 console.log(`TS Check: Running...`)
