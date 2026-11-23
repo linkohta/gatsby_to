@@ -10,8 +10,12 @@ module.exports = {
   mode,
   output: {
     path: path.join(__dirname, `..`, `dist`),
-    filename: `./app.js`,
-    publicPath: `/___graphql`,
+    filename: `app.js`,
+    // Monaco エディターの worker などは別のチャンクになる。チャンクは長期間
+    // キャッシュされるので、ファイル名に内容のハッシュを入れる
+    chunkFilename: `[name].[contenthash].js`,
+    assetModuleFilename: `[name].[contenthash][ext]`,
+    publicPath: `/___graphql/`,
   },
   devtool: false,
   module: {
@@ -29,7 +33,9 @@ module.exports = {
                   corejs: 3,
                   loose: true,
                   bugfixes: true,
-                  modules: `commonjs`,
+                  // graphiql 6 は ESM 専用で、`exports` に `import` の条件しかない。
+                  // CommonJS に変換すると解決できなくなるので、変換は webpack に任せる
+                  modules: false,
                   useBuiltIns: `entry`,
                   targets: [
                     `>0.25% and supports es6-module`,
@@ -72,13 +78,7 @@ module.exports = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(mode),
     }),
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
   ],
-  optimization: {
-    splitChunks: false,
-  },
   stats: {
     warnings: false,
   },
