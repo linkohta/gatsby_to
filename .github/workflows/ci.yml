@@ -35,7 +35,7 @@ jobs:
           node-version: 22
       # lint に必要なのはルートの依存だけなので、インストールを速くするために
       # workspaces を `babel-preset-gatsby-package` だけに絞る。
-      # `.eslintrc.js` が `.babelrc.js` 経由でこのプリセットを読み込むため、これだけは残す。
+      # `eslint.config.js` が `.babelrc.js` 経由でこのプリセットを読み込むため、これだけは残す。
       - name: Limit workspaces to what lint needs
         run: |
           sed -i ':a;N;$!ba;s/,\n\s*"workspaces":\s\[[^]]*]/,"workspaces":\["packages\/babel-preset-gatsby-package"\]/g' package.json
