@@ -1,9 +1,7 @@
 const yargs = require(`yargs`)
-const {
-  getAllPackageNames,
-  regenerateChangelog,
-  updateChangelog,
-} = require(`./generate`)
+const { getAllPackageNames, regenerateChangelog, updateChangelog } = require(
+  `./generate`
+)
 
 const _argv = yargs
   .command(

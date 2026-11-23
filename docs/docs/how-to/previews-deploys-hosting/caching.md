@@ -75,6 +75,6 @@ Since Gatsby adapters were introduced in later Gatsby releases, you could also l
 
 ---
 
-<sup>1</sup> You can use 'no-cache' instead of 'max-age=0, must-revalidate'. Despite
-what the name might imply, 'no-cache' permits a cache to serve cached content as
-long as it validates the cache freshness first.
+<sup>1</sup> You can use 'no-cache' instead of 'max-age=0, must-revalidate'.
+Despite what the name might imply, 'no-cache' permits a cache to serve cached
+content as long as it validates the cache freshness first.

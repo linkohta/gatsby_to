@@ -1,10 +1,8 @@
 const execa = require(`execa`)
 const { Octokit } = require(`@octokit/rest`)
-const {
-  getAllPackageNames,
-  updateChangelog,
-  changelogRelativePath,
-} = require(`./generate`)
+const { getAllPackageNames, updateChangelog, changelogRelativePath } = require(
+  `./generate`
+)
 
 if (!process.env.GITHUB_BOT_AUTH_TOKEN) {
   throw new Error(`GITHUB_BOT_AUTH_TOKEN env var not set`)

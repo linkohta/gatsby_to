@@ -51,8 +51,8 @@ export async function prepareFunction(
   const displayName = isODB
     ? `DSG`
     : fun.name === `SSR & DSG`
-    ? `SSR`
-    : fun.name
+      ? `SSR`
+      : fun.name
 
   const functionManifest: INetlifyFunctionManifest = {
     config: {

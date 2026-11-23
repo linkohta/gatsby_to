@@ -120,22 +120,25 @@ describe(`generateImageUrl`, () => {
     [`cropFocus`, `position`, `center,right`],
     [`format`, `fm`, `webp`],
     [`quality`, `q`, 60],
-  ] as Array<[keyof ImageCdnTransformArgs, string, ImageCdnTransformArgs[keyof ImageCdnTransformArgs]]>)(
-    `should set %s in image args`,
-    (key, queryKey, value) => {
-      const url = new URL(
-        // @ts-ignore remove typings
-        `https://netlify.com${generateImageUrl(
-          source,
-          {
-            format: `webp`,
-            [key]: value,
-          },
-          pathPrefix
-        )}`
-      )
+  ] as Array<
+    [
+      keyof ImageCdnTransformArgs,
+      string,
+      ImageCdnTransformArgs[keyof ImageCdnTransformArgs],
+    ]
+  >)(`should set %s in image args`, (key, queryKey, value) => {
+    const url = new URL(
+      // @ts-ignore remove typings
+      `https://netlify.com${generateImageUrl(
+        source,
+        {
+          format: `webp`,
+          [key]: value,
+        },
+        pathPrefix
+      )}`
+    )
 
-      expect(url.searchParams.get(queryKey)).toEqual(value.toString())
-    }
-  )
+    expect(url.searchParams.get(queryKey)).toEqual(value.toString())
+  })
 })

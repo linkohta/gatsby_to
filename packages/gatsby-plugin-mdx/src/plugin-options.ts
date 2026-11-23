@@ -52,9 +52,10 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
 ) => {
   const options = defaultOptions(pluginOptions)
 
-  const { default: remarkUnwrapImages } = await cachedImport<
-    typeof import("remark-unwrap-images")
-  >(`remark-unwrap-images`)
+  const { default: remarkUnwrapImages } =
+    await cachedImport<typeof import("remark-unwrap-images")>(
+      `remark-unwrap-images`
+    )
 
   // Gatsby プロジェクトの設定をもとに jsxRuntime と jsxImportSource を設定する
   const { config } = helpers.store.getState()

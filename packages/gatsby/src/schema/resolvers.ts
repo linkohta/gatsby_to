@@ -323,8 +323,8 @@ export function paginate(
     return limit
       ? Math.ceil(skip / limit) + Math.ceil((count - skip) / limit)
       : skip
-      ? 2
-      : 1
+        ? 2
+        : 1
   }
   const currentPage = limit ? Math.ceil(skip / limit) + 1 : skip ? 2 : 1
   const hasPreviousPage = currentPage > 1

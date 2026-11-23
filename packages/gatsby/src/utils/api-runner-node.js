@@ -13,9 +13,9 @@ const { codeFrameColumns } = require(`@babel/code-frame`)
 const fs = require(`fs-extra`)
 const { getCache } = require(`./get-cache`)
 import { createNodeId } from "./create-node-id"
-const {
-  createContentDigest: _createContentDigest,
-} = require(`gatsby-core-utils`)
+const { createContentDigest: _createContentDigest } = require(
+  `gatsby-core-utils`
+)
 import {
   buildObjectType,
   buildUnionType,
@@ -323,10 +323,9 @@ const runAPI = async (plugin, api, args, activity) => {
 
     pluginSpan.setTag(`api`, api)
     pluginSpan.setTag(`plugin`, plugin.name)
-    const {
-      publicActions,
-      restrictedActionsAvailableInAPI,
-    } = require(`../redux/actions`)
+    const { publicActions, restrictedActionsAvailableInAPI } = require(
+      `../redux/actions`
+    )
 
     let availableActions
     if (availableActionsCache.has(api)) {

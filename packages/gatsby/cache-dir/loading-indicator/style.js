@@ -12,13 +12,22 @@ export const Style = () => (
           --color: #232129;
           --radii: 4px;
           --z-index-indicator: 10000;
-          --shadow: 0px 2px 4px rgba(46, 41, 51, 0.08),
+          --shadow:
+            0px 2px 4px rgba(46, 41, 51, 0.08),
             0px 4px 8px rgba(71, 63, 79, 0.16);
         }
 
         [data-gatsby-loading-indicator="root"] {
-          font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-            Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          font:
+            14px/1.5 -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif,
+            "Apple Color Emoji",
+            "Segoe UI Emoji",
             "Segoe UI Symbol" !important;
           background: var(--background);
           color: var(--color);

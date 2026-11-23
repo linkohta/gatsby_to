@@ -78,19 +78,19 @@ async function queryResult(
     }
   )
 
-  const {
-    createSchemaComposer,
-  } = require(`../../../gatsby/src/schema/schema-composer`)
+  const { createSchemaComposer } = require(
+    `../../../gatsby/src/schema/schema-composer`
+  )
 
-  const {
-    addInferredFields,
-  } = require(`../../../gatsby/src/schema/infer/add-inferred-fields`)
-  const {
-    addNodes,
-  } = require(`../../../gatsby/src/schema/infer/inference-metadata`)
-  const {
-    getExampleObject,
-  } = require(`../../../gatsby/src/schema/infer/build-example-data`)
+  const { addInferredFields } = require(
+    `../../../gatsby/src/schema/infer/add-inferred-fields`
+  )
+  const { addNodes } = require(
+    `../../../gatsby/src/schema/infer/inference-metadata`
+  )
+  const { getExampleObject } = require(
+    `../../../gatsby/src/schema/infer/build-example-data`
+  )
 
   const typeName = `MarkdownRemark`
   const sc = createSchemaComposer()

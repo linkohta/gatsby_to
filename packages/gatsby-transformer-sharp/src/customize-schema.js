@@ -9,13 +9,9 @@ const {
   GraphQLNonNull,
   GraphQLJSON,
 } = require(`gatsby/graphql`)
-const {
-  queueImageResizing,
-  base64,
-  fluid,
-  fixed,
-  generateImageData,
-} = require(`gatsby-plugin-sharp`)
+const { queueImageResizing, base64, fluid, fixed, generateImageData } = require(
+  `gatsby-plugin-sharp`
+)
 const { hasFeature } = require(`gatsby-plugin-utils`)
 
 const sharp = require(`./safe-sharp`)

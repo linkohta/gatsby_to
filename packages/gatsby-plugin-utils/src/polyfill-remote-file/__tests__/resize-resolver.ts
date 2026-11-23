@@ -191,7 +191,7 @@ describe(`resizeResolver`, () => {
         widthWithFit: Array<[ImageFit, number, number]>
         heightWithFit: Array<[ImageFit, number, number]>
         bothWithFit: Array<[ImageFit, number, number]>
-      }
+      },
     ]
   >)(`%s image`, (type, source, expected) => {
     it(`should resize an image when width is given`, async () => {

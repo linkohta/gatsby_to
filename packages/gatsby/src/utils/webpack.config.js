@@ -3,9 +3,9 @@ const fs = require(`fs-extra`)
 const path = require(`path`)
 const dotenv = require(`dotenv`)
 const { CoreJSResolver } = require(`./webpack/plugins/corejs-resolver`)
-const {
-  CacheFolderResolver,
-} = require(`./webpack/plugins/cache-folder-resolver`)
+const { CacheFolderResolver } = require(
+  `./webpack/plugins/cache-folder-resolver`
+)
 const { store } = require(`../redux`)
 const { actions } = require(`../redux/actions`)
 const { getPublicPath } = require(`./get-public-path`)

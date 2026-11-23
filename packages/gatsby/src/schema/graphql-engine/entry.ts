@@ -26,8 +26,7 @@ import {
 import { initTracer } from "../../utils/tracer"
 
 type MaybePhantomActivity =
-  | ReturnType<typeof reporter.phantomActivity>
-  | undefined
+  ReturnType<typeof reporter.phantomActivity> | undefined
 
 const tracerReadyPromise = initTracer(
   process.env.GATSBY_OPEN_TRACING_CONFIG_FILE ?? ``
@@ -205,8 +204,7 @@ export class GraphQLEngine {
       pages: {
         get(pathName: string): IGatsbyPage | undefined {
           return getDataStore().getNode(`SitePage ${pathName}`) as
-            | IGatsbyPage
-            | undefined
+            IGatsbyPage | undefined
         },
         values(): Iterable<IGatsbyPage> {
           return getDataStore().iterateNodesByType(

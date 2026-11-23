@@ -15,7 +15,7 @@ import { isPromise } from "./utils"
 let counter = 0
 export interface IGatsbyWorkerMessenger<
   MessagesFromParent = unknown,
-  MessagesFromChild = MessagesFromParent
+  MessagesFromChild = MessagesFromParent,
 > {
   onMessage: (listener: (msg: MessagesFromParent) => void) => void
   sendMessage: (msg: MessagesFromChild) => void
@@ -28,7 +28,7 @@ export interface IGatsbyWorkerMessenger<
 let isWorker = false
 let getMessenger = function <
   MessagesFromParent = unknown,
-  MessagesFromChild = MessagesFromParent
+  MessagesFromChild = MessagesFromParent,
 >(): IGatsbyWorkerMessenger<MessagesFromParent, MessagesFromChild> | undefined {
   return undefined
 }
@@ -89,7 +89,7 @@ if (
 
   getMessenger = function <
     MessagesFromParent = unknown,
-    MessagesFromChild = MessagesFromParent
+    MessagesFromChild = MessagesFromParent,
   >(): IGatsbyWorkerMessenger<MessagesFromParent, MessagesFromChild> {
     return {
       onMessage(listener: (msg: MessagesFromParent) => void): void {

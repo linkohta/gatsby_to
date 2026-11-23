@@ -1,8 +1,8 @@
 const fs = require(`fs-extra`)
 const _ = require(`lodash`)
-const {
-  getMonorepoPackageJsonPath,
-} = require(`./get-monorepo-package-json-path`)
+const { getMonorepoPackageJsonPath } = require(
+  `./get-monorepo-package-json-path`
+)
 const got = require(`got`)
 
 function difference(object, base) {

@@ -367,32 +367,24 @@ Use `nodeModel.findAll` and `nodeModel.findOne` instead. Those are almost a drop
 ```js
 const entries = await nodeModel.runQuery({
   type: `MyType`,
-  query: {
-    /* ... */
-  },
+  query: {/* ... */},
   firstOnly: false,
 })
 // is the same as:
 const { entries } = await nodeModel.findAll({
   type: `MyType`,
-  query: {
-    /* ... */
-  },
+  query: {/* ... */},
 })
 
 const node = await nodeModel.runQuery({
   type: `MyType`,
-  query: {
-    /* ... */
-  },
+  query: {/* ... */},
   firstOnly: true,
 })
 // is the same as:
 const node = await nodeModel.findOne({
   type: `MyType`,
-  query: {
-    /* ... */
-  },
+  query: {/* ... */},
 })
 ```
 
@@ -570,9 +562,7 @@ Before v4 you could do something like this, and it was working:
 
 ```js
 exports.sourceNodes = ({ actions }) => {
-  const node = {
-    /* */
-  }
+  const node = {/* */}
   actions.createNode(node)
 
   // somewhere else:

@@ -21,7 +21,7 @@ const invokeLeftoverPreviewCallback =
   }) =>
   async ([nodeId, callback]: [
     string,
-    OnPageCreatedCallback
+    OnPageCreatedCallback,
   ]): Promise<void> => {
     const passedNode = getNode(nodeId)
 

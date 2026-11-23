@@ -21,8 +21,7 @@ interface IModuleWithServerData {
 
 export async function getServerData(
   req:
-    | Partial<Pick<Request, "query" | "method" | "url" | "headers">>
-    | undefined,
+    Partial<Pick<Request, "query" | "method" | "url" | "headers">> | undefined,
   page: Pick<IGatsbyPage, "path" | "matchPath" | "context">,
   pagePath: string,
   mod: IModuleWithServerData | undefined

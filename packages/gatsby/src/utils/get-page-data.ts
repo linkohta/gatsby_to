@@ -57,16 +57,19 @@ async function waitNextPageData(
     return new Promise(resolve => {
       emitter.on(`CLEAR_PENDING_PAGE_DATA_WRITE`, listener)
 
-      const timeout = setTimeout((): void => {
-        emitter.off(`CLEAR_PENDING_PAGE_DATA_WRITE`, listener)
-        resolve(
-          doGetPageData(
-            pagePath,
-            Math.max(remainingTime - RETRY_INTERVAL, 0),
-            initialWaitForMs
+      const timeout = setTimeout(
+        (): void => {
+          emitter.off(`CLEAR_PENDING_PAGE_DATA_WRITE`, listener)
+          resolve(
+            doGetPageData(
+              pagePath,
+              Math.max(remainingTime - RETRY_INTERVAL, 0),
+              initialWaitForMs
+            )
           )
-        )
-      }, Math.min(RETRY_INTERVAL, remainingTime))
+        },
+        Math.min(RETRY_INTERVAL, remainingTime)
+      )
 
       function listener(data: IClearPendingPageDataWriteAction): void {
         if (data.payload.page === pagePath) {

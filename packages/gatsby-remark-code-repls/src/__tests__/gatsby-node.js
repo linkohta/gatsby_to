@@ -17,10 +17,9 @@ const readdir = require(`recursive-readdir`)
 
 const reporter = require(`gatsby/reporter`)
 
-const {
-  OPTION_DEFAULT_REPL_DIRECTORY,
-  OPTION_DEFAULT_CODEPEN,
-} = require(`../constants`)
+const { OPTION_DEFAULT_REPL_DIRECTORY, OPTION_DEFAULT_CODEPEN } = require(
+  `../constants`
+)
 const { createPages } = require(`../gatsby-node`)
 
 const createPage = jest.fn()

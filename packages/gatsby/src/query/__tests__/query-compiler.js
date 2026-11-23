@@ -10,11 +10,9 @@ const { parse, buildSchema } = require(`graphql`)
 const fs = require(`fs-extra`)
 const path = require(`path`)
 const glob = require(`glob`)
-const {
-  resolveThemes,
-  parseQueries,
-  processQueries,
-} = require(`../query-compiler`)
+const { resolveThemes, parseQueries, processQueries } = require(
+  `../query-compiler`
+)
 
 const base = path.resolve(``)
 

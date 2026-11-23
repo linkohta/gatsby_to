@@ -13,8 +13,8 @@ type WeakValidationMap<T> = {
   [K in keyof T]?: null extends T[K]
     ? PropTypes.Validator<T[K] | null | undefined>
     : undefined extends T[K]
-    ? PropTypes.Validator<T[K] | null | undefined>
-    : PropTypes.Validator<T[K]>
+      ? PropTypes.Validator<T[K] | null | undefined>
+      : PropTypes.Validator<T[K]>
 }
 
 const removeNewLines = (str: string): string => str.replace(/\n/g, ``)

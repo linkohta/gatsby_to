@@ -41,7 +41,7 @@ export function getRemoteFileFields(
 }
 
 function addRemoteFilePolyfillInterface<
-  T = ReturnType<SchemaBuilder["buildObjectType"]>
+  T = ReturnType<SchemaBuilder["buildObjectType"]>,
 >(
   type: T,
   {

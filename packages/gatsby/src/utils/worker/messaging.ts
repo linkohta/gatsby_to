@@ -25,7 +25,6 @@ export type GatsbyWorkerMessenger = IGatsbyWorkerMessenger<
 >
 
 const getGatsbyMessenger = getMessenger as () =>
-  | GatsbyWorkerMessenger
-  | undefined
+  GatsbyWorkerMessenger | undefined
 
 export { isWorker, getGatsbyMessenger as getMessenger }

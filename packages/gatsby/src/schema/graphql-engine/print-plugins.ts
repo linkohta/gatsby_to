@@ -168,11 +168,8 @@ async function filterPluginsWithWorkers(
   return filteredPlugins
 }
 
-type ArrayElement<ArrayType extends Array<unknown>> = ArrayType extends Array<
-  infer ElementType
->
-  ? ElementType
-  : never
+type ArrayElement<ArrayType extends Array<unknown>> =
+  ArrayType extends Array<infer ElementType> ? ElementType : never
 
 function getSubpluginsByPluginPath(
   parentPlugin: ArrayElement<IGatsbyState["flattenedPlugins"]>,

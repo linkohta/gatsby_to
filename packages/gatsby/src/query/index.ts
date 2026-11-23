@@ -139,8 +139,7 @@ async function processQueries<QueryIDType>({
     queryId: QueryIDType
   ) => IQueryJob | undefined
   onQueryDone:
-    | (({ job, result }: { job: IQueryJob; result: unknown }) => void)
-    | undefined
+    (({ job, result }: { job: IQueryJob; result: unknown }) => void) | undefined
   state: IGatsbyState
   activity: IProgressReporter
   graphqlRunner: GraphQLRunner

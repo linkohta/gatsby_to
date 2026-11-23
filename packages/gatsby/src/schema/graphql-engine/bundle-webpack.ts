@@ -147,20 +147,17 @@ interface ILMDBBinaryPackageStatusBase {
   packageVersion: string
 }
 
-interface ILMDBBinaryPackageStatusInstalled
-  extends ILMDBBinaryPackageStatusBase {
+interface ILMDBBinaryPackageStatusInstalled extends ILMDBBinaryPackageStatusBase {
   needToInstall: false
   packageLocation: string
 }
 
-interface ILMDBBinaryPackageStatusNeedAlternative
-  extends ILMDBBinaryPackageStatusBase {
+interface ILMDBBinaryPackageStatusNeedAlternative extends ILMDBBinaryPackageStatusBase {
   needToInstall: true
 }
 
 type IBinaryPackageStatus =
-  | ILMDBBinaryPackageStatusInstalled
-  | ILMDBBinaryPackageStatusNeedAlternative
+  ILMDBBinaryPackageStatusInstalled | ILMDBBinaryPackageStatusNeedAlternative
 
 function checkIfInstalledInInternalPackagesCache(
   packageStatus: IBinaryPackageStatus,
@@ -340,7 +337,7 @@ export async function createGraphqlEngineBundle(
 ): Promise<webpack.Compilation | undefined> {
   const state = store.getState()
   const pathPrefix = state.program.prefixPaths
-    ? state.config.pathPrefix ?? ``
+    ? (state.config.pathPrefix ?? ``)
     : ``
 
   const schemaSnapshotString = await fs.readFile(

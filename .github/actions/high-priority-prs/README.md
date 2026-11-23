@@ -28,7 +28,7 @@ except for the Core team which receives a list from all open PRs.
 Run using [act](https://github.com/nektos/act): `act -a "high-priority-prs"`
 
 You'll be prompted to enter in the required tokens (GitHub will use the tokens saved from the UI), you can
-[generate your own Slack token](https://api.slack.com/custom-integrations/legacy-tokens) as well as [your own GitHub token](), for GitHub be sure to
+[generate your own Slack token](https://api.slack.com/custom-integrations/legacy-tokens) as well as [your own GitHub token](<>), for GitHub be sure to
 add permissions when generating for `repo`, `read:org`, and `read:discussion`, you can enter the ID of your personal slack channel to send direct messages
 to yourself while testing.
 

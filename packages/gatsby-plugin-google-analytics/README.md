@@ -245,9 +245,7 @@ The analytics script tag is not properly loaded into the DOM. You can fix this b
 
 ```javascript
 module.exports = {
-  siteMetadata: {
-    /* your metadata */
-  },
+  siteMetadata: {/* your metadata */},
   plugins: [
     // Make sure this plugin is first in the array of plugins
     {

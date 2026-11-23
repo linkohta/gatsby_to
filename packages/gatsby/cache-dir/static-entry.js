@@ -1,9 +1,8 @@
 const React = require(`react`)
 const path = require(`path`)
-const {
-  renderToStaticMarkup,
-  renderToPipeableStream,
-} = require(`react-dom/server`)
+const { renderToStaticMarkup, renderToPipeableStream } = require(
+  `react-dom/server`
+)
 const { ServerLocation, Router, isRedirect } = require(`@gatsbyjs/reach-router`)
 const merge = require(`deepmerge`)
 const { StaticQueryContext } = require(`gatsby`)

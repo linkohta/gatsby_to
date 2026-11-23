@@ -59,11 +59,7 @@ type CSSModulesOptions =
       localIdentHashPrefix?: string
       namedExport?: boolean
       exportLocalsConvention?:
-        | "asIs"
-        | "camelCaseOnly"
-        | "camelCase"
-        | "dashes"
-        | "dashesOnly"
+        "asIs" | "camelCaseOnly" | "camelCase" | "dashes" | "dashesOnly"
       exportOnlyLocals?: boolean
     }
 
@@ -82,8 +78,7 @@ interface ILoaderUtils {
   css: LoaderResolver<{
     url?: boolean | ((url: string, resourcePath: string) => boolean)
     import?:
-      | boolean
-      | ((url: string, media: string, resourcePath: string) => boolean)
+      boolean | ((url: string, media: string, resourcePath: string) => boolean)
     modules?: CSSModulesOptions
     sourceMap?: boolean
     importLoaders?: number

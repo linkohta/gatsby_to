@@ -49,10 +49,7 @@ const isGatsbyImageParent = <T>(
 ): node is IGatsbyImageParent<T> => Boolean(node?.gatsbyImage)
 
 export type ImageDataLike =
-  | FileNode
-  | IGatsbyImageDataParent
-  | IGatsbyImageParent
-  | IGatsbyImageData
+  FileNode | IGatsbyImageDataParent | IGatsbyImageParent | IGatsbyImageData
 
 export const getImage = (
   node: ImageDataLike | null

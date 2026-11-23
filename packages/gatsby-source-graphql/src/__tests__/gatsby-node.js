@@ -25,11 +25,9 @@ jest.mock(`gatsby/graphql`, () => {
     printSchema: jest.fn(),
   }
 })
-const {
-  createSchemaCustomization,
-  sourceNodes,
-  pluginOptionsSchema,
-} = require(`../gatsby-node`)
+const { createSchemaCustomization, sourceNodes, pluginOptionsSchema } = require(
+  `../gatsby-node`
+)
 const { fetchWrapper } = require(`../fetch`)
 
 const getInternalGatsbyAPI = () => {

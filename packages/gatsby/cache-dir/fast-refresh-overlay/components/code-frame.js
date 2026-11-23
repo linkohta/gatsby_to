@@ -18,8 +18,8 @@ export function CodeFrame({ decoded }) {
             ...(entry.decoration === `bold`
               ? { fontWeight: 800 }
               : entry.decoration === `italic`
-              ? { fontStyle: `italic` }
-              : undefined),
+                ? { fontStyle: `italic` }
+                : undefined),
           }
 
           return (

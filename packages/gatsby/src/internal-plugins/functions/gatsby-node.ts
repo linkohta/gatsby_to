@@ -248,15 +248,21 @@ const createWebpackConfig = async ({
     }
   }
 
-  const envObject = Object.keys(parsed).reduce((acc, key) => {
-    acc[key] = JSON.stringify(parsed[key])
-    return acc
-  }, {} as Record<string, string>)
+  const envObject = Object.keys(parsed).reduce(
+    (acc, key) => {
+      acc[key] = JSON.stringify(parsed[key])
+      return acc
+    },
+    {} as Record<string, string>
+  )
 
-  const varsFromProcessEnv = Object.keys(process.env).reduce((acc, key) => {
-    acc[key] = JSON.stringify(process.env[key])
-    return acc
-  }, {} as Record<string, string>)
+  const varsFromProcessEnv = Object.keys(process.env).reduce(
+    (acc, key) => {
+      acc[key] = JSON.stringify(process.env[key])
+      return acc
+    },
+    {} as Record<string, string>
+  )
 
   // gatsby の動作を壊さないよう、NODE_ENV と PUBLIC_DIR の上書きは許可しない
   envObject.NODE_ENV = JSON.stringify(nodeEnv)

@@ -11,8 +11,10 @@ export enum ScriptStrategy {
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface ScriptProps
-  extends Omit<ScriptHTMLAttributes<HTMLScriptElement>, `onLoad` | `onError`> {
+export interface ScriptProps extends Omit<
+  ScriptHTMLAttributes<HTMLScriptElement>,
+  `onLoad` | `onError`
+> {
   id?: string
   strategy?: ScriptStrategy | `post-hydrate` | `idle` | `off-main-thread`
   children?: string

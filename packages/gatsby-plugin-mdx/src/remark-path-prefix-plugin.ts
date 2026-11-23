@@ -11,9 +11,8 @@ export const remarkPathPlugin = ({ pathPrefix }: { pathPrefix: string }) =>
     if (!pathPrefix) {
       return markdownAST
     }
-    const { visit } = await cachedImport<typeof import("unist-util-visit")>(
-      `unist-util-visit`
-    )
+    const { visit } =
+      await cachedImport<typeof import("unist-util-visit")>(`unist-util-visit`)
 
     visit(markdownAST, [`link`, `definition`], (node: Node) => {
       const typedNode = node as { url?: string }

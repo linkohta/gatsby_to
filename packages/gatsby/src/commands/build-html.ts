@@ -177,9 +177,9 @@ const runWebpack = (
           } else {
             newHash = stats?.hash || ``
 
-            const {
-              restartWorker,
-            } = require(`../utils/dev-ssr/render-dev-html`)
+            const { restartWorker } = require(
+              `../utils/dev-ssr/render-dev-html`
+            )
             // 開発中は必ず最新のバージョンを使うようにする
             if (oldHash !== `` && newHash !== oldHash) {
               restartWorker(`${directory}/${ROUTES_DIRECTORY}render-page.js`)

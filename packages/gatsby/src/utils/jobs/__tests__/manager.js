@@ -1,7 +1,9 @@
 const path = require(`path`)
 const _ = require(`lodash`)
 const { slash } = require(`gatsby-core-utils`)
-const worker = require(`./fixtures/node_modules/gatsby-plugin-test/gatsby-worker`)
+const worker = require(
+  `./fixtures/node_modules/gatsby-plugin-test/gatsby-worker`
+)
 const reporter = require(`gatsby-cli/lib/reporter`)
 const hasha = require(`hasha`)
 const fs = require(`fs-extra`)

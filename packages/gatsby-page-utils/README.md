@@ -9,12 +9,9 @@ npm install gatsby-page-utils
 ### Example
 
 ```js
-const {
-  createPath,
-  ignorePath,
-  validatePath,
-  watchDirectory,
-} = require(`gatsby-page-utils`)
+const { createPath, ignorePath, validatePath, watchDirectory } = require(
+  `gatsby-page-utils`
+)
 
 // ...
 

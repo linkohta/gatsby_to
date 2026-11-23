@@ -392,7 +392,9 @@ describe(`gatsby-source-drupal`, () => {
     describe(`multiple entities in webhook body`, () => {
       let resp
       beforeAll(async () => {
-        const webhookBody = require(`./fixtures/webhook-body-multiple-nodes.json`)
+        const webhookBody = require(
+          `./fixtures/webhook-body-multiple-nodes.json`
+        )
         await sourceNodes(
           {
             ...args,

@@ -10,9 +10,8 @@ import type { MdxJsxAttribute, MdxJsxFlowElement } from "mdast-util-mdx"
 // 処理の負荷はとても小さい。
 export const remarkMdxHtmlPlugin = () =>
   async function transformer(markdownAST: Node): Promise<Node> {
-    const { visit } = await cachedImport<typeof import("unist-util-visit")>(
-      `unist-util-visit`
-    )
+    const { visit } =
+      await cachedImport<typeof import("unist-util-visit")>(`unist-util-visit`)
 
     // mdast ノードを hast ノードに変換する
     // gatsby-plugin-autolink-headers に対応するために必要である

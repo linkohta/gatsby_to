@@ -23,10 +23,7 @@ import { store } from "../redux"
 export const toNodeTypeNames = (
   schema: GraphQLSchema,
   gqlTypeName:
-    | string
-    | GraphQLObjectType
-    | GraphQLInterfaceType
-    | GraphQLUnionType
+    string | GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType
 ): Array<string> => {
   const gqlType =
     typeof gqlTypeName === `string` ? schema.getType(gqlTypeName) : gqlTypeName

@@ -53,8 +53,8 @@ export function routeLoadingIndicatorRequests(app: Express): void {
         indicatorEnabled === `auto`
           ? `auto`
           : indicatorEnabled
-          ? `enabled`
-          : `disabled`,
+            ? `enabled`
+            : `disabled`,
     })
   })
 }

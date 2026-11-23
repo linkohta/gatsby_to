@@ -35,10 +35,9 @@ const {
   setActions,
 } = require(`../`)
 
-const {
-  getPluginOptionsDefaults,
-  setPluginOptions,
-} = require(`../plugin-options`)
+const { getPluginOptionsDefaults, setPluginOptions } = require(
+  `../plugin-options`
+)
 
 jest.mock(`gatsby/reporter`, () => {
   return {

@@ -17,7 +17,7 @@ function isNode(result: IDecoratedResult): boolean {
   const keys = Object.keys(result)
   return Boolean(
     result.shopifyId &&
-      !(keys.length === 2 && result.__parentId && result.shopifyId)
+    !(keys.length === 2 && result.__parentId && result.shopifyId)
   )
 }
 

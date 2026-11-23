@@ -97,10 +97,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: (context): `${Type}` =>
       `WEBPACK.${
         context.stage.toUpperCase() as
-          | `DEVELOP`
-          | `DEVELOP-HTML`
-          | `BUILD-JAVASCRIPT`
-          | `BUILD-HTML`
+          `DEVELOP` | `DEVELOP-HTML` | `BUILD-JAVASCRIPT` | `BUILD-HTML`
       }`,
     level: Level.ERROR,
     category: ErrorCategory.UNKNOWN,
@@ -118,10 +115,7 @@ const errors: Record<string, IErrorMapEntry> = {
     type: (context): `${Type}` =>
       `WEBPACK.${
         context.stage.toUpperCase() as
-          | `DEVELOP`
-          | `DEVELOP-HTML`
-          | `BUILD-JAVASCRIPT`
-          | `BUILD-HTML`
+          `DEVELOP` | `DEVELOP-HTML` | `BUILD-JAVASCRIPT` | `BUILD-HTML`
       }`,
     level: Level.ERROR,
     category: ErrorCategory.USER,
@@ -225,8 +219,8 @@ const errors: Record<string, IErrorMapEntry> = {
     text: (context): string =>
       stripIndent(`
         GraphQL syntax error in query:\n\n${context.sourceMessage}${
-        context.codeFrame ? `\n\n${context.codeFrame}` : ``
-      }`),
+          context.codeFrame ? `\n\n${context.codeFrame}` : ``
+        }`),
     type: Type.GRAPHQL_VALIDATION,
     level: Level.ERROR,
     category: ErrorCategory.USER,
@@ -262,8 +256,8 @@ const errors: Record<string, IErrorMapEntry> = {
         There was an error in your GraphQL query:\n\n${
           context.sourceMessage
         }${optionalGraphQLInfo(
-        context
-      )}\n\n${staticQueryMessage}\n\n${generalMessage}`)
+          context
+        )}\n\n${staticQueryMessage}\n\n${generalMessage}`)
     },
     type: Type.GRAPHQL_VALIDATION,
     level: Level.ERROR,
@@ -578,8 +572,8 @@ const errors: Record<string, IErrorMapEntry> = {
       [
         stripIndent(`
           Invalid plugin options for "${context.pluginName}"${
-          context.configDir ? `, configured by ${context.configDir}` : ``
-        }:
+            context.configDir ? `, configured by ${context.configDir}` : ``
+          }:
         `),
       ]
         .concat([``])
@@ -776,8 +770,8 @@ const errors: Record<string, IErrorMapEntry> = {
       stripIndent(`
         The path "${context.path}" errored during SSR.
         Edit its component ${context.filePath}${
-        context.line ? `:${context.line}:${context.column}` : ``
-      } to resolve the error.`),
+          context.line ? `:${context.line}:${context.column}` : ``
+        } to resolve the error.`),
     level: Level.WARNING,
     category: ErrorCategory.USER,
     type: Type.HTML_GENERATION_DEV_SSR,
@@ -996,8 +990,10 @@ export interface IErrorMapEntry {
 }
 
 // プラグイン向けに level と type を省略可能にする
-export interface IErrorMapEntryPublicApi
-  extends Omit<IErrorMapEntry, "level" | "type"> {
+export interface IErrorMapEntryPublicApi extends Omit<
+  IErrorMapEntry,
+  "level" | "type"
+> {
   level?: `${Level}`
   type?: `${Type}` | ((context) => `${Type}`)
 }

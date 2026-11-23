@@ -1,9 +1,7 @@
 // @flow
-const {
-  GraphQLDirective,
-  DirectiveLocation,
-  specifiedDirectives,
-} = require(`graphql`)
+const { GraphQLDirective, DirectiveLocation, specifiedDirectives } = require(
+  `graphql`
+)
 
 const { link, fileByPath } = require(`../resolvers`)
 import { getDateResolver } from "../types/date"

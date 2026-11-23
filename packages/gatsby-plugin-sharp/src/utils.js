@@ -85,12 +85,12 @@ export function fixedImageSizes({
     const fixedDimension = imgDimensions.width < width ? `width` : `height`
     reporter.warn(`
                        The requested ${fixedDimension} "${
-      fixedDimension === `width` ? width : height
-    }px" for a resolutions field for
+                         fixedDimension === `width` ? width : height
+                       }px" for a resolutions field for
                        the file ${file.absolutePath}
                        was larger than the actual image ${fixedDimension} of ${
-      imgDimensions[fixedDimension]
-    }px!
+                         imgDimensions[fixedDimension]
+                       }px!
                        If possible, replace the current image with a larger one.
                        `)
 

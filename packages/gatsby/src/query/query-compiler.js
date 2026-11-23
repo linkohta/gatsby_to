@@ -43,15 +43,14 @@ const {
   unknownFragmentError,
 } = require(`./graphql-errors`)
 const report = require(`gatsby-cli/lib/reporter`)
-const {
-  default: errorParser,
-  locInGraphQlToLocInFile,
-} = require(`./error-parser`)
+const { default: errorParser, locInGraphQlToLocInFile } = require(
+  `./error-parser`
+)
 
 const overlayErrorID = `graphql-compiler`
 
 export default async function compile({ parentSpan } = {}): Promise<
-  Map<string, RootQuery>
+  Map<string, RootQuery>,
 > {
   const { program, schema, flattenedPlugins } = store.getState()
 

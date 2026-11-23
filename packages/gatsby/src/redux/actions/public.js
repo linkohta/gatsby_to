@@ -9,9 +9,9 @@ const path = require(`path`)
 const { trueCasePathSync } = require(`true-case-path`)
 const url = require(`url`)
 const { slash } = require(`gatsby-core-utils/path`)
-const {
-  createContentDigest,
-} = require(`gatsby-core-utils/create-content-digest`)
+const { createContentDigest } = require(
+  `gatsby-core-utils/create-content-digest`
+)
 const { splitComponentPath } = require(`gatsby-core-utils/parse-component-path`)
 const { hasNodeChanged } = require(`../../utils/nodes`)
 const { getNode, getDataStore } = require(`../../datastore`)
@@ -20,11 +20,9 @@ const { store } = require(`../index`)
 const { validateComponent } = require(`../../utils/validate-component`)
 import { nodeSchema } from "../../joi-schemas/joi"
 const { generateComponentChunkName } = require(`../../utils/js-chunk-names`)
-const {
-  getCommonDir,
-  truncatePath,
-  tooLongSegmentsInPath,
-} = require(`../../utils/path`)
+const { getCommonDir, truncatePath, tooLongSegmentsInPath } = require(
+  `../../utils/path`
+)
 const { applyTrailingSlashOption } = require(`gatsby-page-utils`)
 const apiRunnerNode = require(`../../utils/api-runner-node`)
 const { getNonGatsbyCodeFrame } = require(`../../utils/stack-trace-utils`)
@@ -43,7 +41,9 @@ const isTestEnv = process.env.NODE_ENV === `test`
 // 無効化すべきである。しかし、webpack は現状、develop セッション中のシャドーイングの変更を
 // 扱えないので、無効化しなくても致命的ではない。
 const shadowCreatePagePath = _.memoize(
-  require(`../../internal-plugins/webpack-theme-component-shadowing/create-page`)
+  require(
+    `../../internal-plugins/webpack-theme-component-shadowing/create-page`
+  )
 )
 const { createInternalJob } = require(`../../utils/jobs/manager`)
 

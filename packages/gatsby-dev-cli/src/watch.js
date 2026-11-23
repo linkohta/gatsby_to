@@ -8,10 +8,9 @@ const findWorkspaceRoot = require(`find-yarn-workspace-root`)
 const { publishPackagesLocallyAndInstall } = require(`./local-npm-registry`)
 const { checkDepsChanges } = require(`./utils/check-deps-changes`)
 const { getDependantPackages } = require(`./utils/get-dependant-packages`)
-const {
-  setDefaultSpawnStdio,
-  promisifiedSpawn,
-} = require(`./utils/promisified-spawn`)
+const { setDefaultSpawnStdio, promisifiedSpawn } = require(
+  `./utils/promisified-spawn`
+)
 const { traversePackagesDeps } = require(`./utils/traverse-package-deps`)
 
 let numCopied = 0

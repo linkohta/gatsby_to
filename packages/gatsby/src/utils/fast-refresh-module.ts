@@ -4,7 +4,7 @@ type Event = [
   {
     action: string
     payload?: any
-  }
+  },
 ]
 
 declare global {

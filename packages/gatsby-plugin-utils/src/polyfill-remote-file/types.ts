@@ -10,8 +10,7 @@ interface IRemoteFileNodeFields {
 export interface IRemoteFileNode extends IRemoteFileNodeFields, Node {}
 
 export interface IRemoteFileNodeInput
-  extends IRemoteFileNodeFields,
-    NodeInput {}
+  extends IRemoteFileNodeFields, NodeInput {}
 
 interface IRemoteImageNodeFields {
   width: number
@@ -20,23 +19,21 @@ interface IRemoteImageNodeFields {
 }
 
 export interface IRemoteImageNode
-  extends IRemoteImageNodeFields,
-    IRemoteFileNode {}
+  extends IRemoteImageNodeFields, IRemoteFileNode {}
 
 export interface IRemoteImageNodeInput
-  extends IRemoteImageNodeFields,
-    IRemoteFileNodeInput {}
+  extends IRemoteImageNodeFields, IRemoteFileNodeInput {}
 
 type GraphqlType<T> = T extends number
   ? "Int" | "Float"
   : T extends boolean
-  ? "Boolean"
-  : string
+    ? "Boolean"
+    : string
 
 export interface IGraphQLFieldConfigDefinition<
   TSource,
   R,
-  TArgs = Record<string, unknown>
+  TArgs = Record<string, unknown>,
 > {
   type: string
   description?: string
@@ -60,14 +57,7 @@ export type ImageFit = import("sharp").FitEnum[keyof import("sharp").FitEnum]
 export type ImageFormat = "jpg" | "png" | "webp" | "avif" | "auto"
 export type ImageLayout = "fixed" | "constrained" | "fullWidth"
 export type ImageCropFocus =
-  | "center"
-  | "top"
-  | "right"
-  | "bottom"
-  | "left"
-  | "entropy"
-  | "edges"
-  | "faces"
+  "center" | "top" | "right" | "bottom" | "left" | "entropy" | "edges" | "faces"
 
 export type WidthOrHeight =
   | { width: number; height: number }

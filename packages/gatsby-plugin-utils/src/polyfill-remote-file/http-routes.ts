@@ -94,8 +94,7 @@ export function addImageRoutes(app: Application, store?: Store): Application {
     )
 
     const httpHeaders = getRequestHeadersForUrl(remoteUrl, store) as
-      | Record<string, string>
-      | undefined
+      Record<string, string> | undefined
 
     const filePath = await transformImage({
       outputDir,

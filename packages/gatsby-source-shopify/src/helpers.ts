@@ -120,8 +120,7 @@ export async function processShopifyImages(
       const image = fieldPath
         .split(`.`)
         .reduce((acc, value) => acc[value] as never, node) as
-        | IShopifyImage
-        | undefined
+        IShopifyImage | undefined
 
       if (image && parseImageExtension(image.originalSrc) !== `gif`) {
         const fileNode = await createRemoteFileNode({

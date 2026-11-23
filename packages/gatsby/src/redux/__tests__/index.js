@@ -8,12 +8,9 @@ const v8Deserialize = jest.spyOn(v8, `deserialize`)
 const reporterInfo = jest.spyOn(reporter, `info`).mockImplementation(jest.fn)
 const reporterWarn = jest.spyOn(reporter, `warn`).mockImplementation(jest.fn)
 
-const {
-  saveState,
-  store,
-  readState,
-  savePartialStateToDisk,
-} = require(`../index`)
+const { saveState, store, readState, savePartialStateToDisk } = require(
+  `../index`
+)
 
 const {
   actions: { createPage, createNode },

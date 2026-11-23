@@ -158,7 +158,7 @@ export const printDirectives = (
 
 const printInputValue = ([name, inputTC]: [
   string,
-  ObjectTypeComposerArgumentConfig
+  ObjectTypeComposerArgumentConfig,
 ]): string => {
   let argDecl = name + `: ` + inputTC.type.getTypeName()
   if (inputTC.defaultValue) {

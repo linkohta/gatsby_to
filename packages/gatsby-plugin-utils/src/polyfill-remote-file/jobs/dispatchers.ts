@@ -113,8 +113,7 @@ export function dispatchLocalImageServiceJob(
   const outputFilename = decodeURI(publicUrl.pop()?.split(`?`)?.[0] as string)
 
   const httpHeaders = getRequestHeadersForUrl(url, store) as
-    | Record<string, string>
-    | undefined
+    Record<string, string> | undefined
 
   actions.createJobV2(
     {

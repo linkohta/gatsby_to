@@ -207,21 +207,19 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
     const blogPost = path.resolve("src/templates/blog-post.js")
     // Query for all markdown "nodes" and for the slug you previously created.
     resolve(
-      graphql(
-        `
-          {
-            allMarkdownRemark {
-              edges {
-                node {
-                  fields {
-                    slug
-                  }
+      graphql(`
+        {
+          allMarkdownRemark {
+            edges {
+              node {
+                fields {
+                  slug
                 }
               }
             }
           }
-        `
-      ).then(result => {
+        }
+      `).then(result => {
         if (result.errors) {
           console.log(result.errors)
           reject(result.errors)

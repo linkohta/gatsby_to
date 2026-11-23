@@ -27,9 +27,7 @@ The left sidebar has a top and bottom section. The top has buttons for the docum
 In the middle section, below the welcome comment, begin typing:
 
 ```graphql
-query {
-
-}
+query {}
 ```
 
 Now inside the curly braces press <kbd>Ctrl + Space</kbd> (or use <kbd>Shift + Space</kbd> as an alternate keyboard shortcut) to bring up the autocomplete window. Build out a query like this:

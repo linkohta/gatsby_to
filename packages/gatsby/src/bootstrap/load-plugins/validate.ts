@@ -352,10 +352,8 @@ async function validatePluginsOptions(
           reporter.warn(
             stripIndent(`
         Warning: there are unknown plugin options for "${plugin.resolve}"${
-              configDir ? `, configured by ${configDir}` : ``
-            }: ${validationWarnings
-              .map(error => error.path.join(`.`))
-              .join(`, `)}
+          configDir ? `, configured by ${configDir}` : ``
+        }: ${validationWarnings.map(error => error.path.join(`.`)).join(`, `)}
         Please open an issue at https://ghub.io/${
           plugin.resolve
         } if you believe this option is valid.

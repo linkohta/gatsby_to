@@ -1,8 +1,7 @@
 const { buildSchema, printSchema } = require(`gatsby/graphql`)
-const {
-  NamespaceUnderFieldTransform,
-  StripNonQueryTransform,
-} = require(`../transforms`)
+const { NamespaceUnderFieldTransform, StripNonQueryTransform } = require(
+  `../transforms`
+)
 
 const sdl = `
   type Query {
