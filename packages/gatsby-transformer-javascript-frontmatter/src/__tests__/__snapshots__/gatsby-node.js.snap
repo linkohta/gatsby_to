@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`gatsby-transformer-javascript-frontmatter onCreateNode should load frontmatter data from named export 1`] = `
 Array [

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`transformer-react-doc-gen: onCreateNode flowTypes should add flow type info: flow types 1`] = `
 Array [

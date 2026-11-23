@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`gatsby-remark-code-repls Babel remark transform generates a link for files in nested directories 1`] = `
 Object {

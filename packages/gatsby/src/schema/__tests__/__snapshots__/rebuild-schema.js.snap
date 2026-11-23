@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Built-in types preserves built-in types 1`] = `
 "\\"\\"\\"Add date formatting options.\\"\\"\\"

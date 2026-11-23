@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Babelrc actions/reducer adds stage option to babel-preset-gatsby defined with userland babelrc 1`] = `
 Array [

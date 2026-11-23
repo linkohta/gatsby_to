@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`babel-preset-gatsby should specify proper presets and plugins when stage is build-html 1`] = `
 Object {
