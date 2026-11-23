@@ -39,10 +39,13 @@ exports.onPostBuild = async ({ graphql, reporter }, pluginOptions) => {
         `You did not pass in a valid serialize function. Your feed will not be generated.`
       )
     } else {
-      const rssFeed = (await feed.serialize(locals)).reduce((merged, item) => {
-        merged.item(item)
-        return merged
-      }, new RSS(setup(locals)))
+      const rssFeed = (await feed.serialize(locals)).reduce(
+        (merged, item) => {
+          merged.item(item)
+          return merged
+        },
+        new RSS(setup(locals))
+      )
 
       const outputPath = path.join(publicPath, feed.output)
       const outputDir = path.dirname(outputPath)

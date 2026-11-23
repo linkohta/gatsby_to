@@ -23,14 +23,13 @@ const { getDataStore, getNode, getNodesByType } = require(`../datastore`)
 const apiRunner = require(`../utils/api-runner-node`)
 const report = require(`gatsby-cli/lib/reporter`)
 const { addNodeInterfaceFields } = require(`./types/node-interface`)
-const {
-  overridableBuiltInTypeNames,
-  builtInScalarTypeNames,
-} = require(`./types/built-in-types`)
+const { overridableBuiltInTypeNames, builtInScalarTypeNames } = require(
+  `./types/built-in-types`
+)
 const { addInferredTypes } = require(`./infer`)
-const {
-  addRemoteFileInterfaceFields,
-} = require(`./types/remote-file-interface`)
+const { addRemoteFileInterfaceFields } = require(
+  `./types/remote-file-interface`
+)
 
 const {
   findOne,
@@ -38,10 +37,9 @@ const {
   wrappingResolver,
   defaultResolver,
 } = require(`./resolvers`)
-const {
-  processFieldExtensions,
-  internalExtensionNames,
-} = require(`./extensions`)
+const { processFieldExtensions, internalExtensionNames } = require(
+  `./extensions`
+)
 import { getPagination } from "./types/pagination"
 import {
   SORTABLE_ENUM,
@@ -51,11 +49,9 @@ import {
 import { getFilterInput, SEARCHABLE_ENUM } from "./types/filter"
 import { isGatsbyType, GatsbyGraphQLTypeKind } from "./types/type-builders"
 
-const {
-  isASTDocument,
-  parseTypeDef,
-  reportParsingError,
-} = require(`./types/type-defs`)
+const { isASTDocument, parseTypeDef, reportParsingError } = require(
+  `./types/type-defs`
+)
 const { printTypeDefinitions } = require(`./print`)
 
 const buildSchema = async ({

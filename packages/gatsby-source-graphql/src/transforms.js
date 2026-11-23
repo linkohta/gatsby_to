@@ -1,10 +1,7 @@
 const { GraphQLObjectType, GraphQLNonNull } = require(`gatsby/graphql`)
-const {
-  mapSchema,
-  MapperKind,
-  addTypes,
-  modifyObjectFields,
-} = require(`@graphql-tools/utils`)
+const { mapSchema, MapperKind, addTypes, modifyObjectFields } = require(
+  `@graphql-tools/utils`
+)
 
 class NamespaceUnderFieldTransform {
   constructor({ typeName, fieldName, resolver }) {

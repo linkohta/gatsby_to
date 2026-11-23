@@ -57,8 +57,8 @@ React.lazy and Suspense are not ready for server-side rendering, but they can be
 ```jsx
 import React from "react"
 
-const ClientSideOnlyLazy = React.lazy(() =>
-  import("../components/ClientSideOnly")
+const ClientSideOnlyLazy = React.lazy(
+  () => import("../components/ClientSideOnly")
 )
 const MyPage = () => {
   const isSSR = typeof window === "undefined"

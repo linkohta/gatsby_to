@@ -13,10 +13,9 @@ const {
 } = require(`gatsby/graphql`)
 const { queueImageResizing } = require(`gatsby-plugin-sharp`)
 const { fetchRemoteFile } = require(`gatsby-core-utils/fetch-remote-file`)
-const {
-  DuotoneGradientType,
-  ImageCropFocusType,
-} = require(`gatsby-transformer-sharp/types`)
+const { DuotoneGradientType, ImageCropFocusType } = require(
+  `gatsby-transformer-sharp/types`
+)
 
 const generateSqip = require(`./generate-sqip`)
 
@@ -183,10 +182,9 @@ async function sqipContentful({ cache }) {
         },
       },
       async resolve(asset, fieldArgs) {
-        const {
-          createUrl,
-          mimeTypeExtensions,
-        } = require(`gatsby-source-contentful/image-helpers`)
+        const { createUrl, mimeTypeExtensions } = require(
+          `gatsby-source-contentful/image-helpers`
+        )
 
         const {
           file: { contentType, url: imgUrl, fileName },

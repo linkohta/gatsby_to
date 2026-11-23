@@ -139,7 +139,7 @@ also align the raw Markdown).
 
 To have a line break without a paragraph, you will need to use two trailing
 spaces.\
- Note that this line is separate, but within the same paragraph.
+Note that this line is separate, but within the same paragraph.
 
 - Unordered list can use asterisks
 

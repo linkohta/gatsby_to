@@ -37,7 +37,7 @@ describe(`log actions from workers are dispatched in main process`, () => {
   describe(`single log lines`, () => {
     type ActionCreateLogCreatorArgs = [
       "log" | "warn" | "info" | "success" | "verbose" | "error",
-      "LOG" | "WARNING" | "INFO" | "SUCCESS" | "DEBUG" | "ERROR"
+      "LOG" | "WARNING" | "INFO" | "SUCCESS" | "DEBUG" | "ERROR",
     ]
 
     test.each([

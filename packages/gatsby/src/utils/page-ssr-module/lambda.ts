@@ -81,14 +81,14 @@ function setupFsWrapper(): string {
     }
 
     function applyRename<
-      T = typeof import("fs") | typeof import("fs").promises
+      T = typeof import("fs") | typeof import("fs").promises,
     >(fsToRewrite: T, lfs: T, method: "rename" | "renameSync"): void {
       const original = fsToRewrite[method]
       if (original) {
         // @ts-ignore - complains about __promisify__ which doesn't actually exist in runtime
         lfs[method] = (
-          ...args: Parameters<typeof import("fs")["rename" | "renameSync"]>
-        ): ReturnType<typeof import("fs")["rename" | "renameSync"]> => {
+          ...args: Parameters<(typeof import("fs"))["rename" | "renameSync"]>
+        ): ReturnType<(typeof import("fs"))["rename" | "renameSync"]> => {
           args[0] = mapPathUsingRewrites(args[0])
           args[1] = mapPathUsingRewrites(args[1])
           // @ts-ignore - can't decide which signature this is, but we just preserve the original
@@ -102,7 +102,7 @@ function setupFsWrapper(): string {
     linkRewritableMethods.push(`createWriteStream`, `createReadStream`, `rm`)
 
     function createLinkedFS<
-      T = typeof import("fs") | typeof import("fs").promises
+      T = typeof import("fs") | typeof import("fs").promises,
     >(fsToRewrite: T): T {
       const linkedFS = link(fsToRewrite, rewrites) as T
 
@@ -248,11 +248,13 @@ const dbPath = setupFsWrapper()
 type GraphQLEngineType =
   import("../../schema/graphql-engine/entry").GraphQLEngine
 
-const { GraphQLEngine } =
-  require(`../query-engine`) as typeof import("../../schema/graphql-engine/entry")
+const { GraphQLEngine } = require(
+  `../query-engine`
+) as typeof import("../../schema/graphql-engine/entry")
 
-const { getData, renderPageData, renderHTML, findEnginePageByPath } =
-  require(`./index`) as typeof import("./entry")
+const { getData, renderPageData, renderHTML, findEnginePageByPath } = require(
+  `./index`
+) as typeof import("./entry")
 
 const streamPipeline = promisify(pipeline)
 

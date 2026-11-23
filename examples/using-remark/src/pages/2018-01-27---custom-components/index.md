@@ -22,9 +22,7 @@ Write the component the way you normally would. For example, here's a simple "Co
 ```js
 import React from "react"
 
-const counterStyle = {
-  /* styles skipped for brevity */
-}
+const counterStyle = {/* styles skipped for brevity */}
 
 export default class Counter extends React.Component {
   static defaultProps = {

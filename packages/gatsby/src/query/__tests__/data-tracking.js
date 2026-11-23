@@ -211,9 +211,9 @@ const setup = async ({ restart = isFirstRun, clearCache = false } = {}) => {
     },
   })
 
-  await require(`../../utils/create-schema-customization`).createSchemaCustomization(
-    {}
-  )
+  await require(
+    `../../utils/create-schema-customization`
+  ).createSchemaCustomization({})
 
   await require(`../../utils/source-nodes`).default({})
   // page-hot-reloader を起動する（前のテストでセットアップされていた場合）

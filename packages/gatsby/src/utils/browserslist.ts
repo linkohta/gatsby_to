@@ -5,12 +5,9 @@ import query from "browserslist"
 const installedGatsbyVersion = (directory: string): number | undefined => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { version } = require(path.join(
-      directory,
-      `node_modules`,
-      `gatsby`,
-      `package.json`
-    ))
+    const { version } = require(
+      path.join(directory, `node_modules`, `gatsby`, `package.json`)
+    )
     return parseInt(version.split(`.`)[0], 10)
   } catch (e) {
     return undefined

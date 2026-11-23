@@ -17,9 +17,8 @@ export async function compileMDX(
   reporter: NodePluginArgs["reporter"]
 ): Promise<{ processedMDX: string; metadata: IMdxMetadata } | null> {
   try {
-    const { createProcessor } = await cachedImport<
-      typeof import("@mdx-js/mdx")
-    >(`@mdx-js/mdx`)
+    const { createProcessor } =
+      await cachedImport<typeof import("@mdx-js/mdx")>(`@mdx-js/mdx`)
     const { VFile } = await cachedImport<typeof import("vfile")>(`vfile`)
 
     const processor = createProcessor(options)

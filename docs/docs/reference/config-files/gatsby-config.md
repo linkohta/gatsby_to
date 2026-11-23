@@ -218,7 +218,7 @@ You can specify the path of the generated TypeScript types file relative to the 
 
 > Support added in `gatsby@5.3.0`
 
-You can overwrite the search paths, which contain documents that should be scanned. Usually you want to include the default values and append your additional paths. Default: `` [`./gatsby-node.ts`, `./plugins/**/gatsby-node.ts`] ``.
+You can overwrite the search paths, which contain documents that should be scanned. Usually you want to include the default values and append your additional paths. Default: ``[`./gatsby-node.ts`, `./plugins/**/gatsby-node.ts`]``.
 
 ### generateOnBuild
 

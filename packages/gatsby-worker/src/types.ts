@@ -28,7 +28,7 @@ type TaskError = [
   ErrorType,
   ErrorMessage,
   ErrorStack | undefined,
-  Error
+  Error,
 ]
 
 type ResultType = unknown
@@ -36,7 +36,4 @@ type ResultType = unknown
 type TaskResult = [typeof RESULT, Counter, ResultType]
 
 export type ChildMessageUnion =
-  | TaskError
-  | TaskResult
-  | CustomMessage
-  | WorkerReadyMessage
+  TaskError | TaskResult | CustomMessage | WorkerReadyMessage

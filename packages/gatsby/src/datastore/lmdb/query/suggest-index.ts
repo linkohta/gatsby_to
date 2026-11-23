@@ -136,9 +136,10 @@ function toIndexFields(
   queries: Array<DbQuery>,
   sortDirection: number = 1
 ): IndexFields {
-  return queries.map(
-    (q): IndexField => [dbQueryToDottedField(q), sortDirection]
-  )
+  return queries.map((q): IndexField => [
+    dbQueryToDottedField(q),
+    sortDirection,
+  ])
 }
 
 function dedupeAndTrim(fields: IndexFields, maxFields: number): IndexFields {

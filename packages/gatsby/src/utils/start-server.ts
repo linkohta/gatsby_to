@@ -203,7 +203,7 @@ export async function startServer(
                 extensions: {
                   stack: err.stack ? err.stack.split(`\n`) : [],
                 },
-              } as unknown as GraphQLError)
+              }) as unknown as GraphQLError
           )
         }
 

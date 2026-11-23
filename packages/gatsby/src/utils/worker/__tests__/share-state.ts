@@ -222,9 +222,8 @@ describe(`worker (share-state)`, () => {
     const components = await worker.single.getComponent(
       dummyPagePayload.component
     )
-    const staticQueryComponents = await worker.single.getStaticQueryComponent(
-      staticQueryID
-    )
+    const staticQueryComponents =
+      await worker.single.getStaticQueryComponent(staticQueryID)
 
     expect(components).toMatchInlineSnapshot(`
       Object {

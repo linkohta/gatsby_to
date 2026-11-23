@@ -450,9 +450,9 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
 function isLocalGatsbySite(): boolean {
   let inGatsbySite = false
   try {
-    const { dependencies, devDependencies } = require(path.resolve(
-      `./package.json`
-    ))
+    const { dependencies, devDependencies } = require(
+      path.resolve(`./package.json`)
+    )
     inGatsbySite =
       (dependencies && dependencies.gatsby) ||
       (devDependencies && devDependencies.gatsby)

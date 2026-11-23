@@ -147,16 +147,14 @@ export function createErrorFromString(
       const error = new Error(errorOrErrorStack.message) as ErrorWithCodeFrame
       error.stack = `${errorOrErrorStack.message}
   at ${forcedLocation.functionName ?? `<anonymous>`} (${
-        forcedLocation.fileName
-      }${
-        forcedLocation.lineNumber
-          ? `:${forcedLocation.lineNumber}${
-              forcedLocation.columnNumber
-                ? `:${forcedLocation.columnNumber}`
-                : ``
-            }`
-          : ``
-      })`
+    forcedLocation.fileName
+  }${
+    forcedLocation.lineNumber
+      ? `:${forcedLocation.lineNumber}${
+          forcedLocation.columnNumber ? `:${forcedLocation.columnNumber}` : ``
+        }`
+      : ``
+  })`
 
       try {
         const source = readFileSync(forcedLocation.fileName, `utf8`)

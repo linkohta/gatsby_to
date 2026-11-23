@@ -339,7 +339,7 @@ function getRoutesManifest(): {
   const routes: Array<RouteWithScore> = []
   const state = store.getState()
   const pathPrefix = state.program.prefixPaths
-    ? state.config.pathPrefix ?? ``
+    ? (state.config.pathPrefix ?? ``)
     : ``
   const createHeaders = createHeadersMatcher(state.config.headers, pathPrefix)
 
@@ -355,9 +355,9 @@ function getRoutesManifest(): {
 
   // TODO: これは、ソートされた順序を保ってルートを一覧に追加する "addSortedRoute" 関数にできるかもしれない。パフォーマンス上必要かどうかは未定
   function addRoute(route: Route): void {
-    if (
-      !(route.path.startsWith(`https://`) || route.path.startsWith(`http://`))
-    ) {
+    if (!(
+      route.path.startsWith(`https://`) || route.path.startsWith(`http://`)
+    )) {
       if (!route.path.startsWith(`/`)) {
         route.path = `/${route.path}`
       }

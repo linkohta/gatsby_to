@@ -6,9 +6,9 @@ const _ = require(`lodash`)
 const { emitter, store } = require(`../../redux`)
 const { actions } = require(`../../redux/actions`)
 const { getNode } = require(`../../datastore`)
-const {
-  findCompiledLocalPluginModule,
-} = require(`../../utils/parcel/compile-gatsby-files`)
+const { findCompiledLocalPluginModule } = require(
+  `../../utils/parcel/compile-gatsby-files`
+)
 
 function transformPackageJson(json) {
   const transformDeps = deps =>

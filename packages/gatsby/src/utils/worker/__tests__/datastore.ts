@@ -41,9 +41,8 @@ it(`worker can access node created in main process`, async () => {
   await getDataStore().ready()
 
   const nodeStoredInMainProcess = getDataStore().getNode(testNodeId)
-  const nodeStoredInWorkerProcess = await worker.single.getNodeFromWorker(
-    testNodeId
-  )
+  const nodeStoredInWorkerProcess =
+    await worker.single.getNodeFromWorker(testNodeId)
 
   expect(nodeStoredInWorkerProcess).toMatchInlineSnapshot(`
     Object {

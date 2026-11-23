@@ -79,7 +79,7 @@ Building on the stacking ring example, suppose that you wanted to give your cust
     data-item-custom1-name="Size"
     data-item-custom1-options="6|6.5|7|7.5|8|8.5|9"
     <!-- highlight-end -->
-    >
+  >
     Add to cart
   </button>
 </section>

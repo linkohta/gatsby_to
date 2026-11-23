@@ -16,11 +16,9 @@ const remark2retext = require(`remark-retext`)
 const stripPosition = require(`unist-util-remove-position`)
 const hastReparseRaw = require(`hast-util-raw`)
 const prune = require(`underscore.string/prune`)
-const {
-  getConcatenatedValue,
-  cloneTreeUntil,
-  findLastTextNode,
-} = require(`./hast-processing`)
+const { getConcatenatedValue, cloneTreeUntil, findLastTextNode } = require(
+  `./hast-processing`
+)
 const codeHandler = require(`./code-handler`)
 const { getHeadingID } = require(`./utils/get-heading-id`)
 const { timeToRead } = require(`./utils/time-to-read`)
@@ -299,8 +297,8 @@ module.exports = function remarkExtendNodeType(
         const defaultFunction = _.isFunction(requiredPlugin)
           ? requiredPlugin
           : _.isFunction(requiredPlugin.default)
-          ? requiredPlugin.default
-          : undefined
+            ? requiredPlugin.default
+            : undefined
 
         if (defaultFunction) {
           await defaultFunction(

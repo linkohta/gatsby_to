@@ -957,9 +957,9 @@ const addRootNodeToInlineObject = (
   rootNodeMap,
   data,
   nodeId,
-  isNode /* : boolean */,
-  path /* : Set<mixed> */
-) /* : void */ => {
+  isNode: boolean,
+  path: Set<mixed>
+): void => {
   const isPlainObject = _.isPlainObject(data)
 
   if (isPlainObject || _.isArray(data)) {

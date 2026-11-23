@@ -22,10 +22,9 @@ const loadCachedConfig = (): ILoadCachedConfigReturnType => {
     },
   }
   if (process.env.NODE_ENV !== `test`) {
-    pluginBabelConfig = require(path.join(
-      process.cwd(),
-      `./.cache/babelState.json`
-    ))
+    pluginBabelConfig = require(
+      path.join(process.cwd(), `./.cache/babelState.json`)
+    )
   }
   return pluginBabelConfig
 }

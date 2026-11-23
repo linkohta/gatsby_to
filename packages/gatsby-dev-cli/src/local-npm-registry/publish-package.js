@@ -9,9 +9,9 @@ const NPMRCContent = `${registryUrl.replace(
   ``
 )}/:_authToken="gatsby-dev"`
 
-const {
-  getMonorepoPackageJsonPath,
-} = require(`../utils/get-monorepo-package-json-path`)
+const { getMonorepoPackageJsonPath } = require(
+  `../utils/get-monorepo-package-json-path`
+)
 const { registerCleanupTask } = require(`./cleanup-tasks`)
 
 const DEPENDENCY_FIELDS = [`dependencies`, `optionalDependencies`]
@@ -68,9 +68,8 @@ const adjustPackageJson = ({
     ).version
 
     for (const field of fieldsToAdjust) {
-      monorepoPKGjson[field][
-        packageThatWillBePublished
-      ] = `${currentVersion}-dev-${versionPostFix}`
+      monorepoPKGjson[field][packageThatWillBePublished] =
+        `${currentVersion}-dev-${versionPostFix}`
     }
   })
 

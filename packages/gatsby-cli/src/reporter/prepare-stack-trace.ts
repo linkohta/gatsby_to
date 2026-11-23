@@ -159,9 +159,7 @@ function CallSiteToString(): string {
   // @ts-ignore
   const _this = this // eslint-disable-line @typescript-eslint/no-this-alias
   const self = _this as
-    | NodeJS.CallSite
-    | IWrappedStackFrame
-    | stackTrace.StackFrame
+    NodeJS.CallSite | IWrappedStackFrame | stackTrace.StackFrame
 
   let fileName
   let fileLocation = ``

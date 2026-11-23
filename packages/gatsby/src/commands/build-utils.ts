@@ -183,28 +183,26 @@ export function markHtmlDirtyIfResultOfUsedStaticQueryChanged(): void {
   const state = store.getState()
 
   const dirtyStaticQueryResults = new Set<string>()
-  state.html.trackedStaticQueryResults.forEach(function (
-    staticQueryResultState,
-    staticQueryHash
-  ) {
-    if (staticQueryResultState.dirty) {
-      dirtyStaticQueryResults.add(staticQueryHash)
+  state.html.trackedStaticQueryResults.forEach(
+    function (staticQueryResultState, staticQueryHash) {
+      if (staticQueryResultState.dirty) {
+        dirtyStaticQueryResults.add(staticQueryHash)
+      }
     }
-  })
+  )
 
   // dirty な静的クエリのハッシュがある。次に、それらを使っているテンプレートを見つける必要がある
   const dirtyTemplates = new Set<string>()
-  state.staticQueriesByTemplate.forEach(function (
-    staticQueryHashes,
-    componentPath
-  ) {
-    for (const dirtyStaticQueryHash of dirtyStaticQueryResults) {
-      if (staticQueryHashes.includes(dirtyStaticQueryHash)) {
-        dirtyTemplates.add(componentPath)
-        break // このテンプレートは再ビルドが必要だとすでに分かっているので、残りのクエリを確認する必要はない
+  state.staticQueriesByTemplate.forEach(
+    function (staticQueryHashes, componentPath) {
+      for (const dirtyStaticQueryHash of dirtyStaticQueryResults) {
+        if (staticQueryHashes.includes(dirtyStaticQueryHash)) {
+          dirtyTemplates.add(componentPath)
+          break // このテンプレートは再ビルドが必要だとすでに分かっているので、残りのクエリを確認する必要はない
+        }
       }
     }
-  })
+  )
 
   // html を dirty とマークする
   const dirtyPages = new Set<string>()

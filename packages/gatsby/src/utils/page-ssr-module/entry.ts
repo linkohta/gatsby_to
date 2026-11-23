@@ -83,8 +83,7 @@ const tracerReadyPromise = initTracer(
 )
 
 type MaybePhantomActivity =
-  | ReturnType<typeof reporter.phantomActivity>
-  | undefined
+  ReturnType<typeof reporter.phantomActivity> | undefined
 
 const createHeaders = createHeadersMatcher(INLINED_HEADERS_CONFIG, PATH_PREFIX)
 

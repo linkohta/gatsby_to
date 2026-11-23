@@ -177,7 +177,8 @@ The component should accept the same props as your image data function, as well 
 ```typescript
 interface ImageComponentProps
   //This is the type for your image data function
-  extends GetGatsbyImageDataProps,
+  extends
+    GetGatsbyImageDataProps,
     // We omit "image" because that's the prop that we generate,
     Omit<GatsbyImageProps, "image"> {
   // Any other props can go here

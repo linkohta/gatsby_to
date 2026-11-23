@@ -1,7 +1,7 @@
 const path = require(`path`)
-const {
-  CORE_JS_POLYFILL_EXCLUDE_LIST: polyfillsToExclude,
-} = require(`gatsby-legacy-polyfills/dist/exclude`)
+const { CORE_JS_POLYFILL_EXCLUDE_LIST: polyfillsToExclude } = require(
+  `gatsby-legacy-polyfills/dist/exclude`
+)
 
 const resolve = m => require.resolve(m)
 
@@ -11,10 +11,9 @@ export function loadCachedConfig() {
   let pluginBabelConfig = {}
   if (!IS_TEST) {
     try {
-      pluginBabelConfig = require(path.join(
-        process.cwd(),
-        `./.cache/babelState.json`
-      ))
+      pluginBabelConfig = require(
+        path.join(process.cwd(), `./.cache/babelState.json`)
+      )
     } catch (err) {
       if (err.message.includes(`Cannot find module`)) {
         // おそらく Gatsby CLI の外で使われている。

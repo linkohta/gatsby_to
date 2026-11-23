@@ -8,7 +8,8 @@ import PropTypes from "prop-types"
 import { ISharpGatsbyImageArgs } from "../image-utils"
 
 export interface IStaticImageProps
-  extends Omit<GatsbyImageProps, "image">,
+  extends
+    Omit<GatsbyImageProps, "image">,
     Omit<ISharpGatsbyImageArgs, "backgroundColor"> {
   src: string
   filename?: string

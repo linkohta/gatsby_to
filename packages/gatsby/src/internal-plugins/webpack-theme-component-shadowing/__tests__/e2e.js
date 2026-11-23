@@ -1,7 +1,9 @@
 const webpack = require(`webpack`)
 const path = require(`path`)
 const fs = require(`fs`)
-const ShadowRealm = require(`gatsby/dist/internal-plugins/webpack-theme-component-shadowing`)
+const ShadowRealm = require(
+  `gatsby/dist/internal-plugins/webpack-theme-component-shadowing`
+)
 
 test.each([
   [

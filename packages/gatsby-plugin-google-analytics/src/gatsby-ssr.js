@@ -115,14 +115,12 @@ export const onRenderBody = (
   }
   if (typeof ga === "function") {
     ga('create', '${pluginOptions.trackingId}', '${
-          typeof pluginOptions.cookieDomain === `string`
-            ? pluginOptions.cookieDomain
-            : `auto`
-        }', ${
-          typeof pluginOptions.name === `string`
-            ? `'${pluginOptions.name}', `
-            : ``
-        }${JSON.stringify(gaCreateOptions)});
+      typeof pluginOptions.cookieDomain === `string`
+        ? pluginOptions.cookieDomain
+        : `auto`
+    }', ${
+      typeof pluginOptions.name === `string` ? `'${pluginOptions.name}', ` : ``
+    }${JSON.stringify(gaCreateOptions)});
       ${
         typeof pluginOptions.anonymize !== `undefined` &&
         pluginOptions.anonymize === true

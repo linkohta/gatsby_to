@@ -25,7 +25,7 @@ interface IWorkerOptions {
 }
 
 type WrapReturnOfAFunctionInAPromise<
-  FunctionThatDoesNotReturnAPromise extends (...args: Array<any>) => any
+  FunctionThatDoesNotReturnAPromise extends (...args: Array<any>) => any,
 > = (
   ...a: Parameters<FunctionThatDoesNotReturnAPromise>
 ) => Promise<ReturnType<FunctionThatDoesNotReturnAPromise>>
@@ -37,8 +37,8 @@ type EnsureFunctionReturnsAPromise<MaybeFunction> = MaybeFunction extends (
 ) => Promise<any>
   ? MaybeFunction
   : MaybeFunction extends (...args: Array<any>) => any
-  ? WrapReturnOfAFunctionInAPromise<MaybeFunction>
-  : never
+    ? WrapReturnOfAFunctionInAPromise<MaybeFunction>
+    : never
 
 type WrapReturnInArray<MaybeFunction> = MaybeFunction extends (
   ...args: Array<any>
@@ -112,7 +112,7 @@ export interface IPublicWorkerInfo {
 export class WorkerPool<
   WorkerModuleExports = Record<string, unknown>,
   MessagesFromParent = unknown,
-  MessagesFromChild = MessagesFromParent
+  MessagesFromChild = MessagesFromParent,
 > {
   /**
    * すべてのワーカーでタスクの実行を予約する。ワーカーの初期設定に役立つ
@@ -139,7 +139,10 @@ export class WorkerPool<
     []
   private counter = 0
 
-  constructor(private workerPath: string, private options?: IWorkerOptions) {
+  constructor(
+    private workerPath: string,
+    private options?: IWorkerOptions
+  ) {
     const single: Partial<WorkerPool<WorkerModuleExports>["single"]> = {}
     const all: Partial<WorkerPool<WorkerModuleExports>["all"]> = {}
 
@@ -438,8 +441,7 @@ export class WorkerPool<
     taskInfo: TaskInfo<T>
   ): Promise<unknown> {
     let workerToExecuteTaskNow:
-      | IWorkerInfo<keyof WorkerModuleExports>
-      | undefined
+      IWorkerInfo<keyof WorkerModuleExports> | undefined
 
     if (taskInfo.assignedToWorker) {
       if (this.idleWorkers.has(taskInfo.assignedToWorker)) {

@@ -79,7 +79,7 @@ export async function createPageSSRBundle({
 }): Promise<webpack.Compilation | undefined> {
   const state = store.getState()
   const pathPrefix = state.program.prefixPaths
-    ? state.config.pathPrefix ?? ``
+    ? (state.config.pathPrefix ?? ``)
     : ``
   const slicesStateObject = {}
   for (const [key, value] of state.slices) {
@@ -274,7 +274,7 @@ export async function createPageSSRBundle({
     )
     .replaceAll(
       `%CDN_DATASTORE_ORIGIN%`,
-      shouldBundleDatastore() ? `` : state.adapter.config.deployURL ?? ``
+      shouldBundleDatastore() ? `` : (state.adapter.config.deployURL ?? ``)
     )
     .replaceAll(`%PATH_PREFIX%`, pathPrefix)
     .replaceAll(

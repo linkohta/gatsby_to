@@ -69,9 +69,9 @@ block of code below:
 
 ```js
 function gaOptout() {
-  ;(document.cookie =
+  ;((document.cookie =
     disableStr + "=true; expires=Thu, 31 Dec 2099 23:59:59 UTC;path=/"),
-    (window[disableStr] = !0)
+    (window[disableStr] = !0))
 }
 
 var gaProperty = "UA-XXXXXXXX-X",

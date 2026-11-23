@@ -327,9 +327,8 @@ describe(`requires-writer`, () => {
       }
 
       it(`will find static path before dynamic paths`, async () => {
-        const { allMatchingPages, selectedPage } = await testScenario(
-          `/mp1/mp2`
-        )
+        const { allMatchingPages, selectedPage } =
+          await testScenario(`/mp1/mp2`)
 
         expect(allMatchingPages).toMatchInlineSnapshot(`
           Array [
@@ -345,9 +344,8 @@ describe(`requires-writer`, () => {
       })
 
       it(`will find path with dynamic parameter before path with wildcard`, async () => {
-        const { allMatchingPages, selectedPage } = await testScenario(
-          `/mp1/test`
-        )
+        const { allMatchingPages, selectedPage } =
+          await testScenario(`/mp1/test`)
 
         expect(allMatchingPages).toMatchInlineSnapshot(`
           Array [
@@ -361,9 +359,8 @@ describe(`requires-writer`, () => {
       })
 
       it(`it will find most specific path with wildcard`, async () => {
-        const { allMatchingPages, selectedPage } = await testScenario(
-          `/mp1/mp2/wat`
-        )
+        const { allMatchingPages, selectedPage } =
+          await testScenario(`/mp1/mp2/wat`)
 
         expect(allMatchingPages).toMatchInlineSnapshot(`
           Array [

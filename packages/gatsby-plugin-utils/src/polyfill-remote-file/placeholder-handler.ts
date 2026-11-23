@@ -114,8 +114,7 @@ const queue = Queue<
       )
     }
   }
-},
-QUEUE_CONCURRENCY)
+}, QUEUE_CONCURRENCY)
 
 // eslint-disable-next-line consistent-return
 export async function generatePlaceholder(

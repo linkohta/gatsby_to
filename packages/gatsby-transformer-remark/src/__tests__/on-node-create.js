@@ -119,18 +119,18 @@ yadda yadda
   describe(`process graphql correctly`, () => {
     // ノードの集合とクエリを受け取り、クエリの結果を返す
     async function queryResult(nodes, fragment) {
-      const {
-        createSchemaComposer,
-      } = require(`../../../gatsby/src/schema/schema-composer`)
-      const {
-        addInferredFields,
-      } = require(`../../../gatsby/src/schema/infer/add-inferred-fields`)
-      const {
-        addNodes,
-      } = require(`../../../gatsby/src/schema/infer/inference-metadata`)
-      const {
-        getExampleObject,
-      } = require(`../../../gatsby/src/schema/infer/build-example-data`)
+      const { createSchemaComposer } = require(
+        `../../../gatsby/src/schema/schema-composer`
+      )
+      const { addInferredFields } = require(
+        `../../../gatsby/src/schema/infer/add-inferred-fields`
+      )
+      const { addNodes } = require(
+        `../../../gatsby/src/schema/infer/inference-metadata`
+      )
+      const { getExampleObject } = require(
+        `../../../gatsby/src/schema/infer/build-example-data`
+      )
 
       const sc = createSchemaComposer()
       const typeName = `MarkdownRemark`

@@ -131,8 +131,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
           pages: {
             get(pathName: string): IGatsbyPage | undefined {
               return getDataStore().getNode(`SitePage ${pathName}`) as
-                | IGatsbyPage
-                | undefined
+                IGatsbyPage | undefined
             },
             values(): Iterable<IGatsbyPage> {
               return getDataStore().iterateNodesByType(
@@ -140,7 +139,7 @@ module.exports = async (program: IServeProgram): Promise<void> => {
               ) as Iterable<IGatsbyPage>
             },
           },
-        } as unknown as IGatsbyState),
+        }) as unknown as IGatsbyState,
       trailingSlash
     )
   )
@@ -190,10 +189,13 @@ module.exports = async (program: IServeProgram): Promise<void> => {
 
   if (graphqlEnginePath && pageSSRModule) {
     try {
-      const { GraphQLEngine } =
-        require(graphqlEnginePath) as typeof import("../schema/graphql-engine/entry")
+      const { GraphQLEngine } = require(
+        graphqlEnginePath
+      ) as typeof import("../schema/graphql-engine/entry")
       const { getData, renderPageData, renderHTML, findEnginePageByPath } =
-        require(pageSSRModule) as typeof import("../utils/page-ssr-module/entry")
+        require(
+          pageSSRModule
+        ) as typeof import("../utils/page-ssr-module/entry")
       const graphqlEngine = new GraphQLEngine({
         dbPath: path.posix.join(
           slash(program.directory),

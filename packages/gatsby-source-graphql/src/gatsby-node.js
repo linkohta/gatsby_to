@@ -1,19 +1,16 @@
 const { uuid } = require(`gatsby-core-utils`)
 const { buildSchema, printSchema } = require(`gatsby/graphql`)
-const {
-  wrapSchema,
-  introspectSchema,
-  RenameTypes,
-} = require(`@graphql-tools/wrap`)
+const { wrapSchema, introspectSchema, RenameTypes } = require(
+  `@graphql-tools/wrap`
+)
 const { linkToExecutor } = require(`@graphql-tools/links`)
 const { createHttpLink } = require(`@apollo/client`)
 const { fetchWrapper } = require(`./fetch`)
 const { createDataloaderLink } = require(`./batching/dataloader-link`)
 
-const {
-  NamespaceUnderFieldTransform,
-  StripNonQueryTransform,
-} = require(`./transforms`)
+const { NamespaceUnderFieldTransform, StripNonQueryTransform } = require(
+  `./transforms`
+)
 
 exports.pluginOptionsSchema = ({ Joi }) =>
   Joi.object({

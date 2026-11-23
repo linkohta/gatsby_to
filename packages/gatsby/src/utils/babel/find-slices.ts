@@ -23,7 +23,7 @@ function mergePreviouslyCollectedSlice(
     allowEmpty:
       previousInfo?.allowEmpty === false
         ? false
-        : previousInfo?.allowEmpty ?? newInfo.allowEmpty,
+        : (previousInfo?.allowEmpty ?? newInfo.allowEmpty),
   }
 }
 

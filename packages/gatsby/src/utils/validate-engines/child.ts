@@ -67,11 +67,9 @@ export async function validate(directory: string): Promise<void> {
   process.env.GATSBY_WORKER_MODULE_PATH = ``
 
   // エンジンを import して初期化する。エラーが投げられた場合は、親プロセスで処理される
-  const { GraphQLEngine } = require(path.join(
-    directory,
-    `.cache`,
-    `query-engine`
-  ))
+  const { GraphQLEngine } = require(
+    path.join(directory, `.cache`, `query-engine`)
+  )
   require(path.join(directory, `.cache`, `page-ssr`))
   const graphqlEngine = new GraphQLEngine({
     dbPath: path.join(directory, `.cache`, `data`, `datastore`),

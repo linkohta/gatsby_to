@@ -5,8 +5,7 @@ import chalk from "chalk"
 type CancelExperimentNoticeCallback = () => void
 
 export type CancelExperimentNoticeCallbackOrUndefined =
-  | CancelExperimentNoticeCallback
-  | undefined
+  CancelExperimentNoticeCallback | undefined
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 

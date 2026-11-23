@@ -31,11 +31,10 @@ let renderImageToStringPromise
 let renderImage: typeof renderImageToString | undefined
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface GatsbyImageProps
-  extends Omit<
-    ImgHTMLAttributes<HTMLImageElement>,
-    "placeholder" | "onLoad" | "src" | "srcSet" | "width" | "height"
-  > {
+export interface GatsbyImageProps extends Omit<
+  ImgHTMLAttributes<HTMLImageElement>,
+  "placeholder" | "onLoad" | "src" | "srcSet" | "width" | "height"
+> {
   alt: string
   as?: ElementType
   className?: string

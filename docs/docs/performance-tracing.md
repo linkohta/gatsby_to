@@ -60,16 +60,16 @@ const api = require(`@opentelemetry/api`)
 const { TracerShim } = require(`@opentelemetry/shim-opentracing`)
 const opentracing = require(`opentracing`)
 const { NodeSDK } = require(`@opentelemetry/sdk-node`)
-const {
-  getNodeAutoInstrumentations,
-} = require(`@opentelemetry/auto-instrumentations-node`)
+const { getNodeAutoInstrumentations } = require(
+  `@opentelemetry/auto-instrumentations-node`
+)
 const { Resource } = require(`@opentelemetry/resources`)
-const {
-  SemanticResourceAttributes,
-} = require(`@opentelemetry/semantic-conventions`)
-const {
-  CollectorTraceExporter,
-} = require(`@opentelemetry/exporter-collector-grpc`)
+const { SemanticResourceAttributes } = require(
+  `@opentelemetry/semantic-conventions`
+)
+const { CollectorTraceExporter } = require(
+  `@opentelemetry/exporter-collector-grpc`
+)
 
 const metadata = new Metadata()
 metadata.set(`x-honeycomb-team`, `ADD YOUR API KEY`)

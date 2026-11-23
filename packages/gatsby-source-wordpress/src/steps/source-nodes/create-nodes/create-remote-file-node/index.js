@@ -11,11 +11,9 @@ const readChunk = require(`read-chunk`)
 const fileType = require(`file-type`)
 
 const { createFileNode } = require(`gatsby-source-filesystem/create-file-node`)
-const {
-  getRemoteFileExtension,
-  getRemoteFileName,
-  createFilePath,
-} = require(`gatsby-source-filesystem/utils`)
+const { getRemoteFileExtension, getRemoteFileName, createFilePath } = require(
+  `gatsby-source-filesystem/utils`
+)
 const cacheId = url => withPluginKey(`create-remote-file-node-${url}`)
 
 let bar

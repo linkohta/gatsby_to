@@ -5,10 +5,9 @@ const { extname, resolve, parse, join } = require(`path`)
 const readdir = require(`recursive-readdir`)
 const normalizePath = require(`normalize-path`)
 
-const {
-  OPTION_DEFAULT_REPL_DIRECTORY,
-  OPTION_DEFAULT_CODEPEN,
-} = require(`./constants`)
+const { OPTION_DEFAULT_REPL_DIRECTORY, OPTION_DEFAULT_CODEPEN } = require(
+  `./constants`
+)
 
 exports.createPages = async (
   { actions, reporter },

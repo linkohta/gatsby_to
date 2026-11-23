@@ -83,19 +83,17 @@ exports.createPages = ({ graphql, actions }) => {
     // from the fetched data that you can run queries against.
 
     // ==== PAGES (LEVER) ====
-    graphql(
-      `
-        {
-          allLever {
-            edges {
-              node {
-                id
-              }
+    graphql(`
+      {
+        allLever {
+          edges {
+            node {
+              id
             }
           }
         }
-      `
-    )
+      }
+    `)
       .then(result => {
         if (result.errors) {
           console.log(result.errors)

@@ -323,13 +323,11 @@ export async function sourceNodes(
 
   if (isCachedBuild) {
     existingNodes.forEach(n => {
-      if (
-        !(
-          n.sys.type === `Entry` &&
-          !newOrUpdatedEntries.has(`${n.id}___${n.sys.type}`) &&
-          !deletedEntryGatsbyReferenceIds.has(n.id)
-        )
-      ) {
+      if (!(
+        n.sys.type === `Entry` &&
+        !newOrUpdatedEntries.has(`${n.id}___${n.sys.type}`) &&
+        !deletedEntryGatsbyReferenceIds.has(n.id)
+      )) {
         return
       }
 

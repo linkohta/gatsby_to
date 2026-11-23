@@ -707,9 +707,8 @@ export async function renderSlices({
     const staticQueryHashes =
       staticQueriesBySliceTemplate[slice.componentPath] || []
 
-    const { staticQueryContext } = await getStaticQueryContext(
-      staticQueryHashes
-    )
+    const { staticQueryContext } =
+      await getStaticQueryContext(staticQueryHashes)
 
     const MAGIC_CHILDREN_STRING = `__DO_NOT_USE_OR_ELSE__`
     const sliceData = await readSliceData(publicDir, slice.name)
