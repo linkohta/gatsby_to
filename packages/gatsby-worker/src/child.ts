@@ -1,4 +1,4 @@
-import signalExit from "signal-exit"
+import { onExit as signalExit } from "signal-exit"
 import fs from "fs-extra"
 import {
   ParentMessageUnion,
