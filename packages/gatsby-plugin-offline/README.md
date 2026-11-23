@@ -120,7 +120,7 @@ In version 3, Workbox is also upgraded to version 4 so you may need to update yo
 
 ## Overriding Workbox configuration
 
-When adding this plugin to your `gatsby-config.js`, you can use the option `workboxConfig` to override the default Workbox config. To see the full list of options, see [this article on Google Developers](https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config).
+When adding this plugin to your `gatsby-config.js`, you can use the option `workboxConfig` to override the default Workbox config. The plugin uses Workbox 7 and generates a service worker that exposes the global `workbox` object, so the supported options are the ones shown in the default config below, plus `maximumFileSizeToCacheInBytes`. `importWorkboxFrom` accepts `local`, `cdn` or `disabled`.
 
 The default `workboxConfig` is as follows. Note that some of these options are configured automatically, e.g. `globPatterns`. If you're not sure about what all of these options mean, it's best to leave them as-is - otherwise, you may end up causing errors on your site, causing old files to be remain cached, or even breaking offline support.
 

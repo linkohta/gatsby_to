@@ -75,6 +75,94 @@ function getPrecachePages(globs, base) {
   return precachePages
 }
 
+// Workbox のランタイム（`workbox-sw.js`）の読み込み元を決める。
+// `local` のときは、Workbox のライブラリ一式を `public` にコピーする
+async function getWorkboxImport(importWorkboxFrom, rootDir) {
+  switch (importWorkboxFrom) {
+    case `local`: {
+      const workboxDirectory = await workboxBuild.copyWorkboxLibraries(rootDir)
+      return {
+        script: `${workboxDirectory}/workbox-sw.js`,
+        modulePathPrefix: workboxDirectory,
+      }
+    }
+    case `cdn`:
+      return { script: workboxBuild.getModuleURL(`workbox-sw`) }
+    case `disabled`:
+      return {}
+    default:
+      throw new Error(
+        `"importWorkboxFrom" must be one of "local", "cdn" or "disabled"`
+      )
+  }
+}
+
+// Workbox 5 以降の `generateSW` は、ランタイムをバンドルした service worker を出力し、
+// グローバルの `workbox` を用意しない。`sw-append.js` と利用者の `appendScript` は
+// グローバルの `workbox` を使うので、Workbox 4 の `generateSW` と同じ形の
+// service worker をここで組み立てる
+function generateServiceWorker({
+  workboxImport,
+  debug,
+  cacheId,
+  skipWaiting,
+  clientsClaim,
+  manifestEntries,
+  runtimeCaching = [],
+}) {
+  const lines = []
+
+  if (workboxImport.script) {
+    lines.push(`importScripts(${JSON.stringify(workboxImport.script)});`)
+  }
+
+  const workboxConfig = {}
+  if (workboxImport.modulePathPrefix) {
+    workboxConfig.modulePathPrefix = workboxImport.modulePathPrefix
+  }
+  if (debug !== undefined) {
+    workboxConfig.debug = debug
+  }
+  if (Object.keys(workboxConfig).length > 0) {
+    lines.push(`workbox.setConfig(${JSON.stringify(workboxConfig)});`)
+  }
+
+  if (cacheId) {
+    lines.push(
+      `workbox.core.setCacheNameDetails({prefix: ${JSON.stringify(cacheId)}});`
+    )
+  }
+  if (skipWaiting) {
+    lines.push(`self.skipWaiting();`)
+  }
+  if (clientsClaim) {
+    lines.push(`workbox.core.clientsClaim();`)
+  }
+
+  lines.push(
+    `workbox.precaching.precacheAndRoute(${JSON.stringify(
+      manifestEntries,
+      null,
+      2
+    )}, {});`
+  )
+
+  runtimeCaching.forEach(({ urlPattern, handler, method = `GET`, options }) => {
+    const matcher =
+      typeof urlPattern === `string`
+        ? JSON.stringify(urlPattern)
+        : urlPattern.toString()
+    const strategyOptions = options ? JSON.stringify(options) : ``
+    lines.push(
+      `workbox.routing.registerRoute(${matcher}, new workbox.strategies.${handler}(${strategyOptions}), ${JSON.stringify(
+        method
+      )});`
+    )
+  })
+
+  return lines.join(`\n`) + `\n`
+}
+
 exports.onPostBuild = (
   args,
   {
@@ -183,20 +271,32 @@ exports.onPostBuild = (
   fs.createReadStream(idbKeyvalSource).pipe(fs.createWriteStream(idbKeyvalDest))
 
   const swDest = `public/sw.js`
+  const {
+    importWorkboxFrom,
+    cacheId,
+    runtimeCaching,
+    skipWaiting,
+    clientsClaim,
+    ...manifestOptions
+  } = combinedOptions
+
   return workboxBuild
-    .generateSW({ swDest, ...combinedOptions })
-    .then(({ count, size, warnings }) => {
+    .getManifest(manifestOptions)
+    .then(async ({ count, size, warnings, manifestEntries }) => {
       if (warnings) warnings.forEach(warning => console.warn(warning))
 
-      if (debug !== undefined) {
-        const swText = fs
-          .readFileSync(swDest, `utf8`)
-          .replace(
-            /(workbox\.setConfig\({modulePathPrefix: "[^"]+")}\);/,
-            `$1, debug: ${JSON.stringify(debug)}});`
-          )
-        fs.writeFileSync(swDest, swText)
-      }
+      fs.writeFileSync(
+        swDest,
+        generateServiceWorker({
+          workboxImport: await getWorkboxImport(importWorkboxFrom, rootDir),
+          debug,
+          cacheId,
+          skipWaiting,
+          clientsClaim,
+          manifestEntries,
+          runtimeCaching,
+        })
+      )
 
       const swAppend = fs
         .readFileSync(`${__dirname}/sw-append.js`, `utf8`)
