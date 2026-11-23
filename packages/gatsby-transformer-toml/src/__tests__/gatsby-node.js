@@ -59,6 +59,52 @@ describe(`Process TOML nodes correctly`, () => {
     })
   })
 
+  it(`creates nodes whose nested fields are plain objects`, async () => {
+    node.content = `
+    title = "plain"
+    date = 1979-05-27T07:32:00Z
+
+    [table]
+    inline = { key = 1 }
+
+    [[items]]
+    nested = { list = [ { deep = true } ] }
+    `
+
+    const createNode = jest.fn()
+    const actions = { createNode, createParentChildLink: jest.fn() }
+
+    await onCreateNode({
+      node,
+      loadNodeContent,
+      actions,
+      createNodeId: jest.fn().mockReturnValue(`uuid-from-gatsby`),
+      createContentDigest: jest.fn().mockReturnValue(`contentDigest`),
+    })
+
+    const [createdNode] = createNode.mock.calls[0]
+    const prototypes = []
+    const collectPrototypes = value => {
+      if (Array.isArray(value)) {
+        value.forEach(collectPrototypes)
+      } else if (
+        value &&
+        typeof value === `object` &&
+        !(value instanceof Date)
+      ) {
+        prototypes.push(Object.getPrototypeOf(value))
+        Object.values(value).forEach(collectPrototypes)
+      }
+    }
+    collectPrototypes(createdNode)
+
+    expect(prototypes.length).toBeGreaterThan(4)
+    expect(prototypes.every(proto => proto === Object.prototype)).toBe(true)
+    expect(createdNode.date).toBeInstanceOf(Date)
+    expect(createdNode.table.inline.key).toBe(1)
+    expect(createdNode.items[0].nested.list[0].deep).toBe(true)
+  })
+
   // TOML トランスフォーマーは配列からサブオブジェクトを生成せず、
   // オブジェクトをそのまま使うので、サブオブジェクト間の 'id' の一意性のテストは
   // 省略している。
