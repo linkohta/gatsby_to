@@ -71,7 +71,7 @@ process.on(`unhandledRejection`, (reason: unknown) => {
 // それ以外のときはコメントアウトしたままにしておく。
 // require(`../bootstrap/log-line-function`)
 
-type WebhookBody = IDataLayerContext["webhookBody"]
+type WebhookBody = IDataLayerContext[`webhookBody`]
 
 export async function initialize({
   program: args,

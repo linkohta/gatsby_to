@@ -992,7 +992,7 @@ export interface IErrorMapEntry {
 // プラグイン向けに level と type を省略可能にする
 export interface IErrorMapEntryPublicApi extends Omit<
   IErrorMapEntry,
-  "level" | "type"
+  `level` | `type`
 > {
   level?: `${Level}`
   type?: `${Type}` | ((context) => `${Type}`)

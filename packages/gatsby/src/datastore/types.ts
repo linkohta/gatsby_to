@@ -27,7 +27,7 @@ export interface IRunQueryArgs {
     sort:
       | {
           fields: Array<string>
-          order: Array<boolean | "asc" | "desc" | "ASC" | "DESC">
+          order: Array<boolean | `asc` | `desc` | `ASC` | `DESC`>
         }
       | undefined
     limit?: number

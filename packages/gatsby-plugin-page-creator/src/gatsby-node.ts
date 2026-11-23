@@ -54,7 +54,7 @@ export async function createPagesStatefully(
     graphql,
     emitter,
   }: CreatePagesArgs & {
-    traceId: "initial-createPages"
+    traceId: `initial-createPages`
   },
   pluginOptions: IOptions,
   doneCb: PluginCallback

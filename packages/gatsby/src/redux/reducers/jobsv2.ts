@@ -10,7 +10,7 @@ import {
   IClearJobV2Context,
 } from "../types"
 
-const initialState = (): IGatsbyState["jobsV2"] => {
+const initialState = (): IGatsbyState[`jobsV2`] => {
   return {
     incomplete: new Map(),
     complete: new Map(),
@@ -27,7 +27,7 @@ export const jobsV2Reducer = (
     | ISetJobV2Context
     | IClearJobV2Context
     | IDeleteCacheAction
-): IGatsbyState["jobsV2"] => {
+): IGatsbyState[`jobsV2`] => {
   switch (action.type) {
     case `DELETE_CACHE`: {
       // 状態の形が初期状態の形と一致しない場合は、キャッシュを消す

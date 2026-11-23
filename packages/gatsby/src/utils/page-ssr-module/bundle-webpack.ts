@@ -27,8 +27,8 @@ export async function copyStaticQueriesToEngine({
   staticQueriesByTemplate,
 }: {
   engineTemplatePaths: Set<string>
-  components: IGatsbyState["components"]
-  staticQueriesByTemplate: IGatsbyState["staticQueriesByTemplate"]
+  components: IGatsbyState[`components`]
+  staticQueriesByTemplate: IGatsbyState[`staticQueriesByTemplate`]
 }): Promise<void> {
   const staticQueriesToCopy = new Set<string>()
 
@@ -71,9 +71,9 @@ export async function createPageSSRBundle({
   isVerbose = false,
 }: {
   rootDir: string
-  components: IGatsbyState["components"]
-  staticQueriesByTemplate: IGatsbyState["staticQueriesByTemplate"]
-  webpackCompilationHash: IGatsbyState["webpackCompilationHash"]
+  components: IGatsbyState[`components`]
+  staticQueriesByTemplate: IGatsbyState[`staticQueriesByTemplate`]
+  webpackCompilationHash: IGatsbyState[`webpackCompilationHash`]
   reporter: Reporter
   isVerbose?: boolean
 }): Promise<webpack.Compilation | undefined> {

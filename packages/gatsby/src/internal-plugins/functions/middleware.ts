@@ -25,7 +25,7 @@ interface IGatsbyRequestContext {
   fnToExecute: (req: Request, res: Response) => void | Promise<void>
   // params は setContext ミドルウェアの早い段階で加工しているが、どうやら他のミドルウェアが
   // リセットしてしまうようなので、自前のコンテキストに保存しておき、後で復元する
-  params: Request["params"]
+  params: Request[`params`]
   config: IGatsbyFunctionConfigProcessed
   showDebugMessageInResponse: boolean
 }

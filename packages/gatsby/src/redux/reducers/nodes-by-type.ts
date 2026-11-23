@@ -2,7 +2,7 @@ import { IGatsbyNode, IGatsbyState, ActionsUnion } from "../types"
 
 const getNodesOfType = (
   node: IGatsbyNode,
-  state: IGatsbyState["nodesByType"]
+  state: IGatsbyState[`nodesByType`]
 ): Map<string, IGatsbyNode> => {
   const { type } = node.internal
   if (!state.has(type)) {
@@ -20,9 +20,9 @@ const getNodesOfType = (
 }
 
 export const nodesByTypeReducer = (
-  state: IGatsbyState["nodesByType"] = new Map(),
+  state: IGatsbyState[`nodesByType`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["nodesByType"] => {
+): IGatsbyState[`nodesByType`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return new Map()

@@ -1,6 +1,6 @@
 import mime from "mime"
 
-export type ImageFormat = "jpg" | "png" | "webp" | "avif" | "auto"
+export type ImageFormat = `jpg` | `png` | `webp` | `avif` | `auto`
 
 export function getImageFormatFromMimeType(mimeType: string): ImageFormat {
   return mimeType

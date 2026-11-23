@@ -25,7 +25,7 @@ export function createPage(
   filePath: string,
   pagesDirectory: string,
   actions: Actions,
-  graphql: CreatePagesArgs["graphql"],
+  graphql: CreatePagesArgs[`graphql`],
   reporter: Reporter,
   trailingSlash: TrailingSlash,
   pagesPath: string,

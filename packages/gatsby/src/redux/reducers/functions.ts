@@ -1,9 +1,9 @@
 import { IGatsbyState, ISetSiteFunctions } from "../types"
 
 export const functionsReducer = (
-  state: IGatsbyState["functions"] = [],
+  state: IGatsbyState[`functions`] = [],
   action: ISetSiteFunctions
-): IGatsbyState["functions"] => {
+): IGatsbyState[`functions`] => {
   switch (action.type) {
     case `SET_SITE_FUNCTIONS`:
       return action.payload

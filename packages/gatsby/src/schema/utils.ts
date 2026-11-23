@@ -144,7 +144,7 @@ export function getResolvedFields(
   return resolvedNodes?.get(node.id)
 }
 
-type NestedPathStructure = INestedPathStructureNode | true | "ASC" | "DESC"
+type NestedPathStructure = INestedPathStructureNode | true | `ASC` | `DESC`
 
 export interface INestedPathStructureNode {
   [key: string]: NestedPathStructure

@@ -5,10 +5,10 @@ import { dataLayerServices } from "./services"
 
 export type DataLayerResult = Pick<
   IDataLayerContext,
-  | "gatsbyNodeGraphQLFunction"
-  | "graphqlRunner"
-  | "pagesToBuild"
-  | "pagesToDelete"
+  | `gatsbyNodeGraphQLFunction`
+  | `graphqlRunner`
+  | `pagesToBuild`
+  | `pagesToDelete`
 >
 
 const loadDataStates: StatesConfig<IDataLayerContext, any, any> = {

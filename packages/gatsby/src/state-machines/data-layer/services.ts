@@ -11,7 +11,7 @@ import { IDataLayerContext } from "./types"
 export const dataLayerServices: MachineOptions<
   IDataLayerContext,
   any
->["services"] = {
+>[`services`] = {
   customizeSchema,
   sourceNodes,
   createPages,

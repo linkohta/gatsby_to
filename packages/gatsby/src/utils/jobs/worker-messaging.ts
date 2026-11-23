@@ -69,7 +69,7 @@ export const waitUntilWorkerJobsAreComplete = (): Promise<void> =>
  * それらを解決または reject できるようにすることである。
  */
 const deferredWorkerPromises = new Map<
-  InternalJob["id"],
+  InternalJob[`id`],
   pDefer.DeferredPromise<Record<string, unknown>>
 >()
 const gatsbyWorkerMessenger = getMessenger()

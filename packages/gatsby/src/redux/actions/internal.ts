@@ -111,7 +111,7 @@ export const replaceComponentQuery = ({
 }
 
 export const apiFinished = (
-  payload: IApiFinishedAction["payload"]
+  payload: IApiFinishedAction[`payload`]
 ): IApiFinishedAction => {
   return {
     type: `API_FINISHED`,
@@ -254,7 +254,7 @@ export const setProgramStatus = (
  * @private
  */
 export const pageQueryRun = (
-  payload: IPageQueryRunAction["payload"],
+  payload: IPageQueryRunAction[`payload`],
   plugin: IGatsbyPlugin,
   traceId?: string
 ): IPageQueryRunAction => {
@@ -358,7 +358,7 @@ export const setSiteConfig = (config?: unknown): ISetSiteConfig => {
  * @private
  */
 export const setFunctions = (
-  functions: IGatsbyState["functions"]
+  functions: IGatsbyState[`functions`]
 ): ISetSiteFunctions => {
   return {
     type: `SET_SITE_FUNCTIONS`,

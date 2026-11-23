@@ -8,9 +8,9 @@ import { compileMDX } from "./compile-mdx"
 
 export interface IGatsbyMDXLoaderOptions {
   options: ProcessorOptions
-  getNode: NodePluginArgs["getNode"]
-  cache: NodePluginArgs["cache"]
-  reporter: NodePluginArgs["reporter"]
+  getNode: NodePluginArgs[`getNode`]
+  cache: NodePluginArgs[`cache`]
+  reporter: NodePluginArgs[`reporter`]
 }
 
 // MDX を JSX にコンパイルするカスタムの MDX ローダー

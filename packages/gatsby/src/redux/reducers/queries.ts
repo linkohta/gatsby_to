@@ -19,7 +19,7 @@ export const FLAG_ERROR_EXTRACTION = 0b0001
 
 export const FLAG_RUNNING_INFLIGHT = 0b0001
 
-const initialState = (): IGatsbyState["queries"] => {
+const initialState = (): IGatsbyState[`queries`] => {
   return {
     byNode: new Map<NodeId, Set<QueryId>>(),
     byConnection: new Map<ConnectionName, Set<QueryId>>(),
@@ -58,9 +58,9 @@ const initialComponentState = (): IComponentState => {
  * ダーティなクエリは再実行しなければならない。
  */
 export function queriesReducer(
-  state: IGatsbyState["queries"] = initialState(),
+  state: IGatsbyState[`queries`] = initialState(),
   action: ActionsUnion
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   switch (action.type) {
     case `DELETE_CACHE`:
       return initialState()
@@ -274,10 +274,10 @@ export function hasFlag(allFlags: number, flag: number): boolean {
 }
 
 function addNodeDependency(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId,
   nodeId: NodeId
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   // パフォーマンス: 双方向のマップを使う。
   //   追加の `queryNodes` マップがなければ、ノード <-> クエリの依存を削除するために、
   //   `clearNodeDependencies` で既存のすべてのノードをループしなければならない
@@ -297,10 +297,10 @@ function addNodeDependency(
 }
 
 function addConnectionDependency(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId,
   connection: ConnectionName
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   // 注: connection には双方向のマップを使わない。要素数が少ない場合は、それに伴う
   //   オーバーヘッドのほうが利点より大きく、パフォーマンスは向上しないためである
   let queryIds = state.byConnection.get(connection)
@@ -313,9 +313,9 @@ function addConnectionDependency(
 }
 
 function clearNodeDependencies(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   const queryNodeIds = state.queryNodes.get(queryId) ?? new Set()
   for (const nodeId of queryNodeIds) {
     const nodeQueries = state.byNode.get(nodeId)
@@ -327,9 +327,9 @@ function clearNodeDependencies(
 }
 
 function clearConnectionDependencies(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   for (const [, queryIds] of state.byConnection) {
     queryIds.delete(queryId)
   }
@@ -337,7 +337,7 @@ function clearConnectionDependencies(
 }
 
 function registerQuery(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId
 ): IQueryState {
   let query = state.trackedQueries.get(queryId)
@@ -349,7 +349,7 @@ function registerQuery(
 }
 
 function registerComponent(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   componentPath: string
 ): IComponentState {
   let component = state.trackedComponents.get(componentPath)
@@ -362,9 +362,9 @@ function registerComponent(
 }
 
 function trackDirtyQuery(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   queryId: QueryId
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   if (process.env.GATSBY_QUERY_ON_DEMAND) {
     state.dirtyQueriesListToEmitViaWebsocket.push(queryId)
   }
@@ -374,13 +374,13 @@ function trackDirtyQuery(
 
 interface IWorkerStateChunk {
   workerId: number
-  queryStateChunk: IGatsbyState["queries"]
+  queryStateChunk: IGatsbyState[`queries`]
 }
 
 function mergeWorkerDataDependencies(
-  state: IGatsbyState["queries"],
+  state: IGatsbyState[`queries`],
   workerStateChunk: IWorkerStateChunk
-): IGatsbyState["queries"] {
+): IGatsbyState[`queries`] {
   const queryState = workerStateChunk.queryStateChunk
 
   // まず、ワーカーが追跡しているすべてのクエリのデータ依存を消去する

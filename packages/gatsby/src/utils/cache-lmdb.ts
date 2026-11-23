@@ -27,7 +27,7 @@ function getAlreadyOpenedStore(): RootDatabase | undefined {
 
 export default class GatsbyCacheLmdb {
   private db: Database | undefined
-  private encoding: DatabaseOptions["encoding"]
+  private encoding: DatabaseOptions[`encoding`]
   public readonly name: string
   // キャッシュディレクトリにデータを書き込みたいプラグインのために必要である
   public readonly directory: string
@@ -41,7 +41,7 @@ export default class GatsbyCacheLmdb {
     encoding = `json`,
   }: {
     name: string
-    encoding?: DatabaseOptions["encoding"]
+    encoding?: DatabaseOptions[`encoding`]
   }) {
     this.name = name
     this.encoding = encoding

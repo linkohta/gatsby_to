@@ -25,9 +25,9 @@ export interface IRemoteImageNodeInput
   extends IRemoteImageNodeFields, IRemoteFileNodeInput {}
 
 type GraphqlType<T> = T extends number
-  ? "Int" | "Float"
+  ? `Int` | `Float`
   : T extends boolean
-    ? "Boolean"
+    ? `Boolean`
     : string
 
 export interface IGraphQLFieldConfigDefinition<
@@ -50,14 +50,14 @@ export interface IGraphQLFieldConfigDefinition<
 }
 
 export type SchemaBuilder = Parameters<
-  NonNullable<GatsbyNode["createSchemaCustomization"]>
->[0]["schema"]
+  NonNullable<GatsbyNode[`createSchemaCustomization`]>
+>[0][`schema`]
 
 export type ImageFit = import("sharp").FitEnum[keyof import("sharp").FitEnum]
-export type ImageFormat = "jpg" | "png" | "webp" | "avif" | "auto"
-export type ImageLayout = "fixed" | "constrained" | "fullWidth"
+export type ImageFormat = `jpg` | `png` | `webp` | `avif` | `auto`
+export type ImageLayout = `fixed` | `constrained` | `fullWidth`
 export type ImageCropFocus =
-  "center" | "top" | "right" | "bottom" | "left" | "entropy" | "edges" | "faces"
+  `center` | `top` | `right` | `bottom` | `left` | `entropy` | `edges` | `faces`
 
 export type WidthOrHeight =
   | { width: number; height: number }
@@ -73,7 +73,7 @@ export type CalculateImageSizesArgs = {
 } & WidthOrHeight
 
 export function isImage(node: {
-  mimeType: IRemoteFileNode["mimeType"]
+  mimeType: IRemoteFileNode[`mimeType`]
 }): node is IRemoteImageNode {
   if (!node.mimeType) {
     throw new Error(

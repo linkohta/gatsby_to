@@ -1,7 +1,7 @@
 import type webpack from "webpack"
 import type { IGatsbyState } from "../../internal"
 
-type ChunkGroup = webpack.Compilation["chunkGroups"][0]
+type ChunkGroup = webpack.Compilation[`chunkGroups`][0]
 
 function getHashes(
   chunkGroup: ChunkGroup,
@@ -42,7 +42,7 @@ export function getSSRChunkHashes({
   components,
 }: {
   stats: webpack.Stats
-  components: IGatsbyState["components"]
+  components: IGatsbyState[`components`]
 }): {
   templateHashes: Record<string, string>
   renderPageHash: string

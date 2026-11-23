@@ -1,12 +1,12 @@
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const pendingPageDataWritesReducer = (
-  state: IGatsbyState["pendingPageDataWrites"] = {
+  state: IGatsbyState[`pendingPageDataWrites`] = {
     pagePaths: new Set(),
     sliceNames: new Set(),
   },
   action: ActionsUnion
-): IGatsbyState["pendingPageDataWrites"] => {
+): IGatsbyState[`pendingPageDataWrites`] => {
   switch (action.type) {
     case `DELETE_CACHE`: {
       return {

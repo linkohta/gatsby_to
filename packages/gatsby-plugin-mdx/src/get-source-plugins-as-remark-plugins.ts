@@ -4,11 +4,11 @@ import type { Pluggable } from "unified"
 import type { IMdxPluginOptions } from "./plugin-options"
 
 interface IGetSourcePluginsAsRemarkPlugins {
-  gatsbyRemarkPlugins: IMdxPluginOptions["gatsbyRemarkPlugins"]
-  getNode: NodePluginArgs["getNode"]
-  getNodesByType: NodePluginArgs["getNodesByType"]
-  pathPrefix: NodePluginArgs["pathPrefix"]
-  reporter: NodePluginArgs["reporter"]
+  gatsbyRemarkPlugins: IMdxPluginOptions[`gatsbyRemarkPlugins`]
+  getNode: NodePluginArgs[`getNode`]
+  getNodesByType: NodePluginArgs[`getNodesByType`]
+  pathPrefix: NodePluginArgs[`pathPrefix`]
+  reporter: NodePluginArgs[`reporter`]
   cache: GatsbyCache
 }
 
@@ -20,7 +20,7 @@ export async function getSourcePluginsAsRemarkPlugins({
   cache,
   pathPrefix,
 }: IGetSourcePluginsAsRemarkPlugins): Promise<
-  ProcessorOptions["remarkPlugins"]
+  ProcessorOptions[`remarkPlugins`]
 > {
   const userPluginsFiltered = gatsbyRemarkPlugins
     ? gatsbyRemarkPlugins.filter(plugin => typeof plugin.module === `function`)

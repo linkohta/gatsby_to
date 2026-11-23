@@ -15,7 +15,7 @@ interface ICreatePageAction {
     errors?: any
     data?: TData
   }>
-  traceId: "initial-createPages"
+  traceId: `initial-createPages`
   waitForCascadingActions: boolean
   parentSpan: Span
   activity: ActivityTracker

@@ -46,7 +46,7 @@ export interface IJobCreatedMessage {
 export interface IJobCompletedMessage {
   type: MESSAGE_TYPES.JOB_COMPLETED
   payload: {
-    id: InternalJob["id"]
+    id: InternalJob[`id`]
     result: Record<string, unknown>
   }
 }
@@ -54,7 +54,7 @@ export interface IJobCompletedMessage {
 export interface IJobFailed {
   type: MESSAGE_TYPES.JOB_FAILED
   payload: {
-    id: InternalJob["id"]
+    id: InternalJob[`id`]
     error: Error
   }
 }
@@ -62,7 +62,7 @@ export interface IJobFailed {
 export interface IJobNotWhitelisted {
   type: MESSAGE_TYPES.JOB_NOT_WHITELISTED
   payload: {
-    id: InternalJob["id"]
+    id: InternalJob[`id`]
   }
 }
 

@@ -126,9 +126,9 @@ export interface ITypeMetadata {
   [key: string]: unknown
 }
 
-type Operation = "add" | "del"
+type Operation = `add` | `del`
 
-const getType = (value: unknown, key: string): ValueType | "null" => {
+const getType = (value: unknown, key: string): ValueType | `null` => {
   // できるだけ GraphQL の型に近づけている
   switch (typeof value) {
     case `number`:

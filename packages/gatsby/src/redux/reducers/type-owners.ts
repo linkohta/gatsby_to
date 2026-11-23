@@ -10,9 +10,9 @@ import {
 function setTypeOwner(
   typeName: string,
   plugin: IGatsbyPlugin,
-  typeOwners: IGatsbyState["typeOwners"],
+  typeOwners: IGatsbyState[`typeOwners`],
   fullNode?: IGatsbyNode
-): IGatsbyState["typeOwners"] {
+): IGatsbyState[`typeOwners`] {
   const ownerName = plugin?.name || fullNode?.internal.owner
 
   if (!ownerName) {
@@ -61,12 +61,12 @@ function setTypeOwner(
 }
 
 export const typeOwnersReducer = (
-  typeOwners: IGatsbyState["typeOwners"] = {
+  typeOwners: IGatsbyState[`typeOwners`] = {
     pluginsToTypes: new Map(),
     typesToPlugins: new Map(),
-  } as IGatsbyState["typeOwners"],
+  } as IGatsbyState[`typeOwners`],
   action: ActionsUnion
-): IGatsbyState["typeOwners"] => {
+): IGatsbyState[`typeOwners`] => {
   switch (action.type) {
     case `DELETE_NODE`: {
       const { plugin, payload: internalNode } = action

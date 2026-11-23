@@ -14,51 +14,51 @@ export type ErrorMeta =
   | Array<ErrorMeta>
 
 export interface ILogIntent {
-  type: "LOG_INTENT"
+  type: `LOG_INTENT`
   payload:
     | {
-        name: "createLog"
-        args: Parameters<(typeof ActionCreators)["createLog"]>
+        name: `createLog`
+        args: Parameters<(typeof ActionCreators)[`createLog`]>
       }
     | {
-        name: "createPendingActivity"
-        args: Parameters<(typeof ActionCreators)["createPendingActivity"]>
+        name: `createPendingActivity`
+        args: Parameters<(typeof ActionCreators)[`createPendingActivity`]>
       }
     | {
-        name: "setStatus"
-        args: Parameters<(typeof ActionCreators)["setStatus"]>
+        name: `setStatus`
+        args: Parameters<(typeof ActionCreators)[`setStatus`]>
       }
     | {
-        name: "startActivity"
-        args: Parameters<(typeof ActionCreators)["startActivity"]>
+        name: `startActivity`
+        args: Parameters<(typeof ActionCreators)[`startActivity`]>
       }
     | {
-        name: "endActivity"
-        args: Parameters<(typeof ActionCreators)["endActivity"]>
+        name: `endActivity`
+        args: Parameters<(typeof ActionCreators)[`endActivity`]>
       }
     | {
-        name: "updateActivity"
-        args: Parameters<(typeof ActionCreators)["updateActivity"]>
+        name: `updateActivity`
+        args: Parameters<(typeof ActionCreators)[`updateActivity`]>
       }
     | {
-        name: "setActivityErrored"
-        args: Parameters<(typeof ActionCreators)["setActivityErrored"]>
+        name: `setActivityErrored`
+        args: Parameters<(typeof ActionCreators)[`setActivityErrored`]>
       }
     | {
-        name: "setActivityStatusText"
-        args: Parameters<(typeof ActionCreators)["setActivityStatusText"]>
+        name: `setActivityStatusText`
+        args: Parameters<(typeof ActionCreators)[`setActivityStatusText`]>
       }
     | {
-        name: "setActivityTotal"
-        args: Parameters<(typeof ActionCreators)["setActivityTotal"]>
+        name: `setActivityTotal`
+        args: Parameters<(typeof ActionCreators)[`setActivityTotal`]>
       }
     | {
-        name: "activityTick"
-        args: Parameters<(typeof ActionCreators)["activityTick"]>
+        name: `activityTick`
+        args: Parameters<(typeof ActionCreators)[`activityTick`]>
       }
 }
 
-type PageMode = "SSG" | "DSG" | "SSR"
+type PageMode = `SSG` | `DSG` | `SSR`
 
 interface IGatsbyPageComponent {
   componentPath: string

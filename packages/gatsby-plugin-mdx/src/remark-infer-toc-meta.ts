@@ -22,7 +22,7 @@ type TocNodeType =
     }
 
 interface IRemarkTocOptions {
-  maxDepth?: Options["maxDepth"]
+  maxDepth?: Options[`maxDepth`]
   toc: typeof toc
   visit: typeof visit
 }

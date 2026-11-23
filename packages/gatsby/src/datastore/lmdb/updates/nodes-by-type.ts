@@ -2,7 +2,7 @@ import { ActionsUnion } from "../../../redux/types"
 import { ILmdbDatabases } from "../../types"
 
 export function updateNodesByType(
-  nodesByTypeDb: ILmdbDatabases["nodesByType"],
+  nodesByTypeDb: ILmdbDatabases[`nodesByType`],
   action: ActionsUnion
 ): Promise<boolean> | boolean {
   switch (action.type) {

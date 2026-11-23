@@ -78,7 +78,7 @@ export async function loadPlugins(
   // ここまで来れば、すべて問題ない。store を更新する
   store.dispatch({
     type: `SET_SITE_FLATTENED_PLUGINS`,
-    payload: flattenedPlugins as IGatsbyState["flattenedPlugins"],
+    payload: flattenedPlugins as IGatsbyState[`flattenedPlugins`],
   })
 
   return flattenedPlugins

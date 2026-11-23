@@ -17,7 +17,7 @@ const invokeLeftoverPreviewCallback =
     status: PreviewStatusUnion
     context?: string
     error?: Error
-    getNode: NodePluginArgs["getNode"]
+    getNode: NodePluginArgs[`getNode`]
   }) =>
   async ([nodeId, callback]: [
     string,

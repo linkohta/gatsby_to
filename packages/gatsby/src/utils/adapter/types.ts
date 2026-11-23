@@ -40,7 +40,7 @@ export interface IStaticRoute extends IBaseRoute {
    * このルートで設定する HTTP ヘッダー。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/headers/
    */
-  headers: IHeader["headers"]
+  headers: IHeader[`headers`]
 }
 
 export interface IFunctionRoute extends IBaseRoute {
@@ -75,7 +75,7 @@ export interface IRedirectRoute extends IBaseRoute {
    * このリダイレクトで使う HTTP ヘッダー。
    * @see http://www.gatsbyjs.com/docs/how-to/previews-deploys-hosting/headers/
    */
-  headers: IHeader["headers"]
+  headers: IHeader[`headers`]
   [key: string]: unknown
 }
 
@@ -84,7 +84,7 @@ export type Route = IStaticRoute | IFunctionRoute | IRedirectRoute
 export type RoutesManifest = Array<Route>
 
 export interface IHeaderRoute extends IBaseRoute {
-  headers: IHeader["headers"]
+  headers: IHeader[`headers`]
 }
 
 export type HeaderRoutes = Array<IHeaderRoute>
@@ -223,7 +223,7 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
  */
 export type IAdapterFinalConfig = WithRequired<
   IAdapterConfig,
-  "excludeDatastoreFromEngineFunction" | "pluginsToDisable"
+  `excludeDatastoreFromEngineFunction` | `pluginsToDisable`
 >
 
 export interface IAdapter {

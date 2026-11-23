@@ -5,7 +5,7 @@ import type { IOptions } from "./types"
 export async function createPagesFromChangedNodes(
   {
     actions,
-  }: Pick<CreatePagesArgs, "actions"> & {
+  }: Pick<CreatePagesArgs, `actions`> & {
     pluginInstance: IStatePerInstance
   },
   pluginOptions: IOptions

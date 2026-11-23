@@ -1,9 +1,9 @@
 import { IGatsbyState, ActionsUnion, IGatsbySlice } from "../types"
 
 export const slicesReducer = (
-  state: IGatsbyState["slices"] = new Map<string, IGatsbySlice>(),
+  state: IGatsbyState[`slices`] = new Map<string, IGatsbySlice>(),
   action: ActionsUnion
-): IGatsbyState["slices"] => {
+): IGatsbyState[`slices`] => {
   switch (action.type) {
     case `CREATE_SLICE`: {
       state.set(action.payload.name, action.payload)

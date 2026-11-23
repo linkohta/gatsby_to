@@ -3,13 +3,13 @@ import { prepareRegex } from "../../utils/prepare-regex"
 import { makeRe } from "micromatch"
 
 export interface IDbQueryQuery {
-  type: "query"
+  type: `query`
   path: Array<string>
   query: IDbFilterStatement
 }
 
 export interface IDbQueryElemMatch {
-  type: "elemMatch"
+  type: `elemMatch`
   path: Array<string>
   nestedQuery: DbQuery
 }

@@ -6,7 +6,7 @@ export interface IGatsbyCLIState {
   activities: {
     [id: string]: IActivity
   }
-  status: ActivityStatuses | ""
+  status: ActivityStatuses | ``
 }
 
 export type ActionsUnion =
@@ -45,7 +45,7 @@ export interface ILog {
   type: string | undefined
   category?: keyof typeof ErrorCategory
   filePath: string | undefined
-  location: IStructuredError["location"] | undefined
+  location: IStructuredError[`location`] | undefined
   docsUrl: string | undefined
   context: string | undefined
   activity_current: number | undefined
@@ -53,7 +53,7 @@ export interface ILog {
   activity_type: string | undefined
   activity_uuid: string | undefined
   timestamp: string
-  stack: IStructuredError["stack"] | undefined
+  stack: IStructuredError[`stack`] | undefined
   pluginName: string | undefined
 }
 
@@ -64,7 +64,7 @@ export interface ICreateLog {
 
 export interface ISetStatus {
   type: Actions.SetStatus
-  payload: ActivityStatuses | ""
+  payload: ActivityStatuses | ``
 }
 
 export interface IPendingActivity {

@@ -4,27 +4,27 @@ import type { FailOnOptions, SharpOptions } from "sharp"
 
 export type PluginOptionsDefaults = Pick<
   ISharpGatsbyImageArgs,
-  | "formats"
-  | "placeholder"
-  | "quality"
-  | "breakpoints"
-  | "backgroundColor"
-  | "tracedSVGOptions"
-  | "blurredOptions"
-  | "jpgOptions"
-  | "pngOptions"
-  | "webpOptions"
-  | "avifOptions"
+  | `formats`
+  | `placeholder`
+  | `quality`
+  | `breakpoints`
+  | `backgroundColor`
+  | `tracedSVGOptions`
+  | `blurredOptions`
+  | `jpgOptions`
+  | `pngOptions`
+  | `webpOptions`
+  | `avifOptions`
 >
 
 export interface ISharpPluginOptions {
   base64Width?: number
-  forceBase64Format?: "png" | "webp" | "jpg" | string
+  forceBase64Format?: `png` | `webp` | `jpg` | string
   useMozJpeg?: boolean
   stripMetadata?: boolean
   lazyImageGeneration?: boolean
   defaultQuality: number
-  failOn?: SharpOptions["failOn"]
+  failOn?: SharpOptions[`failOn`]
   defaults?: PluginOptionsDefaults
 }
 
@@ -162,7 +162,7 @@ export const healOptions = (
   {
     defaultQuality: quality,
     base64Width,
-  }: Pick<ISharpPluginOptions, "defaultQuality" | "base64Width">,
+  }: Pick<ISharpPluginOptions, `defaultQuality` | `base64Width`>,
   args: ITransformArgs,
   fileExtension = ``,
   defaultArgs = {}

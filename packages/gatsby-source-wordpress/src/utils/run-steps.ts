@@ -10,7 +10,7 @@ export type Step = (
   pluginOptions?: IPluginOptions
 ) => Promise<void> | void
 
-export type ActivityTimer = ReturnType<GatsbyReporter["activityTimer"]>
+export type ActivityTimer = ReturnType<GatsbyReporter[`activityTimer`]>
 
 const runSteps = async (
   steps: Array<Step>,

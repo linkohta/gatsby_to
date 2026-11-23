@@ -6,9 +6,9 @@ let programStatus = `BOOTSTRAPPING`
 // TODO: このレデューサーの使用箇所を queries.trackedComponents に置き換える
 //  これは互換性のためだけに残っている。
 export const componentsReducer = (
-  state: IGatsbyState["components"] = new Map(),
+  state: IGatsbyState[`components`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["components"] => {
+): IGatsbyState[`components`] => {
   switch (action.type) {
     case `CREATE_SLICE`: {
       let component = state.get(action.payload.componentPath)

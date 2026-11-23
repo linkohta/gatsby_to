@@ -49,7 +49,7 @@ export async function writeGraphQLConfig(
 }
 
 export async function writeGraphQLFragments(
-  directory: IStateProgram["directory"],
+  directory: IStateProgram[`directory`],
   definitions: Map<string, IDefinitionMeta>
 ): Promise<void> {
   try {
@@ -66,7 +66,7 @@ export async function writeGraphQLFragments(
 }
 
 export async function writeGraphQLSchema(
-  directory: IStateProgram["directory"],
+  directory: IStateProgram[`directory`],
   schema: GraphQLSchema
 ): Promise<void> {
   try {

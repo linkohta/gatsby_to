@@ -35,7 +35,7 @@ export interface IRunFilterArg extends IRunQueryArgs {
 type ISortParameters =
   | {
       fields: Array<string>
-      order: Array<boolean | "asc" | "desc" | "ASC" | "DESC">
+      order: Array<boolean | `asc` | `desc` | `ASC` | `DESC`>
     }
   | undefined
 
@@ -449,7 +449,7 @@ function sortNodes(
   )
   const sortOrder = sort.order.map(order =>
     typeof order === `boolean` ? order : order.toLowerCase()
-  ) as Array<boolean | "asc" | "desc">
+  ) as Array<boolean | `asc` | `desc`>
 
   if (stats) {
     sortFields.forEach(sortField => {

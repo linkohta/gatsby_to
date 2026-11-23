@@ -6,9 +6,9 @@ import {
 } from "../../redux/types"
 
 interface IMinimalStateSliceForTest {
-  html: IGatsbyState["html"]
-  pages: IGatsbyState["pages"]
-  components: IGatsbyState["components"]
+  html: IGatsbyState[`html`]
+  pages: IGatsbyState[`pages`]
+  components: IGatsbyState[`components`]
 }
 
 describe(`calcDirtyHtmlFiles`, () => {
@@ -24,7 +24,7 @@ describe(`calcDirtyHtmlFiles`, () => {
       string,
       {
         dirty: number
-        removedOrDeleted?: "deleted" | "not-recreated"
+        removedOrDeleted?: `deleted` | `not-recreated`
       }
     >
   ): IGatsbyState {

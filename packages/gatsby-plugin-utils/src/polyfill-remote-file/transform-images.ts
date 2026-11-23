@@ -120,7 +120,7 @@ async function resizeImageWithSharp(
     .toFormat(
       format as unknown as keyof Awaited<
         ReturnType<typeof getSharpInstance>
-      >["format"]
+      >[`format`]
     )
 
   if (outputPath) {

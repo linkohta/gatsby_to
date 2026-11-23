@@ -27,8 +27,8 @@ export async function createImageNode({
   reporter,
 }: {
   fullPath: string
-  createNodeId: ParentSpanPluginArgs["createNodeId"]
-  createNode: Actions["createNode"]
+  createNodeId: ParentSpanPluginArgs[`createNodeId`]
+  createNode: Actions[`createNode`]
   reporter: Reporter
 }): Promise<FileSystemNode | undefined> {
   if (!fs.existsSync(fullPath)) {
@@ -77,8 +77,8 @@ export async function writeImages({
   reporter: Reporter
   cache: GatsbyCache
   sourceDir: string
-  createNodeId: ParentSpanPluginArgs["createNodeId"]
-  createNode: Actions["createNode"]
+  createNodeId: ParentSpanPluginArgs[`createNodeId`]
+  createNode: Actions[`createNode`]
   filename: string
 }): Promise<void> {
   const promises = [...images.entries()].map(

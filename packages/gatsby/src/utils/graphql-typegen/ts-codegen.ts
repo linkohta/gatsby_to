@@ -54,12 +54,12 @@ const DEFAULT_TYPESCRIPT_OPERATIONS_CONFIG: Readonly<TypeScriptDocumentsPluginCo
   }
 
 export async function writeTypeScriptTypes(
-  directory: IStateProgram["directory"],
+  directory: IStateProgram[`directory`],
   schema: GraphQLSchema,
   definitions: Map<string, IDefinitionMeta>,
   graphqlTypegenOptions: IGraphQLTypegenOptions
 ): Promise<void> {
-  const pluginConfig: Pick<Types.GenerateOptions, "plugins" | "pluginMap"> = {
+  const pluginConfig: Pick<Types.GenerateOptions, `plugins` | `pluginMap`> = {
     pluginMap: {
       add: require(`@graphql-codegen/add`),
       typescript: require(`@graphql-codegen/typescript`),
@@ -144,7 +144,7 @@ export async function writeTypeScriptTypes(
       }
     })
 
-  const codegenOptions: Omit<Types.GenerateOptions, "plugins" | "pluginMap"> = {
+  const codegenOptions: Omit<Types.GenerateOptions, `plugins` | `pluginMap`> = {
     // @ts-ignore - Incorrect types
     schema: undefined,
     schemaAst: stabilizeSchema(schema),

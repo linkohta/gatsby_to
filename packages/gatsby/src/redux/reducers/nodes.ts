@@ -1,9 +1,9 @@
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const nodesReducer = (
-  state: IGatsbyState["nodes"] = new Map(),
+  state: IGatsbyState[`nodes`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["nodes"] => {
+): IGatsbyState[`nodes`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return new Map()

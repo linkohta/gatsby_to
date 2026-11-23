@@ -366,7 +366,7 @@ export async function waitJobs(jobDigests: Set<string>): Promise<void> {
 }
 
 export function isJobStale(
-  job: Partial<InternalJob> & { inputPaths: InternalJob["inputPaths"] }
+  job: Partial<InternalJob> & { inputPaths: InternalJob[`inputPaths`] }
 ): boolean {
   const areInputPathsStale = job.inputPaths.some(inputPath => {
     // inputPath はまだ存在するか？

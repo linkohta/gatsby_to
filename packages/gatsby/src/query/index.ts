@@ -234,7 +234,7 @@ function onDevelopStaticQueryDone({
   result,
 }: {
   job: IQueryJob
-  result: IStaticQueryResult["result"]
+  result: IStaticQueryResult[`result`]
 }): void {
   if (!job.hash) {
     return
@@ -247,7 +247,7 @@ function onDevelopStaticQueryDone({
 }
 
 export async function processStaticQueries(
-  queryIds: IGroupedQueryIds["staticQueryIds"],
+  queryIds: IGroupedQueryIds[`staticQueryIds`],
   { state, activity, graphqlRunner, graphqlTracing }
 ): Promise<void> {
   const processedQueries = await processQueries<string>({
@@ -271,7 +271,7 @@ export async function processStaticQueries(
 }
 
 export async function processSliceQueries(
-  queryIds: IGroupedQueryIds["sliceQueryIds"],
+  queryIds: IGroupedQueryIds[`sliceQueryIds`],
   { state, activity, graphqlRunner, graphqlTracing }
 ): Promise<void> {
   const processedQueries = await processQueries<string>({
@@ -292,7 +292,7 @@ export async function processSliceQueries(
 }
 
 export async function processPageQueries(
-  queryIds: IGroupedQueryIds["pageQueryIds"],
+  queryIds: IGroupedQueryIds[`pageQueryIds`],
   { state, activity, graphqlRunner, graphqlTracing }
 ): Promise<void> {
   const processedQueries = await processQueries<IGatsbyPage>({

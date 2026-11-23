@@ -25,7 +25,7 @@ describe(`Status actions/reducer`, () => {
   })
 
   it(`throws an error if status isn't an object`, done => {
-    function runReducer(): IGatsbyState["status"] {
+    function runReducer(): IGatsbyState[`status`] {
       return statusReducer(
         undefined,
         actions.setPluginStatus(`test job`, { name: `test-plugin` })
@@ -37,7 +37,7 @@ describe(`Status actions/reducer`, () => {
   })
 
   it(`throws an error if the plugin name isn't set`, done => {
-    function runReducer(): IGatsbyState["status"] {
+    function runReducer(): IGatsbyState[`status`] {
       return statusReducer(
         undefined,
         actions.setPluginStatus({ blah: `test job` })

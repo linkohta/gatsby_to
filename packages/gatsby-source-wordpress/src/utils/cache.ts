@@ -22,7 +22,7 @@ const MAX_CACHE_SIZE = 250
 const TTL = Number.MAX_SAFE_INTEGER
 const cacheDir = `.wordpress-cache/caches`
 
-type Store = manager.StoreConfig["store"]
+type Store = manager.StoreConfig[`store`]
 
 interface ICacheOptions {
   name?: string
@@ -303,7 +303,7 @@ export const restoreHardCachedNodes = async ({
       node.internal = {
         contentDigest: node.internal.contentDigest,
         type: node.internal.type,
-      } as Node["internal"]
+      } as Node[`internal`]
 
       const typeSettingsCache = {}
 

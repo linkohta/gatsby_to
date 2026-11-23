@@ -5,12 +5,12 @@ import { generateHtmlPath } from "gatsby-core-utils/page-html"
 interface ISliceBoundaryMatch {
   index: number
   end: number
-  syntax: "element" | "comment"
+  syntax: `element` | `comment`
   id: string
-  type: "start" | "end"
+  type: `start` | `end`
 }
 
-function ensureExpectedType(maybeType: string): "start" | "end" {
+function ensureExpectedType(maybeType: string): `start` | `end` {
   if (maybeType === `start` || maybeType === `end`) {
     return maybeType
   } else {

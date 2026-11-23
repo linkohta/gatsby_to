@@ -61,7 +61,7 @@ export function makeResolveGatsbyImageData(cache: GatsbyCache) {
 
     let placeholderURL
 
-    const generateImageSource: IGatsbyImageHelperArgs["generateImageSource"] = (
+    const generateImageSource: IGatsbyImageHelperArgs[`generateImageSource`] = (
       filename,
       width,
       height,

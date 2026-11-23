@@ -41,7 +41,7 @@ export function getRemoteFileFields(
 }
 
 function addRemoteFilePolyfillInterface<
-  T = ReturnType<SchemaBuilder["buildObjectType"]>,
+  T = ReturnType<SchemaBuilder[`buildObjectType`]>,
 >(
   type: T,
   {
@@ -72,9 +72,9 @@ function addRemoteFilePolyfillInterface<
 
     const types: Array<
       | string
-      | ReturnType<SchemaBuilder["buildObjectType"]>
-      | ReturnType<SchemaBuilder["buildInterfaceType"]>
-      | ReturnType<SchemaBuilder["buildEnumType"]>
+      | ReturnType<SchemaBuilder[`buildObjectType`]>
+      | ReturnType<SchemaBuilder[`buildInterfaceType`]>
+      | ReturnType<SchemaBuilder[`buildEnumType`]>
     > = []
 
     for (const key in enums) {
@@ -106,7 +106,7 @@ function addRemoteFilePolyfillInterface<
         ) as InterfaceTypeComposerAsObjectDefinition<
           IRemoteFileNode,
           unknown
-        >["fields"],
+        >[`fields`],
       })
     )
 

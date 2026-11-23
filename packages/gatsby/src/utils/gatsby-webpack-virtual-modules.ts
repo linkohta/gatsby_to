@@ -17,7 +17,7 @@ import * as fs from "fs-extra"
  */
 
 interface IGatsbyWebpackVirtualModulesContext {
-  writeModule: VirtualModulesPlugin["writeModule"]
+  writeModule: VirtualModulesPlugin[`writeModule`]
 }
 
 const fileContentLookup: Record<string, string> = {}

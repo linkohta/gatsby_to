@@ -2,7 +2,7 @@ import { IGatsbyConfig } from "../internal"
 
 type ConstructConfigObjectResponse = Pick<
   IGatsbyConfig,
-  "trailingSlash" | "assetPrefix" | "pathPrefix"
+  `trailingSlash` | `assetPrefix` | `pathPrefix`
 >
 
 export function constructConfigObject(

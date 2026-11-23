@@ -31,12 +31,12 @@ export function getPage(pathname: string): IGatsbyPage | undefined {
   return store.getState().pages.get(pathname)
 }
 export function getComponent(
-  componentPath: IGatsbyPageComponent["componentPath"]
+  componentPath: IGatsbyPageComponent[`componentPath`]
 ): IGatsbyPageComponent | undefined {
   return store.getState().components.get(componentPath)
 }
 export function getStaticQueryComponent(
-  id: IGatsbyStaticQueryComponents["id"]
+  id: IGatsbyStaticQueryComponents[`id`]
 ): IGatsbyStaticQueryComponents | undefined {
   return store.getState().staticQueryComponents.get(id)
 }
@@ -47,7 +47,7 @@ export function getInferenceMetadata(typeName: string): ITypeMetadata {
 // test: reporter
 export function log(
   message: string,
-  method: "log" | "warn" | "info" | "success" | "verbose" | "error" = `log`
+  method: `log` | `warn` | `info` | `success` | `verbose` | `error` = `log`
 ): boolean {
   if (method === `verbose`) {
     reporter.setVerbose(true)

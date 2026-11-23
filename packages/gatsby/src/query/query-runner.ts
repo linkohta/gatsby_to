@@ -33,7 +33,7 @@ export interface IQueryJob {
   query: string
   componentPath: string
   context: PageContext
-  queryType: "page" | "static" | "slice"
+  queryType: `page` | `static` | `slice`
   pluginCreatorId?: string
 }
 

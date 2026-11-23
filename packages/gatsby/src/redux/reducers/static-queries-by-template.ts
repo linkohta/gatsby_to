@@ -1,9 +1,9 @@
 import { ActionsUnion, IGatsbyState } from "../types"
 
 export const staticQueriesByTemplateReducer = (
-  state: IGatsbyState["staticQueriesByTemplate"] = new Map(),
+  state: IGatsbyState[`staticQueriesByTemplate`] = new Map(),
   action: ActionsUnion
-): IGatsbyState["staticQueriesByTemplate"] => {
+): IGatsbyState[`staticQueriesByTemplate`] => {
   switch (action.type) {
     case `REMOVE_STATIC_QUERIES_BY_TEMPLATE`:
       state.delete(action.payload.componentPath)

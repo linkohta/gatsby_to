@@ -316,7 +316,7 @@ const getDefaultHeaderRoutes = (pathPrefix: string): HeaderRoutes => [
 
 const customHeaderFilter =
   (route: Route, pathPrefix: string) =>
-  (h: IHeader["headers"][0]): boolean => {
+  (h: IHeader[`headers`][0]): boolean => {
     for (const baseHeader of MUST_REVALIDATE_HEADERS) {
       if (headersAreEqual(baseHeader, h)) {
         return false
@@ -400,7 +400,7 @@ function getRoutesManifest(): {
   }: {
     path: string
     pathToFillInPublicDir: string
-    headers: IHeader["headers"]
+    headers: IHeader[`headers`]
   }): void {
     addRoute({
       path,
@@ -440,7 +440,7 @@ function getRoutesManifest(): {
         headers: MUST_REVALIDATE_HEADERS,
       })
     } else {
-      const commonFields: Omit<IFunctionRoute, "path"> = {
+      const commonFields: Omit<IFunctionRoute, `path`> = {
         type: `function`,
         functionId: `ssr-engine`,
       }
@@ -590,7 +590,7 @@ function getRoutesManifest(): {
 
   for (const fileAsset of fileAssets) {
     // 残りのアセットの分類を試みる
-    let headers: IHeader["headers"] | undefined = undefined
+    let headers: IHeader[`headers`] | undefined = undefined
 
     if (fileAsset.startsWith(`~partytown`)) {
       // ハッシュがないので、再検証が必要である

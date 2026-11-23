@@ -86,7 +86,7 @@ const transformWebpackError = (
   }
 
   let id = `98123`
-  const context: ITransformedWebpackError["context"] = {
+  const context: ITransformedWebpackError[`context`] = {
     stage,
     stageLabel: stageCodeToReadableLabel[stage],
     // TODO 警告の場合と同じように formatWebpackMessages を使う
@@ -156,7 +156,7 @@ export const structureWebpackErrors = (
 }
 
 export const reportWebpackWarnings = (
-  warnings: StatsCompilation["warnings"] = [],
+  warnings: StatsCompilation[`warnings`] = [],
   reporter: Reporter
 ): void => {
   let warningMessages: Array<string> = []

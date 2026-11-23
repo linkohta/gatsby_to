@@ -19,7 +19,7 @@ export async function renderHTML({
   isClientOnlyPage?: boolean
   error?: IErrorRenderMeta
   directory: string
-  serverData?: IServerData["props"]
+  serverData?: IServerData[`props`]
 }): Promise<string> {
   try {
     const htmlComponentRenderer = require(htmlComponentRendererPath)

@@ -11,7 +11,7 @@ interface ITestPluginOptionsSchemaReturnType {
 }
 
 export async function testPluginOptionsSchema(
-  pluginSchemaFunction: Exclude<GatsbyNode["pluginOptionsSchema"], undefined>,
+  pluginSchemaFunction: Exclude<GatsbyNode[`pluginOptionsSchema`], undefined>,
   pluginOptions: IPluginInfoOptions
 ): Promise<ITestPluginOptionsSchemaReturnType> {
   const pluginSchema = pluginSchemaFunction({

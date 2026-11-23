@@ -5,7 +5,7 @@ import { IStructuredError } from "../../../../structured-errors/types"
 
 interface IFileProps {
   filePath: string
-  location: IStructuredError["location"]
+  location: IStructuredError[`location`]
 }
 
 const File: FunctionComponent<IFileProps> = ({ filePath, location }) => {

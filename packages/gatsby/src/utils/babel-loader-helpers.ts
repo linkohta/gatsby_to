@@ -29,7 +29,7 @@ const loadCachedConfig = (): ILoadCachedConfigReturnType => {
   return pluginBabelConfig
 }
 
-export const getCustomOptions = (stage: Stage): IBabelStage["options"] => {
+export const getCustomOptions = (stage: Stage): IBabelStage[`options`] => {
   const pluginBabelConfig = loadCachedConfig()
   return pluginBabelConfig.stages[stage].options
 }
@@ -229,7 +229,7 @@ export const mergeConfigItemOptions = ({
 }: {
   items: Array<ConfigItem>
   itemToMerge: ConfigItem
-  type: CreateConfigItemOptions["type"]
+  type: CreateConfigItemOptions[`type`]
   babel: typeof Babel
 }): Array<ConfigItem> => {
   const index = _.findIndex(

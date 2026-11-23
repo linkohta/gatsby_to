@@ -12,7 +12,7 @@ interface IIndexingContext {
 export type IndexFields = Map<string, number> // 名前、方向
 
 export interface IIndexMetadata {
-  state: "ready" | "building" | "stale" | "error" | "initial"
+  state: `ready` | `building` | `stale` | `error` | `initial`
   error?: string
   typeName: string
   keyPrefix: number | string
@@ -103,7 +103,7 @@ async function doCreateIndex(
 
   // TODO: dirty なノードだけを走査する
   // TODO: 非同期トランザクションで包むか
-  const stats: IIndexMetadata["stats"] = {
+  const stats: IIndexMetadata[`stats`] = {
     maxKeysPerItem: 0,
     keyCount: 0,
     itemCount: 0,

@@ -2,7 +2,7 @@ import _ from "lodash"
 import { uuid } from "gatsby-core-utils"
 import { ActionsUnion, IGatsbyState } from "../types"
 
-const defaultState: IGatsbyState["status"] = {
+const defaultState: IGatsbyState[`status`] = {
   PLUGINS_HASH: ``,
   LAST_NODE_COUNTER: 0,
   plugins: {},
@@ -10,9 +10,9 @@ const defaultState: IGatsbyState["status"] = {
 }
 
 export const statusReducer = (
-  state: IGatsbyState["status"] = defaultState,
+  state: IGatsbyState[`status`] = defaultState,
   action: ActionsUnion
-): IGatsbyState["status"] => {
+): IGatsbyState[`status`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return {

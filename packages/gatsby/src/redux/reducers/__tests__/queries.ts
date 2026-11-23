@@ -27,7 +27,7 @@ import {
 
 import { cloneDeep } from "lodash"
 
-type QueriesState = IGatsbyState["queries"]
+type QueriesState = IGatsbyState[`queries`]
 
 let state: QueriesState
 let Pages
@@ -1068,7 +1068,7 @@ function deletePage(
 
 function runQuery(
   state: QueriesState,
-  payload: Partial<IQueryStartAction["payload"]>
+  payload: Partial<IQueryStartAction[`payload`]>
 ): QueriesState {
   const tmp = startQuery(state, payload)
   return finishQuery(tmp, payload)
@@ -1076,21 +1076,21 @@ function runQuery(
 
 function startQuery(
   state: QueriesState,
-  payload: Partial<IQueryStartAction["payload"]>
+  payload: Partial<IQueryStartAction[`payload`]>
 ): QueriesState {
   return reducer(
     state,
-    queryStart(payload as IQueryStartAction["payload"], {} as any)
+    queryStart(payload as IQueryStartAction[`payload`], {} as any)
   )
 }
 
 function finishQuery(
   state: QueriesState,
-  payload: Partial<IPageQueryRunAction["payload"]>
+  payload: Partial<IPageQueryRunAction[`payload`]>
 ): QueriesState {
   return reducer(
     state,
-    pageQueryRun(payload as IPageQueryRunAction["payload"], {} as any)
+    pageQueryRun(payload as IPageQueryRunAction[`payload`], {} as any)
   )
 }
 

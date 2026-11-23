@@ -51,7 +51,7 @@ export interface IBuildArgs extends IProgram {
 interface IBuildRendererResult {
   rendererPath: string
   stats: webpack.Stats
-  close: ReturnType<typeof watch>["close"]
+  close: ReturnType<typeof watch>[`close`]
 }
 
 let devssrWebpackCompiler: webpack.Watching | undefined
@@ -143,7 +143,7 @@ const runWebpack = (
   directory: string
 ): Promise<{
   stats: webpack.Stats
-  close: ReturnType<typeof watch>["close"]
+  close: ReturnType<typeof watch>[`close`]
 }> => {
   const isDevSSREnabledAndViable =
     process.env.GATSBY_EXPERIMENTAL_DEV_SSR && stage === `develop-html`

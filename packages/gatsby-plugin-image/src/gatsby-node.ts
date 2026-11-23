@@ -8,7 +8,7 @@ import {
 
 export * from "./node-apis/preprocess-source"
 
-export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] =
+export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] =
   ({ actions, schema }) => {
     actions.createTypes([
       schema.buildEnumType(ImageFormatType),
@@ -17,7 +17,7 @@ export const createSchemaCustomization: GatsbyNode["createSchemaCustomization"] 
     ])
   }
 
-export const onCreateBabelConfig: GatsbyNode["onCreateBabelConfig"] = ({
+export const onCreateBabelConfig: GatsbyNode[`onCreateBabelConfig`] = ({
   actions,
   store,
 }) => {
@@ -33,7 +33,7 @@ export const onCreateBabelConfig: GatsbyNode["onCreateBabelConfig"] = ({
   })
 }
 
-export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
+export const onCreateWebpackConfig: GatsbyNode[`onCreateWebpackConfig`] = ({
   stage,
   plugins,
   actions,

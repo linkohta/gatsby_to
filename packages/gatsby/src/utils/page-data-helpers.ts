@@ -4,9 +4,9 @@ import { IGatsbyPage, IGatsbyState } from "../redux/types"
 import { ICollectedSlices } from "./babel/find-slices"
 
 interface IPageDataBase {
-  componentChunkName: IGatsbyPage["componentChunkName"]
-  matchPath: IGatsbyPage["matchPath"]
-  path: IGatsbyPage["path"]
+  componentChunkName: IGatsbyPage[`componentChunkName`]
+  matchPath: IGatsbyPage[`matchPath`]
+  path: IGatsbyPage[`path`]
   staticQueryHashes: Array<string>
   getServerDataError?: IStructuredError | Array<IStructuredError> | null
   manifestId?: string
@@ -25,7 +25,7 @@ function traverseSlicesUsedByTemplates(
   componentPath: string,
   overrideSlices: Record<string, string>,
   slicesUsedByTemplates: Map<string, ICollectedSlices>,
-  slices: IGatsbyState["slices"],
+  slices: IGatsbyState[`slices`],
   formattedSlices: Record<string, string> = {},
   handledSlices: Set<string> = new Set<string>()
 ): Record<string, string> | null {
@@ -91,7 +91,7 @@ export function constructPageDataString(
   }: IPageDataInput,
   result: string | Buffer,
   slicesUsedByTemplates: Map<string, ICollectedSlices>,
-  slices: IGatsbyState["slices"]
+  slices: IGatsbyState[`slices`]
 ): string {
   let body =
     `{` +

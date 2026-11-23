@@ -48,10 +48,10 @@ type CSSModulesOptions =
   | string
   | {
       mode?:
-        | "local"
-        | "global"
-        | "pure"
-        | ((resourcePath: string) => "local" | "global" | "pure")
+        | `local`
+        | `global`
+        | `pure`
+        | ((resourcePath: string) => `local` | `global` | `pure`)
       auto?: boolean
       exportGlobals?: boolean
       localIdentName?: string
@@ -59,7 +59,7 @@ type CSSModulesOptions =
       localIdentHashPrefix?: string
       namedExport?: boolean
       exportLocalsConvention?:
-        "asIs" | "camelCaseOnly" | "camelCase" | "dashes" | "dashesOnly"
+        `asIs` | `camelCaseOnly` | `camelCase` | `dashes` | `dashesOnly`
       exportOnlyLocals?: boolean
     }
 
@@ -621,13 +621,13 @@ export const createWebpackUtils = (
    * CSS の style ローダー。
    */
   {
-    const css: IRuleUtils["css"] = (options = {}): RuleSetRule => {
+    const css: IRuleUtils[`css`] = (options = {}): RuleSetRule => {
       const { browsers, ...restOptions } = options
       const use = [
         !isSSR && loaders.miniCssExtract(restOptions),
         loaders.css({ ...restOptions, importLoaders: 1 }),
         loaders.postcss({ browsers }),
-      ].filter(Boolean) as RuleSetRule["use"]
+      ].filter(Boolean) as RuleSetRule[`use`]
 
       return {
         use,
@@ -641,7 +641,7 @@ export const createWebpackUtils = (
     css.internal = makeInternalOnly(css)
     css.external = makeExternalOnly(css)
 
-    const cssModules: IRuleUtils["cssModules"] = (options): RuleSetRule => {
+    const cssModules: IRuleUtils[`cssModules`] = (options): RuleSetRule => {
       const rule = css({ ...options, modules: true })
       delete rule.exclude
       rule.test = /\.module\.css$/

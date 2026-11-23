@@ -94,7 +94,7 @@ const getQueryOperatorInput = ({
   if (type instanceof GraphQLEnumType) {
     typeName = `Enum`
   } else if (isBuiltInScalarType(type)) {
-    typeName = type.name as Exclude<TypeName, "Enum" | "CustomScalar">
+    typeName = type.name as Exclude<TypeName, `Enum` | `CustomScalar`>
   } else {
     typeName = `CustomScalar`
   }

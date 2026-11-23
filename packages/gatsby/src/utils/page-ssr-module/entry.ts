@@ -44,13 +44,13 @@ export interface ITemplateDetails {
 
 export type EnginePage = Pick<
   IGatsbyPage,
-  | "componentChunkName"
-  | "componentPath"
-  | "context"
-  | "matchPath"
-  | "mode"
-  | "path"
-  | "slices"
+  | `componentChunkName`
+  | `componentPath`
+  | `context`
+  | `matchPath`
+  | `mode`
+  | `path`
+  | `slices`
 >
 
 export interface ISSRData {
@@ -89,7 +89,7 @@ const createHeaders = createHeadersMatcher(INLINED_HEADERS_CONFIG, PATH_PREFIX)
 
 interface IGetDataBaseArgs {
   pathName: string
-  req?: Partial<Pick<Request, "query" | "method" | "url" | "headers">>
+  req?: Partial<Pick<Request, `query` | `method` | `url` | `headers`>>
   spanContext?: Span | SpanContext
   telemetryResolverTimings?: Array<IGraphQLTelemetryRecord>
 }
@@ -342,7 +342,7 @@ export async function renderPageData({
     const slicesFromBundler = GATSBY_SLICES as {
       [key: string]: IGatsbySlice
     }
-    const slices: IGatsbyState["slices"] = new Map()
+    const slices: IGatsbyState[`slices`] = new Map()
     for (const [key, value] of Object.entries(slicesFromBundler)) {
       slices.set(key, value)
     }
@@ -352,7 +352,7 @@ export async function renderPageData({
       GATSBY_SLICES_BY_TEMPLATE as {
         [key: string]: { [key: string]: ICollectedSlice }
       }
-    const slicesUsedByTemplates: IGatsbyState["slicesByTemplate"] = new Map()
+    const slicesUsedByTemplates: IGatsbyState[`slicesByTemplate`] = new Map()
     for (const [key, value] of Object.entries(
       slicesUsedByTemplatesFromBundler
     )) {

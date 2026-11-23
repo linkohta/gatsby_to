@@ -33,7 +33,7 @@ export interface IEntry {
   api?: IApi
 }
 
-export type ExportType = "node" | "browser" | "ssr"
+export type ExportType = `node` | `browser` | `ssr`
 
 type IEntryMap = {
   [exportType in ExportType]: Array<IEntry>
@@ -224,7 +224,7 @@ async function validatePluginsOptions(
 
       let optionsSchema = (
         gatsbyNode.pluginOptionsSchema as Exclude<
-          GatsbyNode["pluginOptionsSchema"],
+          GatsbyNode[`pluginOptionsSchema`],
           undefined
         >
       )({

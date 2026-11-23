@@ -3,7 +3,7 @@ import { IGatsbyNode } from "../../../redux/types"
 import { getValueAt } from "../../../utils/get-value-at"
 
 export function isDesc(
-  sortOrder: "asc" | "desc" | "ASC" | "DESC" | boolean | void
+  sortOrder: `asc` | `desc` | `ASC` | `DESC` | boolean | void
 ): boolean {
   return sortOrder === `desc` || sortOrder === `DESC` || sortOrder === false
 }

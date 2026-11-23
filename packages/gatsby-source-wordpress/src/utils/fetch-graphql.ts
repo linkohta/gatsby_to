@@ -718,7 +718,7 @@ const fetchGraphql = async ({
       panic: (message: { id: string; context: { sourceMessage: string } }) => {
         throw new Error(message?.context?.sourceMessage)
       },
-      error: console.error as GatsbyReporter["error"],
+      error: console.error as GatsbyReporter[`error`],
     } as GatsbyReporter
   }
 

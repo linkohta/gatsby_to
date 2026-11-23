@@ -22,14 +22,14 @@ export interface IGatsbyConfigInput {
     url: string
   }
   developMiddleware?(app: Express): void
-  jsxRuntime?: "classic" | "automatic"
+  jsxRuntime?: `classic` | `automatic`
   jsxImportSource?: string
   trailingSlash?: TrailingSlash
 }
 
 type ConfigKey = keyof IGatsbyConfigInput
-type Metadata = IGatsbyConfigInput["siteMetadata"]
-type Mapping = IGatsbyConfigInput["mapping"]
+type Metadata = IGatsbyConfigInput[`siteMetadata`]
+type Mapping = IGatsbyConfigInput[`mapping`]
 
 const howToMerge = {
   /**

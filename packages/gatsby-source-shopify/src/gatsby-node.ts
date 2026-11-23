@@ -6,7 +6,7 @@ export { createResolvers } from "./create-resolvers"
 export { pluginOptionsSchema } from "./plugin-options-schema"
 export { createSchemaCustomization } from "./create-schema-customization"
 
-export const onPluginInit: GatsbyNode["onPluginInit"] = ({
+export const onPluginInit: GatsbyNode[`onPluginInit`] = ({
   reporter,
 }): void => {
   reporter.setErrorMap(ERROR_MAP)

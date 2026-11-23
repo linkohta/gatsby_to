@@ -1,4 +1,4 @@
-type Channel = "FAST_REFRESH"
+type Channel = `FAST_REFRESH`
 type Event = [
   Channel,
   {

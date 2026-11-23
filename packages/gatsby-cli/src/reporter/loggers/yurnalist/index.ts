@@ -25,7 +25,7 @@ interface IYurnalistActivities {
   [activityId: string]: {
     text: string | undefined
     statusText: string | undefined
-    update(payload: IUpdateActivity["payload"]): void
+    update(payload: IUpdateActivity[`payload`]): void
     end(): void
   }
 }

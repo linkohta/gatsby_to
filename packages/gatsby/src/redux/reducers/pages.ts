@@ -8,13 +8,13 @@ import {
 } from "../types"
 
 export const pagesReducer = (
-  state: IGatsbyState["pages"] = new Map<string, IGatsbyPage>(),
+  state: IGatsbyState[`pages`] = new Map<string, IGatsbyPage>(),
   action:
     | IDeleteCacheAction
     | ICreatePageAction
     | IDeletePageAction
     | IMaterializePageMode
-): IGatsbyState["pages"] => {
+): IGatsbyState[`pages`] => {
   switch (action.type) {
     case `DELETE_CACHE`:
       return new Map()

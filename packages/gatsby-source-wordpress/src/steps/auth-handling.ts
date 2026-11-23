@@ -2,7 +2,7 @@ import type { GatsbyNodeApiHelpers } from "~/utils/gatsby-types"
 import type { Step } from "./../utils/run-steps"
 import type { IPluginOptions } from "~/models/gatsby-api"
 
-let storedAuthSettings: IPluginOptions["auth"] | undefined
+let storedAuthSettings: IPluginOptions[`auth`] | undefined
 
 export const hideAuthPluginOptions: Step = async (
   _helpers: GatsbyNodeApiHelpers,
