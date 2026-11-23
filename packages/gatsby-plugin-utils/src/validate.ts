@@ -1,8 +1,7 @@
-import { ValidationOptions } from "joi"
 import { ObjectSchema, Joi } from "./joi"
 import { IPluginInfoOptions } from "./types"
 
-const validationOptions: ValidationOptions = {
+const validationOptions = {
   // 毎回最初の 1 件だけではなく、すべてのエラーをまとめて表示する
   abortEarly: false,
   cache: true,
