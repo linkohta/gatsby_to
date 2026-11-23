@@ -1,7 +1,8 @@
 const path = require(`path`)
 const fs = require(`fs-extra`)
 const mime = require(`mime`)
-const prettyBytes = require(`pretty-bytes`)
+// pretty-bytes 6 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: prettyBytes } = require(`pretty-bytes`)
 
 const { createContentDigest, slash, md5File } = require(`gatsby-core-utils`)
 
