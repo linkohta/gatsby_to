@@ -54,7 +54,7 @@ export default {
           {
             "modules": false,
             "shippedProposals": true,
-            "targets": { "node": "18.0.0" }
+            "targets": { "node": "22.0.0" }
           }
         ],
         "@babel/preset-react"

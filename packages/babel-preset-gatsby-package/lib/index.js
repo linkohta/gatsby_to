@@ -4,7 +4,7 @@ function preset(context, options = {}) {
   const {
     browser = false,
     debug = false,
-    nodeVersion = `18.0.0`,
+    nodeVersion = `22.0.0`,
     esm = false,
     availableCompilerFlags = [`GATSBY_MAJOR`],
     keepDynamicImports = null
