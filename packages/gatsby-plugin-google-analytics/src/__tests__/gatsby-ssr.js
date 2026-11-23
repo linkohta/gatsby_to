@@ -102,6 +102,29 @@ describe(`gatsby-plugin-google-analytics`, () => {
           expect(result).toMatch(/excludeGAPaths/)
         })
 
+        it(`writes excluded paths as regular expressions that match the paths`, () => {
+          const { setPostBodyComponents } = setup({
+            exclude: [`/preview/**`, `/do-not-track/me/too/`],
+          })
+
+          const script =
+            setPostBodyComponents.mock.calls[0][0][0].props
+              .dangerouslySetInnerHTML.__html
+          const [, source] = script.match(/window\.excludeGAPaths=(\[.*?\]);/)
+          // インラインスクリプトに書き出された正規表現を、ブラウザと同じように評価して確かめる
+          const excludeGAPaths = new Function(`return ${source}`)()
+          const isExcluded = pathname =>
+            excludeGAPaths.some(rx => rx.test(pathname))
+
+          expect(excludeGAPaths).toHaveLength(2)
+          expect(isExcluded(`/preview/`)).toBe(true)
+          expect(isExcluded(`/preview/a/b/`)).toBe(true)
+          expect(isExcluded(`/do-not-track/me/too/`)).toBe(true)
+          expect(isExcluded(`/do-not-track/me/too`)).toBe(false)
+          expect(isExcluded(`/previews/`)).toBe(false)
+          expect(isExcluded(`/`)).toBe(false)
+        })
+
         it(`sets optimizeId`, () => {
           const { setPostBodyComponents } = setup({
             optimizeId: `TEST_OPTIMIZE_ID`,
