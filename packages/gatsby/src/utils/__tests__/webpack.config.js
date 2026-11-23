@@ -176,5 +176,33 @@ describe(`build-html`, () => {
         )
       })
     })
+
+    describe(`.env file parsing`, () => {
+      it(`reads values the way dotenv does`, async () => {
+        process.env.GATSBY_ACTIVE_ENV = `staging`
+        readFileSync.mockImplementationOnce(() =>
+          [
+            `PLAIN=value`,
+            `INLINE_COMMENT=value # comment`,
+            `UNQUOTED_HASH=pass#word`,
+            `QUOTED_HASH="pass#word"`,
+            `MULTILINE="line1`,
+            `line2"`,
+            `export EXPORTED=exported`,
+          ].join(`\n`)
+        )
+        await getConfig(stage)
+
+        expect(DefinePlugin.mock.calls[0][0]).toMatchObject({
+          [`process.env.PLAIN`]: JSON.stringify(`value`),
+          // 引用符で囲んでいない値では、`#` 以降がコメントとして扱われる
+          [`process.env.INLINE_COMMENT`]: JSON.stringify(`value`),
+          [`process.env.UNQUOTED_HASH`]: JSON.stringify(`pass`),
+          [`process.env.QUOTED_HASH`]: JSON.stringify(`pass#word`),
+          [`process.env.MULTILINE`]: JSON.stringify(`line1\nline2`),
+          [`process.env.EXPORTED`]: JSON.stringify(`exported`),
+        })
+      })
+    })
   })
 })
