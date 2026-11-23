@@ -64,9 +64,29 @@ describe(`onPostBuild`, () => {
     createWriteStream() {},
   }
 
+  let manifestOptions
   const mockWorkboxBuild = {
-    generateSW() {
-      return Promise.resolve({ count: 1, size: 1, warnings: [] })
+    getManifest(options) {
+      manifestOptions = options
+      return Promise.resolve({
+        count: 1,
+        size: 1,
+        warnings: [],
+        manifestEntries: [
+          { url: `app-123.js`, revision: null },
+          {
+            url: `offline-plugin-app-shell-fallback/index.html`,
+            revision: `abc`,
+          },
+        ],
+      })
+    },
+    copyWorkboxLibraries(directory) {
+      expect(directory).toBe(`public`)
+      return Promise.resolve(`workbox-v7.0.0`)
+    },
+    getModuleURL(moduleName) {
+      return `https://cdn.example/${moduleName}.js`
     },
   }
 
@@ -75,38 +95,128 @@ describe(`onPostBuild`, () => {
   gatsbyNode.__set__(`workboxBuild`, mockWorkboxBuild)
   gatsbyNode.__set__(`console`, { log() {} })
 
-  it(`appends to sw.js`, async () => {
-    await gatsbyNode.onPostBuild(
-      {
-        pathPrefix: ``,
-        reporter: {
-          info(message) {
-            console.log(message)
-          },
-        },
+  const args = {
+    pathPrefix: ``,
+    reporter: {
+      info(message) {
+        console.log(message)
       },
-      { appendScript: `${__dirname}/fixtures/custom-sw-code.js` }
-    )
+    },
+  }
+
+  beforeEach(() => {
+    swText = ``
+    manifestOptions = undefined
+  })
+
+  it(`appends to sw.js`, async () => {
+    await gatsbyNode.onPostBuild(args, {
+      appendScript: `${__dirname}/fixtures/custom-sw-code.js`,
+    })
 
     expect(swText).toContain(`console.log(\`Hello, world!\`)`)
   })
 
-  it(`configures the Workbox debug option`, async () => {
-    swText = `workbox.setConfig({modulePathPrefix: "workbox-v4.3.1"});`
+  it(`generates a service worker that exposes the workbox global`, async () => {
+    await gatsbyNode.onPostBuild(args, {})
 
-    await gatsbyNode.onPostBuild(
-      {
-        pathPrefix: ``,
-        reporter: {
-          info(message) {
-            console.log(message)
-          },
-        },
-      },
-      { debug: true }
+    expect(swText).toContain(`importScripts("workbox-v7.0.0/workbox-sw.js");`)
+    expect(swText).toContain(
+      `workbox.setConfig({"modulePathPrefix":"workbox-v7.0.0"});`
     )
+    expect(swText).toContain(
+      `workbox.core.setCacheNameDetails({prefix: "gatsby-plugin-offline"});`
+    )
+    expect(swText).toContain(`self.skipWaiting();`)
+    expect(swText).toContain(`workbox.core.clientsClaim();`)
+    expect(swText).toMatch(
+      /workbox\.precaching\.precacheAndRoute\(\[\s+\{\s+"url": "app-123\.js",\s+"revision": null/
+    )
+    expect(swText).toContain(
+      `workbox.routing.registerRoute(/(\\.js$|\\.css$|static\\/)/, new workbox.strategies.CacheFirst(), "GET");`
+    )
+    expect(swText).toContain(
+      `workbox.routing.registerRoute(/^https?:.*\\/page-data\\/.*\\.json/, new workbox.strategies.StaleWhileRevalidate(), "GET");`
+    )
+  })
 
-    expect(swText).toContain(`debug: true`)
+  it(`passes only the manifest options to Workbox`, async () => {
+    await gatsbyNode.onPostBuild(args, {
+      workboxConfig: { maximumFileSizeToCacheInBytes: 1000 },
+    })
+
+    expect(Object.keys(manifestOptions).sort()).toEqual([
+      `dontCacheBustURLsMatching`,
+      `globDirectory`,
+      `globPatterns`,
+      `maximumFileSizeToCacheInBytes`,
+      `modifyURLPrefix`,
+    ])
+    expect(manifestOptions.globDirectory).toBe(`public`)
+  })
+
+  it(`configures the Workbox debug option`, async () => {
+    await gatsbyNode.onPostBuild(args, { debug: true })
+
+    expect(swText).toContain(
+      `workbox.setConfig({"modulePathPrefix":"workbox-v7.0.0","debug":true});`
+    )
+  })
+
+  it(`imports Workbox from the CDN`, async () => {
+    await gatsbyNode.onPostBuild(args, {
+      workboxConfig: { importWorkboxFrom: `cdn` },
+    })
+
+    expect(swText).toContain(
+      `importScripts("https://cdn.example/workbox-sw.js");`
+    )
+    expect(swText).not.toContain(`modulePathPrefix`)
+  })
+
+  it(`does not import Workbox when importWorkboxFrom is disabled`, async () => {
+    await gatsbyNode.onPostBuild(args, {
+      workboxConfig: { importWorkboxFrom: `disabled` },
+    })
+
+    expect(swText).not.toContain(`importScripts(`)
+    expect(swText).not.toContain(`workbox.setConfig`)
+  })
+
+  it(`rejects an unknown importWorkboxFrom value`, async () => {
+    await expect(
+      gatsbyNode.onPostBuild(args, {
+        workboxConfig: { importWorkboxFrom: `somewhere` },
+      })
+    ).rejects.toThrow(
+      `"importWorkboxFrom" must be one of "local", "cdn" or "disabled"`
+    )
+  })
+
+  it(`applies the options and settings of runtimeCaching and the service worker`, async () => {
+    await gatsbyNode.onPostBuild(args, {
+      workboxConfig: {
+        cacheId: `my-site`,
+        skipWaiting: false,
+        clientsClaim: false,
+        runtimeCaching: [
+          {
+            urlPattern: /\/api\//,
+            handler: `NetworkFirst`,
+            options: { networkTimeoutSeconds: 3 },
+          },
+        ],
+      },
+    })
+
+    expect(swText).toContain(
+      `workbox.core.setCacheNameDetails({prefix: "my-site"});`
+    )
+    expect(swText).not.toContain(`self.skipWaiting();`)
+    expect(swText).not.toContain(`workbox.core.clientsClaim();`)
+    expect(swText).toContain(
+      `workbox.routing.registerRoute(/\\/api\\//, new workbox.strategies.NetworkFirst({"networkTimeoutSeconds":3}), "GET");`
+    )
   })
 })
 
