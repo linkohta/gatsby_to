@@ -78,7 +78,7 @@ describe(`gatsby file compilation`, () => {
           root: {
             distDir: `${dir.js}/${COMPILED_CACHE_DIR}`,
             engines: {
-              node: _CFLAGS_.GATSBY_MAJOR !== `5` ? `>= 14.15.0` : `>= 18.0.0`,
+              node: _CFLAGS_.GATSBY_MAJOR !== `5` ? `>= 14.15.0` : `>= 22.0.0`,
             },
           },
         },
