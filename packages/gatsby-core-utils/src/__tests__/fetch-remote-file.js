@@ -2,7 +2,7 @@
 
 import path from "path"
 import zlib from "zlib"
-import { rest } from "msw"
+import { http, HttpResponse } from "msw"
 import { setupServer } from "msw/node"
 import { Writable } from "stream"
 import got from "got"
@@ -34,13 +34,14 @@ async function getFileSize(file) {
  * - maxBytes は送信するバイト数を表す
  *
  * @param {string} file ディスク上のファイルパス
- * @param {Object} req msw のリクエストオブジェクト
+ * @param {Request} request msw が渡すリクエストオブジェクト
  * @param {{ compress?: boolean}} options getFilecontent のオプション（gzip を使うかどうか）
  */
-async function getFileContent(file, req, options = {}) {
-  const cacheKey = req.url.origin + req.url.pathname
-  const maxRetry = req.url.searchParams.get(`attempts`)
-  const maxBytes = req.url.searchParams.get(`maxBytes`)
+async function getFileContent(file, request, options = {}) {
+  const url = new URL(request.url)
+  const cacheKey = url.origin + url.pathname
+  const maxRetry = url.searchParams.get(`attempts`)
+  const maxBytes = url.searchParams.get(`maxBytes`)
   const currentRetryCount = urlCount.get(cacheKey) || 0
   urlCount.set(cacheKey, currentRetryCount + 1)
 
@@ -81,188 +82,219 @@ async function getFileContent(file, req, options = {}) {
   return {
     content,
     contentLength:
-      req.url.searchParams.get(`contentLength`) === `false`
+      url.searchParams.get(`contentLength`) === `false`
         ? undefined
         : String(fileContentBuffer.length),
   }
 }
 
+/**
+ * msw のレスポンスを作る。
+ * 値が undefined のヘッダーは送らない。
+ * 304 はボディを持てないので、ボディと Content-Length を付けない。
+ * msw 2 は実際の HTTP と同じようにレスポンスを組み立てるため、
+ * Content-Length だけを付けると、ダウンロードが不完全だと判定されてしまう。
+ *
+ * @param {Buffer | string} body レスポンスのボディ
+ * @param {{ status: number, headers: Record<string, string | undefined> }} init ステータスとヘッダー
+ */
+function createResponse(body, { status, headers }) {
+  const hasBody = status !== 304
+  const definedHeaders = Object.entries(headers).filter(
+    ([name, value]) =>
+      value !== undefined && (hasBody || name !== `Content-Length`)
+  )
+
+  return new HttpResponse(hasBody ? body : null, {
+    status,
+    headers: definedHeaders,
+  })
+}
+
 let attempts503 = 0
 
 const server = setupServer(
-  rest.get(`http://external.com/logo.svg`, async (req, res, ctx) => {
+  http.get(`http://external.com/logo.svg`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/gatsby-logo.svg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/svg+xml`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/svg+xml`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
-  rest.get(`http://external.com/logo-gzip.svg`, async (req, res, ctx) => {
+  http.get(`http://external.com/logo-gzip.svg`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/gatsby-logo.svg`),
-      req,
+      request,
       {
         compress: true,
       }
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/svg+xml`),
-      ctx.set(`content-encoding`, `gzip`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/svg+xml`,
+        [`content-encoding`]: `gzip`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
-  rest.get(`http://external.com/dog.jpg`, async (req, res, ctx) => {
+  http.get(`http://external.com/dog.jpg`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/jpg`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
   // 非 ASCII の単語 `개`（韓国語で犬の意味）でテストすること
-  rest.get(
+  http.get(
     `http://external.com/${encodeURIComponent(`개`)}.jpg`,
-    async (req, res, ctx) => {
+    async ({ request }) => {
       const { content, contentLength } = await getFileContent(
         path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-        req
+        request
       )
 
-      return res(
-        ctx.set(`Content-Type`, `image/jpg`),
-        ctx.set(`Content-Length`, contentLength),
-        ctx.status(200),
-        ctx.body(content)
-      )
+      return createResponse(content, {
+        status: 200,
+        headers: {
+          [`Content-Type`]: `image/jpg`,
+          [`Content-Length`]: contentLength,
+        },
+      })
     }
   ),
-  rest.get(`http://external.com/dog`, async (req, res, ctx) => {
+  http.get(`http://external.com/dog`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/jpg`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
-  rest.get(
-    `http://external.com/invalid:dog*name.jpg`,
-    async (req, res, ctx) => {
-      const { content, contentLength } = await getFileContent(
-        path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-        req
-      )
-
-      return res(
-        ctx.set(`Content-Type`, `image/jpg`),
-        ctx.set(`Content-Length`, contentLength),
-        ctx.status(200),
-        ctx.body(content)
-      )
-    }
-  ),
-  rest.get(`http://external.com/dog-304.jpg`, async (req, res, ctx) => {
+  http.get(`http://external.com/invalid:dog*name.jpg`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/jpg`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.set(`etag`, `abcd`),
-      ctx.status(req.headers.get(`if-none-match`) === `abcd` ? 304 : 200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
-  rest.get(`http://external.com/dog-*.jpg`, async (req, res, ctx) => {
+  http.get(`http://external.com/dog-304.jpg`, async ({ request }) => {
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/jpg`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: request.headers.get(`if-none-match`) === `abcd` ? 304 : 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: contentLength,
+        [`etag`]: `abcd`,
+      },
+    })
   }),
-  rest.get(`http://external.com/404.jpg`, async (req, res, ctx) => {
+  http.get(`http://external.com/dog-*.jpg`, async ({ request }) => {
+    const { content, contentLength } = await getFileContent(
+      path.join(__dirname, `./fixtures/dog-thumbnail.jpg`),
+      request
+    )
+
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/jpg`,
+        [`Content-Length`]: contentLength,
+      },
+    })
+  }),
+  http.get(`http://external.com/404.jpg`, async ({ request }) => {
     const content = `Page not found`
 
-    return res(
-      ctx.set(`Content-Type`, `text/html`),
-      ctx.set(`Content-Length`, String(content.length)),
-      ctx.status(404),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 404,
+      headers: {
+        [`Content-Type`]: `text/html`,
+        [`Content-Length`]: String(content.length),
+      },
+    })
   }),
-  rest.get(`http://external.com/500.jpg`, async (req, res, ctx) => {
+  http.get(`http://external.com/500.jpg`, async ({ request }) => {
     const content = `Server error`
 
-    return res(
-      ctx.set(`Content-Type`, `text/html`),
-      ctx.set(`Content-Length`, String(content.length)),
-      ctx.status(500),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 500,
+      headers: {
+        [`Content-Type`]: `text/html`,
+        [`Content-Length`]: String(content.length),
+      },
+    })
   }),
-  rest.get(`http://external.com/503-twice.svg`, async (req, res, ctx) => {
+  http.get(`http://external.com/503-twice.svg`, async ({ request }) => {
     const errorContent = `Server error`
     attempts503++
 
     if (attempts503 < 3) {
-      return res(
-        ctx.set(`Content-Type`, `text/html`),
-        ctx.set(`Content-Length`, String(errorContent.length)),
-        ctx.status(503),
-        ctx.body(errorContent)
-      )
+      return createResponse(errorContent, {
+        status: 503,
+        headers: {
+          [`Content-Type`]: `text/html`,
+          [`Content-Length`]: String(errorContent.length),
+        },
+      })
     }
 
     const { content, contentLength } = await getFileContent(
       path.join(__dirname, `./fixtures/gatsby-logo.svg`),
-      req
+      request
     )
 
-    return res(
-      ctx.set(`Content-Type`, `image/svg+xml`),
-      ctx.set(`Content-Length`, contentLength),
-      ctx.status(200),
-      ctx.body(content)
-    )
+    return createResponse(content, {
+      status: 200,
+      headers: {
+        [`Content-Type`]: `image/svg+xml`,
+        [`Content-Length`]: contentLength,
+      },
+    })
   }),
-  rest.get(`http://external.com/503-forever.svg`, async (req, res, ctx) => {
+  http.get(`http://external.com/503-forever.svg`, async ({ request }) => {
     const errorContent = `Server error`
-    return res(
-      ctx.set(`Content-Type`, `text/html`),
-      ctx.set(`Content-Length`, String(errorContent.length)),
-      ctx.status(503),
-      ctx.body(errorContent)
-    )
+    return createResponse(errorContent, {
+      status: 503,
+      headers: {
+        [`Content-Type`]: `text/html`,
+        [`Content-Length`]: String(errorContent.length),
+      },
+    })
   }),
-  rest.get(`http://external.com/network-error.svg`, (req, res) =>
-    res.networkError(`ECONNREFUSED`)
-  )
+  http.get(`http://external.com/network-error.svg`, () => HttpResponse.error())
 )
 
 async function createMockCache(tmpDir) {
@@ -488,30 +520,29 @@ describe(`fetch-remote-file`, () => {
         cache,
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(`
-"Unable to fetch:
-http://external.com/500.jpg
----
-Reason: Response code 500 (Internal Server Error)
----
-Fetch details:
-{
-  \\"attempt\\": 3,
-  \\"method\\": \\"GET\\",
-  \\"errorCode\\": \\"ERR_NON_2XX_3XX_RESPONSE\\",
-  \\"responseStatusCode\\": 500,
-  \\"responseStatusMessage\\": \\"Internal Server Error\\",
-  \\"requestHeaders\\": {
-    \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-    \\"accept-encoding\\": \\"gzip, deflate, br\\"
-  },
-  \\"responseHeaders\\": {
-    \\"x-powered-by\\": \\"msw\\",
-    \\"content-length\\": \\"12\\",
-    \\"content-type\\": \\"text/html\\"
-  }
-}
----"
-`)
+      "Unable to fetch:
+      http://external.com/500.jpg
+      ---
+      Reason: Response code 500 (Internal Server Error)
+      ---
+      Fetch details:
+      {
+        \\"attempt\\": 3,
+        \\"method\\": \\"GET\\",
+        \\"errorCode\\": \\"ERR_NON_2XX_3XX_RESPONSE\\",
+        \\"responseStatusCode\\": 500,
+        \\"responseStatusMessage\\": \\"Internal Server Error\\",
+        \\"requestHeaders\\": {
+          \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
+          \\"accept-encoding\\": \\"gzip, deflate, br\\"
+        },
+        \\"responseHeaders\\": {
+          \\"content-type\\": \\"text/html\\",
+          \\"content-length\\": \\"12\\"
+        }
+      }
+      ---"
+    `)
   })
 
   let cacheVersion = 0
@@ -755,7 +786,10 @@ Fetch details:
       expect(getFileSize(filePath)).resolves.toBe(
         await getFileSize(path.join(__dirname, `./fixtures/gatsby-logo.svg`))
       )
-      expect(gotStream).toHaveBeenCalledTimes(2)
+      // NOTE: msw 2 は Content-Length より短いボディを、実際の HTTP と同じく接続の切断（ECONNRESET）として伝える。
+      // このとき `fetch-file.ts` は、エラーの処理と書き込み完了の処理の両方からリトライするため、
+      // 最初の 1 回とあわせて 3 回呼ばれる。
+      expect(gotStream).toHaveBeenCalledTimes(3)
     })
 
     it(`Retries when binary file is incomplete`, async () => {
@@ -768,7 +802,8 @@ Fetch details:
       expect(getFileSize(filePath)).resolves.toBe(
         await getFileSize(path.join(__dirname, `./fixtures/dog-thumbnail.jpg`))
       )
-      expect(gotStream).toHaveBeenCalledTimes(2)
+      // NOTE: 上のテストと同じ理由で 3 回呼ばれる。
+      expect(gotStream).toHaveBeenCalledTimes(3)
     })
 
     it(`Retries when server returns 503 error till server returns 200`, async () => {
@@ -793,30 +828,29 @@ Fetch details:
           cache,
         })
       ).rejects.toThrowErrorMatchingInlineSnapshot(`
-"Unable to fetch:
-http://external.com/503-forever.svg
----
-Reason: Response code 503 (Service Unavailable)
----
-Fetch details:
-{
-  \\"attempt\\": 3,
-  \\"method\\": \\"GET\\",
-  \\"errorCode\\": \\"ERR_NON_2XX_3XX_RESPONSE\\",
-  \\"responseStatusCode\\": 503,
-  \\"responseStatusMessage\\": \\"Service Unavailable\\",
-  \\"requestHeaders\\": {
-    \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-    \\"accept-encoding\\": \\"gzip, deflate, br\\"
-  },
-  \\"responseHeaders\\": {
-    \\"x-powered-by\\": \\"msw\\",
-    \\"content-length\\": \\"12\\",
-    \\"content-type\\": \\"text/html\\"
-  }
-}
----"
-`)
+        "Unable to fetch:
+        http://external.com/503-forever.svg
+        ---
+        Reason: Response code 503 (Service Unavailable)
+        ---
+        Fetch details:
+        {
+          \\"attempt\\": 3,
+          \\"method\\": \\"GET\\",
+          \\"errorCode\\": \\"ERR_NON_2XX_3XX_RESPONSE\\",
+          \\"responseStatusCode\\": 503,
+          \\"responseStatusMessage\\": \\"Service Unavailable\\",
+          \\"requestHeaders\\": {
+            \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
+            \\"accept-encoding\\": \\"gzip, deflate, br\\"
+          },
+          \\"responseHeaders\\": {
+            \\"content-type\\": \\"text/html\\",
+            \\"content-length\\": \\"12\\"
+          }
+        }
+        ---"
+      `)
 
       expect(gotStream).toHaveBeenCalledTimes(3)
     })
@@ -828,23 +862,23 @@ Fetch details:
           cache,
         })
       ).rejects.toThrowErrorMatchingInlineSnapshot(`
-"Unable to fetch:
-http://external.com/network-error.svg
----
-Reason: ECONNREFUSED
----
-Fetch details:
-{
-  \\"attempt\\": 3,
-  \\"method\\": \\"GET\\",
-  \\"errorCode\\": \\"ERR_GOT_REQUEST_ERROR\\",
-  \\"requestHeaders\\": {
-    \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-    \\"accept-encoding\\": \\"gzip, deflate, br\\"
-  }
-}
----"
-`)
+        "Unable to fetch:
+        http://external.com/network-error.svg
+        ---
+        Reason: Network error
+        ---
+        Fetch details:
+        {
+          \\"attempt\\": 3,
+          \\"method\\": \\"GET\\",
+          \\"errorCode\\": \\"ERR_GOT_REQUEST_ERROR\\",
+          \\"requestHeaders\\": {
+            \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
+            \\"accept-encoding\\": \\"gzip, deflate, br\\"
+          }
+        }
+        ---"
+      `)
 
       expect(gotStream).toHaveBeenCalledTimes(3)
     })

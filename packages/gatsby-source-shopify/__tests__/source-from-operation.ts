@@ -4,7 +4,7 @@
 import fs from "fs"
 import path from "path"
 import os from "os"
-import { graphql, rest } from "msw"
+import { graphql, http, HttpResponse, GraphQLResponseResolver } from "msw"
 import { setupServer } from "msw/node"
 import * as processBulkResultsModule from "../src/process-bulk-results"
 import { makeSourceFromOperation } from "../src/source-from-operation"
@@ -27,13 +27,14 @@ afterAll(() => {
   server.close()
 })
 
-function resolve(data) {
-  return (_req, res, ctx): void => res(ctx.data(data))
+function resolve<T extends Record<string, unknown>>(
+  data: T
+): GraphQLResponseResolver<T> {
+  return () => HttpResponse.json({ data })
 }
 
-function resolveOnce(data) {
-  return (_req, res, ctx): void => res.once(ctx.data(data))
-}
+// 最初の 1 回だけ応答するハンドラーにするためのオプション
+const once = { once: true }
 
 function generateTestName(prioritize, type): string {
   const modifiers = [prioritize ? `priority` : `non-priority`]
@@ -109,16 +110,17 @@ describe(`makeSourceFromOperation`, () => {
     server.use(
       graphql.query<ICurrentBulkOperationResponse>(
         `OPERATION_STATUS`,
-        resolveOnce({
+        resolve({
           currentBulkOperation: {
             id: `12345`,
             status: `COMPLETED`,
           },
-        })
+        }),
+        once
       ),
       graphql.mutation<IBulkOperationRunQueryResponse>(
         `INITIATE_BULK_OPERATION`,
-        resolveOnce({
+        resolve({
           bulkOperationRunQuery: {
             bulkOperation: {
               id: `12345`,
@@ -129,11 +131,12 @@ describe(`makeSourceFromOperation`, () => {
             },
             userErrors: [],
           },
-        })
+        }),
+        once
       ),
       graphql.query<{ node: IBulkOperationNode }>(
         `OPERATION_BY_ID`,
-        resolveOnce({
+        resolve({
           node: {
             status: `CREATED`,
             id: ``,
@@ -141,7 +144,8 @@ describe(`makeSourceFromOperation`, () => {
             query: ``,
             url: ``,
           },
-        })
+        }),
+        once
       ),
       graphql.query<{ node: IBulkOperationNode }>(
         `OPERATION_BY_ID`,
@@ -161,9 +165,7 @@ describe(`makeSourceFromOperation`, () => {
   testConfigs.forEach(({ bulkResults, prioritize, type }) => {
     it(`testing prioritize: ${prioritize}, type: ${type}`, async () => {
       const jsonLData = bulkResults.map(d => JSON.stringify(d)).join(os.EOL)
-      server.use(
-        rest.get(BULK_DATA_URL, (req, res, ctx) => res(ctx.text(jsonLData)))
-      )
+      server.use(http.get(BULK_DATA_URL, () => HttpResponse.text(jsonLData)))
       const options = {
         password: ``,
         storeUrl: `my-shop.shopify.com`,
@@ -219,9 +221,7 @@ describe(`makeSourceFromOperation`, () => {
         const lineCountInFile = countJsonLRows(fileContents)
 
         server.use(
-          rest.get(BULK_DATA_URL, (req, res, ctx) =>
-            res(ctx.text(fileContents))
-          )
+          http.get(BULK_DATA_URL, () => HttpResponse.text(fileContents))
         )
 
         const options = {

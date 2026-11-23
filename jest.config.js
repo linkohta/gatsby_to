@@ -23,6 +23,7 @@ const useJestUnit = !!process.env.GENERATE_JEST_REPORT
 // list to add ESM to ignore
 const esModules = [
   `@mdx-js/mdx`,
+  `@open-draft/deferred-promise`,
   `@sindresorhus/is`,
   `@szmarczak/http-timer`,
   `aggregate-error`,
@@ -111,6 +112,7 @@ const esModules = [
   `remark-rehype`,
   `remark-stringify`,
   `responselike`,
+  `rettime`,
   `space-separated-tokens`,
   `stringify-entities`,
   `trim-lines`,
@@ -123,6 +125,7 @@ const esModules = [
   `unist-util-position-from-estree`,
   `unist-util-stringify-position`,
   `unist-util-visit`,
+  `until-async`,
   `vfile`,
   `web-namespaces`,
   `zwitch`,
