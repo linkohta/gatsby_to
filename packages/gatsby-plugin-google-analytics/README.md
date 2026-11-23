@@ -144,7 +144,7 @@ Optimizing for the quality of user experience is key to the long-term success of
 We send three metrics:
 
 - **Largest Contentful Paint (LCP)**: measures loading performance. To provide a good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.
-- **First Input Delay (FID)**: measures interactivity. To provide a good user experience, pages should have a FID of 100 milliseconds or less.
+- **Interaction to Next Paint (INP)**: measures interactivity. To provide a good user experience, pages should have an INP of 200 milliseconds or less.
 - **Cumulative Layout Shift (CLS)**: measures visual stability. To provide a good user experience, pages should maintain a CLS of 1 or less.
 
 ## Optional Fields

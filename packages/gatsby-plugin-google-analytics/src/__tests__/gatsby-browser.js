@@ -4,21 +4,21 @@
 
 import { onInitialClientRender, onRouteUpdate } from "../gatsby-browser"
 import { Minimatch } from "minimatch"
-import { getLCP, getFID, getCLS } from "web-vitals/base"
+import { onLCP, onINP, onCLS } from "web-vitals"
 
-jest.mock(`web-vitals/base`, () => {
+jest.mock(`web-vitals`, () => {
   function createEntry(type, id, value) {
     return { name: type, id, value }
   }
 
   return {
-    getLCP: jest.fn(report => {
+    onLCP: jest.fn(report => {
       report(createEntry(`LCP`, `1`, `300`))
     }),
-    getFID: jest.fn(report => {
-      report(createEntry(`FID`, `2`, `150`))
+    onINP: jest.fn(report => {
+      report(createEntry(`INP`, `2`, `150`))
     }),
-    getCLS: jest.fn(report => {
+    onCLS: jest.fn(report => {
       report(createEntry(`CLS`, `3`, `0.10`))
     }),
   }
@@ -134,7 +134,7 @@ describe(`gatsby-plugin-google-analytics`, () => {
             `send`,
             `event`,
             expect.objectContaining({
-              eventAction: `FID`,
+              eventAction: `INP`,
               eventCategory: `Web Vitals`,
               eventLabel: `2`,
               eventValue: 150,
@@ -161,9 +161,9 @@ describe(`gatsby-plugin-google-analytics`, () => {
 
           jest.runAllTimers()
 
-          expect(getLCP).not.toHaveBeenCalled()
-          expect(getFID).not.toHaveBeenCalled()
-          expect(getCLS).not.toHaveBeenCalled()
+          expect(onLCP).not.toHaveBeenCalled()
+          expect(onINP).not.toHaveBeenCalled()
+          expect(onCLS).not.toHaveBeenCalled()
         })
       })
     })

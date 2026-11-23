@@ -2,21 +2,21 @@
  * @jest-environment jsdom
  */
 
-import { getLCP, getFID, getCLS } from "web-vitals/base"
+import { onLCP, onINP, onCLS } from "web-vitals"
 
-jest.mock(`web-vitals/base`, () => {
+jest.mock(`web-vitals`, () => {
   function createEntry(type, id, value) {
     return { name: type, id, value }
   }
 
   return {
-    getLCP: jest.fn(report => {
+    onLCP: jest.fn(report => {
       report(createEntry(`LCP`, `1`, `300`))
     }),
-    getFID: jest.fn(report => {
-      report(createEntry(`FID`, `2`, `150`))
+    onINP: jest.fn(report => {
+      report(createEntry(`INP`, `2`, `150`))
     }),
-    getCLS: jest.fn(report => {
+    onCLS: jest.fn(report => {
       report(createEntry(`CLS`, `3`, `0.10`))
     }),
   }
@@ -166,7 +166,7 @@ describe(`onRouteUpdate`, () => {
     expect(window.dataLayer).toContainEqual({
       event: `core-web-vitals`,
       webVitalsMeasurement: {
-        name: `FID`,
+        name: `INP`,
         id: `2`,
         value: 150,
       },
@@ -193,8 +193,8 @@ describe(`onRouteUpdate`, () => {
 
     jest.runAllTimers()
 
-    expect(getLCP).not.toHaveBeenCalled()
-    expect(getFID).not.toHaveBeenCalled()
-    expect(getCLS).not.toHaveBeenCalled()
+    expect(onLCP).not.toHaveBeenCalled()
+    expect(onINP).not.toHaveBeenCalled()
+    expect(onCLS).not.toHaveBeenCalled()
   })
 })

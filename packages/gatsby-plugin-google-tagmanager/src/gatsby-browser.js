@@ -24,17 +24,17 @@ function sendWebVitals(dataLayerName = `dataLayer`) {
     sendToGTM(data, win[dataLayerName])
   }
 
-  return import(`web-vitals/base`).then(({ getLCP, getFID, getCLS }) => {
+  return import(`web-vitals`).then(({ onLCP, onINP, onCLS }) => {
     const debouncedCLS = debounce(sendData, 3000)
-    // FID はデバウンスする必要がない。発生した時点で送信する
-    const debouncedFID = sendData
+    // INP は操作のたびに値が大きくなることがあるので、デバウンスする
+    const debouncedINP = debounce(sendData, 3000)
     // LCP は複数回発生することがあるので、デバウンスする
     const debouncedLCP = debounce(sendData, 3000)
 
-    // true フラグを付けると、リッスンの開始が遅れた場合に備えて、それ以前の発生分もすべて計測する。
-    getCLS(debouncedCLS, true)
-    getFID(debouncedFID, true)
-    getLCP(debouncedLCP, true)
+    // reportAllChanges を付けると、値が確定するのを待たずに、値が変わるたびに報告される。
+    onCLS(debouncedCLS, { reportAllChanges: true })
+    onINP(debouncedINP, { reportAllChanges: true })
+    onLCP(debouncedLCP, { reportAllChanges: true })
   })
 }
 
