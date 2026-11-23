@@ -219,3 +219,54 @@ describe(`Processing YAML nodes with internal type other than 'File'`, () => {
     })
   })
 })
+
+describe(`Reading YAML content the same way as before js-yaml 5`, () => {
+  beforeEach(() => {
+    node.internal.type = `File`
+    node.dir = `${os.tmpdir()}/bar/`
+  })
+
+  it(`keeps dates, merge keys and plain objects`, async () => {
+    node.content = [
+      `base: &base`,
+      `  color: red`,
+      `item:`,
+      `  <<: *base`,
+      `  size: 1`,
+      `published: 2002-12-14`,
+      `updated: 2001-12-14t21:59:43.10-05:00`,
+      `answer: yes`,
+      `time: 12:30:45`,
+    ].join(`\n`)
+
+    await onCreateNode(createNodeSpec)
+
+    expect(createNode).toHaveBeenCalledTimes(1)
+    const [createdNode] = createNode.mock.calls[0]
+    expect(createdNode.item).toEqual({ color: `red`, size: 1 })
+    expect(Object.getPrototypeOf(createdNode.item)).toBe(Object.prototype)
+    expect(createdNode.published).toEqual(new Date(`2002-12-14T00:00:00.000Z`))
+    expect(createdNode.updated).toEqual(new Date(`2001-12-15T02:59:43.100Z`))
+    // YAML 1.1 の真偽値や 60 進数としては解釈しない
+    expect(createdNode.answer).toBe(`yes`)
+    expect(createdNode.time).toBe(`12:30:45`)
+  })
+
+  it.each([
+    [`an empty file`, ``],
+    [`a file with only comments`, `# nothing here\n`],
+  ])(`creates no nodes and does not throw for %s`, async (_label, content) => {
+    node.content = content
+
+    await onCreateNode(createNodeSpec)
+
+    expect(createNode).not.toHaveBeenCalled()
+  })
+
+  it(`throws for a file with more than one document`, async () => {
+    node.content = `---\na: 1\n---\nb: 2\n`
+
+    await expect(onCreateNode(createNodeSpec)).rejects.toThrow()
+    expect(createNode).not.toHaveBeenCalled()
+  })
+})
