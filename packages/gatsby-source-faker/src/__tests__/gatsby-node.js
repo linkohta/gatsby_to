@@ -35,4 +35,17 @@ describe(`gatsby-source-faker`, () => {
       },
     })
   })
+
+  it(`should not print faker's deprecation warnings`, () => {
+    const log = jest.spyOn(console, `log`).mockImplementation(() => {})
+    const warn = jest.spyOn(console, `warn`).mockImplementation(() => {})
+
+    sourceNodes({ actions, createNodeId, createContentDigest }, pluginOptions)
+
+    expect(log).not.toHaveBeenCalled()
+    expect(warn).not.toHaveBeenCalled()
+
+    log.mockRestore()
+    warn.mockRestore()
+  })
 })
