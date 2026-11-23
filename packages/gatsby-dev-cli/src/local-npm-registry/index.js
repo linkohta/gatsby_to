@@ -1,4 +1,4 @@
-const startVerdaccio = require(`verdaccio`).default
+const { runServer } = require(`verdaccio`)
 
 const fs = require(`fs-extra`)
 const _ = require(`lodash`)
@@ -19,23 +19,16 @@ const startServer = () => {
   // ストレージを消去する
   fs.removeSync(verdaccioConfig.storage)
 
-  VerdaccioInitPromise = new Promise(resolve => {
-    startVerdaccio(
-      verdaccioConfig,
-      verdaccioConfig.port,
-      verdaccioConfig.storage,
-      `1.0.0`,
-      `gatsby-dev`,
-      (webServer, addr, pkgName, pkgVersion) => {
-        // console.log(webServer)
-        webServer.listen(addr.port || addr.path, addr.host, () => {
+  VerdaccioInitPromise = runServer(verdaccioConfig).then(
+    webServer =>
+      new Promise(resolve => {
+        webServer.listen(verdaccioConfig.port, `localhost`, () => {
           console.log(`Started local verdaccio server`)
 
           resolve()
         })
-      }
-    )
-  })
+      })
+  )
 
   return VerdaccioInitPromise
 }

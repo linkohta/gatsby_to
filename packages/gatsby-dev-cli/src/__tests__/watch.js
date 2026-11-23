@@ -19,19 +19,12 @@ jest.mock(`del`, () => jest.fn())
 
 jest.mock(`verdaccio`, () => {
   return {
-    default: (_, _2, _3, _4, _5, callback) => {
-      callback(
-        {
-          listen: (_, _2, cb2) => {
-            cb2()
-          },
+    runServer: async () => {
+      return {
+        listen: (_, _2, cb2) => {
+          cb2()
         },
-        {
-          port: `aa`,
-          path: `bb`,
-          host: `cc,`,
-        }
-      )
+      }
     },
   }
 })
