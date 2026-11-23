@@ -1,6 +1,6 @@
 import report from "gatsby-cli/lib/reporter"
 import { getConfigStore, getGatsbyVersion, isCI } from "gatsby-core-utils"
-import getDayOfYear from "date-fns/getDayOfYear"
+import { getDayOfYear } from "date-fns/getDayOfYear"
 
 const feedbackKey = `feedback.disabled`
 const lastDateKey = `feedback.lastRequestDate`

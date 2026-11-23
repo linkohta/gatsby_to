@@ -3,11 +3,15 @@ import {
   setFeedbackDisabledValue,
   userPassesFeedbackRequestHeuristic,
 } from "../feedback"
-jest.mock(`date-fns/getDayOfYear`, (): (() => number) => (): number => {
-  // これは、ヒューリスティック 1 が常に一致するようにするために必要である
-  // Math.random が 1 を返す場合（`clearStateToAllowHeuristicsToPass` 関数でモックしている）
-  const currentQuarter = Math.floor((new Date().getMonth() + 3) / 3)
-  return 1 * 30 * 3 * currentQuarter
+jest.mock(`date-fns/getDayOfYear`, () => {
+  return {
+    getDayOfYear: (): number => {
+      // これは、ヒューリスティック 1 が常に一致するようにするために必要である
+      // Math.random が 1 を返す場合（`clearStateToAllowHeuristicsToPass` 関数でモックしている）
+      const currentQuarter = Math.floor((new Date().getMonth() + 3) / 3)
+      return 1 * 30 * 3 * currentQuarter
+    },
+  }
 })
 jest.mock(`gatsby-core-utils`, () => {
   return {
