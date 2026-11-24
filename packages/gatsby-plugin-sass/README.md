@@ -31,7 +31,7 @@ import "./src/index.scss"
 
 ## Other options
 
-If you need to pass options to Sass use the plugins options, see [`node-sass`](https://github.com/sass/node-sass)/[`dart-sass`](https://github.com/sass/dart-sass) docs
+If you need to pass options to Sass use the plugins options, see the [Sass JavaScript API docs](https://sass-lang.com/documentation/js-api/interfaces/options/)
 for all available options.
 
 ```javascript:title=gatsby-config.js
@@ -40,7 +40,7 @@ plugins: [
     resolve: `gatsby-plugin-sass`,
     options: {
       sassOptions: {
-        includePaths: ["absolute/path/a", "absolute/path/b"],
+        loadPaths: ["absolute/path/a", "absolute/path/b"],
         ...
       }
     },
@@ -83,10 +83,10 @@ plugins: [
 
 ### Alternative Sass Implementations
 
-By default, the Dart implementation of Sass (`sass`) is used. To use the implementation written in Node (`node-sass`), you can install `node-sass` instead of `sass` and pass it into the options as the implementation:
+By default, [`sass-embedded`](https://github.com/sass/embedded-host-node) is used when it is installed, otherwise the Dart implementation of Sass (`sass`). To use a specific implementation, pass it into the options as the implementation:
 
 ```shell
-npm install node-sass
+npm install sass-embedded
 ```
 
 ```javascript:title=gatsby-config.js
@@ -94,53 +94,13 @@ plugins: [
   {
     resolve: `gatsby-plugin-sass`,
     options: {
-      implementation: require("node-sass"),
+      implementation: require("sass-embedded"),
     },
   },
 ]
 ```
 
-### Sass Precision
-
-`sass` intentionally doesn't have support for setting a custom `precision`. `node-sass` defaults to [5 digits of precision](https://github.com/sass/node-sass#precision). If you want some other level of precision (e.g. if you use Bootstrap), you may configure it as follows:
-
-#### Bootstrap 4
-
-See [Bootstrap's documentation on theming](https://getbootstrap.com/docs/4.3/getting-started/theming/#sass) for reference.
-
-```javascript:title=gatsby-config.js
-plugins: [
-  {
-    resolve: `gatsby-plugin-sass`,
-    options: {
-      implementation: require("node-sass"),
-      postCssPlugins: [somePostCssPlugin()],
-      sassOptions: {
-        precision: 6,
-      },
-    },
-  },
-]
-```
-
-#### Bootstrap 3 (with `bootstrap-sass`)
-
-See [`bootstrap-sass`](https://github.com/twbs/bootstrap-sass/blob/master/README.md#sass-number-precision) for reference.
-
-```javascript:title=gatsby-config.js
-plugins: [
-  {
-    resolve: `gatsby-plugin-sass`,
-    options: {
-      implementation: require("node-sass"),
-      postCssPlugins: [somePostCssPlugin()],
-      sassOptions: {
-        precision: 8,
-      },
-    },
-  },
-]
-```
+`node-sass` is not supported anymore.
 
 ### With CSS Modules
 
@@ -234,6 +194,12 @@ plugins: [
 ## Breaking changes history
 
 <!-- Please keep the breaking changes list ordered with the newest change at the top -->
+
+### sass-loader 17
+
+- `sass-loader` is updated to v17, which only supports the modern Sass JavaScript API. `node-sass` and the options of the legacy API are not supported anymore. Rename the options in `sassOptions` as follows: `includePaths` to `loadPaths`, `outputStyle` to `style`, `indentedSyntax` to `syntax` and `importer` to `importers` (the signature of importers and custom functions also changed, see the [Sass JavaScript API docs](https://sass-lang.com/documentation/js-api/interfaces/options/)). Other options of the legacy API such as `precision` are ignored.
+- `sass` 1.45.0 or later is required.
+- `resolve-url-loader` is updated to v5. The `engine` option was removed.
 
 ### v3.0.0
 
