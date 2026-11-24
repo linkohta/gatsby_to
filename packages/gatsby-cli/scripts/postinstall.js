@@ -1,4 +1,5 @@
-const chalk = require(`chalk`);
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`);
 
 const showSuccessMessage = () => {
   console.log(chalk.green(`Success!\n`));

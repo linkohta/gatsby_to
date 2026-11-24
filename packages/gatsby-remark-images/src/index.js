@@ -17,7 +17,8 @@ const { fluid, stats, traceSVG } = require(`gatsby-plugin-sharp`)
 const Promise = require(`bluebird`)
 const cheerio = require(`cheerio`)
 const { slash } = require(`gatsby-core-utils`)
-const chalk = require(`chalk`)
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`)
 
 // https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-transformer-sharp/src/supported-extensions.js と同じ内容にすること
 const supportedExtensions = {
