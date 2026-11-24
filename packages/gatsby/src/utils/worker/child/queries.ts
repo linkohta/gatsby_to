@@ -14,8 +14,8 @@ import {
   IGatsbyState,
   IPageQueryRunAction,
   IQueryStartAction,
+  DeepPartial,
 } from "../../../redux/types"
-import { DeepPartial } from "redux"
 import { waitUntilPageQueryResultsAreStored } from "../../page-data"
 
 export function setComponents(): void {

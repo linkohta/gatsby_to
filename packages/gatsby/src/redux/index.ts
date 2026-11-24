@@ -1,19 +1,25 @@
 import {
+  AnyAction,
   applyMiddleware,
   combineReducers,
   createStore,
-  DeepPartial,
   Middleware,
+  Reducer,
   ReducersMapObject,
   Store,
 } from "redux"
 import _ from "lodash"
 
 import { mett } from "../utils/mett"
-import thunk, { ThunkMiddleware, ThunkAction, ThunkDispatch } from "redux-thunk"
+import { thunk, ThunkMiddleware, ThunkAction, ThunkDispatch } from "redux-thunk"
 import * as rawReducers from "./reducers"
 import { writeToCache, readFromCache } from "./persist"
-import { IGatsbyState, ActionsUnion, GatsbyStateKeys } from "./types"
+import {
+  IGatsbyState,
+  ActionsUnion,
+  GatsbyStateKeys,
+  DeepPartial,
+} from "./types"
 
 const persistedReduxKeys = [
   `nodes`,
@@ -91,10 +97,20 @@ export interface IMultiDispatch {
 const multi: Middleware<IMultiDispatch> =
   ({ dispatch }) =>
   next =>
-  (action: ActionsUnion): ActionsUnion | Array<ActionsUnion> =>
+  (action): unknown =>
     Array.isArray(action) ? action.filter(Boolean).map(dispatch) : next(action)
 
-export type GatsbyReduxStore = Store<IGatsbyState> & {
+// redux 5 の `combineReducers` は、渡したレデューサーから状態とアクションの型を推論する。
+// レデューサーごとに受け取るアクションの型が異なり、そのままでは推論できないので、
+// redux 4 のときと同じく、任意のアクションを受け取る `IGatsbyState` 全体のレデューサーとして型を付ける
+const combineGatsbyReducers = (
+  reducersMap: Partial<ReducersMapObject<IGatsbyState, any>>
+): Reducer<IGatsbyState, AnyAction> =>
+  combineReducers(reducersMap) as unknown as Reducer<IGatsbyState, AnyAction>
+
+// redux 5 では `Store` の既定のアクションの型が `UnknownAction` になり、インターフェースで定義した
+// アクションを渡せなくなる。redux 4 の既定と同じ `AnyAction` を明示する
+export type GatsbyReduxStore = Store<IGatsbyState, AnyAction> & {
   dispatch: ThunkDispatch<IGatsbyState, any, ActionsUnion> & IMultiDispatch
 }
 
@@ -102,7 +118,7 @@ export const configureStore = (
   initialState: IGatsbyState
 ): GatsbyReduxStore => {
   const store = createStore(
-    combineReducers<IGatsbyState>({ ...reducers }),
+    combineGatsbyReducers({ ...reducers }),
     initialState,
     applyMiddleware(thunk as ThunkMiddleware<IGatsbyState, ActionsUnion>, multi)
   )
@@ -122,10 +138,10 @@ export const store: GatsbyReduxStore = configureStore(
  * 一部のレデューサーを差し替えられるようにする（たとえば独自のデータストアを設定する場合）
  */
 export function replaceReducer(
-  customReducers: Partial<ReducersMapObject<IGatsbyState>>
+  customReducers: Partial<ReducersMapObject<IGatsbyState, any>>
 ): void {
   store.replaceReducer(
-    combineReducers<IGatsbyState>({ ...reducers, ...customReducers })
+    combineGatsbyReducers({ ...reducers, ...customReducers })
   )
 }
 
