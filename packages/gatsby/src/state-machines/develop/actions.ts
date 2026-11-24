@@ -1,9 +1,10 @@
 import {
-  assign,
+  assign as xstateAssign,
   AnyEventObject,
-  ActionFunction,
-  spawn,
-  DoneEventObject,
+  DoneActorEvent,
+  ErrorActorEvent,
+  NonReducibleUnknown,
+  ProvidedActor,
 } from "xstate"
 import { IBuildContext } from "../../services"
 import { actions } from "../../redux/actions"
@@ -20,30 +21,49 @@ import {
   writeGraphQLSchema,
 } from "../../utils/graphql-typegen/file-writes"
 import { writeTypeScriptTypes } from "../../utils/graphql-typegen/ts-codegen"
+
+interface IBuildActionArgs {
+  context: IBuildContext
+  event: AnyEventObject
+}
+
+// 型引数を省くと、関数を渡さない `assign({ ... })` のコンテキストが推論されず、
+// マシンのアクションとして渡せない。そのため、このマシンの型で固定しておく
+const assign = xstateAssign<
+  IBuildContext,
+  AnyEventObject,
+  NonReducibleUnknown,
+  AnyEventObject,
+  ProvidedActor
+>
+
 /**
  * ノードを変更できるべきハンドラーの中にいる場合のハンドラー
  * キューに入れずに、すぐに呼び出す
  */
-export const callApi: ActionFunction<IBuildContext, AnyEventObject> = (
-  { store },
-  event
-) => callRealApi(event.payload, store)
+export const callApi = ({
+  context: { store },
+  event,
+}: IBuildActionArgs): void => callRealApi(event.payload, store)
 
 /**
  * ノードの変更を処理する準備ができていないすべての状態で使うイベント
  * ハンドラー。処理する代わりにバッチに追加し、次にアイドルになったときに処理する
  */
-export const addNodeMutation = assign<IBuildContext, AnyEventObject>({
-  nodeMutationBatch: ({ nodeMutationBatch = [] }, { payload }) => {
+export const addNodeMutation = assign({
+  nodeMutationBatch: ({
+    context: { nodeMutationBatch = [] },
+    event: { payload },
+  }: IBuildActionArgs) => {
     // きれいではないが、concat よりずっと速い
     nodeMutationBatch.push(payload)
     return nodeMutationBatch
   },
 })
 
-export const assignStoreAndWorkerPool = assign<IBuildContext, DoneEventObject>(
-  (_context, event) => {
-    const { store, workerPool } = event.data
+export const assignStoreAndWorkerPool = assign(
+  ({ event }: IBuildActionArgs) => {
+    const { store, workerPool } = (event as DoneActorEvent<any>).output
     return {
       store,
       workerPool,
@@ -57,12 +77,12 @@ const setQueryRunningFinished = async (): Promise<void> => {
   )
 }
 
-export const markQueryFilesDirty = assign<IBuildContext>({
+export const markQueryFilesDirty = assign({
   queryFilesDirty: true,
 })
 
-export const markSourceFilesDirty = assign<IBuildContext, AnyEventObject>(
-  (context, event) => {
+export const markSourceFilesDirty = assign(
+  ({ context, event }: IBuildActionArgs) => {
     const prev = context.changedSourceFiles ?? new Set()
     return {
       sourceFilesDirty: true,
@@ -71,31 +91,29 @@ export const markSourceFilesDirty = assign<IBuildContext, AnyEventObject>(
   }
 )
 
-export const markSourceFilesClean = assign<IBuildContext>({
+export const markSourceFilesClean = assign({
   sourceFilesDirty: false,
-  changedSourceFiles: () => new Set(),
+  changedSourceFiles: () => new Set<string>(),
 })
 
-export const setRecompiledFiles = assign<IBuildContext, AnyEventObject>(
-  context => {
-    return {
-      recompiledFiles: context.changedSourceFiles,
-    }
+export const setRecompiledFiles = assign(({ context }: IBuildActionArgs) => {
+  return {
+    recompiledFiles: context.changedSourceFiles,
   }
-)
+})
 
-export const markNodesDirty = assign<IBuildContext>({
+export const markNodesDirty = assign({
   nodesMutatedDuringQueryRun: true,
 })
 
-export const markNodesClean = assign<IBuildContext>({
+export const markNodesClean = assign({
   nodesMutatedDuringQueryRun: false,
 })
 
-export const incrementRecompileCount = assign<IBuildContext>({
+export const incrementRecompileCount = assign({
   nodesMutatedDuringQueryRunRecompileCount: ({
-    nodesMutatedDuringQueryRunRecompileCount: count = 0,
-  }) => {
+    context: { nodesMutatedDuringQueryRunRecompileCount: count = 0 },
+  }: IBuildActionArgs) => {
     reporter.verbose(
       `Re-running queries because nodes mutated during query run. Count: ${
         count + 1
@@ -105,34 +123,32 @@ export const incrementRecompileCount = assign<IBuildContext>({
   },
 })
 
-export const resetRecompileCount = assign<IBuildContext>({
+export const resetRecompileCount = assign({
   nodesMutatedDuringQueryRunRecompileCount: 0,
   nodesMutatedDuringQueryRun: false,
 })
 
-export const assignServiceResult = assign<IBuildContext, DoneEventObject>(
-  (_context, { data }): DataLayerResult => data
+export const assignServiceResult = assign(
+  ({ event }: IBuildActionArgs): DataLayerResult =>
+    (event as DoneActorEvent<DataLayerResult>).output
 )
 
 /**
  * さまざまな変更イベントを `emitter` で監視するサービスを起動する
  */
-export const spawnMutationListener = assign<IBuildContext>({
-  // @ts-ignore - TODO: Fixing this seems more involved: https://xstate.js.org/docs/guides/typescript.html#troubleshooting & https://github.com/statelyai/xstate/issues/2664
-  mutationListener: () => spawn(listenForMutations, `listen-for-mutations`),
+export const spawnMutationListener = assign({
+  mutationListener: ({ spawn }) =>
+    spawn(listenForMutations, { id: `listen-for-mutations` }),
 })
 
-export const assignServers = assign<IBuildContext, AnyEventObject>(
-  (_context, { data }) => {
-    return {
-      ...data,
-    }
+export const assignServers = assign(({ event }: IBuildActionArgs) => {
+  return {
+    ...(event as DoneActorEvent<Partial<IBuildContext>>).output,
   }
-)
+})
 
-export const spawnWebpackListener = assign<IBuildContext, AnyEventObject>({
-  // @ts-ignore - TODO: Fixing this seems more involved: https://xstate.js.org/docs/guides/typescript.html#troubleshooting & https://github.com/statelyai/xstate/issues/2664
-  webpackListener: ({ compiler }) => {
+export const spawnWebpackListener = assign({
+  webpackListener: ({ context: { compiler }, spawn }) => {
     if (!compiler) {
       return undefined
     }
@@ -140,39 +156,36 @@ export const spawnWebpackListener = assign<IBuildContext, AnyEventObject>({
   },
 })
 
-export const assignWebhookBody = assign<IBuildContext, AnyEventObject>({
-  webhookBody: (_context, { payload }) => payload?.webhookBody,
-  webhookSourcePluginName: (_context, { payload }) => payload?.pluginName,
+export const assignWebhookBody = assign({
+  webhookBody: ({ event: { payload } }: IBuildActionArgs) =>
+    payload?.webhookBody,
+  webhookSourcePluginName: ({ event: { payload } }: IBuildActionArgs) =>
+    payload?.pluginName,
 })
 
-export const clearWebhookBody = assign<IBuildContext, AnyEventObject>({
+export const clearWebhookBody = assign({
   webhookBody: undefined,
   webhookSourcePluginName: undefined,
 })
 
-export const finishParentSpan = ({ parentSpan }: IBuildContext): void =>
-  parentSpan?.finish()
+export const finishParentSpan = ({
+  context: { parentSpan },
+}: IBuildActionArgs): void => parentSpan?.finish()
 
 export const saveDbState = (): Promise<void> => saveState()
 
-export const logError: ActionFunction<IBuildContext, AnyEventObject> = (
-  _context,
-  event
-) => {
-  reporter.error(event.data)
+// 失敗したサービスが投げた値は、xstate 5 ではイベントの `error` に入る
+type ReportableError = Parameters<typeof reporter.error>[0]
+
+export const logError = ({ event }: IBuildActionArgs): void => {
+  reporter.error((event as ErrorActorEvent).error as ReportableError)
 }
 
-export const panic: ActionFunction<IBuildContext, AnyEventObject> = (
-  _context,
-  event
-) => {
-  reporter.panic(event.data)
+export const panic = ({ event }: IBuildActionArgs): void => {
+  reporter.panic((event as ErrorActorEvent).error as ReportableError)
 }
 
-export const panicBecauseOfInfiniteLoop: ActionFunction<
-  IBuildContext,
-  AnyEventObject
-> = () => {
+export const panicBecauseOfInfiniteLoop = (): void => {
   reporter.panic(
     reporter.stripIndent(`
   Panicking because nodes appear to be being changed every time we run queries. This would cause the site to recompile infinitely.
@@ -181,8 +194,8 @@ export const panicBecauseOfInfiniteLoop: ActionFunction<
   )
 }
 
-export const trackRequestedQueryRun = assign<IBuildContext, AnyEventObject>({
-  pendingQueryRuns: (context, { payload }) => {
+export const trackRequestedQueryRun = assign({
+  pendingQueryRuns: ({ context, event: { payload } }: IBuildActionArgs) => {
     const pendingQueryRuns = context.pendingQueryRuns || new Set<string>()
     if (payload?.pagePath) {
       pendingQueryRuns.add(payload.pagePath)
@@ -191,16 +204,16 @@ export const trackRequestedQueryRun = assign<IBuildContext, AnyEventObject>({
   },
 })
 
-export const clearPendingQueryRuns = assign<IBuildContext>(() => {
+export const clearPendingQueryRuns = assign(() => {
   return {
     pendingQueryRuns: new Set<string>(),
   }
 })
 
-export const schemaTypegen: ActionFunction<
-  IBuildContext,
-  AnyEventObject
-> = async (context, event) => {
+export const schemaTypegen = async ({
+  context,
+  event,
+}: IBuildActionArgs): Promise<void> => {
   const schema = event.payload.payload
   const directory = context.program.directory
 
@@ -218,10 +231,10 @@ export const schemaTypegen: ActionFunction<
   }
 }
 
-export const definitionsTypegen: ActionFunction<
-  IBuildContext,
-  AnyEventObject
-> = async (context, event) => {
+export const definitionsTypegen = async ({
+  context,
+  event,
+}: IBuildActionArgs): Promise<void> => {
   const definitions = event.payload.payload
   const { schema, config } = context.store!.getState()
   const directory = context.program.directory

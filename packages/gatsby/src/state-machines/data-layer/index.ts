@@ -1,7 +1,8 @@
-import { createMachine, StatesConfig, MachineOptions } from "xstate"
+import { createMachine, MachineConfig, AnyEventObject } from "xstate"
 import { dataLayerActions } from "./actions"
 import { IDataLayerContext } from "./types"
 import { dataLayerServices } from "./services"
+import { contextAsInput } from "../from-service"
 
 export type DataLayerResult = Pick<
   IDataLayerContext,
@@ -11,10 +12,15 @@ export type DataLayerResult = Pick<
   | `pagesToDelete`
 >
 
-const loadDataStates: StatesConfig<IDataLayerContext, any, any> = {
+type DataLayerStates = NonNullable<
+  MachineConfig<IDataLayerContext, AnyEventObject>[`states`]
+>
+
+const loadDataStates: DataLayerStates = {
   customizingSchema: {
     invoke: {
       src: `customizeSchema`,
+      input: contextAsInput,
       id: `customizing-schema`,
       onDone: {
         target: `sourcingNodes`,
@@ -24,6 +30,7 @@ const loadDataStates: StatesConfig<IDataLayerContext, any, any> = {
   sourcingNodes: {
     invoke: {
       src: `sourceNodes`,
+      input: contextAsInput,
       id: `sourcing-nodes`,
       onDone: {
         target: `buildingSchema`,
@@ -33,11 +40,12 @@ const loadDataStates: StatesConfig<IDataLayerContext, any, any> = {
   },
 }
 
-const initialCreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
+const initialCreatePagesStates: DataLayerStates = {
   buildingSchema: {
     invoke: {
       id: `building-schema`,
       src: `buildSchema`,
+      input: contextAsInput,
       onDone: {
         target: `creatingPages`,
         actions: `assignGraphQLRunners`,
@@ -48,6 +56,7 @@ const initialCreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
     invoke: {
       id: `creating-pages`,
       src: `createPages`,
+      input: contextAsInput,
       onDone: {
         target: `writingOutRedirects`,
         actions: `assignChangedPages`,
@@ -57,6 +66,7 @@ const initialCreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
   writingOutRedirects: {
     invoke: {
       src: `writeOutRedirectsAndWatch`,
+      input: contextAsInput,
       onDone: {
         target: `done`,
       },
@@ -64,11 +74,12 @@ const initialCreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
   },
 }
 
-const recreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
+const recreatePagesStates: DataLayerStates = {
   buildingSchema: {
     invoke: {
       id: `building-schema`,
       src: `buildSchema`,
+      input: contextAsInput,
       onDone: {
         target: `creatingPages`,
         actions: `assignGraphQLRunners`,
@@ -79,6 +90,7 @@ const recreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
     invoke: {
       id: `creating-pages`,
       src: `createPages`,
+      input: contextAsInput,
       onDone: {
         target: `done`,
         actions: `assignChangedPages`,
@@ -87,28 +99,45 @@ const recreatePagesStates: StatesConfig<IDataLayerContext, any, any> = {
   },
 }
 
-const doneState: StatesConfig<IDataLayerContext, any, any> = {
+const doneState: DataLayerStates = {
   done: {
     type: `final`,
-    data: ({
-      gatsbyNodeGraphQLFunction,
-      graphqlRunner,
-      pagesToBuild,
-      pagesToDelete,
-    }): DataLayerResult => {
-      return {
-        gatsbyNodeGraphQLFunction,
-        graphqlRunner,
-        pagesToBuild,
-        pagesToDelete,
-      }
-    },
   },
 }
 
-const options: Partial<MachineOptions<IDataLayerContext, any>> = {
+// 最終状態に達したときに、親のマシンへ返す値
+const output = ({
+  context: {
+    gatsbyNodeGraphQLFunction,
+    graphqlRunner,
+    pagesToBuild,
+    pagesToDelete,
+  },
+}: {
+  context: IDataLayerContext
+}): DataLayerResult => {
+  return {
+    gatsbyNodeGraphQLFunction,
+    graphqlRunner,
+    pagesToBuild,
+    pagesToDelete,
+  }
+}
+
+// 親のマシンが invoke の `input` で渡した値を、そのままコンテキストにする
+const context = ({ input }: { input?: IDataLayerContext }): IDataLayerContext =>
+  input ?? {}
+
+const types = {} as {
+  context: IDataLayerContext
+  events: AnyEventObject
+  input: IDataLayerContext | undefined
+  output: DataLayerResult
+}
+
+const options = {
   actions: dataLayerActions,
-  services: dataLayerServices,
+  actors: dataLayerServices,
 }
 
 /**
@@ -117,9 +146,10 @@ const options: Partial<MachineOptions<IDataLayerContext, any>> = {
 
 export const initializeDataMachine = createMachine(
   {
-    predictableActionArguments: true,
+    types,
     id: `initializeDataMachine`,
-    context: {},
+    context,
+    output,
     initial: `customizingSchema`,
     states: {
       ...loadDataStates,
@@ -136,9 +166,10 @@ export const initializeDataMachine = createMachine(
 
 export const reloadDataMachine = createMachine(
   {
-    predictableActionArguments: true,
+    types,
     id: `reloadDataMachine`,
-    context: {},
+    context,
+    output,
     initial: `customizingSchema`,
     states: {
       ...loadDataStates,
@@ -155,9 +186,10 @@ export const reloadDataMachine = createMachine(
  */
 export const recreatePagesMachine = createMachine(
   {
-    predictableActionArguments: true,
+    types,
     id: `recreatePagesMachine`,
-    context: {},
+    context,
+    output,
     initial: `buildingSchema`,
     states: {
       ...recreatePagesStates,

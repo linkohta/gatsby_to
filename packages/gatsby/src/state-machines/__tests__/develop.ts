@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { developMachine } from "../develop"
-import { interpret } from "xstate"
+import { initializeDataMachine } from "../data-layer"
+import { createActor, fromPromise, Actor } from "xstate"
 import { IProgram } from "../../commands/types"
 
 const actions = {
@@ -31,15 +32,22 @@ const throwService = async (): Promise<void> => {
 
 const rejectService = async (): Promise<void> => Promise.reject(`fail`)
 
-const machine = developMachine.withConfig(
-  {
-    actions,
-    services,
-  },
-  {
-    program: {} as IProgram,
-  }
-)
+// モックが何も返さないサービスは、完了しないものとして扱う。完了は、テストが
+// `xstate.done.actor.<id>` のイベントを送って知らせる
+const pending = new Promise<never>(() => {})
+
+const machine = developMachine.provide({
+  actions,
+  actors: Object.fromEntries(
+    Object.entries(services).map(([name, service]) => [
+      name,
+      fromPromise(async ({ input }) => service(input) ?? pending),
+    ])
+  ),
+})
+
+const interpret = (logic: typeof machine): Actor<typeof machine> =>
+  createActor(logic, { input: { program: {} as IProgram } })
 
 const tick = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0))
 
@@ -59,7 +67,7 @@ describe(`the top-level develop state machine`, () => {
   it(`initialises`, async () => {
     const service = interpret(machine)
     service.start()
-    expect(service.state.value).toBe(`initializing`)
+    expect(service.getSnapshot().value).toBe(`initializing`)
   })
 
   it(`runs node mutation during initialising data state`, () => {
@@ -67,13 +75,17 @@ describe(`the top-level develop state machine`, () => {
     const service = interpret(machine)
 
     service.start()
-    service.send(`done.invoke.initialize`)
-    expect(service.state.value).toBe(`initializingData`)
-    service.send(`ADD_NODE_MUTATION`, payload)
+    service.send({ type: `xstate.done.actor.initialize` })
+    expect(service.getSnapshot().value).toBe(`initializingData`)
+    service.send({ type: `ADD_NODE_MUTATION`, ...payload })
     expect(actions.callApi).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ type: `ADD_NODE_MUTATION`, ...payload }),
-      expect.anything()
+      expect.objectContaining({
+        event: expect.objectContaining({
+          type: `ADD_NODE_MUTATION`,
+          ...payload,
+        }),
+      }),
+      undefined
     )
   })
 
@@ -81,12 +93,12 @@ describe(`the top-level develop state machine`, () => {
     const service = interpret(machine)
 
     service.start()
-    expect(service.state.value).toBe(`initializing`)
-    service.send(`done.invoke.initialize`)
-    expect(service.state.value).toBe(`initializingData`)
-    expect(service.state.context.sourceFilesDirty).toBeFalsy()
-    service.send(`SOURCE_FILE_CHANGED`)
-    expect(service.state.context.sourceFilesDirty).toBeTruthy()
+    expect(service.getSnapshot().value).toBe(`initializing`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    expect(service.getSnapshot().value).toBe(`initializingData`)
+    expect(service.getSnapshot().context.sourceFilesDirty).toBeFalsy()
+    service.send({ type: `SOURCE_FILE_CHANGED` })
+    expect(service.getSnapshot().context.sourceFilesDirty).toBeTruthy()
   })
 
   // これが現在の動作だが、将来はキューに入れられるようになる
@@ -94,12 +106,12 @@ describe(`the top-level develop state machine`, () => {
     const webhookBody = { foo: 1 }
     const service = interpret(machine)
     service.start()
-    expect(service.state.value).toBe(`initializing`)
-    service.send(`done.invoke.initialize`)
-    expect(service.state.value).toBe(`initializingData`)
-    expect(service.state.context.webhookBody).toBeUndefined()
-    service.send(`WEBHOOK_RECEIVED`, { payload: { webhookBody } })
-    expect(service.state.context.webhookBody).toEqual(webhookBody)
+    expect(service.getSnapshot().value).toBe(`initializing`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    expect(service.getSnapshot().value).toBe(`initializingData`)
+    expect(service.getSnapshot().context.webhookBody).toBeUndefined()
+    service.send({ type: `WEBHOOK_RECEIVED`, payload: { webhookBody } })
+    expect(service.getSnapshot().context.webhookBody).toEqual(webhookBody)
     expect(services.reloadData).toHaveBeenCalled()
   })
 
@@ -108,14 +120,16 @@ describe(`the top-level develop state machine`, () => {
 
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    expect(service.state.context.nodeMutationBatch).toBeUndefined()
-    expect(service.state.context.nodesMutatedDuringQueryRun).toBeFalsy()
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    expect(service.getSnapshot().context.nodeMutationBatch).toBeUndefined()
+    expect(service.getSnapshot().context.nodesMutatedDuringQueryRun).toBeFalsy()
 
-    service.send(`ADD_NODE_MUTATION`, { payload })
-    expect(service.state.context.nodesMutatedDuringQueryRun).toBeTruthy()
+    service.send({ type: `ADD_NODE_MUTATION`, payload })
+    expect(
+      service.getSnapshot().context.nodesMutatedDuringQueryRun
+    ).toBeTruthy()
     expect(actions.callApi).toHaveBeenCalled()
   })
 
@@ -124,30 +138,30 @@ describe(`the top-level develop state machine`, () => {
 
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.send(`ADD_NODE_MUTATION`, { payload })
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.send({ type: `ADD_NODE_MUTATION`, payload })
+    service.send({ type: `xstate.done.actor.run-queries` })
     expect(
-      service.state.context.nodesMutatedDuringQueryRunRecompileCount
+      service.getSnapshot().context.nodesMutatedDuringQueryRunRecompileCount
     ).toEqual(1)
-    expect(service.state.context.nodesMutatedDuringQueryRun).toBeFalsy()
+    expect(service.getSnapshot().context.nodesMutatedDuringQueryRun).toBeFalsy()
   })
 
   it(`resets the recompile count if nodes were not mutated during query running`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
-    service.state.context.nodesMutatedDuringQueryRunRecompileCount = 1
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
+    service.getSnapshot().context.nodesMutatedDuringQueryRunRecompileCount = 1
+    service.send({ type: `xstate.done.actor.run-queries` })
     expect(
-      service.state.context.nodesMutatedDuringQueryRunRecompileCount
+      service.getSnapshot().context.nodesMutatedDuringQueryRunRecompileCount
     ).toEqual(0)
-    expect(service.state.context.nodesMutatedDuringQueryRun).toBeFalsy()
+    expect(service.getSnapshot().context.nodesMutatedDuringQueryRun).toBeFalsy()
   })
 
   it(`panics if the recompile count is above the limit`, () => {
@@ -155,16 +169,16 @@ describe(`the top-level develop state machine`, () => {
 
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
 
-    service.send(`ADD_NODE_MUTATION`, { payload })
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `ADD_NODE_MUTATION`, payload })
+    service.send({ type: `xstate.done.actor.run-queries` })
     for (let index = 0; index < 6; index++) {
-      service.send(`done.invoke.recreate-pages`)
-      service.send(`ADD_NODE_MUTATION`, { payload })
-      service.send(`done.invoke.run-queries`)
+      service.send({ type: `xstate.done.actor.recreate-pages` })
+      service.send({ type: `ADD_NODE_MUTATION`, payload })
+      service.send({ type: `xstate.done.actor.run-queries` })
     }
     expect(actions.panicBecauseOfInfiniteLoop).toHaveBeenCalled()
   })
@@ -172,26 +186,26 @@ describe(`the top-level develop state machine`, () => {
   it(`starts webpack if there is no compiler`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    expect(service.state.context.compiler).toBeUndefined()
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    expect(service.getSnapshot().context.compiler).toBeUndefined()
     services.startWebpackServer.mockReset()
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.run-queries` })
     expect(services.startWebpackServer).toHaveBeenCalled()
   })
 
   it(`recompiles if source files have changed`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`SOURCE_FILE_CHANGED`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `SOURCE_FILE_CHANGED` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
     // そのため、代わりに webpack を起動しない
-    service.state.context.compiler = {} as any
+    service.getSnapshot().context.compiler = {} as any
     services.recompile.mockReset()
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.run-queries` })
     expect(services.startWebpackServer).not.toHaveBeenCalled()
     expect(services.recompile).toHaveBeenCalled()
   })
@@ -199,12 +213,12 @@ describe(`the top-level develop state machine`, () => {
   it(`skips compilation if source files are unchanged`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
     services.recompile.mockReset()
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.run-queries` })
     expect(services.startWebpackServer).not.toHaveBeenCalled()
     expect(services.recompile).not.toHaveBeenCalled()
   })
@@ -212,12 +226,12 @@ describe(`the top-level develop state machine`, () => {
   it(`recreates pages when waiting is complete`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
-    service.send(`done.invoke.run-queries`)
-    service.send(`done.invoke.waiting`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
+    service.send({ type: `xstate.done.actor.run-queries` })
+    service.send({ type: `xstate.done.actor.waiting` })
 
     expect(services.recreatePages).toHaveBeenCalled()
   })
@@ -225,12 +239,12 @@ describe(`the top-level develop state machine`, () => {
   it(`extracts queries when waiting requests it`, () => {
     const service = interpret(machine)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
-    service.send(`done.invoke.run-queries`)
-    service.send(`EXTRACT_QUERIES_NOW`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
+    service.send({ type: `xstate.done.actor.run-queries` })
+    service.send({ type: `EXTRACT_QUERIES_NOW` })
     expect(services.runQueries).toHaveBeenCalled()
   })
 
@@ -254,32 +268,57 @@ describe(`the top-level develop state machine`, () => {
     const service = interpret(machine)
     services.initializeData.mockImplementationOnce(throwService)
     service.start()
-    service.send(`done.invoke.initialize`)
+    service.send({ type: `xstate.done.actor.initialize` })
     await tick()
     expect(actions.logError).toHaveBeenCalled()
-    expect(service.state.value).toEqual(`waiting`)
+    expect(service.getSnapshot().value).toEqual(`waiting`)
+  })
+
+  // xstate 5 では、子のステートマシンの中で失敗したサービスのエラーが親へ伝わる
+  it(`logs errors from a service inside a child machine and transitions to waiting`, async () => {
+    const service = createActor(
+      machine.provide({
+        actors: {
+          initializeData: initializeDataMachine.provide({
+            actors: { customizeSchema: fromPromise(throwService) },
+          }),
+        },
+      }),
+      { input: { program: {} as IProgram } }
+    )
+    service.start()
+    service.send({ type: `xstate.done.actor.initialize` })
+    expect(service.getSnapshot().value).toBe(`initializingData`)
+    await tick()
+    expect(actions.logError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: expect.objectContaining({ error: new Error(`fail`) }),
+      }),
+      undefined
+    )
+    expect(service.getSnapshot().value).toEqual(`waiting`)
   })
 
   it(`logs errors during query running and transitions to waiting`, async () => {
     const service = interpret(machine)
     services.runQueries.mockImplementationOnce(throwService)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
     await tick()
     expect(actions.logError).toHaveBeenCalled()
-    expect(service.state.value).toEqual(`waiting`)
+    expect(service.getSnapshot().value).toEqual(`waiting`)
   })
 
   it(`panics on errors when launching webpack`, async () => {
     const service = interpret(machine)
     services.startWebpackServer.mockImplementationOnce(throwService)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.send({ type: `xstate.done.actor.run-queries` })
     await tick()
     expect(actions.panic).toHaveBeenCalled()
   })
@@ -288,26 +327,26 @@ describe(`the top-level develop state machine`, () => {
     const service = interpret(machine)
     services.recompile.mockImplementationOnce(throwService)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
-    service.state.context.sourceFilesDirty = true
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
+    service.getSnapshot().context.sourceFilesDirty = true
+    service.send({ type: `xstate.done.actor.run-queries` })
     await tick()
     expect(actions.logError).toHaveBeenCalled()
-    expect(service.state.value).toEqual(`waiting`)
+    expect(service.getSnapshot().value).toEqual(`waiting`)
   })
 
   it(`panics on errors while waiting`, async () => {
     const service = interpret(machine)
     services.waitForMutations.mockImplementationOnce(throwService)
     service.start()
-    service.send(`done.invoke.initialize`)
-    service.send(`done.invoke.initialize-data`)
-    service.send(`done.invoke.post-bootstrap`)
-    service.state.context.compiler = {} as any
-    service.send(`done.invoke.run-queries`)
+    service.send({ type: `xstate.done.actor.initialize` })
+    service.send({ type: `xstate.done.actor.initialize-data` })
+    service.send({ type: `xstate.done.actor.post-bootstrap` })
+    service.getSnapshot().context.compiler = {} as any
+    service.send({ type: `xstate.done.actor.run-queries` })
     await tick()
     expect(actions.panic).toHaveBeenCalled()
   })

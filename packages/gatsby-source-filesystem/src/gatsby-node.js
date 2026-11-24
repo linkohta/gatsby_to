@@ -1,7 +1,7 @@
 const chokidar = require(`chokidar`)
 const fs = require(`fs`)
 const path = require(`path`)
-const { createMachine, interpret, assign } = require(`xstate`)
+const { createMachine, createActor, assign } = require(`xstate`)
 const { createGlobWatchFilter } = require(`gatsby-core-utils/watch-globs`)
 
 const { createFileNode } = require(`./create-file-node`)
@@ -68,15 +68,16 @@ const createFSMachine = (
     )
   }
 
-  const log = expr => (ctx, action, meta) => {
-    if (ctx.bootstrapped) {
-      reporter.info(expr(ctx, action, meta))
+  const log =
+    expr =>
+    ({ context, event }) => {
+      if (context.bootstrapped) {
+        reporter.info(expr(event))
+      }
     }
-  }
 
   const fsMachine = createMachine(
     {
-      predictableActionArguments: true,
       context: {
         bootstrapped: false,
       },
@@ -114,17 +115,14 @@ const createFSMachine = (
                 CHOKIDAR_ADD: {
                   actions: [
                     `createAndProcessNode`,
-                    log(
-                      (_, { pathType, path }) => `added ${pathType} at ${path}`
-                    ),
+                    log(({ pathType, path }) => `added ${pathType} at ${path}`),
                   ],
                 },
                 CHOKIDAR_CHANGE: {
                   actions: [
                     `createAndProcessNode`,
                     log(
-                      (_, { pathType, path }) =>
-                        `changed ${pathType} at ${path}`
+                      ({ pathType, path }) => `changed ${pathType} at ${path}`
                     ),
                   ],
                 },
@@ -132,8 +130,7 @@ const createFSMachine = (
                   actions: [
                     `deletePathNode`,
                     log(
-                      (_, { pathType, path }) =>
-                        `deleted ${pathType} at ${path}`
+                      ({ pathType, path }) => `deleted ${pathType} at ${path}`
                     ),
                   ],
                 },
@@ -145,25 +142,26 @@ const createFSMachine = (
     },
     {
       actions: {
-        createAndProcessNode(_, { pathType, path }) {
+        createAndProcessNode({ event: { path } }) {
           createAndProcessNode(path).catch(err => reporter.error(err))
         },
-        deletePathNode(_, { pathType, path }, { state }) {
+        deletePathNode({ event: { path } }) {
           deletePathNode(path)
         },
-        flushPathQueue(_, { resolve, reject }) {
+        // `NOT_READY` を抜けるときのアクションなので、イベントは `CHOKIDAR_READY` である
+        flushPathQueue({ event: { resolve, reject } }) {
           flushPathQueue().then(resolve, reject)
         },
-        queueNodeDeleting(_, { path }) {
+        queueNodeDeleting({ event: { path } }) {
           pathQueue.push({ op: `delete`, path })
         },
-        queueNodeProcessing(_, { path }) {
+        queueNodeProcessing({ event: { path } }) {
           pathQueue.push({ op: `upsert`, path })
         },
       },
     }
   )
-  return interpret(fsMachine).start()
+  return createActor(fsMachine).start()
 }
 
 exports.pluginOptionsSchema = ({ Joi }) =>
@@ -200,7 +198,7 @@ See docs here - https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/
   // ブートストラップが終わった後は、File ノードの更新を一度に 1 つずつしか
   // システムに通さない。
   api.emitter.on(`BOOTSTRAP_FINISHED`, () => {
-    fsMachine.send(`BOOTSTRAP_FINISHED`)
+    fsMachine.send({ type: `BOOTSTRAP_FINISHED` })
   })
 
   // chokidar 4 以降の `ignored` は glob を受け付けないので、glob を照合する関数に置き換える
