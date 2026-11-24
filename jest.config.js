@@ -46,6 +46,7 @@ const esModules = [
   `comma-separated-tokens`,
   `configstore`,
   `convert-hrtime`,
+  `cookie`,
   `decode-named-character-reference`,
   `del`,
   `dot-prop`,

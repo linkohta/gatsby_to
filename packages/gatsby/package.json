@@ -60,7 +60,7 @@
     "chokidar": "^3.6.0",
     "common-tags": "^1.8.2",
     "compression": "^1.8.2",
-    "cookie": "^0.5.0",
+    "cookie": "^2.0.2",
     "core-js": "^3.51.0",
     "cors": "^2.8.6",
     "css-loader": "^5.2.7",
