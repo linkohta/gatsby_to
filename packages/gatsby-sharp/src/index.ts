@@ -1,9 +1,16 @@
+import type sharp from "sharp"
+
 const { exec } = require(`child_process`)
 const { createRequire } = require(`module`)
 
-let sharpInstance: typeof import("sharp")
+// sharp 0.35 の型定義は、解決のされ方によって ESM の形（関数が `default` に入る）にも
+// CommonJS の形（`export =`）にもなる。どちらでも sharp の関数そのものの型になるように、
+// default import の型を使う
+type SharpModule = typeof sharp
 
-export = async function getSharpInstance(): Promise<typeof import("sharp")> {
+let sharpInstance: SharpModule
+
+export = async function getSharpInstance(): Promise<SharpModule> {
   try {
     return importSharp()
   } catch (err) {
@@ -14,7 +21,7 @@ export = async function getSharpInstance(): Promise<typeof import("sharp")> {
   }
 }
 
-function importSharp(): typeof import("sharp") {
+function importSharp(): SharpModule {
   if (!sharpInstance) {
     const cleanRequire = createRequire(__filename)
     const sharp = cleanRequire(`sharp`)

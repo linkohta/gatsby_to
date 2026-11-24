@@ -23,6 +23,7 @@ import {
   getCurrentPlatformAndTarget,
   getFunctionsTargetPlatformAndTarget,
 } from "../../utils/engines-helpers"
+import { getSharpSharedLibraries } from "./sharp-shared-libraries"
 
 type Reporter = typeof reporter
 
@@ -225,19 +226,57 @@ function checkIfNeedToInstallMissingLmdb(
   )
 }
 
+// sharp（0.33 以降）は、ビルド済みのバイナリを `@img/sharp-<platform>-<arch>` として配布している。
+// Linux では、musl 向けに `@img/sharp-linuxmusl-<arch>` もある
+function hasPrebuiltSharpBinary(target: IPlatformAndArch): boolean {
+  const sharpRequire = mod.createRequire(require.resolve(`sharp`))
+  const platforms =
+    target.platform === `linux` ? [`linux`, `linuxmusl`] : [target.platform]
+
+  return platforms.some(platform => {
+    try {
+      sharpRequire.resolve(`@img/sharp-${platform}-${target.arch}/package`)
+      return true
+    } catch (e) {
+      return false
+    }
+  })
+}
+
+// エンジンを実行する環境を、sharp のビルド済みパッケージの名前の形式（`linux-x64` など）で返す。
+// 関数の実行環境は glibc として扱う（lmdb のバイナリと同じ）。現在の環境向けにビルドしていて、
+// それが musl（Alpine Linux など）のときだけ `linuxmusl` にする
+function getSharpRuntimePlatformAndArch(
+  functionsTarget: IPlatformAndArch,
+  currentTarget: IPlatformAndArch
+): string {
+  let platform = functionsTarget.platform
+
+  if (platform === `linux` && isEqual(functionsTarget, currentTarget)) {
+    const report = process.report?.getReport() as
+      { header?: { glibcVersionRuntime?: string } } | undefined
+
+    if (report?.header && !report.header.glibcVersionRuntime) {
+      platform = `linuxmusl`
+    }
+  }
+
+  return `${platform}-${functionsTarget.arch}`
+}
+
 function checkIfNeedToInstallMissingSharp(
   functionsTarget: IPlatformAndArch,
   currentTarget: IPlatformAndArch
 ): IBinaryPackageStatus | undefined {
   try {
     // sharp が解決できるかを確認する
-    const sharp: typeof import("sharp") = require(`sharp`)
+    const sharp: typeof import("sharp").default = require(`sharp`)
 
     if (isEqual(functionsTarget, currentTarget)) {
       // 現在のプラットフォームとターゲットが関数のターゲットと同じ場合は、現在の sharp のインストールに
-      // 同梱の libvips があるかを確認する必要がある。lambda で必要になるためである
-      if (sharp.vendor.installed.includes(sharp.vendor.current)) {
-        // 同梱の libvips がインストールされているので、それを使える
+      // ビルド済みのバイナリ（libvips を同梱している）があるかを確認する必要がある。lambda で必要になるためである
+      if (hasPrebuiltSharpBinary(functionsTarget)) {
+        // ビルド済みのバイナリがインストールされているので、それを使える
         return undefined
       }
     }
@@ -246,8 +285,7 @@ function checkIfNeedToInstallMissingSharp(
       {
         needToInstall: true,
         packageName: `sharp`,
-        packageVersion:
-          sharp.versions.sharp ?? require(`sharp/package.json`).version,
+        packageVersion: sharp.versions.sharp,
       },
       functionsTarget
     )
@@ -282,10 +320,13 @@ async function installMissing(
     env: {
       npm_config_arch: functionsTarget.arch,
       npm_config_platform: functionsTarget.platform,
-      // グローバルにインストールされた libvips が sharp の要件を満たしていても、スキップせずに、同梱の libvips を sharp に強制的にダウンロードさせる
-      // これにより、生成される関数は自己完結し、関数の実行環境にグローバルで使える（同じ）libvips が
-      // あることに依存しなくなる
-      SHARP_IGNORE_GLOBAL_LIBVIPS: `1`,
+      // sharp（0.33 以降）のビルド済みバイナリは optionalDependencies として配布されていて、
+      // npm は `os`、`cpu`、`libc` の設定に合うものをインストールする
+      npm_config_os: functionsTarget.platform,
+      npm_config_cpu: functionsTarget.arch,
+      ...(functionsTarget.platform === `linux`
+        ? { npm_config_libc: `glibc` }
+        : {}),
     },
   }
 
@@ -444,18 +485,6 @@ export async function createGraphqlEngineBundle(
       rules: [
         {
           oneOf: [
-            {
-              // sharp 専用のローダーの組み合わせ
-              test: /node_modules[/\\]sharp[/\\].*\.[cm]?js$/,
-              // Node 向けのビルドでは、AMD のサポートを無効にすることが推奨されている
-              parser: { amd: false },
-              use: [
-                assetRelocatorUseEntry,
-                {
-                  loader: require.resolve(`./sharp-bundling-patch`),
-                },
-              ],
-            },
             {
               // LMBD 専用のローダーの組み合わせ - lmdb が relocator で動くように加工する独自のパッチ -> relocator
               test: /node_modules[/\\]lmdb[/\\].*\.[cm]?js/,
@@ -660,6 +689,35 @@ export async function createGraphqlEngineBundle(
 
           await Promise.all(binaryFixingPromises)
         }
+
+        // sharp の `.node` が読み込む共有ライブラリ（libvips など）は、relocator がコピーしないので、
+        // ここでエンジンの中へコピーする
+        const sharpRuntime = getSharpRuntimePlatformAndArch(
+          functionsTarget,
+          currentTarget
+        )
+        const sharedLibraryPromises: Array<Promise<void>> = []
+        for (const asset of (
+          stats?.compilation?.assetsInfo ?? new Map()
+        ).keys()) {
+          if (asset?.endsWith(`.node`)) {
+            const sourcePath = getAssetMeta(
+              path.posix.relative(`assets`, asset),
+              stats?.compilation
+            )?.path
+            if (sourcePath) {
+              for (const { from, to } of getSharpSharedLibraries(
+                sourcePath,
+                path.join(outputDir, asset),
+                sharpRuntime
+              )) {
+                sharedLibraryPromises.push(fs.copy(from, to))
+              }
+            }
+          }
+        }
+
+        await Promise.all(sharedLibraryPromises)
 
         compiler.close(closeErr => {
           if (err) {

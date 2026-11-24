@@ -457,6 +457,22 @@ describe(`gatsby-plugin-sharp`, () => {
       expect(result).toMatchSnapshot()
     })
 
+    it(`should support option: 'trim'`, async () => {
+      const alphaFile = getFileObject(
+        path.join(__dirname, `images/alphatest.png`)
+      )
+      const untrimmed = await generateBase64({ file: alphaFile, args: {} })
+      const trimmed = await generateBase64({
+        file: alphaFile,
+        args: { trim: 10 },
+      })
+
+      // 周囲の透明な部分が取り除かれるので、同じ幅の画像でも内容が変わる
+      expect(trimmed.src).toMatch(/^data:image\/png;base64,/)
+      expect(trimmed.width).toEqual(untrimmed.width)
+      expect(trimmed.src).not.toEqual(untrimmed.src)
+    })
+
     describe(`should support option: 'base64Width'`, () => {
       // 結果が `base64()` のキャッシュの影響を受けないよう、'generateBase64()` を直接使う。
       it(`should support a configurable width`, async () => {
