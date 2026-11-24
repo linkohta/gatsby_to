@@ -1,6 +1,6 @@
 const chokidar = require(`chokidar`)
 const _ = require(`lodash`)
-const del = require(`del`)
+const { deleteAsync } = require(`del`)
 const fs = require(`fs-extra`)
 const path = require(`path`)
 const findWorkspaceRoot = require(`find-yarn-workspace-root`)
@@ -117,7 +117,7 @@ async function watch(
     await Promise.all(
       [...packagesToClear].map(
         async packageToClear =>
-          await del([
+          await deleteAsync([
             `node_modules/${packageToClear}/**/*.{js,js.map}`,
             `!node_modules/${packageToClear}/node_modules/**/*.{js,js.map}`,
             `!node_modules/${packageToClear}/src/**/*.{js,js.map}`,
