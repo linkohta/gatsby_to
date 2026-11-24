@@ -1,5 +1,5 @@
 import { match as reachMatch } from "@gatsbyjs/reach-router"
-import cookie from "cookie"
+import { parseCookie } from "cookie"
 import { urlencoded, text, json, raw } from "express"
 import type { RequestHandler, Request, Response, NextFunction } from "express"
 import reporter from "gatsby-cli/lib/reporter"
@@ -179,7 +179,7 @@ function setCookies(
     return next()
   }
 
-  req.cookies = cookie.parse(cookies)
+  req.cookies = parseCookie(cookies)
 
   return next()
 }
