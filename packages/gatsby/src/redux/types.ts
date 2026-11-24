@@ -21,6 +21,18 @@ import type {
   IAdapterManager,
 } from "../utils/adapter/types"
 
+type Primitive = string | number | boolean | bigint | symbol | null | undefined
+
+// redux 5 で `DeepPartial` が export されなくなったので、redux 4 と同じ内容の定義をここに持つ
+// （プロパティの型がプリミティブを含まないときだけ、その中も省略可能にする）
+export type DeepPartial<T> = {
+  [K in keyof T]?: unknown extends T[K]
+    ? T[K]
+    : T[K] extends Exclude<T[K], Primitive>
+      ? DeepPartial<T[K]>
+      : T[K]
+}
+
 type SystemPath = string
 type Identifier = string
 

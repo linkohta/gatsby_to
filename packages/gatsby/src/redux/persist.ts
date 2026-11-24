@@ -15,11 +15,11 @@ import {
   IGatsbyNode,
   IGatsbyPage,
   GatsbyStateKeys,
+  DeepPartial,
 } from "./types"
 import { globSync } from "../utils/glob"
 import { createContentDigest } from "gatsby-core-utils"
 import report from "gatsby-cli/lib/reporter"
-import { DeepPartial } from "redux"
 
 const getReduxCacheFolder = (): string =>
   // 誰かが process.chdir をする場合に備えて、これは関数にしている (#19800)

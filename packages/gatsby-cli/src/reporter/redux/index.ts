@@ -1,4 +1,4 @@
-import { createStore, combineReducers, Store } from "redux"
+import { createStore, combineReducers, Store, AnyAction } from "redux"
 import { reducer as logsReducer } from "./reducers/logs"
 import { reducer as pageTreeReducer } from "./reducers/page-tree"
 import { ActionsUnion, ISetLogs, IGatsbyCLIState } from "./types"
@@ -7,14 +7,18 @@ import { createStructuredLoggingDiagnosticsMiddleware } from "./diagnostics"
 import { Actions } from "../constants"
 import { IRenderPageArgs } from "../../reporter/types"
 
-let store: Store<{ logs: IGatsbyCLIState; pageTree: IRenderPageArgs }> =
-  createStore(
-    combineReducers({
-      logs: logsReducer,
-      pageTree: pageTreeReducer,
-    }),
-    {}
-  )
+// redux 5 では `Store` の既定のアクションの型が `UnknownAction` になり、インターフェースで定義した
+// アクションを渡せなくなる。redux 4 の既定と同じ `AnyAction` を明示する
+let store: Store<
+  { logs: IGatsbyCLIState; pageTree: IRenderPageArgs },
+  AnyAction
+> = createStore(
+  combineReducers({
+    logs: logsReducer,
+    pageTree: pageTreeReducer,
+  }),
+  {}
+)
 
 export type GatsbyCLIStore = typeof store
 type StoreListener = (store: GatsbyCLIStore) => void
