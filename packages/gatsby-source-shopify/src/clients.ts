@@ -38,8 +38,8 @@ export function createGraphqlClient(
       throw new HttpError(response)
     }
 
-    const json = await response.json()
-    return json.data as T
+    const json = (await response.json()) as { data: T }
+    return json.data
   }
 
   return { request: graphqlFetch }

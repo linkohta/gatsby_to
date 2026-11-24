@@ -53,7 +53,10 @@ const _processQueue = async (): Promise<void> => {
         method: `POST`,
         body: postBody,
         headers: logger.headers,
-        timeout: logger.timeout,
+        // node-fetch 3 には `timeout` オプションがないので、`AbortSignal` で同じ制限をかける
+        signal: logger.timeout
+          ? AbortSignal.timeout(logger.timeout)
+          : undefined,
       })
 
       if (response.status !== 202) {

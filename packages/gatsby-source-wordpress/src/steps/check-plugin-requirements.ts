@@ -202,7 +202,12 @@ const blankGetRequest = async ({
   helpers: NodePluginArgs
 }): Promise<void> =>
   fetch(url)
-    .then(response => response.json())
+    .then(
+      response =>
+        response.json() as Promise<{
+          errors?: Array<{ debugMessage?: string; message?: string }>
+        } | null>
+    )
     .then(json => {
       if (json?.errors?.length) {
         const firstError = json.errors[0]

@@ -1,7 +1,8 @@
 const { performance } = require(`perf_hooks`)
 
 const { sync: glob } = require(`fast-glob`)
-const nodeFetch = require(`node-fetch`)
+// node-fetch 3 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: nodeFetch } = require(`node-fetch`)
 const { uuid } = require(`gatsby-core-utils`)
 const { execSync } = require(`child_process`)
 const fs = require(`fs`)
