@@ -379,6 +379,17 @@ module.exports = async (
       rules.images(),
       rules.media(),
       rules.miscAssets(),
+      // css-loader 6 以降は、CSS の `url()` を `new URL()` として出力する。webpack は、その参照先を
+      // 既定でアセットモジュールとして扱うので、url-loader や file-loader が出力した JavaScript が
+      // そのままファイルとして書き出されてしまう。これまでと同じく、`url()` の参照先もローダーの
+      // ルールだけで処理されるように、`javascript/auto` にしたうえで、ローダーの出力を
+      // `new URL()` が受け取れる形に直す。プラグインが追加したルールにも適用される
+      {
+        dependency: `url`,
+        type: `javascript/auto`,
+        enforce: `post`,
+        loader: require.resolve(`./webpack/loaders/css-url-asset-loader`),
+      },
     ]
 
     // TODO(v5): Gatsby 4 の公開の間しか役に立たないので削除する
