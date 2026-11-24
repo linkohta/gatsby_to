@@ -14,7 +14,7 @@ const { default: chalk } = require(`chalk`)
 // yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
 const { hideBin } = require(`yargs/helpers`)
 const yargs = require(`yargs`)(hideBin(process.argv))
-const execa = require(`execa`)
+const { execaSync } = require(`execa`)
 
 console.log(`TS Check: Running...`)
 
@@ -106,7 +106,7 @@ packagesWithTs.forEach(project => {
   ]
 
   try {
-    execa.sync(`node`, args, { stdio: `inherit` })
+    execaSync(`node`, args, { stdio: `inherit` })
   } catch (e) {
     process.exit(1)
   }

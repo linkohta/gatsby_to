@@ -2,7 +2,7 @@
 
 import * as path from "path"
 import * as fs from "fs-extra"
-import execa, { Options as ExecaOptions } from "execa"
+import { execa, Options as ExecaOptions } from "execa"
 import webpack, { Module, NormalModule, Compilation } from "webpack"
 import ConcatenatedModule from "webpack/lib/optimize/ConcatenatedModule"
 import { dependencies } from "gatsby/package.json"

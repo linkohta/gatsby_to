@@ -1,4 +1,4 @@
-const execa = require(`execa`)
+const { execa } = require(`execa`)
 const { Octokit } = require(`@octokit/rest`)
 const { getAllPackageNames, updateChangelog, changelogRelativePath } = require(
   `./generate`
