@@ -185,7 +185,6 @@ function generatePageTreeToConsole(
           top: 0,
           bottom: 0,
         },
-        // @ts-ignore - bad type in boxen
         borderStyle: `round`,
       }
     )
