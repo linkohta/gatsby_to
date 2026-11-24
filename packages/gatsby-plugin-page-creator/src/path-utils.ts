@@ -1,4 +1,4 @@
-import glob from "globby"
+import { globby as glob } from "globby"
 
 // 正規表現は https://spec.graphql.org/draft/#sec-Names をもとに作成した
 // 先頭の文字は英字かアンダースコアのみ、残りは英字、アンダースコア、数字

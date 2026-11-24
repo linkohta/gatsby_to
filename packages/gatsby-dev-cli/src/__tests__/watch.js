@@ -15,7 +15,9 @@ jest.mock(`fs-extra`, () => {
   }
 })
 
-jest.mock(`del`, () => jest.fn())
+jest.mock(`del`, () => {
+  return { deleteAsync: jest.fn() }
+})
 
 jest.mock(`verdaccio`, () => {
   return {

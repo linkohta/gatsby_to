@@ -4,7 +4,7 @@ import * as fs from "fs-extra"
 import { releaseAllMutexes } from "gatsby-core-utils/mutex"
 import { md5, md5File } from "gatsby-core-utils"
 import path from "path"
-import glob from "globby"
+import { globby as glob } from "globby"
 
 import apiRunnerNode from "../utils/api-runner-node"
 import { getBrowsersList } from "../utils/browserslist"
