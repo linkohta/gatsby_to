@@ -46,7 +46,7 @@
     "signal-exit": "^3.0.7",
     "stack-trace": "^1.0.0",
     "strip-ansi": "^6.0.1",
-    "tinyclip": "^0.1.12",
+    "tinyclip": "^1.0.3",
     "yargs": "^15.4.1",
     "yoga-layout-prebuilt": "^1.10.0",
     "yurnalist": "^2.1.0"
