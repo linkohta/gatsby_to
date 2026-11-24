@@ -224,4 +224,26 @@ describe(`webpack utils`, () => {
       })
     })
   })
+
+  describe(`miniCssExtract`, () => {
+    // mini-css-extract-plugin 2 は `modules` オプションを受け付けない
+    it(`does not pass the modules option to the loader`, () => {
+      const loader = config.loaders.miniCssExtract({
+        modules: { namedExport: true },
+      })
+
+      expect(loader.options).toEqual({})
+    })
+  })
+
+  describe(`css`, () => {
+    it(`resolves relative urls but leaves root-relative urls and data URIs as they are`, () => {
+      const { filter } = config.loaders.css().options.url
+
+      expect(filter(`./image.png`)).toBe(true)
+      expect(filter(`image.png`)).toBe(true)
+      expect(filter(`/image.png`)).toBe(false)
+      expect(filter(`data:image/svg+xml;utf8,<svg></svg>`)).toBe(false)
+    })
+  })
 })

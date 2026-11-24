@@ -262,24 +262,15 @@ export const createWebpackUtils = (
         modules?: MiniCSSExtractLoaderModuleOptions
       } = {}
     ) => {
-      let moduleOptions: MiniCSSExtractLoaderModuleOptions = undefined
-
-      const { modules, ...restOptions } = options
-
-      if (typeof modules === `boolean` && options.modules) {
-        moduleOptions = {
-          namedExport: true,
-        }
-      } else {
-        moduleOptions = modules
-      }
+      // mini-css-extract-plugin 2 では `modules.namedExport` がなくなり、css-loader の設定に従うようになった。
+      // 渡すとオプションの検証でエラーになるので、ここで取り除く。プラグインが `modules` を渡して
+      // いることがあるので、引数としては受け付けたままにしている
+      const restOptions = { ...options }
+      delete restOptions.modules
 
       return {
         loader: MiniCssExtractPlugin.loader,
-        options: {
-          modules: moduleOptions,
-          ...restOptions,
-        },
+        options: restOptions,
       }
     },
 
@@ -306,13 +297,21 @@ export const createWebpackUtils = (
         loader: require.resolve(`css-loader`),
         options: {
           // 絶対 URL（https または //）は、この関数には渡されない。渡されるのは、絶対または相対の、解決できるパスだけである。
-          url: function (url: string): boolean {
-            // url が / で始まる場合
-            if (url.startsWith(`/`)) {
-              return false
-            }
+          url: {
+            filter: function (url: string): boolean {
+              // url が / で始まる場合
+              if (url.startsWith(`/`)) {
+                return false
+              }
 
-            return true
+              // css-loader 6 以降は data URI もモジュールとして処理し、内容をエンコードし直す。
+              // これまでどおり、書かれたままの形で出力する
+              if (/^data:/i.test(url)) {
+                return false
+              }
+
+              return true
+            },
           },
           sourceMap: !PRODUCTION,
           modules: modulesOptions,
@@ -719,9 +718,10 @@ export const createWebpackUtils = (
                 // 正しい設定形式を使い、特定の引数が必要なプラグインを取り除く - https://github.com/gatsbyjs/gatsby/issues/31619 を参照
                 // デフォルトのプラグインとそのデフォルト値の一覧: https://github.com/svg/svgo#built-in-plugins
                 // 最終更新 2021-08-17
+                // svgo 3 と 4 で名前が変わったプラグイン（`cleanupIDs` と `removeScriptElement`）は、新しい名前にしている
                 `cleanupAttrs`,
                 `cleanupEnableBackground`,
-                `cleanupIDs`,
+                `cleanupIds`,
                 `cleanupListOfValues`, // デフォルト: 無効
                 `cleanupNumericValues`,
                 `collapseGroups`,
@@ -746,7 +746,7 @@ export const createWebpackUtils = (
                 `removeMetadata`,
                 `removeNonInheritableGroupAttrs`,
                 `removeRasterImages`, // デフォルト: 無効
-                `removeScriptElement`, // デフォルト: 無効
+                `removeScripts`, // デフォルト: 無効
                 `removeStyleElement`, // デフォルト: 無効
                 `removeTitle`,
                 `removeUnknownsAndDefaults`,
