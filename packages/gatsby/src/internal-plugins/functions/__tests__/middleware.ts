@@ -63,3 +63,27 @@ describe(`functions middleware: cookies`, () => {
     ])
   })
 })
+
+describe(`functions middleware: body`, () => {
+  // express 4 のボディパーサーと同じ動作を保っている
+  it(`sets req.body to an empty object when no body was parsed`, async () => {
+    const middlewares = functionMiddlewares({
+      getFunctions: () => [],
+    }) as Array<RequestHandler>
+    const executeFunction = middlewares[middlewares.length - 1]
+    const fnToExecute = jest.fn()
+    const req = {
+      context: {
+        functionObj: { functionRoute: `hello` },
+        fnToExecute,
+        params: {},
+        config: {},
+      },
+    } as any
+
+    await executeFunction(req, {} as any, jest.fn())
+
+    expect(fnToExecute).toHaveBeenCalledTimes(1)
+    expect(req.body).toEqual({})
+  })
+})

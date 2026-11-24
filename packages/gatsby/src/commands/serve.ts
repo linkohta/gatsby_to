@@ -22,7 +22,10 @@ import { reverseFixedPagePath } from "../utils/page-data"
 import { initTracer } from "../utils/tracer"
 import { configureTrailingSlash } from "../utils/express-middlewares"
 import { getDataStore } from "../datastore"
-import { functionMiddlewares } from "../internal-plugins/functions/middleware"
+import {
+  functionMiddlewares,
+  FUNCTIONS_ROUTE,
+} from "../internal-plugins/functions/middleware"
 import {
   thirdPartyProxyPath,
   partytownProxy,
@@ -113,6 +116,9 @@ module.exports = async (program: IServeProgram): Promise<void> => {
   const root = path.join(program.directory, `public`)
 
   const app = express()
+  // express 5 の既定は "simple" になった。クエリ文字列の `a[b]=1` をこれまでどおり
+  // ネストしたオブジェクトとして受け取れるように、express 4 の既定に合わせる
+  app.set(`query parser`, `extended`)
 
   // off-main-thread 戦略を使う gatsby-script をプロキシする
   const { partytownProxiedURLs = [] } = config || {}
@@ -168,9 +174,9 @@ module.exports = async (program: IServeProgram): Promise<void> => {
       },
     })
 
-    router.use(`/api/*`, ...functionMiddlewaresInstances)
+    router.use(FUNCTIONS_ROUTE, ...functionMiddlewaresInstances)
     // TODO(v6) ハンドラーを app から削除し、router にだけ残す（router は pathPrefix に設定されるが、app は常にルートである）
-    app.use(`/api/*`, ...functionMiddlewaresInstances)
+    app.use(FUNCTIONS_ROUTE, ...functionMiddlewaresInstances)
   }
 
   // SSR と DSG のページを処理する
@@ -206,9 +212,10 @@ module.exports = async (program: IServeProgram): Promise<void> => {
       })
 
       router.get(
-        `/page-data/:pagePath(*)/page-data.json`,
+        `/page-data/*pagePath/page-data.json`,
         async (req, res, next) => {
-          const requestedPagePath = req.params.pagePath
+          // express 5 のワイルドカードは、パスを `/` で区切った配列になる
+          const requestedPagePath = req.params.pagePath.join(`/`)
           if (!requestedPagePath) {
             return void next()
           }

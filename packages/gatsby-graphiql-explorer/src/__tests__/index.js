@@ -39,13 +39,15 @@ describe(`gatsby-graphiql-explorer`, () => {
     const page = createResponse()
     routes[`/___graphql`]({}, page)
     expect(page.sendFile).toHaveBeenCalledWith(
-      path.join(distDirectory, `index.html`)
+      path.join(distDirectory, `index.html`),
+      { dotfiles: `allow` }
     )
 
     const bundle = createResponse()
     routes[`/___graphql/app.js`]({}, bundle)
     expect(bundle.sendFile).toHaveBeenCalledWith(
-      path.join(distDirectory, `app.js`)
+      path.join(distDirectory, `app.js`),
+      { dotfiles: `allow` }
     )
 
     const fragments = createResponse()
@@ -67,7 +69,8 @@ describe(`gatsby-graphiql-explorer`, () => {
       `public, max-age=31557600`
     )
     expect(res.sendFile).toHaveBeenCalledWith(
-      path.join(distDirectory, `123.abcdef.js`)
+      path.join(distDirectory, `123.abcdef.js`),
+      { dotfiles: `allow` }
     )
     expect(next).not.toHaveBeenCalled()
   })

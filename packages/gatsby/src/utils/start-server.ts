@@ -165,10 +165,14 @@ export async function startServer(
   /**
    * 先頭に 1 つ以上のアンダースコアが付いた、graphql または graphiql のすべてのエンドポイントに一致するパターン
    */
-  const graphqlEndpoint = `/_+graphi?ql`
+  // express 5 では、パスの文字列の中に正規表現（`/_+graphi?ql`）を書けない。そのため、正規表現で
+  // マウントしたルーターの中に、GraphiQL と GraphQL のエンドポイントを置いている
+  const graphqlEndpoint = /^\/_+graphi?ql(?=\/|$)/i
+  const graphqlRouter = express.Router()
+  app.use(graphqlEndpoint, graphqlRouter)
 
-  graphiqlExplorer(app, {
-    graphqlEndpoint,
+  graphiqlExplorer(graphqlRouter, {
+    graphqlEndpoint: `/`,
     getFragments: function getFragments(): Array<FragmentDefinitionNode> {
       const fragments: Array<FragmentDefinitionNode> = []
       for (const def of store.getState().definitions.values()) {
@@ -180,8 +184,7 @@ export async function startServer(
     },
   })
 
-  app.use(
-    graphqlEndpoint,
+  graphqlRouter.use(
     createGraphqlEndpointHandler({
       schema() {
         return store.getState().schema
@@ -235,7 +238,7 @@ export async function startServer(
     })
   }
 
-  app.post(`${REFRESH_ENDPOINT}/:plugin_name?`, express.json(), (req, res) => {
+  app.post(`${REFRESH_ENDPOINT}{/:plugin_name}`, express.json(), (req, res) => {
     const pluginName = req.params[`plugin_name`]
 
     const enableRefresh = process.env.ENABLE_GATSBY_REFRESH_ENDPOINT
@@ -279,9 +282,10 @@ export async function startServer(
   app.use(webpackDevMiddlewareInstance)
 
   app.get(
-    `/page-data/:pagePath(*)/page-data.json`,
+    `/page-data/*pagePath/page-data.json`,
     async (req, res, next): Promise<void> => {
-      const requestedPagePath = req.params.pagePath
+      // express 5 のワイルドカードは、パスを `/` で区切った配列になる
+      const requestedPagePath = req.params.pagePath.join(`/`)
       if (!requestedPagePath) {
         next()
         return
@@ -598,7 +602,7 @@ export async function startServer(
   // API のプロキシをセットアップする。
   if (proxy) {
     proxy.forEach(({ prefix, url }) => {
-      app.use(`${prefix}/*`, (req, res) => {
+      app.use(`${prefix}/{*splat}`, (req, res) => {
         const proxiedUrl = url + req.originalUrl
         const {
           // コピーしたヘッダーから `host` を取り除く
@@ -645,7 +649,7 @@ export async function startServer(
 
   // HTML ページをレンダリングして配信する。
   if (process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
-    app.get(`*`, async (req, res, next) => {
+    app.get(`/{*splat}`, async (req, res, next) => {
       const pathObj = findPageByPath(store.getState(), decodeURI(req.path))
 
       if (!pathObj) {
@@ -843,11 +847,16 @@ export async function startServer(
           res.status(404)
         }
 
-        res.sendFile(directoryPath(`.cache/develop-html/index.html`), err => {
-          if (err) {
-            res.status(500).end()
+        // express 5 は、パスの途中に `.` で始まるフォルダー（`.cache`）があるだけで配信を拒否する
+        res.sendFile(
+          directoryPath(`.cache/develop-html/index.html`),
+          { dotfiles: `allow` },
+          err => {
+            if (err) {
+              res.status(500).end()
+            }
           }
-        })
+        )
       }
     }
   })

@@ -12,7 +12,7 @@ import { createGlobWatchFilter } from "gatsby-core-utils/watch-globs"
 import { reportWebpackWarnings } from "../../utils/webpack-error-utils"
 import { internalActions } from "../../redux/actions"
 import { IGatsbyFunction } from "../../redux/types"
-import { functionMiddlewares } from "./middleware"
+import { functionMiddlewares, FUNCTIONS_ROUTE } from "./middleware"
 import mod from "module"
 
 const isProductionEnv = process.env.gatsby_executing_command !== `develop`
@@ -572,7 +572,7 @@ export async function onCreateDevServer({
   )
 
   app.use(
-    `/api/*`,
+    FUNCTIONS_ROUTE,
     ...functionMiddlewares({
       getFunctions(): Array<IGatsbyFunction> {
         const { functions }: { functions: Array<IGatsbyFunction> } =
