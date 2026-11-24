@@ -410,13 +410,9 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
         describe: "Valid commands include `docs`, `ls`.",
         type: `string`,
       }),
-    handler: async ({
-      cmd,
-    }: yargs.Arguments<{
-      cmd: string | undefined
-    }>) => {
+    handler: async (args: yargs.Arguments) => {
       const pluginHandler = require(`./handlers/plugin`).default
-      await pluginHandler(siteInfo.directory, cmd)
+      await pluginHandler(siteInfo.directory, args.cmd as string | undefined)
     },
   })
 
@@ -481,7 +477,10 @@ Gatsby version: ${gatsbyVersion}
   }
 }
 
-export const createCli = (argv: Array<string>): yargs.Arguments => {
+// yargs 17 以降の `parse()` は、ハンドラーが非同期のコマンドでは Promise を返す
+export const createCli = (
+  argv: Array<string>
+): yargs.Arguments | Promise<yargs.Arguments> => {
   const cli = yargs(argv).parserConfiguration({
     "boolean-negation": false,
   })

@@ -6,7 +6,13 @@ jest.mock(`../reporter`, () => {
     warn: jest.fn(),
   }
 })
-jest.mock(`../create-cli`)
+// 自動モックは実物の `create-cli` を読み込むが、yargs 18 は `import.meta` を使う ESM で
+// Jest の変換では読み込めないので、モックの中身を直接渡す
+jest.mock(`../create-cli`, () => {
+  return {
+    createCli: jest.fn(),
+  }
+})
 
 interface IGetCLI {
   reporter: {
