@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const Configstore = require(`configstore`)
+// configstore 6 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: Configstore } = require(`configstore`)
 const pkg = require(`../package.json`)
 const _ = require(`lodash`)
 const path = require(`path`)

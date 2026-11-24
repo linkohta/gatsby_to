@@ -88,7 +88,8 @@ export const GatsbyPluginCreate = async ({
 }
 
 const packageMangerConfigKey = `cli.packageManager`
-const PACKAGE_MANAGER = getConfigStore().get(packageMangerConfigKey) || `yarn`
+const PACKAGE_MANAGER =
+  getConfigStore().get<string>(packageMangerConfigKey) || `yarn`
 
 const getPackageNames = (
   packages: Array<{ name: string; version: string }>

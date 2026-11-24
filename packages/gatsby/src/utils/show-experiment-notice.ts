@@ -26,7 +26,7 @@ export function showExperimentNoticeAfterTimeout(
   showNoticeAfterMs: number,
   minimumIntervalBetweenNoticesMs: number = ONE_DAY
 ): CancelExperimentNoticeCallbackOrUndefined {
-  const lastTimeWeShowedNotice = getConfigStore().get(
+  const lastTimeWeShowedNotice = getConfigStore().get<number>(
     configStoreKey(experimentIdentifier)
   )
 

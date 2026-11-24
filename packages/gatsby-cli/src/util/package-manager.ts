@@ -5,7 +5,7 @@ type PackageManager = `yarn` | `npm`
 
 const packageMangerConfigKey = `cli.packageManager`
 export const getPackageManager = (): PackageManager =>
-  getConfigStore().get(packageMangerConfigKey)
+  getConfigStore().get(packageMangerConfigKey) as PackageManager
 export const setPackageManager = (packageManager: PackageManager): void => {
   getConfigStore().set(packageMangerConfigKey, packageManager)
   report.info(`Preferred package manager set to "${packageManager}"`)

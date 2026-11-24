@@ -76,7 +76,7 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
   }
 
   // ヒューリスティック 5
-  const lastDateValue = getConfigStore().get(lastDateKey)
+  const lastDateValue = getConfigStore().get<number>(lastDateKey)
   // 5.a ユーザーがフィードバックの依頼を一度も受け取っていない場合、これは undefined になる
   //     これは事実上の通過である。最後に依頼を受け取ってから ~無限~ の時間が
   //     経過していることになるためである。
@@ -92,7 +92,7 @@ export async function userPassesFeedbackRequestHeuristic(): Promise<boolean> {
 
   // 5.b
   // 7 日後のフィードバックのアンケートの直後に、このアンケートを出したくはない
-  const sevenDayFeedback = getConfigStore().get(sevenDayKey)
+  const sevenDayFeedback = getConfigStore().get<number>(sevenDayKey)
   if (sevenDayFeedback) {
     const sevenDayDate = new Date(sevenDayFeedback)
     const threeMonthsAgo = new Date()
@@ -160,7 +160,7 @@ export async function userGetsSevenDayFeedback(): Promise<boolean> {
 
   if (getConfigStore().get(sevenDayKey)) return false
 
-  const firstDateValue = getConfigStore().get(firstDateKey)
+  const firstDateValue = getConfigStore().get<number>(firstDateKey)
 
   if (!firstDateValue) {
     getConfigStore().set(firstDateKey, Date.now()) // 初めてこれを設定する
