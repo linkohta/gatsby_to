@@ -7,6 +7,8 @@ jest.mock(`fs-extra`, () => mockFS)
 
 jest.mock(`path`, () => {
   return {
+    // `gatsby-core-utils/watch-globs` とその依存が `path` のほかの関数を使うので、実物を残す
+    ...jest.requireActual(`path`),
     isAbsolute: jest.fn(() => true),
   }
 })

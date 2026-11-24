@@ -29,6 +29,14 @@ jest.mock(`chokidar`, () => {
     ...args: Parameters<typeof ChokidarWatchType>
   ): ReturnType<typeof ChokidarWatchType> => {
     const watcher = originalChokidarWatch.call(chokidar, ...args)
+    // chokidar 6 は、存在しないパスの監視で起きる ENOENT を `error.code` で見分けて無視する。
+    // Jest の中では `fs` のエラーが別の realm のもので `instanceof Error` にならず、
+    // chokidar が作り直したエラーから `code` が失われて `error` イベントになるので、ここで受ける。
+    watcher.on(`error`, (error: unknown) => {
+      if (!String(error).includes(`ENOENT`)) {
+        throw error
+      }
+    })
     mockWatchersToClose.add(watcher)
     return watcher
   }

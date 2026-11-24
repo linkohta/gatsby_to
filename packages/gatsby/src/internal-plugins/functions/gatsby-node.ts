@@ -8,6 +8,7 @@ import { CreateDevServerArgs, ParentSpanPluginArgs } from "gatsby"
 import formatWebpackMessages from "react-dev-utils/formatWebpackMessages"
 import dotenv from "dotenv"
 import chokidar from "chokidar"
+import { createGlobWatchFilter } from "gatsby-core-utils/watch-globs"
 import { reportWebpackWarnings } from "../../utils/webpack-error-utils"
 import { internalActions } from "../../redux/actions"
 import { IGatsbyFunction } from "../../redux/types"
@@ -498,16 +499,24 @@ export async function onPreBootstrap({
           store.getState().flattenedPlugins
         )
 
+        // chokidar 4 以降は glob を監視できないので、glob を親フォルダーの監視と絞り込みに置き換える
+        const watchFilter = createGlobWatchFilter()
+
         // env ファイルの変更を監視し、webpack のウォッチャーを再起動する。
         chokidar
           .watch(
-            [
+            watchFilter.add([
               `${siteDirectoryPath}/.env*`,
               ...globs.map(glob => glob.globPattern),
-            ],
-            { ignoreInitial: true }
+            ]),
+            { ignoreInitial: true, ignored: watchFilter.ignored }
           )
           .on(`all`, async (event, path) => {
+            // glob を監視していたときは、フォルダーのイベントは届かなかった
+            if (event === `addDir` || event === `unlinkDir`) {
+              return
+            }
+
             // すでに監視している関数については、API ディレクトリからの
             // 変更イベントを無視する。
             if (

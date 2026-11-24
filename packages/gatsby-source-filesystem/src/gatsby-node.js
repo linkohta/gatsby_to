@@ -2,6 +2,7 @@ const chokidar = require(`chokidar`)
 const fs = require(`fs`)
 const path = require(`path`)
 const { createMachine, interpret, assign } = require(`xstate`)
+const { createGlobWatchFilter } = require(`gatsby-core-utils/watch-globs`)
 
 const { createFileNode } = require(`./create-file-node`)
 const { ERROR_MAP } = require(`./error-utils`)
@@ -202,7 +203,8 @@ See docs here - https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/
     fsMachine.send(`BOOTSTRAP_FINISHED`)
   })
 
-  const watcher = chokidar.watch(pluginOptions.path, {
+  // chokidar 4 以降の `ignored` は glob を受け付けないので、glob を照合する関数に置き換える
+  const watchFilter = createGlobWatchFilter({
     ignored: [
       `**/*.un~`,
       `**/.DS_Store`,
@@ -215,6 +217,10 @@ See docs here - https://www.gatsbyjs.com/plugins/gatsby-source-filesystem/
       `../**/dist/**`,
       ...(pluginOptions.ignore || []),
     ],
+  })
+
+  const watcher = chokidar.watch(watchFilter.add(pluginOptions.path), {
+    ignored: watchFilter.ignored,
   })
 
   watcher.on(`add`, path => {
