@@ -1,7 +1,6 @@
 import * as path from "path"
 import * as fs from "fs-extra"
 import webpack from "webpack"
-import mod from "module"
 import { WebpackLoggingPlugin } from "../../utils/webpack/plugins/webpack-logging"
 import reporter from "gatsby-cli/lib/reporter"
 import type { EnginePage, ITemplateDetails } from "./entry"
@@ -14,6 +13,7 @@ import { IGatsbyState } from "../../redux/types"
 import { store } from "../../redux"
 import { getLmdbOnCdnPath, shouldBundleDatastore } from "../engines-helpers"
 import { getPageMode } from "../page-mode"
+import { getBuiltinModuleExternals } from "./builtin-externals"
 
 type Reporter = typeof reporter
 
@@ -157,15 +157,7 @@ export async function createPageSSRBundle({
     externals: [
       /^\.\/routes/,
       `electron`, // :shrug: `got` には electron 専用のコードパスがあるようだ
-      mod.builtinModules.reduce((acc, builtinModule) => {
-        if (builtinModule === `fs`) {
-          acc[builtinModule] = `global _actualFsWrapper`
-        } else {
-          acc[builtinModule] = `commonjs ${builtinModule}`
-        }
-
-        return acc
-      }, {}),
+      getBuiltinModuleExternals(),
     ],
     devtool: false,
     module: {
