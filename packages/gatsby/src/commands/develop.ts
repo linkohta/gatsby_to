@@ -2,7 +2,7 @@
 import path from "path"
 import tmp from "tmp"
 import { ChildProcess } from "child_process"
-import execa from "execa"
+import { execaNode } from "execa"
 import { detectPortInUseAndPrompt } from "../utils/detect-port-in-use-and-prompt"
 import fs from "fs-extra"
 import { onExit } from "signal-exit"
@@ -74,13 +74,24 @@ class ControllableScript {
       }
     }
 
-    this.process = execa.node(tmpFileName, args, {
+    const subprocess = execaNode(tmpFileName, args, {
       env: {
         ...process.env,
         GATSBY_NODE_GLOBALS: JSON.stringify(global.__GATSBY ?? {}),
       },
-      stdio: [`inherit`, `inherit`, `inherit`, `ipc`],
+      stdio: `inherit`,
+      ipc: true,
+      // execa 5 までと同じ形式でメッセージをやり取りする
+      serialization: `json`,
+      // メッセージは下の `message` イベントで受け取る。execa 側に溜め込むと、
+      // 長時間動かす develop でメモリを使い続けてしまう
+      buffer: false,
+      // 子プロセスの終了は `exit` イベントで扱う。誰も待たない Promise が
+      // reject されて unhandledRejection になるのを防ぐ
+      reject: false,
     })
+    // execa 9 以降の戻り値は `ChildProcess` ではないので、元の `ChildProcess` を取り出す
+    this.process = subprocess.nodeChildProcess
   }
   async stop(
     signal: NodeJS.Signals | null = null,

@@ -1,6 +1,6 @@
 const fs = require(`fs`)
 const path = require(`path`)
-const execa = require(`execa`)
+const { execa } = require(`execa`)
 const { compare, prerelease, patch, gt, parse, valid } = require(`semver`)
 const gitRawCommits = require(`git-raw-commits`)
 const conventionalCommitsParser = require(`conventional-commits-parser`)

@@ -1,6 +1,6 @@
 import opn from "better-opn"
 import { execSync } from "child_process"
-import execa from "execa"
+import { execa, Options, ResultPromise, Result } from "execa"
 import { sync as existsSync } from "fs-exists-cached"
 import fs from "fs-extra"
 import hostedGitInfo from "hosted-git-info"
@@ -16,14 +16,11 @@ import reporter from "./reporter"
 const spawnWithArgs = (
   file: string,
   args: Array<string>,
-  options?: execa.Options
-): execa.ExecaChildProcess =>
+  options?: Options
+): ResultPromise =>
   execa(file, args, { stdio: `inherit`, preferLocal: false, ...options })
 
-const spawn = (
-  cmd: string,
-  options?: execa.Options
-): execa.ExecaChildProcess => {
+const spawn = (cmd: string, options?: Options): ResultPromise => {
   // 空白、タブ、改行で分割する
   const [file, ...args] = cmd.split(/\s+/)
   return spawnWithArgs(file, args, options)
@@ -51,9 +48,7 @@ const isAlreadyGitRepository = async (): Promise<boolean> => {
 }
 
 // クローンしたばかりのディレクトリを git リポジトリとして初期化する
-const gitInit = async (
-  rootPath: string
-): Promise<execa.ExecaReturnBase<string>> => {
+const gitInit = async (rootPath: string): Promise<Result> => {
   report.info(`Initialising git in ${rootPath}`)
 
   return await spawn(`git init`, { cwd: rootPath })

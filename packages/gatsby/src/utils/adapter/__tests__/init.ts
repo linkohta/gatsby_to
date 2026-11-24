@@ -2,7 +2,7 @@ import semverMaxSatisfying from "semver/ranges/max-satisfying"
 
 import { getAdapterInit, getAdaptersCacheDir } from "../init"
 import { AdapterInit, IAdapter, IAdapterManifestEntry } from "../types"
-import execa from "execa"
+import { execa } from "execa"
 
 let mockAdaptersManifest: Array<IAdapterManifestEntry> = []
 
@@ -131,20 +131,22 @@ const getMockedPackage = (
   }
 }
 
-jest.mock(`execa`, () =>
-  jest.fn((command, args) => {
-    if (command === `npm`) {
-      const [, range] = args
-        .find(arg => arg.includes(`gatsby-adapter-test`))
-        .split(`@`)
+jest.mock(`execa`, () => {
+  return {
+    execa: jest.fn((command, args) => {
+      if (command === `npm`) {
+        const [, range] = args
+          .find(arg => arg.includes(`gatsby-adapter-test`))
+          .split(`@`)
 
-      // モックのアダプターを、キャッシュにインストール済みとして設定する
-      mockInstalledInCacheAdapter = getMockedPackage(range)
-      return
-    }
-    throw new Error(`not expected execa command: "${command}`)
-  })
-)
+        // モックのアダプターを、キャッシュにインストール済みとして設定する
+        mockInstalledInCacheAdapter = getMockedPackage(range)
+        return
+      }
+      throw new Error(`not expected execa command: "${command}`)
+    }),
+  }
+})
 
 const mockSiteAdapterModule = jest.fn(() => {
   if (mockInstalledInSiteAdapter) {
