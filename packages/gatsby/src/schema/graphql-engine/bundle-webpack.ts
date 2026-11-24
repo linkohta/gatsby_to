@@ -386,7 +386,10 @@ export async function createGraphqlEngineBundle(
       )
     }
 
-    forcedLmdbBinaryModule = `${lmdbPackageInfo.packageLocation}/node.abi83.glibc.node`
+    // lmdb 3 のビルド済みパッケージには、Node.js の ABI ごとのバイナリ（`node.abi127.glibc.node` など）と
+    // Node-API のバイナリが入っている。関数を実行する Node.js のバージョンはビルド時と同じとは限らないので、
+    // どのバージョンでも読み込める Node-API のバイナリを使う
+    forcedLmdbBinaryModule = `${lmdbPackageInfo.packageLocation}/node.napi.glibc.node`
   }
 
   if (sharpPackageInfo) {

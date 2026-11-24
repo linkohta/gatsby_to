@@ -1,4 +1,4 @@
-import { RootDatabase, open, ArrayLikeIterable } from "lmdb"
+import { RootDatabase, open, RangeIterable } from "lmdb"
 // import { performance } from "perf_hooks"
 import { ActionsUnion, IGatsbyNode } from "../../redux/types"
 import { updateNodes } from "./updates/nodes"
@@ -166,7 +166,7 @@ function iterateNodes(): GatsbyIterable<IGatsbyNode> {
     nodesDb
       .getKeys({ snapshot: false })
       .map(nodeId => (typeof nodeId === `string` ? getNode(nodeId) : undefined))
-      .filter(Boolean) as ArrayLikeIterable<IGatsbyNode>
+      .filter(Boolean) as RangeIterable<IGatsbyNode>
   )
 }
 
@@ -176,7 +176,7 @@ function iterateNodesByType(type: string): GatsbyIterable<IGatsbyNode> {
     nodesByType
       .getValues(type)
       .map(nodeId => getNode(nodeId))
-      .filter(Boolean) as ArrayLikeIterable<IGatsbyNode>
+      .filter(Boolean) as RangeIterable<IGatsbyNode>
   )
 }
 
@@ -190,7 +190,8 @@ function getNode(id: string): IGatsbyNode | undefined {
 }
 
 function getTypes(): Array<string> {
-  return getDatabases().nodesByType.getKeys({}).asArray
+  // lmdb 3 の `asArray` は型のうえでは Promise なので、同期的に配列へ変換する
+  return Array.from(getDatabases().nodesByType.getKeys({})) as Array<string>
 }
 
 function countNodes(typeName?: string): number {
