@@ -1,7 +1,10 @@
 const toString = require(`mdast-util-to-string`)
 const visit = require(`unist-util-visit`)
-const slugs = require(`github-slugger`)()
+// github-slugger 2 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: GithubSlugger } = require(`github-slugger`)
 const deburr = require(`lodash/deburr`)
+
+const slugs = new GithubSlugger()
 
 function patch(context, key, value) {
   if (!context[key]) {

@@ -21,7 +21,7 @@
     "@jridgewell/trace-mapping": "^0.3.31",
     "@types/common-tags": "^1.8.4",
     "better-opn": "^3.0.2",
-    "boxen": "^5.1.2",
+    "boxen": "^9.0.0",
     "chalk": "^4.1.2",
     "common-tags": "^1.8.2",
     "convert-hrtime": "^5.0.0",
