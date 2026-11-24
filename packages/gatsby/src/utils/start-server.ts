@@ -863,16 +863,22 @@ export async function startServer(
 
   if (!process.env.GATSBY_EXPERIMENTAL_DEV_SSR) {
     const chokidar = require(`chokidar`)
+    const { createGlobWatchFilter } = require(`gatsby-core-utils/watch-globs`)
     // html.js が変更されるたびに index.html を再ビルドするウォッチャーを登録する。
     const watchGlobs = [`src/html.js`, `plugins/**/gatsby-ssr.js`].map(path =>
       slash(directoryPath(path))
     )
 
-    chokidar.watch(watchGlobs).on(`change`, async () => {
-      await createIndexHtml(indexHTMLActivity)
-      // eslint-disable-next-line no-unused-expressions
-      socket?.to(`clients`).emit(`reload`)
-    })
+    // chokidar 4 以降は glob を監視できないので、glob を親フォルダーの監視と絞り込みに置き換える
+    const watchFilter = createGlobWatchFilter()
+
+    chokidar
+      .watch(watchFilter.add(watchGlobs), { ignored: watchFilter.ignored })
+      .on(`change`, async () => {
+        await createIndexHtml(indexHTMLActivity)
+        // eslint-disable-next-line no-unused-expressions
+        socket?.to(`clients`).emit(`reload`)
+      })
   }
 
   return {

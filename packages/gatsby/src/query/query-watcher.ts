@@ -14,6 +14,10 @@ import { Span } from "opentracing"
 import path from "path"
 import { getPathToLayoutComponent } from "gatsby-core-utils/parse-component-path"
 import { slash } from "gatsby-core-utils/path"
+import {
+  createGlobWatchFilter,
+  IGlobWatchFilter,
+} from "gatsby-core-utils/watch-globs"
 
 import { store, emitter } from "../redux/"
 import { actions } from "../redux/actions"
@@ -131,6 +135,7 @@ const handleQuery = (
 
 const filesToWatch = new Set<string>()
 let watcher: FSWatcher
+let watchFilter: IGlobWatchFilter
 
 const watch = async (rootDir: string): Promise<void> => {
   if (watcher) return
@@ -143,10 +148,16 @@ const watch = async (rootDir: string): Promise<void> => {
     return slash(path.join(module.path, pathRegex))
   })
 
+  // chokidar 4 以降は glob を監視できないので、glob を親フォルダーの監視と絞り込みに置き換える
+  watchFilter = createGlobWatchFilter({ ignored: [`**/*.d.ts`] })
+
   watcher = chokidar
     .watch(
-      [slash(path.join(rootDir, `/src/**/*.{js,jsx,ts,tsx}`)), ...packagePaths],
-      { ignoreInitial: true, ignored: [`**/*.d.ts`] }
+      watchFilter.add([
+        slash(path.join(rootDir, `/src/**/*.{js,jsx,ts,tsx}`)),
+        ...packagePaths,
+      ]),
+      { ignoreInitial: true, ignored: watchFilter.ignored }
     )
     .on(`change`, path => {
       emitter.emit(`SOURCE_FILE_CHANGED`, path)
@@ -158,7 +169,7 @@ const watch = async (rootDir: string): Promise<void> => {
       emitter.emit(`SOURCE_FILE_CHANGED`, path)
     })
 
-  filesToWatch.forEach(filePath => watcher.add(filePath))
+  filesToWatch.forEach(filePath => watcher.add(watchFilter.add(filePath)))
 }
 
 const watchComponent = (componentPath: string): void => {
@@ -172,7 +183,7 @@ const watchComponent = (componentPath: string): void => {
   ) {
     filesToWatch.add(componentPath)
     if (watcher) {
-      watcher.add(componentPath)
+      watcher.add(watchFilter.add(componentPath))
     }
   }
 }

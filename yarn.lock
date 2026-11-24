@@ -5523,6 +5523,11 @@
   resolved "https://registry.yarnpkg.com/@types/braces/-/braces-3.0.0.tgz#7da1c0d44ff1c7eb660a36ec078ea61ba7eb42cb"
   integrity sha512-TbH79tcyi9FHwbyboOKeRachRq63mSuWYXOflsNO9ZyE5ClQ/JaozNKl+aWUq87qPNsXasXxi2AbgfwIJ+8GQw==
 
+"@types/braces@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@types/braces/-/braces-3.0.5.tgz#91159f97e516630c7946d8b0d5bf60245986e04c"
+  integrity sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==
+
 "@types/cache-manager@^2.10.3":
   version "2.10.3"
   resolved "https://registry.yarnpkg.com/@types/cache-manager/-/cache-manager-2.10.3.tgz#6c5ffb177b45c2e251f32432354ff83bddbd18ec"
@@ -5658,6 +5663,11 @@
     "@types/jsonfile" "*"
     "@types/node" "*"
 
+"@types/glob-parent@^5.1.3":
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/@types/glob-parent/-/glob-parent-5.1.3.tgz#ebebda6e7034fc14bb97ac10464a595915e9b6f3"
+  integrity sha512-p+NciRH8TRvrgISOCQ55CP+lktMmDpOXsp4spULIIz0L4aJ6G9zFX+N0UZ2xulmJRgaQLRxXIp4xHdL6YOQjDg==
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
@@ -5707,6 +5717,11 @@
   integrity sha512-DYKIKEJqhsGfQ/jgX0t9BzfHmBJ/9dBBT2MDsHAQRAfOPhEe7LZm5QeNBx1J34/e108StCPuJ3r4bh1y38kCJA==
   dependencies:
     ink "*"
+
+"@types/is-glob@^4.0.4":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/is-glob/-/is-glob-4.0.4.tgz#1d60fa47ff70abc97b4d9ea45328747c488b3a50"
+  integrity sha512-3mFBtIPQ0TQetKRDe94g8YrxJZxdMillMGegyv6zRBXvq4peRRhf2wLZ/Dl53emtTsC29dQQBwYvovS20yXpiQ==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.3"
@@ -9028,6 +9043,13 @@ chokidar@^3.4.0, chokidar@^3.4.2, chokidar@^3.5.2, chokidar@^3.6.0:
     readdirp "~3.6.0"
   optionalDependencies:
     fsevents "~2.3.2"
+
+chokidar@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-6.0.0.tgz#66bb84678ab40b8d25679d71f3955bd206ab618b"
+  integrity sha512-Ec2Z7wpcKBiMpR7DxteoqS/sq5G5d2A4fpxzPv6+fD7xNNdrTghn7L11YwV5EN1B3i72Erc3XVT5FkWIDx90+A==
+  dependencies:
+    readdirp "^5.1.1"
 
 chownr@^1.1.1, chownr@^1.1.2, chownr@^1.1.4:
   version "1.1.4"
@@ -23244,6 +23266,11 @@ readdirp@^4.0.0:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-4.1.2.tgz#eb85801435fbf2a7ee58f19e0921b068fc69948d"
   integrity sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==
+
+readdirp@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/readdirp/-/readdirp-5.1.1.tgz#520bca06f9d1ae1b96cc0800dbe84b983d19422c"
+  integrity sha512-Kko+Y5XQ6fM+Ce3dq3m9YGxnacYZYl9cA1wZjaF3Vbry2L3i1qVg8+CAgNPsXRArPMUMCaOR7oa9Nqntc43JKA==
 
 readdirp@~3.6.0:
   version "3.6.0"
