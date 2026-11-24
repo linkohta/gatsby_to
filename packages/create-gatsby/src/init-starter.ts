@@ -15,7 +15,9 @@ export const getPackageManager = (
   npmConfigUserAgent?: string
 ): PackageManager => {
   const configStore = getConfigStore()
-  const actualPackageManager = configStore.get(packageManagerConfigKey)
+  const actualPackageManager = configStore.get<PackageManager>(
+    packageManagerConfigKey
+  )
 
   if (actualPackageManager) {
     return actualPackageManager
