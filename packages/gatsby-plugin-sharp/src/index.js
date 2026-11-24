@@ -273,7 +273,8 @@ async function generateBase64({ file, args = {}, reporter }) {
   }
 
   if (options.trim) {
-    pipeline = pipeline.trim(options.trim)
+    // sharp 0.33 以降の `trim` はオブジェクトしか受け取らない。数値は、これまでどおりしきい値として渡す
+    pipeline = pipeline.trim({ threshold: options.trim })
   }
 
   const changedBase64Format =

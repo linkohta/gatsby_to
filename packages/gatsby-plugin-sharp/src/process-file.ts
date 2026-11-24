@@ -60,7 +60,10 @@ export const processFile = async (
         let clonedPipeline = transforms.length > 1 ? pipeline.clone() : pipeline
 
         if (transformArgs.trim) {
-          clonedPipeline = clonedPipeline.trim(transformArgs.trim)
+          // sharp 0.33 以降の `trim` はオブジェクトしか受け取らない。数値は、これまでどおりしきい値として渡す
+          clonedPipeline = clonedPipeline.trim({
+            threshold: transformArgs.trim,
+          })
         }
 
         if (!transformArgs.rotate) {
