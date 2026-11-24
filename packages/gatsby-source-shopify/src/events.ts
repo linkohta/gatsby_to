@@ -16,7 +16,7 @@ export function eventsApi(options: IShopifyPluginOptions): {
         `/events.json?limit=250&verb=destroy&created_at_min=${date.toISOString()}`
       )
 
-      const { events } = await resp.json()
+      const { events } = (await resp.json()) as { events: Array<IEvent> }
 
       let gatherPaginatedEvents = true
 
@@ -42,7 +42,9 @@ export function eventsApi(options: IShopifyPluginOptions): {
 
         if (nextPage) {
           resp = await restClient.request(nextPage.url)
-          const { events: nextEvents } = await resp.json()
+          const { events: nextEvents } = (await resp.json()) as {
+            events: Array<IEvent>
+          }
           events.push(...nextEvents)
         } else {
           gatherPaginatedEvents = false

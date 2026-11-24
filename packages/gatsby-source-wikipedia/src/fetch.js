@@ -1,7 +1,8 @@
 const Promise = require(`bluebird`)
 // query-string 8 以降は ESM 専用で、`require()` では default export が `default` に入る
 const { default: queryString } = require(`query-string`)
-const fetch = require(`node-fetch`)
+// node-fetch 3 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: fetch } = require(`node-fetch`)
 
 const apiBase = `https://en.wikipedia.org/w/api.php?`
 

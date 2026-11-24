@@ -18,7 +18,9 @@ const getUsername = async (token: string): Promise<string> => {
         "content-type": `application/json`,
       },
     })
-    const resJson = await usernameResponse.json()
+    const resJson = (await usernameResponse.json()) as {
+      data: { currentUser: { name: string } }
+    }
     currentUsername = resJson.data.currentUser.name
   } catch (e) {
     reporter.error(e)

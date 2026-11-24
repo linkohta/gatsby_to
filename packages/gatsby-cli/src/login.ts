@@ -18,7 +18,7 @@ const createTicket = async (): Promise<string> => {
         method: `post`,
       }
     )
-    const ticketJson = await ticketResponse.json()
+    const ticketJson = (await ticketResponse.json()) as { ticketId: string }
     ticketId = ticketJson.ticketId
   } catch (e) {
     reporter.panic(
@@ -38,7 +38,7 @@ const getTicket = async (ticketId: string): Promise<ITicket> => {
     const ticketResponse = await fetch(
       `https://auth.gatsbyjs.com/auth/tickets/${ticketId}`
     )
-    const ticketJson = await ticketResponse.json()
+    const ticketJson = (await ticketResponse.json()) as ITicket
     ticket = ticketJson
   } catch (e) {
     reporter.error(e)

@@ -302,8 +302,9 @@ module.exports = async (
         // node 環境にグローバルな fetch を追加する
         configPlugins.push(
           plugins.provide({
-            fetch: require.resolve(`node-fetch`),
-            "global.fetch": require.resolve(`node-fetch`),
+            // node-fetch 3 以降は ESM 専用なので、default export を指定する
+            fetch: [require.resolve(`node-fetch`), `default`],
+            "global.fetch": [require.resolve(`node-fetch`), `default`],
           })
         )
         break
