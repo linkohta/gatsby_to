@@ -1,7 +1,10 @@
 const { createContentDigest, isCI } = require(`gatsby-core-utils`)
 const { request } = require(`graphql-request`)
 const { formatRelative } = require(`date-fns`)
-const { red, blue, bold, dim } = require(`chalk`)
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`)
+
+const { red, blue, bold, dim } = chalk
 
 module.exports = async ({ logger, endpoint, cache }) => {
   const query = `

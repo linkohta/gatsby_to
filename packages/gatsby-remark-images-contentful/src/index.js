@@ -5,7 +5,8 @@ const axios = require(`axios`)
 const _ = require(`lodash`)
 const Promise = require(`bluebird`)
 const cheerio = require(`cheerio`)
-const chalk = require(`chalk`)
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`)
 const { buildResponsiveSizes } = require(`./utils`)
 
 // 画像が contentful でホストされている場合

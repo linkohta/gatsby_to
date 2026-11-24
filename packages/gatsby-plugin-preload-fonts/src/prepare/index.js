@@ -6,7 +6,10 @@ const { URL } = require(`url`)
 
 const puppeteer = require(`puppeteer`)
 const ProgressBar = require(`progress`)
-const { blue, green, bold, dim } = require(`chalk`)
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`)
+
+const { blue, green, bold, dim } = chalk
 
 const createLogger = require(`./logger`)
 const fetchRoutes = require(`./fetch-routes`)

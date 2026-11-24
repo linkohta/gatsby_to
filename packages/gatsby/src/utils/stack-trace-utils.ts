@@ -12,7 +12,8 @@ import {
 
 const fs = require(`fs-extra`)
 const path = require(`path`)
-const chalk = require(`chalk`)
+// chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
+const { default: chalk } = require(`chalk`)
 const { isNodeInternalModulePath } = require(`gatsby-core-utils`)
 
 const getDirName = (arg: unknown): string => {

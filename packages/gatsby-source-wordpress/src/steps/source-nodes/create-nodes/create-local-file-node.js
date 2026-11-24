@@ -1,7 +1,7 @@
 import fs from "fs-extra"
 import path from "path"
 import url from "url"
-import { bold } from "chalk"
+import chalk from "chalk"
 
 import retry from "async-retry"
 
@@ -122,7 +122,7 @@ export const errorPanicker = ({
         [
           `Unrecoverable error ${sharedError}`,
           `\nYour wordpress host appears to be overloaded by our requests for images`,
-          `\nIn ${bold(`gatsby-config.js`)}, try lowering the ${bold(
+          `\nIn ${chalk.bold(`gatsby-config.js`)}, try lowering the ${chalk.bold(
             `requestConcurrency`
           )} for MediaItems:`,
           `\nplugins: [
