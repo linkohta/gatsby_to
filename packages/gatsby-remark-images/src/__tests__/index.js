@@ -25,7 +25,7 @@ jest.mock(`gatsby-plugin-sharp`, () => {
 })
 
 const Remark = require(`remark`)
-const queryString = require(`query-string`)
+const { default: queryString } = require(`query-string`)
 const cheerio = require(`cheerio`)
 const toHAST = require(`mdast-util-to-hast`)
 const hastToHTML = require(`hast-util-to-html`)
