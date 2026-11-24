@@ -1,7 +1,8 @@
-import { MachineConfig, assign, createMachine } from "xstate"
+import { MachineConfig, assign, createMachine, AnyEventObject } from "xstate"
 import { IWaitingContext } from "./types"
 import { waitingActions } from "./actions"
 import { waitingServices } from "./services"
+import { contextAsInput } from "../from-service"
 
 const NODE_MUTATION_BATCH_SIZE = 100
 const NODE_MUTATION_BATCH_TIMEOUT = 500
@@ -13,13 +14,19 @@ export type WaitingResult = Pick<IWaitingContext, `nodeMutationBatch`>
  * このアイドル状態は、ノードの変更のバッチ処理と、最初に開始したときの
  * 変更の実行も扱う
  */
-export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
-  predictableActionArguments: true,
+export const waitingStates: MachineConfig<IWaitingContext, AnyEventObject> = {
   id: `waitingMachine`,
   initial: `idle`,
-  context: {
-    nodeMutationBatch: [],
-    runningBatch: [],
+  // 親のマシンが invoke の `input` で渡した値を、そのままコンテキストにする
+  context: ({ input }: { input?: IWaitingContext }) =>
+    input ?? {
+      nodeMutationBatch: [],
+      runningBatch: [],
+    },
+  // これは親に返される。このバッチには、もう一方のバッチの
+  // 実行中に届いた変更がすべて含まれる
+  output: ({ context: { nodeMutationBatch } }): WaitingResult => {
+    return { nodeMutationBatch }
   },
   states: {
     idle: {
@@ -27,7 +34,7 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
         {
           // キューに入っているノードの変更がすでにある場合は、
           // すぐにバッチ処理へ移る
-          cond: (ctx): boolean => !!ctx.nodeMutationBatch.length,
+          guard: ({ context }): boolean => !!context.nodeMutationBatch.length,
           target: `batchingNodeMutations`,
         },
         {
@@ -35,7 +42,8 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
           // 再コンパイルを強制するために、すぐに aggregatingFileChanges へ移る
           // https://github.com/gatsbyjs/gatsby/issues/27609 を参照
           target: `aggregatingFileChanges`,
-          cond: ({ sourceFilesDirty }): boolean => Boolean(sourceFilesDirty),
+          guard: ({ context: { sourceFilesDirty } }): boolean =>
+            Boolean(sourceFilesDirty),
         },
       ],
       on: {
@@ -66,18 +74,17 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
           actions: `addNodeMutation`,
           target: `batchingNodeMutations`,
         },
-        SOURCE_FILE_CHANGED: {
-          target: undefined,
-          // 外部の自己遷移がタイマーをリセットする
-          internal: false,
-        },
+        // NOTE: xstate 4 のときは `target: undefined` と `internal: false` を指定していて、コメントには
+        // 「外部の自己遷移がタイマーをリセットする」とあった。しかし、ターゲットのない遷移では
+        // 状態に入り直さないので、実際にはタイマーはリセットされていなかった。その動作を保っている
+        SOURCE_FILE_CHANGED: {},
       },
     },
     batchingNodeMutations: {
       // 入った時点でバッチがすでにいっぱいかを確認する
       always: {
-        cond: (ctx): boolean =>
-          ctx.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
+        guard: ({ context }): boolean =>
+          context.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
         target: `committingBatch`,
       },
       on: {
@@ -87,8 +94,8 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
           {
             // これでバッチがいっぱいになる場合は、コミットする
             actions: `addNodeMutation`,
-            cond: (ctx): boolean =>
-              ctx.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
+            guard: ({ context }): boolean =>
+              context.nodeMutationBatch.length >= NODE_MUTATION_BATCH_SIZE,
             target: `committingBatch`,
           },
           {
@@ -103,7 +110,7 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
       },
     },
     committingBatch: {
-      entry: assign<IWaitingContext>(({ nodeMutationBatch }) => {
+      entry: assign(({ context: { nodeMutationBatch } }) => {
         return {
           nodeMutationBatch: [],
           runningBatch: nodeMutationBatch,
@@ -117,9 +124,10 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
       },
       invoke: {
         src: `runMutationBatch`,
+        input: contextAsInput,
         // 終わったら、次回に備えて実行中のバッチを消去する
         onDone: {
-          actions: assign<IWaitingContext, any>({
+          actions: assign({
             runningBatch: [],
           }),
           target: `rebuild`,
@@ -128,16 +136,11 @@ export const waitingStates: MachineConfig<IWaitingContext, any, any> = {
     },
     rebuild: {
       type: `final`,
-      // これは親に返される。このバッチには、もう一方のバッチの
-      // 実行中に届いた変更がすべて含まれる
-      data: ({ nodeMutationBatch }): WaitingResult => {
-        return { nodeMutationBatch }
-      },
     },
   },
 }
 
 export const waitingMachine = createMachine(waitingStates, {
   actions: waitingActions,
-  services: waitingServices,
+  actors: waitingServices,
 })

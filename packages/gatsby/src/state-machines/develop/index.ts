@@ -10,6 +10,7 @@ import { IQueryRunningContext } from "../query-running/types"
 import { IWaitingContext } from "../waiting/types"
 import { buildActions } from "./actions"
 import { developServices } from "./services"
+import { contextAsInput } from "../from-service"
 import { IBuildContext } from "../../services"
 
 const RECOMPILE_PANIC_LIMIT = 6
@@ -20,9 +21,10 @@ const getGraphqlTypegenConfig = (ctx: IBuildContext): boolean =>
 /**
  * これは `gatsby develop` コマンドのトップレベルのステートマシンである
  */
-const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
-  predictableActionArguments: true,
+const developConfig: MachineConfig<IBuildContext, AnyEventObject> = {
   id: `build`,
+  // マシンを起動するときに `input` で渡した値を、そのままコンテキストにする
+  context: ({ input }: { input: IBuildContext }) => input,
   initial: `initializing`,
   // これらは変更イベントであり、`services/listen-for-mutations.ts` の
   // 変更リスナーからこのマシンへ送られる
@@ -38,7 +40,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     // これらは refresh エンドポイントへの呼び出しである。Gatsby Preview でも使われる。
     // イベントの webhook のボディをコンテキストに保存し、データを再読み込みする
     WEBHOOK_RECEIVED: {
-      target: `reloadingData`,
+      target: `.reloadingData`,
       actions: `assignWebhookBody`,
     },
     QUERY_RUN_REQUESTED: {
@@ -46,13 +48,13 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     },
     SET_SCHEMA: {
       actions: `schemaTypegen`,
-      cond: (ctx: IBuildContext): boolean =>
-        getGraphqlTypegenConfig(ctx) && !ctx.shouldRunInitialTypegen,
+      guard: ({ context }): boolean =>
+        getGraphqlTypegenConfig(context) && !context.shouldRunInitialTypegen,
     },
     SET_GRAPHQL_DEFINITIONS: {
       actions: `definitionsTypegen`,
-      cond: (ctx: IBuildContext): boolean =>
-        getGraphqlTypegenConfig(ctx) && !ctx.shouldRunInitialTypegen,
+      guard: ({ context }): boolean =>
+        getGraphqlTypegenConfig(context) && !context.shouldRunInitialTypegen,
     },
   },
   states: {
@@ -60,13 +62,15 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     initializing: {
       on: {
         // いずれにしてもすべてを実行するので、変更イベントは無視する
-        ADD_NODE_MUTATION: undefined,
-        SOURCE_FILE_CHANGED: undefined,
-        WEBHOOK_RECEIVED: undefined,
+        // （空の遷移を置くと、ルートのハンドラーへ伝わらなくなる）
+        ADD_NODE_MUTATION: {},
+        SOURCE_FILE_CHANGED: {},
+        WEBHOOK_RECEIVED: {},
       },
       invoke: {
         id: `initialize`,
         src: `initialize`,
+        input: contextAsInput,
         onDone: {
           target: `initializingData`,
           actions: [`assignStoreAndWorkerPool`, `spawnMutationListener`],
@@ -87,13 +91,9 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       invoke: {
         id: `initialize-data`,
         src: `initializeData`,
-        data: ({
-          parentSpan,
-          store,
-          webhookBody,
-          program,
-          reporter,
-        }: IBuildContext): IDataLayerContext => {
+        input: ({
+          context: { parentSpan, store, webhookBody, program, reporter },
+        }): IDataLayerContext => {
           return {
             parentSpan,
             store,
@@ -122,6 +122,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       invoke: {
         id: `post-bootstrap`,
         src: `postBootstrap`,
+        input: contextAsInput,
         onDone: `runningQueries`,
       },
     },
@@ -142,16 +143,18 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         id: `run-queries`,
         src: `runQueries`,
         // これが、子のマシンへ送るデータのすべてである
-        data: ({
-          program,
-          store,
-          parentSpan,
-          gatsbyNodeGraphQLFunction,
-          graphqlRunner,
-          websocketManager,
-          pendingQueryRuns,
-          reporter,
-        }: IBuildContext): IQueryRunningContext => {
+        input: ({
+          context: {
+            program,
+            store,
+            parentSpan,
+            gatsbyNodeGraphQLFunction,
+            graphqlRunner,
+            websocketManager,
+            pendingQueryRuns,
+            reporter,
+          },
+        }): IQueryRunningContext => {
           return {
             program,
             store,
@@ -168,17 +171,19 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
             // 再コンパイルの上限に達していて、ノードが再び変更された場合は panic にする
             target: `waiting`,
             actions: `panicBecauseOfInfiniteLoop`,
-            cond: ({
-              nodesMutatedDuringQueryRun = false,
-              nodesMutatedDuringQueryRunRecompileCount = 0,
-            }: IBuildContext): boolean =>
+            guard: ({
+              context: {
+                nodesMutatedDuringQueryRun = false,
+                nodesMutatedDuringQueryRunRecompileCount = 0,
+              },
+            }): boolean =>
               nodesMutatedDuringQueryRun &&
               nodesMutatedDuringQueryRunRecompileCount >= RECOMPILE_PANIC_LIMIT,
           },
           {
             // クエリの実行中にノードが変更されたので、すべてを再実行する必要がある
             target: `recreatingPages`,
-            cond: ({ nodesMutatedDuringQueryRun }: IBuildContext): boolean =>
+            guard: ({ context: { nodesMutatedDuringQueryRun } }): boolean =>
               !!nodesMutatedDuringQueryRun,
             actions: [
               `markNodesClean`,
@@ -191,12 +196,12 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
             // サーバーを起動する
             target: `startingDevServers`,
             actions: [`setQueryRunningFinished`, `clearPendingQueryRuns`],
-            cond: ({ compiler }: IBuildContext): boolean => !compiler,
+            guard: ({ context: { compiler } }): boolean => !compiler,
           },
           {
             // ソースファイルが変更されている場合は、JS バンドルを再コンパイルする
             target: `recompiling`,
-            cond: ({ sourceFilesDirty }: IBuildContext): boolean =>
+            guard: ({ context: { sourceFilesDirty } }): boolean =>
               !!sourceFilesDirty,
             actions: [`clearPendingQueryRuns`],
           },
@@ -211,7 +216,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
           target: `waiting`,
         },
       },
-      exit: assign<IBuildContext>({ shouldRunInitialTypegen: false }),
+      exit: assign({ shouldRunInitialTypegen: false }),
     },
     // JS バンドルを再コンパイルする
     recompiling: {
@@ -221,6 +226,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       entry: [`setRecompiledFiles`, `markSourceFilesClean`],
       invoke: {
         src: `recompile`,
+        input: contextAsInput,
         onDone: {
           target: `waiting`,
         },
@@ -234,10 +240,11 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     startingDevServers: {
       invoke: {
         src: `startWebpackServer`,
+        input: contextAsInput,
         onDone: [
           {
             target: `initialGraphQLTypegen`,
-            cond: (ctx: IBuildContext): boolean => getGraphqlTypegenConfig(ctx),
+            guard: ({ context }): boolean => getGraphqlTypegenConfig(context),
           },
           {
             target: `waiting`,
@@ -253,6 +260,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
     initialGraphQLTypegen: {
       invoke: {
         src: `graphQLTypegen`,
+        input: contextAsInput,
         onDone: {
           target: `waiting`,
         },
@@ -267,7 +275,7 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       always: [
         {
           target: `runningQueries`,
-          cond: ({ pendingQueryRuns }: IBuildContext): boolean =>
+          guard: ({ context: { pendingQueryRuns } }): boolean =>
             !!pendingQueryRuns && pendingQueryRuns.size > 0,
         },
       ],
@@ -289,11 +297,9 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
         id: `waiting`,
         src: `waitForMutations`,
         // キューに入っている既存の変更を子のマシンへ送り、子がそれらを実行する
-        data: ({
-          store,
-          nodeMutationBatch = [],
-          sourceFilesDirty,
-        }: IBuildContext): IWaitingContext => {
+        input: ({
+          context: { store, nodeMutationBatch = [], sourceFilesDirty },
+        }): IWaitingContext => {
           return {
             store,
             nodeMutationBatch,
@@ -321,14 +327,16 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       },
       invoke: {
         src: `reloadData`,
-        data: ({
-          parentSpan,
-          store,
-          webhookBody,
-          webhookSourcePluginName,
-          program,
-          reporter,
-        }: IBuildContext): IDataLayerContext => {
+        input: ({
+          context: {
+            parentSpan,
+            store,
+            webhookBody,
+            webhookSourcePluginName,
+            program,
+            reporter,
+          },
+        }): IDataLayerContext => {
           return {
             parentSpan,
             store,
@@ -366,12 +374,9 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
       invoke: {
         id: `recreate-pages`,
         src: `recreatePages`,
-        data: ({
-          parentSpan,
-          store,
-          program,
-          reporter,
-        }: IBuildContext): IDataLayerContext => {
+        input: ({
+          context: { parentSpan, store, program, reporter },
+        }): IDataLayerContext => {
           return {
             parentSpan,
             store,
@@ -395,6 +400,6 @@ const developConfig: MachineConfig<IBuildContext, any, AnyEventObject> = {
 }
 
 export const developMachine = createMachine(developConfig, {
-  services: developServices,
+  actors: developServices,
   actions: buildActions,
 })

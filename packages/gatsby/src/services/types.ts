@@ -7,7 +7,7 @@ import { Store, AnyAction } from "redux"
 import { IGatsbyPage, IGatsbyState } from "../redux/types"
 import { Express } from "express"
 import type { GatsbyWorkerPool } from "../utils/worker/pool"
-import { Actor, AnyEventObject } from "xstate"
+import { AnyActorRef } from "xstate"
 import { Compiler } from "webpack"
 import { WebsocketManager } from "../utils/websocket-manager"
 import { type WebpackWatching } from "../utils/start-server"
@@ -42,12 +42,12 @@ export interface IBuildContext {
   app?: Express
   nodesMutatedDuringQueryRun?: boolean
   nodesMutatedDuringQueryRunRecompileCount?: number
-  mutationListener?: Actor<unknown, AnyEventObject>
+  mutationListener?: AnyActorRef
   nodeMutationBatch?: Array<IMutationAction>
   compiler?: Compiler
   websocketManager?: WebsocketManager
   webpackWatching?: WebpackWatching
-  webpackListener?: Actor<unknown, AnyEventObject>
+  webpackListener?: AnyActorRef
   queryFilesDirty?: boolean
   sourceFilesDirty?: boolean
   changedSourceFiles?: Set<string> // "recompile" サービスでは使えない

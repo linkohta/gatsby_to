@@ -1,39 +1,38 @@
 import { IQueryRunningContext } from "./types"
-import {
-  DoneInvokeEvent,
-  assign,
-  ActionFunctionMap,
-  AnyEventObject,
-} from "xstate"
+import { DoneActorEvent, assign, AnyEventObject } from "xstate"
 import { enqueueFlush } from "../../utils/page-data"
 
-export const flushPageData = (context: IQueryRunningContext): void => {
+interface IQueryRunningActionArgs {
+  context: IQueryRunningContext
+  event: AnyEventObject
+}
+
+export const flushPageData = ({ context }: IQueryRunningActionArgs): void => {
   enqueueFlush(context.parentSpan)
 }
 
-export const assignDirtyQueries = assign<
-  IQueryRunningContext,
-  DoneInvokeEvent<any>
->((_context, { data }) => {
-  const { queryIds } = data
-  return {
-    queryIds,
+export const assignDirtyQueries = assign(
+  ({ event }: IQueryRunningActionArgs) => {
+    const { queryIds } = (event as DoneActorEvent<any>).output
+    return {
+      queryIds,
+    }
   }
-})
+)
 
-export const markSourceFilesDirty = assign<IQueryRunningContext>({
+export const markSourceFilesDirty = assign({
   filesDirty: true,
 })
 
-export const markSourceFilesClean = assign<IQueryRunningContext>({
+export const markSourceFilesClean = assign({
   filesDirty: false,
 })
 
-export const trackRequestedQueryRun = assign<
-  IQueryRunningContext,
-  AnyEventObject
->({
-  pendingQueryRuns: (context, { payload }) => {
+export const trackRequestedQueryRun = assign({
+  pendingQueryRuns: ({
+    context,
+    event: { payload },
+  }: IQueryRunningActionArgs) => {
     const pendingQueryRuns = context.pendingQueryRuns || new Set<string>()
     if (payload?.pagePath) {
       pendingQueryRuns.add(payload.pagePath)
@@ -42,12 +41,11 @@ export const trackRequestedQueryRun = assign<
   },
 })
 
-export const clearCurrentlyHandledPendingQueryRuns =
-  assign<IQueryRunningContext>({
-    currentlyHandledPendingQueryRuns: undefined,
-  })
+export const clearCurrentlyHandledPendingQueryRuns = assign({
+  currentlyHandledPendingQueryRuns: undefined,
+})
 
-export const queryActions: ActionFunctionMap<IQueryRunningContext, any> = {
+export const queryActions = {
   assignDirtyQueries,
   flushPageData,
   markSourceFilesDirty,

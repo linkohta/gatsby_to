@@ -14,7 +14,7 @@ import {
 import { markWebpackStatusAsPending } from "../utils/webpack-status"
 
 import { IProgram, IDebugInfo } from "./types"
-import { interpret } from "xstate"
+import { createActor } from "xstate"
 import { globalTracer } from "opentracing"
 import { developMachine } from "../state-machines/develop"
 import { logTransitions } from "../utils/state-machine-logging"
@@ -133,16 +133,16 @@ module.exports = async (program: IDevelopArgs): Promise<void> => {
     return next()
   })
 
-  const machine = developMachine.withContext({
-    program,
-    parentSpan,
-    app,
-    reporter,
-    pendingQueryRuns: new Set([`/`]),
-    shouldRunInitialTypegen: true,
+  const service = createActor(developMachine, {
+    input: {
+      program,
+      parentSpan,
+      app,
+      reporter,
+      pendingQueryRuns: new Set([`/`]),
+      shouldRunInitialTypegen: true,
+    },
   })
-
-  const service = interpret(machine)
 
   if (program.verbose) {
     logTransitions(service)

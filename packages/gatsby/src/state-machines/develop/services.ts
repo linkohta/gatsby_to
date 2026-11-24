@@ -1,5 +1,4 @@
 import {
-  IBuildContext,
   startWebpackServer,
   initialize,
   recompile,
@@ -13,17 +12,17 @@ import {
 } from "../data-layer"
 import { queryRunningMachine } from "../query-running"
 import { waitingMachine } from "../waiting"
-import { MachineOptions } from "xstate"
+import { fromService } from "../from-service"
 
-export const developServices: MachineOptions<IBuildContext, any>[`services`] = {
+export const developServices = {
   initializeData: initializeDataMachine,
   reloadData: reloadDataMachine,
   recreatePages: recreatePagesMachine,
-  initialize: initialize,
+  initialize: fromService(initialize),
   runQueries: queryRunningMachine,
   waitForMutations: waitingMachine,
-  startWebpackServer,
-  recompile,
-  postBootstrap,
-  graphQLTypegen,
+  startWebpackServer: fromService(startWebpackServer),
+  recompile: fromService(recompile),
+  postBootstrap: fromService(postBootstrap),
+  graphQLTypegen: fromService(graphQLTypegen),
 }

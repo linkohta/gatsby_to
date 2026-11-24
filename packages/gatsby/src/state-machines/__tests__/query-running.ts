@@ -1,6 +1,7 @@
 import { queryRunningMachine } from "../query-running"
 import { queryActions } from "../query-running/actions"
-import { interpret, Interpreter } from "xstate"
+import { createActor, Actor, AnyActorRef } from "xstate"
+import { fromService } from "../from-service"
 import { IProgram } from "../../commands/types"
 import { store } from "../../redux"
 import reporter from "gatsby-cli/lib/reporter"
@@ -25,18 +26,24 @@ const services = {
   ),
 }
 
-const machine = queryRunningMachine.withConfig(
-  {
-    actions: queryActions,
-    services,
+const machine = queryRunningMachine.provide({
+  actions: queryActions,
+  actors: {
+    extractQueries: fromService(services.extractQueries),
+    writeOutRequires: fromService(services.writeOutRequires),
+    calculateDirtyQueries: fromService(services.calculateDirtyQueries),
   },
-  {
-    program: {} as IProgram,
-    store,
-    reporter,
-    pendingQueryRuns: new Set([`/`]),
-  }
-)
+})
+
+const interpret = (logic: typeof machine): Actor<typeof machine> =>
+  createActor(logic, {
+    input: {
+      program: {} as IProgram,
+      store,
+      reporter,
+      pendingQueryRuns: new Set([`/`]),
+    },
+  })
 
 const resetMocks = (mocks: Record<string, jest.Mock>): void =>
   Object.values(mocks).forEach(mock => mock.mockClear())
@@ -45,30 +52,21 @@ const resetAllMocks = (): void => {
   resetMocks(services)
 }
 
-const finished = async (
-  service: Interpreter<any, any, any, any, any>
-): Promise<void> =>
+const finished = async (service: AnyActorRef): Promise<void> =>
   new Promise(resolve => {
-    service.onDone(() => resolve())
+    service.subscribe({ complete: () => resolve() })
   })
 
-function debug(service: Interpreter<any, any, any, any, any>): void {
+function debug(service: AnyActorRef): void {
   let last: any
 
-  service.onTransition(state => {
-    if (!last) {
-      last = state
-    } else if (!state.changed) {
-      return
-    }
-
+  service.subscribe(state => {
     reporter.info(
       `---onTransition---\n${require(`util`).inspect(
         {
           stateValue: state.value,
-          event: state.event,
           pendingQueryRuns: state.context.pendingQueryRuns,
-          changedStateValue: state.value !== last.value,
+          changedStateValue: state.value !== last?.value,
         },
         { depth: Infinity }
       )}`
@@ -115,7 +113,7 @@ describe(`query-running state machine`, () => {
     // debug(service)
 
     service.start()
-    expect(service.state.value).toBe(`extractingQueries`)
+    expect(service.getSnapshot().value).toBe(`extractingQueries`)
   })
 
   it(`doesn't drop pendingQueryRuns that were added during calculation of dirty queries`, async () => {
@@ -178,25 +176,19 @@ describe(`query-running state machine`, () => {
     expect(services.calculateDirtyQueries).toHaveBeenCalledWith(
       expect.objectContaining({
         currentlyHandledPendingQueryRuns: expect.toHaveInSet(`/`),
-      }),
-      expect.anything(),
-      expect.anything()
+      })
     )
 
     expect(services.calculateDirtyQueries).toHaveBeenCalledWith(
       expect.objectContaining({
         currentlyHandledPendingQueryRuns: expect.toHaveInSet(`/bar/`),
-      }),
-      expect.anything(),
-      expect.anything()
+      })
     )
 
     expect(services.calculateDirtyQueries).toHaveBeenCalledWith(
       expect.objectContaining({
         currentlyHandledPendingQueryRuns: expect.toHaveInSet(`/foo/`),
-      }),
-      expect.anything(),
-      expect.anything()
+      })
     )
   })
 })

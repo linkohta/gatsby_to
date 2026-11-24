@@ -1,4 +1,3 @@
-import { MachineOptions } from "xstate"
 import {
   customizeSchema,
   createPages,
@@ -6,15 +5,12 @@ import {
   sourceNodes,
   writeOutRedirects as writeOutRedirectsAndWatch,
 } from "../../services"
-import { IDataLayerContext } from "./types"
+import { fromService } from "../from-service"
 
-export const dataLayerServices: MachineOptions<
-  IDataLayerContext,
-  any
->[`services`] = {
-  customizeSchema,
-  sourceNodes,
-  createPages,
-  buildSchema,
-  writeOutRedirectsAndWatch,
+export const dataLayerServices = {
+  customizeSchema: fromService(customizeSchema),
+  sourceNodes: fromService(sourceNodes),
+  createPages: fromService(createPages),
+  buildSchema: fromService(buildSchema),
+  writeOutRedirectsAndWatch: fromService(writeOutRedirectsAndWatch),
 }
