@@ -8,7 +8,10 @@ const path = require(`path`)
 const os = require(`os`)
 const watch = require(`./watch`)
 const { getVersionInfo } = require(`./utils/version`)
-const argv = require(`yargs`)
+// yargs 18 の `require()` はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
+const yargs = require(`yargs`)
+const { hideBin } = require(`yargs/helpers`)
+const argv = yargs(hideBin(process.argv))
   .usage(`Usage: gatsby-dev [options]`)
   .alias(`q`, `quiet`)
   .nargs(`q`, 0)
@@ -45,6 +48,9 @@ You typically only need to configure this once.`
   .alias(`h`, `help`)
   .nargs(`v`, 0)
   .alias(`v`, `version`)
+  // yargs 18 は ESM になり、このパッケージの `package.json` からバージョンを見つけられず
+  // `unknown` と表示するので、明示的に渡す
+  .version(pkg.version)
   .describe(`v`, `Print the currently installed version of Gatsby Dev CLI`)
   .choices(`package-manager`, [`yarn`, `pnpm`])
   .default(`package-manager`, `yarn`)
