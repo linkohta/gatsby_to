@@ -6,7 +6,7 @@ import path from "path"
 // このモジュールは require する必要がある。ここでは import を使えない
 const { createRequire } = require(`module`)
 
-// これは、エンジン向けに lmdb@2 を webpack でバンドルできるように、
+// これは、エンジン向けに lmdb（2 系と 3 系）を webpack でバンドルできるように、
 // 文字列の置換を行う、その場しのぎの webpack ローダーである。
 // 現状では、`@vercel/webpack-asset-relocator-loader は、lmdb による
 // バイナリと辞書ファイルの読み込み方を扱えない
@@ -88,7 +88,7 @@ export default function (this: any, source: string): string {
       `require.resolve('../dict/dict.txt')`
     )
     .replace(
-      /fs\.readFileSync\(new URL\('\.\/dict\/dict\.txt',\s*\(typeof\s*document\s*===\s*'undefined'\s*\?\s*new\s*\(require\('u'\s*\+\s*'rl'\)\.URL\)\s*\('file:'\s*\+\s*__filename\).href\s*:\s*\(document\.currentScript\s*&&\s*document\.currentScript\.src\s*\|\|\s*new URL\('index\.cjs',\s*document\.baseURI\)\.href\)\)\.replace\(\/dist\[\\\\\\\/\]index\.cjs\$\/,\s*''\)\)\)/g,
+      /fs\.readFileSync\(\s*new URL\(\s*'\.\/dict\/dict\.txt',\s*\(typeof\s*document\s*===\s*'undefined'\s*\?\s*new\s*\(require\('u'\s*\+\s*'rl'\)\.URL\)\s*\('file:'\s*\+\s*__filename\).href\s*:\s*\(document\.currentScript\s*&&\s*(?:document\.currentScript\.tagName\.toUpperCase\(\)\s*===\s*'SCRIPT'\s*&&\s*)?document\.currentScript\.src\s*\|\|\s*new URL\('index\.cjs',\s*document\.baseURI\)\.href\)\)\.replace\(\/dist\[\\\\\\\/\]index\.cjs\$\/,\s*''\),?\s*\),?\s*\)/g,
       `fs.readFileSync(require.resolve('../dict/dict.txt'))`
     )
 }

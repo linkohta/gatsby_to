@@ -117,7 +117,7 @@
     "joi": "^18.3.2",
     "json-loader": "^0.5.7",
     "latest-version": "^9.0.0",
-    "lmdb": "2.5.3",
+    "lmdb": "3.5.11",
     "lodash": "^4.18.1",
     "meant": "^2.0.1",
     "memoizee": "^0.4.17",
