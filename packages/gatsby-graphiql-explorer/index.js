@@ -3,6 +3,10 @@ const path = require(`path`)
 
 const distDirectory = path.join(__dirname, `dist`)
 
+// express 5 は、パスの途中に `.` で始まるフォルダーがあるだけで配信を拒否する。
+// このパッケージのインストール先がそうしたフォルダーの中でも（`node_modules/.pnpm` など）配信できるようにする
+const sendFileOptions = { dotfiles: `allow` }
+
 module.exports = (expressApp, { graphqlEndpoint, getFragments }) => {
   const assets = new Set(
     fs
@@ -15,7 +19,7 @@ module.exports = (expressApp, { graphqlEndpoint, getFragments }) => {
 
   expressApp.get(bundleUrlHandler, (_req, res) => {
     res.set(`Cache-Control`, `public, max-age=31557600`)
-    res.sendFile(path.join(distDirectory, `app.js`))
+    res.sendFile(path.join(distDirectory, `app.js`), sendFileOptions)
   })
 
   // `app.js` が読み込むチャンク（Monaco エディターの worker など）を配信する。
@@ -28,11 +32,11 @@ module.exports = (expressApp, { graphqlEndpoint, getFragments }) => {
     }
 
     res.set(`Cache-Control`, `public, max-age=31557600`)
-    res.sendFile(path.join(distDirectory, file))
+    res.sendFile(path.join(distDirectory, file), sendFileOptions)
   })
 
   expressApp.get(graphqlEndpoint, (_req, res) => {
-    res.sendFile(path.join(distDirectory, `index.html`))
+    res.sendFile(path.join(distDirectory, `index.html`), sendFileOptions)
   })
 
   expressApp.get(fragmentsUrlHandler, (_req, res) => {

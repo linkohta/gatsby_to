@@ -68,7 +68,9 @@ exports.onCreateDevServer = async ({ app, cache, reporter }) => {
     // ここに到達するのは、たった今処理した遅延画像の場合だけである
     // `express.static` のほうが前のハンドラーなので、現在のリクエストに対しては
     // 生成したファイルを手動で配信する必要がある
-    return res.sendFile(pathOnDisk)
+    // express 5 は、パスの途中に `.` で始まるフォルダーがあるだけで配信を拒否する。
+    // サイトがそうしたフォルダーの中にあっても配信できるようにする
+    return res.sendFile(pathOnDisk, { dotfiles: `allow` })
   })
 }
 

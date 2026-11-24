@@ -121,6 +121,9 @@ module.exports = async (program: IDevelopArgs): Promise<void> => {
   }
 
   const app = express()
+  // express 5 の既定は "simple" になった。クエリ文字列の `a[b]=1` をこれまでどおり
+  // ネストしたオブジェクトとして受け取れるように、express 4 の既定に合わせる
+  app.set(`query parser`, `extended`)
   const parentSpan = tracer.startSpan(`bootstrap`)
 
   app.use((req, res, next) => {
