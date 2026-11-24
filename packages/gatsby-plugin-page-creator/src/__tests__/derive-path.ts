@@ -393,6 +393,24 @@ describe(`derive-path`, () => {
     expect(five).toEqual(`foo/muenchner-weisswuerstchen`)
   })
 
+  // @sindresorhus/slugify 2 以降で結果が変わった入力。URL が意図せず変わらないよう固定しておく
+  it.each([
+    [`What's New?`, `whats-new`],
+    [`don’t stop`, `dont-stop`],
+    [`trade™ mark`, `trade-tm-mark`],
+    [`©2024`, `c-2024`],
+    [`½ cup`, `1-2-cup`],
+    [`50€`, `50e`],
+    [`ｆｕｌｌｗｉｄｔｈ`, `fullwidth`],
+  ])(`slugifies apostrophes and symbols in %s`, async (name, expected) => {
+    const { derivedPath } = await derivePath(
+      `foo/{Model.name}`,
+      { name },
+      reporter
+    )
+    expect(derivedPath).toEqual(`foo/${expected}`)
+  })
+
   it(`supports custom slugify options`, async () => {
     const { derivedPath: one } = await derivePath(
       `foo/{Model.name}`,

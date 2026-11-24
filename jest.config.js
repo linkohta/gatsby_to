@@ -25,6 +25,8 @@ const esModules = [
   `@mdx-js/mdx`,
   `@open-draft/deferred-promise`,
   `@sindresorhus/is`,
+  `@sindresorhus/slugify`,
+  `@sindresorhus/transliterate`,
   `@szmarczak/http-timer`,
   `aggregate-error`,
   `ansi-escapes`,
