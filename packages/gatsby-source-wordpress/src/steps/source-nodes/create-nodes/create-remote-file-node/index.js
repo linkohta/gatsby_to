@@ -8,7 +8,9 @@ const path = require(`path`)
 const { isWebUri } = require(`valid-url`)
 const Queue = require(`better-queue`)
 const readChunk = require(`read-chunk`)
-const fileType = require(`file-type`)
+const { fileTypeFromBuffer, reasonableDetectionSizeInBytes } = require(
+  `file-type`
+)
 
 const { createFileNode } = require(`gatsby-source-filesystem/create-file-node`)
 const { getRemoteFileExtension, getRemoteFileName, createFilePath } = require(
@@ -288,8 +290,12 @@ async function processRemoteNode({
 
   // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、推測を試みる
   if (ext === ``) {
-    const buffer = readChunk.sync(tmpFilename, 0, fileType.minimumBytes)
-    const filetype = fileType(buffer)
+    const buffer = readChunk.sync(
+      tmpFilename,
+      0,
+      reasonableDetectionSizeInBytes
+    )
+    const filetype = await fileTypeFromBuffer(buffer)
     if (filetype) {
       ext = `.${filetype.ext}`
     }

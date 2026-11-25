@@ -1,4 +1,4 @@
-import fileType from "file-type"
+import { fileTypeFromFile } from "file-type"
 import path from "path"
 import fs from "fs-extra"
 import Queue from "fastq"
@@ -218,7 +218,7 @@ async function fetchFile({
       // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、推測を試みる
       if (!ext) {
         // 新しいレスポンスの場合は、拡張子を推測し、今後のために結果をキャッシュする
-        const filetype = await fileType.fromFile(tmpFilename)
+        const filetype = await fileTypeFromFile(tmpFilename)
         if (filetype) {
           ext = `.${filetype.ext}`
 
