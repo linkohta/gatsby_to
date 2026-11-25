@@ -1,11 +1,26 @@
+import fs from "fs"
+import os from "os"
 import path from "path"
 import { ESLint } from "eslint"
 import { slash } from "gatsby-core-utils"
 import { store } from "../../redux"
 import { eslintConfig, eslintRequiredConfig } from "../eslint-config"
 
-const pagePath = path.join(process.cwd(), `src`, `pages`, `index.js`)
-const componentPath = path.join(process.cwd(), `src`, `components`, `a.jsx`)
+// 利用者のサイトに見立てた一時ディレクトリを作り、そこへ移動してリントする。
+// リポジトリの中でリントすると、@babel/eslint-parser がリポジトリのビルド用の
+// Babel 設定（ルートの `.babelrc.js`）を読み込み、利用者のサイトとは違う結果になるためである。
+// Flow の構文は gatsby-plugin-flow を使うサイトと同じく、サイトの Babel 設定で有効にする
+const originalCwd = process.cwd()
+const siteDir = fs.realpathSync(
+  fs.mkdtempSync(path.join(os.tmpdir(), `gatsby-eslint-config-`))
+)
+fs.writeFileSync(path.join(siteDir, `package.json`), `{}`)
+fs.writeFileSync(
+  path.join(siteDir, `.babelrc`),
+  JSON.stringify({ presets: [require.resolve(`@babel/preset-flow`)] })
+)
+const pagePath = path.join(siteDir, `src`, `pages`, `index.js`)
+const componentPath = path.join(siteDir, `src`, `components`, `a.jsx`)
 
 async function lint(
   options: ESLint.Options & { emitWarning?: boolean },
@@ -28,12 +43,15 @@ export default () => <a href="#">{window.x == 1}</a>
 
 describe(`eslint-config`, () => {
   beforeAll(() => {
+    process.chdir(siteDir)
     // ページテンプレート向けのルールは、ストアに登録されたコンポーネントだけを対象にする
     store.getState().components.set(slash(pagePath), {} as never)
   })
 
   afterAll(() => {
     store.getState().components.delete(slash(pagePath))
+    process.chdir(originalCwd)
+    fs.rmSync(siteDir, { recursive: true, force: true })
   })
 
   it(`reports the bundled rules`, async () => {
@@ -103,7 +121,7 @@ export function Widget({ on }) {
     const eslint = new ESLint(options)
 
     expect(
-      await eslint.isPathIgnored(path.join(process.cwd(), `.cache`, `app.js`))
+      await eslint.isPathIgnored(path.join(siteDir, `.cache`, `app.js`))
     ).toBe(true)
     expect(await eslint.isPathIgnored(pagePath)).toBe(false)
   })
