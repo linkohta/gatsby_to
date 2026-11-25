@@ -28,8 +28,13 @@ describe(`gatsby-plugin-sass`, () => {
       "No options": {},
       "Sass options": {
         sassOptions: {
-          includePaths: [`absolute/path/a`, `absolute/path/b`],
+          loadPaths: [`absolute/path/a`, `absolute/path/b`],
         },
+      },
+      "sass-loader options": {
+        api: `modern`,
+        warnRuleAsWarning: false,
+        additionalData: `$test: #000;`,
       },
       "PostCss plugins": {
         postCssPlugins: [`test1`],
@@ -79,24 +84,18 @@ describe(`pluginOptionsSchema`, () => {
       `"sassRuleTest" must be of type object`,
       `"sassRuleModulesTest" must be of type object`,
       `"useResolveUrlLoader" must be one of [boolean, object]`,
-      `"sassOptions.file" must be a string`,
-      `"sassOptions.data" must be a string`,
-      `"sassOptions.importer" must be of type function`,
+      `"sassOptions.loadPaths" must be an array`,
+      `"sassOptions.style" must be one of [expanded, compressed]`,
+      `"sassOptions.syntax" must be one of [scss, indented, css]`,
+      `"sassOptions.importers" must be an array`,
       `"sassOptions.functions" must be of type object`,
-      `"sassOptions.includePaths" must be an array`,
-      `"sassOptions.indentedSyntax" must be a boolean`,
-      `"sassOptions.indentType" must be a string`,
-      `"sassOptions.indentWidth" must be less than or equal to 10`,
-      `"sassOptions.linefeed" must be one of [cr, crlf, lf, lfcr]`,
-      `"sassOptions.omitSourceMapUrl" must be a boolean`,
-      `"sassOptions.outFile" must be a string`,
-      `"sassOptions.outputStyle" must be one of [nested, expanded, compact, compressed]`,
-      `"sassOptions.precision" must be a number`,
-      `"sassOptions.sourceComments" must be a boolean`,
-      `"sassOptions.sourceMap" must be one of [boolean, string]`,
-      `"sassOptions.sourceMapContents" must be a boolean`,
-      `"sassOptions.sourceMapEmbed" must be a boolean`,
-      `"sassOptions.sourceMapRoot" must be a string`,
+      `"sassOptions.quietDeps" must be a boolean`,
+      `"sassOptions.verbose" must be a boolean`,
+      `"sassOptions.silenceDeprecations" must be an array`,
+      `"sassOptions.fatalDeprecations" must be an array`,
+      `"sassOptions.futureDeprecations" must be an array`,
+      `"sassOptions.charset" must be a boolean`,
+      `"sassOptions.sourceMapIncludeSources" must be a boolean`,
     ]
 
     const { errors, isValid } = await testPluginOptionsSchema(
@@ -110,24 +109,18 @@ describe(`pluginOptionsSchema`, () => {
         sassRuleModulesTest: `This should be a regexp`,
         useResolveUrlLoader: `This should be a boolean`,
         sassOptions: {
-          file: 123, // 文字列であるべき
-          data: 123, // 文字列であるべき
-          importer: `This should be a function`,
+          loadPaths: 123, // 文字列の配列であるべき
+          style: `This should be expanded or compressed`,
+          syntax: `This should be scss, indented or css`,
+          importers: `This should be an array`,
           functions: `This should be an object of { string: function }`,
-          includePaths: 123, // 文字列の配列であるべき
-          indentedSyntax: `"useResolveUrlLoader" must be a boolean`,
-          indentType: 123, // これは文字列であるべき
-          indentWidth: 40,
-          linefeed: `This should be cr, crlf, lf or lfcr`,
-          omitSourceMapUrl: `This should be a boolean`,
-          outFile: 123, // これは文字列であるべき
-          outputStyle: `This should be nested, expanded, compact or compressed`,
-          precision: `This should be a number`,
-          sourceComments: `This should be a boolean`,
-          sourceMap: 123, // これは文字列か真偽値であるべき
-          sourceMapContents: `This should be a boolean`,
-          sourceMapEmbed: `This should be a boolean`,
-          sourceMapRoot: 123, // これは文字列であるべき
+          quietDeps: `This should be a boolean`,
+          verbose: `This should be a boolean`,
+          silenceDeprecations: `This should be an array`,
+          fatalDeprecations: `This should be an array`,
+          futureDeprecations: `This should be an array`,
+          charset: `This should be a boolean`,
+          sourceMapIncludeSources: `This should be a boolean`,
         },
       }
     )
@@ -148,36 +141,54 @@ describe(`pluginOptionsSchema`, () => {
         sassRuleModulesTest: /\.mod\.s(a|c)ss$/,
         useResolveUrlLoader: false,
         sassOptions: {
-          file: `../path-to-file`,
-          data: `{ some: data }`,
-          importer: function () {
-            return { file: `path-to-file`, contents: `data` }
-          },
+          loadPaths: [`some`, `path`],
+          style: `expanded`,
+          syntax: `indented`,
+          importers: [{ findFileUrl: () => null }],
           functions: {
             "headings($from: 0, $to: 6)": function () {
               return []
             },
           },
-          includePaths: [`some`, `path`],
-          indentedSyntax: true,
-          indentType: `tabs`,
-          indentWidth: 7,
-          linefeed: `crlf`,
-          omitSourceMapUrl: true,
-          outFile: `somewhere-around.css`,
-          outputStyle: `expanded`,
+          quietDeps: true,
+          verbose: true,
+          silenceDeprecations: [`import`],
+          fatalDeprecations: [`global-builtin`],
+          futureDeprecations: [`import`],
+          charset: false,
+          sourceMapIncludeSources: true,
+          // 新しい API にないオプションは、そのまま通す
           precision: 12,
-          sourceComments: true,
-          sourceMap: true,
-          sourceMapContents: true,
-          sourceMapEmbed: true,
-          sourceMapRoot: `some-source-map-root`,
         },
       }
     )
 
     expect(isValid).toBe(true)
     expect(errors).toEqual([])
+  })
+
+  it(`should reject options of the legacy Sass API that were renamed`, async () => {
+    const { isValid, errors } = await testPluginOptionsSchema(
+      pluginOptionsSchema,
+      {
+        sassOptions: {
+          includePaths: [`some`, `path`],
+          outputStyle: `expanded`,
+          indentedSyntax: true,
+          importer: function () {
+            return null
+          },
+        },
+      }
+    )
+
+    expect(isValid).toBe(false)
+    expect(errors).toEqual([
+      `"sassOptions.includePaths" is not supported by sass-loader 17 and later. Use "loadPaths" instead`,
+      `"sassOptions.outputStyle" is not supported by sass-loader 17 and later. Use "style" instead`,
+      `"sassOptions.indentedSyntax" is not supported by sass-loader 17 and later. Use "syntax" instead`,
+      `"sassOptions.importer" is not supported by sass-loader 17 and later. Use "importers" instead`,
+    ])
   })
 
   it(`should allow unknown options`, async () => {

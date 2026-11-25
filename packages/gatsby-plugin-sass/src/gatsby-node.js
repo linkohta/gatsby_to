@@ -89,12 +89,18 @@ exports.onCreateWebpackConfig = (
 }
 
 const MATCH_ALL_KEYS = /^/
+
+// 古い API のオプションのうち、新しい名前に置き換わったものを、置き換え先を示してエラーにする
+const removedSassOption = (Joi, replacement) =>
+  Joi.forbidden().messages({
+    "any.unknown": `{{#label}} is not supported by sass-loader 17 and later. Use "${replacement}" instead`,
+  })
 exports.pluginOptionsSchema = function ({ Joi }) {
   return Joi.object({
     implementation: Joi.object({})
       .unknown(true)
       .description(
-        `By default the node implementation of Sass (node-sass) is used. To use the implementation written in Dart (dart-sass), you can install sass instead of node-sass and pass it into the options as the implementation`
+        `By default sass-embedded is used when it is installed, otherwise the Dart implementation of Sass (sass). To use a specific implementation, pass it into the options as the implementation`
       ),
     additionalData: Joi.alternatives()
       .try(Joi.string(), Joi.function())
@@ -123,98 +129,56 @@ exports.pluginOptionsSchema = function ({ Joi }) {
 
         Using resolve-url-loader provides a workaround, if you want to use relative url just install the plugin and then add it to your Sass plugin options configuration.`),
     // TODO: 関数も許可できるよう alternatives() を使う。現在はスキーマの検証（テスト）に何らかのバグがある
+    // sass-loader 17 は、Sass の新しい JavaScript API（https://sass-lang.com/documentation/js-api/interfaces/options/）
+    // だけに対応している。古い API のオプションは Sass に無視されるので、新しい名前に置き換わったものは、
+    // 気付けるようにここでエラーにする
     sassOptions: Joi.object({
-      file: Joi.string()
-        .allow(null)
-        .description(`Path to a file for LibSass to compile.`)
-        .default(null),
-      data: Joi.string()
-        .allow(null)
+      loadPaths: Joi.array()
+        .items(Joi.string())
         .description(
-          `A string to pass to LibSass to compile. It is recommended that you use includePaths in conjunction with this so that LibSass can find files when using the @import directive.`
-        )
-        .default(null),
-      importer: Joi.function()
-        .maxArity(3)
+          `Paths in which to look for stylesheets loaded by rules like @use and @import.`
+        ),
+      style: Joi.string()
+        .valid(`expanded`, `compressed`)
+        .description(`The output style of the compiled CSS.`),
+      syntax: Joi.string()
+        .valid(`scss`, `indented`, `css`)
+        .description(`The syntax to use to parse the entrypoint stylesheet.`),
+      importers: Joi.array()
+        .items(Joi.any())
         .description(
-          `Handles when LibSass encounters the @import directive. A custom importer allows extension of the LibSass engine in both a synchronous and asynchronous manner. In both cases, the goal is to either return or call done() with an object literal. (https://github.com/sass/node-sass#importer--v200---experimental)`
+          `Custom importers that control how Sass resolves loads from rules like @use and @import.`
         ),
       functions: Joi.object()
-        .pattern(MATCH_ALL_KEYS, Joi.function().maxArity(2))
+        .pattern(MATCH_ALL_KEYS, Joi.function())
         .description(
-          `functions is an Object that holds a collection of custom functions that may be invoked by the Sass files being compiled.`
+          `Additional built-in Sass functions that are available in all stylesheets. The keys are Sass function signatures like you'd write for the @function rule.`
         ),
-      includePaths: Joi.array()
-        .items(Joi.string())
-        .default([])
-        .description(
-          `An array of paths that LibSass can look in to attempt to resolve your @import declarations. When using data, it is recommended that you use this.`
-        ),
-      indentedSyntax: Joi.boolean()
-        .default(false)
-        .description(
-          `true values enable Sass Indented Syntax for parsing the data string or file.`
-        ),
-      indentType: Joi.string()
-        .default(`space`)
-        .description(
-          `Used to determine whether to use space or tab character for indentation.`
-        ),
-      indentWidth: Joi.number()
-        .default(2)
-        .max(10)
-        .description(
-          `Used to determine the number of spaces or tabs to be used for indentation.`
-        ),
-      linefeed: Joi.string()
-        .default(`lf`)
-        .valid(`cr`, `crlf`, `lf`, `lfcr`)
-        .description(
-          `Used to determine whether to use cr, crlf, lf or lfcr sequence for line break.`
-        ),
-      omitSourceMapUrl: Joi.boolean()
-        .default(false)
-        .description(
-          `true values disable the inclusion of source map information in the output file.`
-        ),
-      outFile: Joi.string()
-        .allow(null)
-        .default(null)
-        .description(
-          `Specify the intended location of the output file. Strongly recommended when outputting source maps so that they can properly refer back to their intended files.`
-        ),
-      outputStyle: Joi.string()
-        .valid(`nested`, `expanded`, `compact`, `compressed`)
-        .description(`Determines the output format of the final CSS style.`),
-      precision: Joi.number()
-        .default(5)
-        .description(
-          `Used to determine how many digits after the decimal will be allowed. For instance, if you had a decimal number of 1.23456789 and a precision of 5, the result will be 1.23457 in the final CSS.`
-        ),
-      sourceComments: Joi.boolean()
-        .default(false)
-        .description(
-          `true Enables the line number and file where a selector is defined to be emitted into the compiled CSS as a comment. Useful for debugging, especially when using imports and mixins.`
-        ),
-      sourceMap: Joi.alternatives()
-        .try(Joi.boolean(), Joi.string())
-        .description(
-          `Enables source map generation during render and renderSync.
-
-When sourceMap === true, the value of outFile is used as the target output location for the source map with the suffix .map appended. If no outFile is set, sourceMap parameter is ignored.
-When typeof sourceMap === "string", the value of sourceMap will be used as the writing location for the file`
-        ),
-      sourceMapContents: Joi.boolean()
-        .default(false)
-        .description(
-          `true includes the contents in the source map information`
-        ),
-      sourceMapEmbed: Joi.boolean()
-        .default(false)
-        .description(`true embeds the source map as a data URI`),
-      sourceMapRoot: Joi.string().description(
-        `the value will be emitted as sourceRoot in the source map information`
+      quietDeps: Joi.boolean().description(
+        `true silences compiler warnings from stylesheets loaded by using the loadPaths or importers options.`
       ),
+      verbose: Joi.boolean().description(
+        `true prints every single deprecation warning Sass encounters.`
+      ),
+      silenceDeprecations: Joi.array()
+        .items(Joi.any())
+        .description(`A set of active deprecations to ignore.`),
+      fatalDeprecations: Joi.array()
+        .items(Joi.any())
+        .description(`A set of deprecations to treat as fatal.`),
+      futureDeprecations: Joi.array()
+        .items(Joi.any())
+        .description(`A set of future deprecations to opt into early.`),
+      charset: Joi.boolean().description(
+        `false prevents Sass from emitting a @charset declaration or a UTF-8 byte-order mark.`
+      ),
+      sourceMapIncludeSources: Joi.boolean().description(
+        `true includes the contents of the stylesheets in the source map.`
+      ),
+      includePaths: removedSassOption(Joi, `loadPaths`),
+      outputStyle: removedSassOption(Joi, `style`),
+      indentedSyntax: removedSassOption(Joi, `syntax`),
+      importer: removedSassOption(Joi, `importers`),
     }).unknown(true),
   }).unknown(true)
 }
