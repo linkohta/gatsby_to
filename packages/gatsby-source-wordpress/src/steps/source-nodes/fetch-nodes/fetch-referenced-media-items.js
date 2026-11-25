@@ -26,12 +26,12 @@ const normalizedConcurrency =
 
 const mediaFileFetchQueue = new PQueue({
   concurrency: normalizedConcurrency,
-  carryoverConcurrencyCount: true,
+  carryoverIntervalCount: true,
 })
 
 const mediaNodeFetchQueue = new PQueue({
   concurrency: nodeFetchConcurrency,
-  carryoverConcurrencyCount: true,
+  carryoverIntervalCount: true,
 })
 
 const previouslyRetriedPromises = {}

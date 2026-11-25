@@ -69,7 +69,7 @@ const getPreviewQueue = (): PQueue => {
 
     previewQueue = new PQueue({
       concurrency: previewRequestConcurrency,
-      carryoverConcurrencyCount: true,
+      carryoverIntervalCount: true,
     })
   }
 
