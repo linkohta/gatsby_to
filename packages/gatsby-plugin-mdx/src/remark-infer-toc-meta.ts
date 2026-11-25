@@ -34,7 +34,7 @@ const remarkInferTocMeta: Plugin<[IRemarkTocOptions]> = options => {
   }
 
   const processToC = (
-    node: BlockContent | DefinitionContent | ListItem | null,
+    node: BlockContent | DefinitionContent | ListItem | null | undefined,
     current: TocNodeType
   ): TocNodeType => {
     if (!node) {
@@ -87,7 +87,7 @@ const remarkInferTocMeta: Plugin<[IRemarkTocOptions]> = options => {
 
   return (tree: Node, file): void => {
     const generatedToC = toc(tree as TableCell, { maxDepth })
-    const mdxFile: IMdxVFile = file
+    const mdxFile = file as unknown as IMdxVFile
     if (!mdxFile.data.meta) {
       mdxFile.data.meta = {}
     }

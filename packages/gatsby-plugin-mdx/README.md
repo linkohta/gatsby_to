@@ -216,6 +216,8 @@ export default config
 
 **Please Note:** Most of the remark/rehype/unified ecosystem is published as ESM which means that you have to use [ES Modules (ESM) and Gatsby](https://www.gatsbyjs.com/docs/how-to/custom-configuration/es-modules/).
 
+**Please Note:** `gatsby-plugin-mdx` compiles with [MDX v3](https://mdxjs.com/migrating/v3/) (unified 11). remark plugins that extend the Markdown parser must be on a version made for it: use `remark-gfm@4` or later (`remark-gfm@3` fails with `this.setData is not a function`), and likewise update `remark-math` to its current major. `@mdx-js/react` v2 and v3 both work.
+
 ## Imports
 
 When importing a React component into your MDX, you can import it using the `import` statement like in JavaScript.

@@ -1,4 +1,4 @@
-import type { VFile, VFileData } from "vfile"
+import type { VFile, Data as VFileData } from "vfile"
 import type { Node } from "gatsby"
 
 export interface IMdxNode extends Node {
@@ -15,11 +15,11 @@ interface IMdxVFileDataMeta {
   [key: string]: unknown
 }
 
-interface IMdxVFileData extends VFileData {
+interface IMdxVFileData extends Omit<VFileData, `meta`> {
   meta?: IMdxVFileDataMeta
 }
 
-export interface IMdxVFile extends VFile {
+export interface IMdxVFile extends Omit<VFile, `data`> {
   data: IMdxVFileData
 }
 

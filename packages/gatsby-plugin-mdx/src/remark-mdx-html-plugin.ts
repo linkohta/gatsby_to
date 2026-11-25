@@ -1,4 +1,3 @@
-import toHast from "mdast-util-to-hast"
 import { cachedImport } from "./cache-helpers"
 
 import type { Node } from "unist"
@@ -12,6 +11,10 @@ export const remarkMdxHtmlPlugin = () =>
   async function transformer(markdownAST: Node): Promise<Node> {
     const { visit } =
       await cachedImport<typeof import("unist-util-visit")>(`unist-util-visit`)
+    const { toHast } =
+      await cachedImport<typeof import("mdast-util-to-hast")>(
+        `mdast-util-to-hast`
+      )
 
     // mdast ノードを hast ノードに変換する
     // gatsby-plugin-autolink-headers に対応するために必要である
