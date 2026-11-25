@@ -3,7 +3,7 @@ const invariant = require(`tiny-invariant`)
 const {
   isSpecifiedScalarType,
   isIntrospectionType,
-  assertValidName,
+  assertName,
   GraphQLNonNull,
   GraphQLList,
   GraphQLObjectType,
@@ -616,7 +616,13 @@ const checkIsAllowedTypeName = name => {
     `The GraphQL type \`${name}\` is reserved for internal use by ` +
       `built-in scalar types.`
   )
-  assertValidName(name)
+  // graphql 17 で削除された `assertValidName` と同じ検査をする。
+  // `assertName` は、`__` で始まる名前（イントロスペクション用に予約されている）を拒否しない
+  invariant(
+    !name.startsWith(`__`),
+    `Name "${name}" must not begin with "__", which is reserved by GraphQL introspection.`
+  )
+  assertName(name)
 }
 
 const createTypeComposerFromGatsbyType = ({

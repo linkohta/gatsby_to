@@ -9,12 +9,12 @@ import { GatsbyImage } from "gatsby-plugin-image";
 </div>
 
 export const query = graphql`{
-  file(relativePath: {eq: "headers/headshot.jpg"}) {
+  file(relativePath: { eq: "headers/headshot.jpg" }) {
     childImageSharp {
       gatsbyImageData(layout: FULL_WIDTH)
     }
   }
-  banner: file(relativePath: {eq: "headers/default.jpg"}) {
+  banner: file(relativePath: { eq: "headers/default.jpg" }) {
     childImageSharp {
       gatsbyImageData(placeholder: TRACED_SVG, layout: CONSTRAINED)
     }

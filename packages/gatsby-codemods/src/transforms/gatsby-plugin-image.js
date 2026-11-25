@@ -404,6 +404,9 @@ function processGraphQLQuery(query, state) {
           layout = `constrained`
           delete fragments[presentationSizeFragment]
         }
+        // graphql 17 のパーサーは、引数のないフィールドの `arguments` を空の配列ではなく
+        // undefined にする
+        fixedOrFluidField.arguments ??= []
         layout = processArguments(
           fixedOrFluidField.arguments,
           fragments?.[0],

@@ -15,6 +15,21 @@ export type Runner = (
   context: Record<string, any>
 ) => Promise<ExecutionResult>
 
+const findCreatePagesFrame = (
+  error: Error
+): stackTrace.StackFrame | undefined =>
+  stackTrace
+    .parse(error)
+    .find(frame => /createPages/.test(frame.getFunctionName()))
+
+const GRAPHQL_EXECUTION_PATH =
+  /[\\/]graphql[\\/](?:__dev__[\\/])?execution[\\/]/
+
+const hasGraphQLExecutionFrame = (error: Error): boolean =>
+  stackTrace
+    .parse(error)
+    .some(frame => GRAPHQL_EXECUTION_PATH.test(frame.getFileName() ?? ``))
+
 export const createGraphQLRunner = (
   store: Store<IGatsbyState>,
   reporter: Reporter,
@@ -48,6 +63,11 @@ export const createGraphQLRunner = (
   })
 
   return (query, context): ReturnType<Runner> => {
+    // graphql 17 の実行エンジンは、非同期のリゾルバーが投げたエラーのスタックを呼び出し元までつなげない
+    // （graphql 16 では createPages までつながっていた）。そのままでは createPages から呼ばれたかどうかを
+    // エラーのスタックだけでは判断できないので、呼び出し時点のスタックを控えておく。
+    const callSite = new Error()
+
     if (!runner) {
       runner = new GraphQLRunner(store, {
         graphqlTracing,
@@ -63,9 +83,12 @@ export const createGraphQLRunner = (
           const structuredErrors = result.errors
             .map(e => {
               // graphql が呼ばれたファイルを見つける。
-              const file = stackTrace
-                .parse(e)
-                .find(file => /createPages/.test(file.getFunctionName()))
+              // スタックが graphql の実行エンジンの中で途切れているエラーは、控えておいた呼び出し時点のスタックから探す。
+              const file =
+                findCreatePagesFrame(e) ??
+                (hasGraphQLExecutionFrame(e)
+                  ? findCreatePagesFrame(callSite)
+                  : undefined)
 
               if (file) {
                 const structuredError = errorParser({

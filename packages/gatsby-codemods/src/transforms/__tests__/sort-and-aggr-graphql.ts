@@ -34,7 +34,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {excerpt: ASC})
+            allMarkdownRemark(sort: { excerpt: ASC })
           }\`"
         `)
       })
@@ -46,7 +46,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {nested: {date: ASC}}})
+            allMarkdownRemark(sort: { frontmatter: { nested: { date: ASC } } })
           }\`"
         `)
       })
@@ -63,7 +63,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: ASC}})
+            allMarkdownRemark(sort: { frontmatter: { date: ASC } })
           }\`"
         `)
       })
@@ -80,7 +80,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+            allMarkdownRemark(sort: { frontmatter: { date: DESC } })
           }\`"
         `)
       })
@@ -91,7 +91,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: ASC}})
+            allMarkdownRemark(sort: { frontmatter: { date: ASC } })
           }\`"
         `)
       })
@@ -106,7 +106,7 @@ describe(transformName, () => {
 
           export const q = graphql\`{
             allMarkdownRemark(
-              sort: [{frontmatter: {priority: ASC}}, {frontmatter: {date: ASC}}]
+              sort: [{ frontmatter: { priority: ASC } }, { frontmatter: { date: ASC } }]
             )
           }\`"
         `)
@@ -124,7 +124,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+            allMarkdownRemark(sort: { frontmatter: { date: DESC } })
           }\`"
         `)
       })
@@ -142,7 +142,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+            allMarkdownRemark(sort: { frontmatter: { date: DESC } })
           }\`"
         `)
       })
@@ -159,7 +159,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+            allMarkdownRemark(sort: { frontmatter: { date: DESC } })
           }\`"
         `)
       })
@@ -177,7 +177,7 @@ describe(transformName, () => {
 
           export const q = graphql\`{
             allMarkdownRemark(
-              sort: [{frontmatter: {isFeatured: DESC}}, {frontmatter: {date: ASC}}]
+              sort: [{ frontmatter: { isFeatured: DESC } }, { frontmatter: { date: ASC } }]
             )
           }\`"
         `)
@@ -196,7 +196,7 @@ describe(transformName, () => {
 
           export const q = graphql\`{
             allMarkdownRemark(
-              sort: [{frontmatter: {isFeatured: DESC}}, {frontmatter: {date: DESC}}]
+              sort: [{ frontmatter: { isFeatured: DESC } }, { frontmatter: { date: DESC } }]
             )
           }\`"
         `)
@@ -242,7 +242,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            distinct(field: {frontmatter: {category: SELECT}})
+            distinct(field: { frontmatter: { category: SELECT } })
           }\`"
         `)
       })
@@ -253,7 +253,7 @@ describe(transformName, () => {
           "import { graphql } from \\"gatsby\\"
 
           export const q = graphql\`{
-            distinct(field: {frontmatter: {nested_category: SELECT}})
+            distinct(field: { frontmatter: { nested_category: SELECT } })
           }\`"
         `)
       })
@@ -303,7 +303,7 @@ describe(transformName, () => {
       ).toMatchInlineSnapshot(`
         "exports.createPages = ({ graphql, actions }) => {
                   const { data } = graphql(\`{
-          allMarkdownRemark(sort: {frontmatter: {date: DESC}}) {
+          allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
             nodes {
               id
             }
@@ -326,7 +326,7 @@ describe(transformName, () => {
       ).toMatchInlineSnapshot(`
         "exports.createPages = ({ graphql, actions }) => {
                   const { data } = graphql(\`{
-          allMarkdownRemark(sort: {frontmatter: {date: DESC}}) {
+          allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
             nodes {
               id
             }
@@ -349,7 +349,7 @@ describe(transformName, () => {
       ).toMatchInlineSnapshot(`
         "exports.createPages = ({ graphql, actions }) => {
                   const { data } = graphql(\`{
-          allMarkdownRemark(sort: {frontmatter: {date: DESC}}) {
+          allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
             nodes {
               id
             }

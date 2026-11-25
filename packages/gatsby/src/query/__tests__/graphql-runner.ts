@@ -112,8 +112,7 @@ describe(`Deprecation warnings`, () => {
     })
     expect(reporter.warn).toHaveBeenCalledTimes(1)
     expect(reporter.warn).toHaveBeenCalledWith(
-      `Field "Foo.foo" argument "arg" is deprecated. Tired\n` +
-        `Queried in /test`
+      `The argument "Foo.foo(arg:)" is deprecated. Tired\n` + `Queried in /test`
     )
   })
 
