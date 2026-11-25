@@ -770,7 +770,7 @@ describe(`GraphQL field extensions`, () => {
     expect(report.panic).toHaveBeenCalledWith(
       expect.stringContaining(
         `Encountered an error parsing the provided GraphQL type definitions:\n` +
-          `Argument "planet" has invalid value 2.`
+          `Argument "@hello(planet:)" has invalid value: String cannot represent a non string value: 2`
       )
     )
   })
@@ -858,19 +858,19 @@ describe(`GraphQL field extensions`, () => {
     expect(report.panic).toHaveBeenCalledWith(
       expect.stringContaining(
         `Encountered an error parsing the provided GraphQL type definitions:\n` +
-          `Argument "one" has invalid value "1".`
+          `Argument "@test(one:)" has invalid value: Int cannot represent non-integer value: "1"`
       )
     )
     expect(report.panic).toHaveBeenCalledWith(
       expect.stringContaining(
         `Encountered an error parsing the provided GraphQL type definitions:\n` +
-          `Argument "two" has invalid value ["1"].`
+          `Argument "@test(two:)" has invalid value at [0]: Int cannot represent non-integer value: "1"`
       )
     )
     expect(report.panic).toHaveBeenCalledWith(
       expect.stringContaining(
         `Encountered an error parsing the provided GraphQL type definitions:\n` +
-          `Argument "three" has invalid value [null].`
+          `Argument "@test(three:)" has invalid value at [0]: Expected value of non-null type "Int!" not to be null.`
       )
     )
   })

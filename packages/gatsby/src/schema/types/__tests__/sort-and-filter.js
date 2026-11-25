@@ -21,6 +21,16 @@ const {
 import { GraphQLDate } from "../date"
 const { GraphQLJSON } = require(`graphql-compose`)
 
+// graphql 17 では、フィールドはプレーンオブジェクトではなく GraphQLInputField のインスタンスに
+// なり、親の型などのプロパティが増えた。これまで比較していたプロパティだけを取り出して比べる
+const fieldShapes = fields =>
+  Object.fromEntries(
+    Object.entries(fields).map(([key, field]) => [
+      key,
+      { name: field.name, type: field.type, astNode: field.astNode },
+    ])
+  )
+
 const getInferredFields = fields => {
   const schemaComposer = createSchemaComposer()
   const tc = schemaComposer.createObjectTC({ name: `Test`, fields })
@@ -32,7 +42,7 @@ const getInferredFields = fields => {
 function isIntInput(type) {
   expect(type.name).toBe(`IntQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLInt, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLInt, astNode: expect.any(Object) },
     lt: { name: `lt`, type: GraphQLInt, astNode: expect.any(Object) },
@@ -55,7 +65,7 @@ function isIntInput(type) {
 function isDateInput(type) {
   expect(type.name).toBe(`DateQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLDate, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLDate, astNode: expect.any(Object) },
     lt: { name: `lt`, type: GraphQLDate, astNode: expect.any(Object) },
@@ -78,7 +88,7 @@ function isDateInput(type) {
 function isIdInput(type) {
   expect(type.name).toBe(`IDQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLID, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLID, astNode: expect.any(Object) },
     in: {
@@ -97,7 +107,7 @@ function isIdInput(type) {
 function isStringInput(type) {
   expect(type.name).toBe(`StringQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLString, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLString, astNode: expect.any(Object) },
     regex: { name: `regex`, type: GraphQLString, astNode: expect.any(Object) },
@@ -118,7 +128,7 @@ function isStringInput(type) {
 function isJsonInput(type) {
   expect(type.name).toBe(`JSONQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLJSON, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLJSON, astNode: expect.any(Object) },
     regex: { name: `regex`, type: GraphQLJSON, astNode: expect.any(Object) },
@@ -139,7 +149,7 @@ function isJsonInput(type) {
 function isFloatInput(type) {
   expect(type.name).toBe(`FloatQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLFloat, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLFloat, astNode: expect.any(Object) },
     lt: { name: `lt`, type: GraphQLFloat, astNode: expect.any(Object) },
@@ -162,7 +172,7 @@ function isFloatInput(type) {
 function isBoolInput(type) {
   expect(type.name).toBe(`BooleanQueryOperatorInput`)
   expect(type instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(type.getFields()).toEqual({
+  expect(fieldShapes(type.getFields())).toEqual({
     eq: { name: `eq`, type: GraphQLBoolean, astNode: expect.any(Object) },
     ne: { name: `ne`, type: GraphQLBoolean, astNode: expect.any(Object) },
     in: {
@@ -180,7 +190,7 @@ function isBoolInput(type) {
 
 function isCustomScalarInput(queryType, type) {
   expect(queryType instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(queryType.getFields()).toEqual({
+  expect(fieldShapes(queryType.getFields())).toEqual({
     eq: { name: `eq`, type, astNode: expect.any(Object) },
     ne: { name: `ne`, type, astNode: expect.any(Object) },
     in: {
@@ -198,7 +208,7 @@ function isCustomScalarInput(queryType, type) {
 
 function isEnumInput(queryType, type) {
   expect(queryType instanceof GraphQLInputObjectType).toBeTruthy()
-  expect(queryType.getFields()).toEqual({
+  expect(fieldShapes(queryType.getFields())).toEqual({
     eq: { name: `eq`, type, astNode: expect.any(Object) },
     ne: { name: `ne`, type, astNode: expect.any(Object) },
     in: {
@@ -457,7 +467,7 @@ describe(`GraphQL Input args from fields`, () => {
     const list = inferredFields.list.type
 
     expect(list instanceof GraphQLInputObjectType).toBeTruthy()
-    expect(list.getFields()).toEqual({
+    expect(fieldShapes(list.getFields())).toEqual({
       eq: { name: `eq`, type: GraphQLFloat, astNode: expect.any(Object) },
       ne: { name: `ne`, type: GraphQLFloat, astNode: expect.any(Object) },
       gt: { name: `gt`, type: GraphQLFloat, astNode: expect.any(Object) },

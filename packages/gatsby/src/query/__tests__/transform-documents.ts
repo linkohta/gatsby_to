@@ -25,7 +25,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           expect(run(`allMarkdownRemark(sort: {fields: excerpt})`))
             .toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {excerpt: ASC})
+              allMarkdownRemark(sort: { excerpt: ASC })
             }"
           `)
         })
@@ -37,7 +37,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {nested: {date: ASC}}})
+              allMarkdownRemark(sort: { frontmatter: { nested: { date: ASC } } })
             }"
           `)
         })
@@ -52,7 +52,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: ASC}})
+              allMarkdownRemark(sort: { frontmatter: { date: ASC } })
             }"
           `)
         })
@@ -67,7 +67,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+              allMarkdownRemark(sort: { frontmatter: { date: DESC } })
             }"
           `)
         })
@@ -76,7 +76,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           expect(run(`allMarkdownRemark(sort: {fields: [frontmatter___date]})`))
             .toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: ASC}})
+              allMarkdownRemark(sort: { frontmatter: { date: ASC } })
             }"
           `)
         })
@@ -89,7 +89,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           ).toMatchInlineSnapshot(`
             "{
               allMarkdownRemark(
-                sort: [{frontmatter: {priority: ASC}}, {frontmatter: {date: ASC}}]
+                sort: [{ frontmatter: { priority: ASC } }, { frontmatter: { date: ASC } }]
               )
             }"
           `)
@@ -105,7 +105,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+              allMarkdownRemark(sort: { frontmatter: { date: DESC } })
             }"
           `)
         })
@@ -121,7 +121,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+              allMarkdownRemark(sort: { frontmatter: { date: DESC } })
             }"
           `)
         })
@@ -136,7 +136,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
             )
           ).toMatchInlineSnapshot(`
             "{
-              allMarkdownRemark(sort: {frontmatter: {date: DESC}})
+              allMarkdownRemark(sort: { frontmatter: { date: DESC } })
             }"
           `)
         })
@@ -152,7 +152,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           ).toMatchInlineSnapshot(`
             "{
               allMarkdownRemark(
-                sort: [{frontmatter: {isFeatured: DESC}}, {frontmatter: {date: ASC}}]
+                sort: [{ frontmatter: { isFeatured: DESC } }, { frontmatter: { date: ASC } }]
               )
             }"
           `)
@@ -169,7 +169,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           ).toMatchInlineSnapshot(`
             "{
               allMarkdownRemark(
-                sort: [{frontmatter: {isFeatured: DESC}}, {frontmatter: {date: DESC}}]
+                sort: [{ frontmatter: { isFeatured: DESC } }, { frontmatter: { date: DESC } }]
               )
             }"
           `)
@@ -213,7 +213,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           expect(run(`distinct(field: frontmatter___category)`))
             .toMatchInlineSnapshot(`
             "{
-              distinct(field: {frontmatter: {category: SELECT}})
+              distinct(field: { frontmatter: { category: SELECT } })
             }"
           `)
         })
@@ -222,7 +222,7 @@ if (_CFLAGS_.GATSBY_MAJOR === `5`) {
           expect(run(`distinct(field: frontmatter___nested_category)`))
             .toMatchInlineSnapshot(`
             "{
-              distinct(field: {frontmatter: {nested_category: SELECT}})
+              distinct(field: { frontmatter: { nested_category: SELECT } })
             }"
           `)
         })

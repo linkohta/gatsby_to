@@ -3,7 +3,7 @@ import { GatsbyImage } from "gatsby-plugin-image";
 import { useStaticQuery, graphql } from "gatsby";
 export const Hero: React.SFC = ({ children }) => {
     const data = useStaticQuery(graphql`{
-  file(relativePath: {eq: "banner.jpg"}) {
+  file(relativePath: { eq: "banner.jpg" }) {
     childImageSharp {
       gatsbyImageData(layout: FULL_WIDTH)
     }

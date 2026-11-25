@@ -85,7 +85,7 @@ describe(`GraphQL Input args`, () => {
     )
     expect(result.errors.length).toEqual(1)
     expect(result.errors[0].message).toMatch(
-      `Field "foo" is not defined by type "BarFilterInput".`
+      `Expected value of type "BarFilterInput" not to include unknown field "foo", found: { foo: { eq: "bar" } }.`
     )
   })
 
@@ -111,7 +111,7 @@ describe(`GraphQL Input args`, () => {
     )
     expect(result.errors.length).toEqual(1)
     expect(result.errors[0].message).toMatch(
-      `Field "foo" is not defined by type "BarFilterInput".`
+      `Expected value of type "BarFilterInput" not to include unknown field "foo", found: { foo: { eq: "bar" } }.`
     )
   })
 
@@ -137,7 +137,7 @@ describe(`GraphQL Input args`, () => {
     )
     expect(result.errors.length).toEqual(1)
     expect(result.errors[0].message).toMatch(
-      `Field "foo" is not defined by type "BarFilterInput".`
+      `Expected value of type "BarFilterInput" not to include unknown field "foo", found: { foo: { eq: "bar" } }.`
     )
   })
 
@@ -163,7 +163,7 @@ describe(`GraphQL Input args`, () => {
     )
     expect(result.errors.length).toEqual(1)
     expect(result.errors[0].message).toMatch(
-      `Field "foo" is not defined by type "BarFilterInput".`
+      `Expected value of type "BarFilterInput" not to include unknown field "foo", found: { foo: { eq: "bar" } }.`
     )
   })
 
@@ -194,7 +194,7 @@ describe(`GraphQL Input args`, () => {
     )
     expect(result.errors.length).toEqual(1)
     expect(result.errors[0].message).toMatch(
-      `Field "linked___NODE" is not defined by type "BarFilterInput".`
+      `Expected value of type "BarFilterInput" not to include unknown field "linked___NODE", found: { linked___NODE: { eq: "baz" } }.`
     )
   })
 
