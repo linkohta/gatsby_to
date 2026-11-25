@@ -174,7 +174,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8974em;vertical-align:-0.0833em;",
                             },
@@ -241,7 +241,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -343,7 +343,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -355,7 +355,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8141em;",
                             },
@@ -422,7 +422,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -524,7 +524,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -536,7 +536,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8141em;",
                             },
@@ -603,7 +603,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -668,7 +668,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -923,7 +923,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8974em;vertical-align:-0.0833em;",
                             },
@@ -990,7 +990,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -1092,7 +1092,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -1104,7 +1104,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8141em;",
                             },
@@ -1171,7 +1171,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -1273,7 +1273,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -1285,7 +1285,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8141em;",
                             },
@@ -1352,7 +1352,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -1417,7 +1417,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -1673,7 +1673,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.9474em;vertical-align:-0.0833em;",
                             },
@@ -1740,7 +1740,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -1842,7 +1842,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -1854,7 +1854,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8641em;",
                             },
@@ -1921,7 +1921,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -2023,7 +2023,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
@@ -2035,7 +2035,7 @@ Object {
                             "children": Array [],
                             "properties": Object {
                               "className": Array [
-                                "strut",
+                                "katex-strut",
                               ],
                               "style": "height:0.8641em;",
                             },
@@ -2102,7 +2102,7 @@ Object {
                                                     ],
                                                     "properties": Object {
                                                       "className": Array [
-                                                        "sizing",
+                                                        "katex-sizing",
                                                         "reset-size6",
                                                         "size3",
                                                         "mtight",
@@ -2167,7 +2167,7 @@ Object {
                         ],
                         "properties": Object {
                           "className": Array [
-                            "base",
+                            "katex-base",
                           ],
                         },
                         "tagName": "span",
