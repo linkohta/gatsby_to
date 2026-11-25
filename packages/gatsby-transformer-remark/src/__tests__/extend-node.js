@@ -1422,3 +1422,81 @@ describe(`Headings are generated correctly from schema`, () => {
     }
   )
 })
+
+describe(`GFM and footnotes options`, () => {
+  const content = `---
+title: "my little pony"
+---
+| a | b |
+| - | - |
+| 1 | 2 |
+
+~~gone~~ www.example.com
+
+- [x] done
+
+Text with a note[^1] and an inline note^[inline].
+
+[^1]: The note.
+`
+
+  bootstrapTest(
+    `enables GFM and footnotes by default`,
+    content,
+    `html`,
+    node => {
+      expect(node.html).toContain(`<table>`)
+      expect(node.html).toContain(`<del>gone</del>`)
+      expect(node.html).toContain(
+        `<a href="http://www.example.com">www.example.com</a>`
+      )
+      expect(node.html).toContain(`<input type="checkbox" checked disabled>`)
+      // 脚注の id は `user-content-` を付けず、これまでと同じ形にしている
+      expect(node.html).toContain(
+        `<sup><a href="#fn-1" id="fnref-1" data-footnote-ref aria-describedby="footnote-label">1</a></sup>`
+      )
+      expect(node.html).toContain(`<li id="fn-1">`)
+      expect(node.html).toContain(`<section data-footnotes class="footnotes">`)
+      // インラインの脚注は対応していないので、そのまま文字として残る
+      expect(node.html).toContain(`an inline note^[inline].`)
+    }
+  )
+
+  bootstrapTest(
+    `keeps footnotes when GFM is disabled`,
+    content,
+    `html`,
+    node => {
+      expect(node.html).not.toContain(`<table>`)
+      expect(node.html).not.toContain(`<del>`)
+      expect(node.html).not.toContain(`<input`)
+      expect(node.html).toContain(`<li id="fn-1">`)
+    },
+    { pluginOptions: { gfm: false } }
+  )
+
+  bootstrapTest(
+    `keeps GFM when footnotes are disabled`,
+    content,
+    `html`,
+    node => {
+      expect(node.html).toContain(`<table>`)
+      expect(node.html).toContain(`<del>gone</del>`)
+      expect(node.html).not.toContain(`data-footnotes`)
+      expect(node.html).not.toContain(`id="fn-1"`)
+    },
+    { pluginOptions: { footnotes: false } }
+  )
+
+  bootstrapTest(
+    `parses plain CommonMark when both are disabled`,
+    content,
+    `html`,
+    node => {
+      expect(node.html).not.toContain(`<table>`)
+      expect(node.html).not.toContain(`<del>`)
+      expect(node.html).not.toContain(`data-footnotes`)
+    },
+    { pluginOptions: { gfm: false, footnotes: false } }
+  )
+})

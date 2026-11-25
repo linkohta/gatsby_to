@@ -1,10 +1,10 @@
-const Remark = require(`remark`)
-const toString = require(`mdast-util-to-string`)
-const visit = require(`unist-util-visit`)
+const { remark: createRemark } = require(`remark`)
+const { toString } = require(`mdast-util-to-string`)
+const { visit } = require(`unist-util-visit`)
 
 const plugin = require(`../`)
 
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,

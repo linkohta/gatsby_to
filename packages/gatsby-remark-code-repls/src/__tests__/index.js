@@ -6,7 +6,7 @@ jest.mock(`fs`, () => {
 })
 
 const fs = require(`fs`)
-const Remark = require(`remark`)
+const { remark: createRemark } = require(`remark`)
 const plugin = require(`../index`)
 
 const {
@@ -23,7 +23,7 @@ const REMARK_TESTS = {
   Ramda: PROTOCOL_RAMDA,
 }
 
-const remark = new Remark()
+const remark = createRemark()
 const JSONstringifySpy = jest.spyOn(JSON, `stringify`)
 
 describe(`gatsby-remark-code-repls`, () => {

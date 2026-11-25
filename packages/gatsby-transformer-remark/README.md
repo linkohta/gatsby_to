@@ -46,11 +46,20 @@ module.exports = {
 }
 ```
 
-The following parts of `options` enable the `remark-footnotes` and `remark-gfm`
-plugins:
+The following parts of `options` enable footnotes and GitHub Flavored Markdown
+(tables, strikethrough, autolink literals and task lists). Both use the same
+syntax extensions as `remark-gfm` and can be switched on and off separately:
 
 - `options.footnotes`
 - `options.gfm`
+
+Footnotes are rendered the way GitHub renders them: a `<section data-footnotes class="footnotes">`
+with a `<h2 class="sr-only" id="footnote-label">Footnotes</h2>` heading at the end of the document
+(hide the heading visually with CSS for `.sr-only` if your site has none). Inline footnotes
+(`^[text]`) are not supported.
+
+`gatsby-transformer-remark` parses with remark 15 (unified 11). A `gatsby-remark-*` plugin that adds
+syntax through `setParserPlugins` has to return remark plugins made for that version.
 
 A full explanation of how to use markdown in Gatsby can be found here: [Adding Markdown Pages](https://www.gatsbyjs.com/docs/how-to/routing/adding-markdown-pages/)
 

@@ -1,10 +1,10 @@
-const Remark = require(`remark`)
-const find = require(`unist-util-find`)
+const { remark: createRemark } = require(`remark`)
+const { find } = require(`unist-util-find`)
 const _ = require(`lodash`)
 
 const plugin = require(`../`)
 
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,
@@ -74,11 +74,17 @@ describe(`gatsby-remark-responsive-iframe`, () => {
   })
 
   it(`can copy JSX images`, async () => {
-    const mdx = require(`remark-mdx`)
-
-    const markdownAST = remark().use(mdx).parse(`
-<iframe url="http://www.example.com/" style="border:0;" width="600px" height="400px"></iframe>
-    `)
+    // MDX v1 の remark-mdx が作っていた `jsx` ノード（JSX の文字列を value に持つ）を再現する。
+    // 現行の remark-mdx はこのノードを作らないので、手で組み立てる。
+    const markdownAST = {
+      type: `root`,
+      children: [
+        {
+          type: `jsx`,
+          value: `<iframe url="http://www.example.com/" style="border:0;" width="600px" height="400px"></iframe>`,
+        },
+      ],
+    }
 
     const transformed = await plugin({ markdownAST })
     const node = find(transformed, function (node) {

@@ -1,20 +1,43 @@
-const Remark = require(`remark`)
+// unified 関連のパッケージは ESM のみで公開されている。remark プラグインを同期的に適用する必要があるので、
+// 動的 import ではなく require で読み込む（対応している Node.js は require で ESM を読み込める）。
+const { remark: createRemark } = require(`remark`)
 const { selectAll } = require(`unist-util-select`)
 const _ = require(`lodash`)
-const visit = require(`unist-util-visit`)
-const toHAST = require(`mdast-util-to-hast`)
-const hastToHTML = require(`hast-util-to-html`)
-const mdastToToc = require(`mdast-util-toc`)
-const mdastToString = require(`mdast-util-to-string`)
-const unified = require(`unified`)
-const parse = require(`remark-parse`)
-const remarkGfm = require(`remark-gfm`)
-const remarkFootnotes = require(`remark-footnotes`)
-const stringify = require(`remark-stringify`)
-const english = require(`retext-english`)
-const remark2retext = require(`remark-retext`)
-const stripPosition = require(`unist-util-remove-position`)
-const hastReparseRaw = require(`hast-util-raw`)
+const { visit } = require(`unist-util-visit`)
+const { toHast: toHAST } = require(`mdast-util-to-hast`)
+const { toHtml: hastToHTML } = require(`hast-util-to-html`)
+const { toc: mdastToToc } = require(`mdast-util-toc`)
+const { toString: mdastToString } = require(`mdast-util-to-string`)
+const { unified } = require(`unified`)
+const { default: parse } = require(`remark-parse`)
+const { default: stringify } = require(`remark-stringify`)
+const { default: english } = require(`retext-english`)
+const { default: remark2retext } = require(`remark-retext`)
+const { removePosition } = require(`unist-util-remove-position`)
+const { raw: hastReparseRaw } = require(`hast-util-raw`)
+const { gfmAutolinkLiteral } = require(
+  `micromark-extension-gfm-autolink-literal`
+)
+const { gfmFootnote } = require(`micromark-extension-gfm-footnote`)
+const { gfmStrikethrough } = require(`micromark-extension-gfm-strikethrough`)
+const { gfmTable } = require(`micromark-extension-gfm-table`)
+const { gfmTaskListItem } = require(`micromark-extension-gfm-task-list-item`)
+const {
+  gfmAutolinkLiteralFromMarkdown,
+  gfmAutolinkLiteralToMarkdown,
+} = require(`mdast-util-gfm-autolink-literal`)
+const { gfmFootnoteFromMarkdown, gfmFootnoteToMarkdown } = require(
+  `mdast-util-gfm-footnote`
+)
+const { gfmStrikethroughFromMarkdown, gfmStrikethroughToMarkdown } = require(
+  `mdast-util-gfm-strikethrough`
+)
+const { gfmTableFromMarkdown, gfmTableToMarkdown } = require(
+  `mdast-util-gfm-table`
+)
+const { gfmTaskListItemFromMarkdown, gfmTaskListItemToMarkdown } = require(
+  `mdast-util-gfm-task-list-item`
+)
 const prune = require(`underscore.string/prune`)
 const { getConcatenatedValue, cloneTreeUntil, findLastTextNode } = require(
   `./hast-processing`
@@ -22,6 +45,42 @@ const { getConcatenatedValue, cloneTreeUntil, findLastTextNode } = require(
 const codeHandler = require(`./code-handler`)
 const { getHeadingID } = require(`./utils/get-heading-id`)
 const { timeToRead } = require(`./utils/time-to-read`)
+
+// remark-gfm 4 は脚注を必ず含み、`gfm` と `footnotes` のオプションを別々に切り替えられない。
+// そのため remark-gfm は使わず、remark-gfm が内部で使っている拡張をオプションに応じて個別に登録する。
+function addGfmParts(processor, { gfm, footnotes }) {
+  const data = processor.data()
+  const add = (field, value) => {
+    data[field] = (data[field] || []).concat(value)
+  }
+
+  if (gfm) {
+    add(`micromarkExtensions`, [
+      gfmAutolinkLiteral(),
+      gfmStrikethrough(),
+      gfmTable(),
+      gfmTaskListItem(),
+    ])
+    add(`fromMarkdownExtensions`, [
+      gfmAutolinkLiteralFromMarkdown(),
+      gfmStrikethroughFromMarkdown(),
+      gfmTableFromMarkdown(),
+      gfmTaskListItemFromMarkdown(),
+    ])
+    add(`toMarkdownExtensions`, [
+      gfmAutolinkLiteralToMarkdown(),
+      gfmStrikethroughToMarkdown(),
+      gfmTableToMarkdown(),
+      gfmTaskListItemToMarkdown(),
+    ])
+  }
+
+  if (footnotes) {
+    add(`micromarkExtensions`, gfmFootnote())
+    add(`fromMarkdownExtensions`, gfmFootnoteFromMarkdown())
+    add(`toMarkdownExtensions`, gfmFootnoteToMarkdown())
+  }
+}
 
 let fileNodes
 let pluginsCacheStr = ``
@@ -120,16 +179,11 @@ module.exports = function remarkExtendNodeType(
       remarkOptions.blocks = blocks
     }
 
-    let remark = new Remark().data(`settings`, remarkOptions)
+    let remark = createRemark().data(`settings`, remarkOptions)
 
-    if (gfm) {
-      // TODO: `gfm` オプションを非推奨にして、remark-gfm を明示的にプラグインとして使う形にする？
-      remark = remark.use(remarkGfm)
-    }
-
-    if (footnotes) {
-      // TODO: `footnotes` オプションを非推奨にして、remark-footnotes を明示的にプラグインとして使う形にする？
-      remark = remark.use(remarkFootnotes, { inlineNotes: true })
+    if (gfm || footnotes) {
+      // TODO: `gfm` と `footnotes` のオプションを非推奨にして、remark-gfm を明示的にプラグインとして使う形にする？
+      addGfmParts(remark, { gfm, footnotes })
     }
 
     for (const plugin of pluginOptions.plugins) {
@@ -469,6 +523,8 @@ module.exports = function remarkExtendNodeType(
     function markdownASTToHTMLAst(ast) {
       return toHAST(ast, {
         allowDangerousHtml: true,
+        // 脚注の id を、これまでと同じ `fn-1` `fnref-1` の形にする（既定では `user-content-` が前に付く）
+        clobberPrefix: ``,
         handlers: { code: codeHandler },
       })
     }
@@ -602,7 +658,10 @@ module.exports = function remarkExtendNodeType(
         excerptSeparator,
       })
 
-      return unified().use(stringify).stringify(excerptAST)
+      // remark-stringify 9 の既定値と同じ書式（インデントのコードブロック、タブ幅のリスト）で出力する
+      return unified()
+        .use(stringify, { fences: false, listItemIndent: `tab` })
+        .stringify(excerptAST)
     }
 
     async function getExcerptPlain(
@@ -694,7 +753,8 @@ module.exports = function remarkExtendNodeType(
         type: `JSON`,
         async resolve(markdownNode, opt, context) {
           const ast = await getHTMLAst(markdownNode, context)
-          const strippedAst = stripPosition(_.clone(ast), true)
+          const strippedAst = _.clone(ast)
+          removePosition(strippedAst, { force: true })
           return hastReparseRaw(strippedAst)
         },
       },
@@ -746,7 +806,8 @@ module.exports = function remarkExtendNodeType(
             truncate,
             excerptSeparator: pluginOptions.excerpt_separator,
           })
-          const strippedAst = stripPosition(_.clone(ast), true)
+          const strippedAst = _.clone(ast)
+          removePosition(strippedAst, { force: true })
           return hastReparseRaw(strippedAst)
         },
       },
@@ -792,14 +853,15 @@ module.exports = function remarkExtendNodeType(
       // TODO: 非ラテン系の言語への対応を追加する https://github.com/wooorm/remark/issues/251#issuecomment-296731071
       wordCount: {
         type: `MarkdownWordCount`,
-        resolve(markdownNode) {
+        async resolve(markdownNode) {
           const counts = {}
 
-          unified()
+          // remark-retext 6 は retext 側のプロセッサーを非同期に実行するので、processSync は使えない
+          await unified()
             .use(parse)
             .use(remark2retext, unified().use(english).use(count))
             .use(stringify)
-            .processSync(markdownNode.internal.content)
+            .process(markdownNode.internal.content)
 
           return {
             paragraphs: counts.ParagraphNode,

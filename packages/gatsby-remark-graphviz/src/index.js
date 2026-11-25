@@ -1,4 +1,4 @@
-const visit = require(`unist-util-visit`)
+const { visit } = require(`unist-util-visit`)
 const Viz = require(`viz.js`)
 const { Module, render } = require(`viz.js/full.render.js`)
 const cheerio = require(`cheerio`)

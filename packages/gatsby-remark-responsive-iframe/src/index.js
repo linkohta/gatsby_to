@@ -1,4 +1,4 @@
-const visit = require(`unist-util-visit`)
+const { visit } = require(`unist-util-visit`)
 const cheerio = require(`cheerio`)
 const { oneLine } = require(`common-tags`)
 const _ = require(`lodash`)

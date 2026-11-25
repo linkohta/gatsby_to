@@ -5,13 +5,13 @@ jest.mock(`fs-extra`, () => {
     ensureDir: jest.fn(),
   }
 })
-const Remark = require(`remark`)
+const { remark: createRemark } = require(`remark`)
 const fsExtra = require(`fs-extra`)
 const path = require(`path`)
 
 const plugin = require(`../`)
 
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,
@@ -127,10 +127,14 @@ describe(`gatsby-remark-copy-linked-files`, () => {
   })
 
   it(`can copy JSX images`, async () => {
-    const mdx = require(`remark-mdx`)
     const path = `images/sample-image.gif`
 
-    const markdownAST = remark().use(mdx).parse(`<img src="${path}" />`)
+    // MDX v1 の remark-mdx が作っていた `jsx` ノード（JSX の文字列を value に持つ）を再現する。
+    // 現行の remark-mdx はこのノードを作らないので、手で組み立てる。
+    const markdownAST = {
+      type: `root`,
+      children: [{ type: `jsx`, value: `<img src="${path}" />` }],
+    }
 
     await plugin({
       files: getFiles(path),

@@ -5,7 +5,7 @@ const URI = require(`urijs`)
 const fs = require(`fs`)
 const LZString = require(`lz-string`)
 const { join } = require(`path`)
-const map = require(`unist-util-map`)
+const { map } = require(`unist-util-map`)
 const normalizePath = require(`normalize-path`)
 const npa = require(`npm-package-arg`)
 

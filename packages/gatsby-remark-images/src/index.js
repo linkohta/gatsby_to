@@ -5,8 +5,8 @@ const {
   imageBackgroundClass,
   imageWrapperClass,
 } = require(`./constants`)
-const visitWithParents = require(`unist-util-visit-parents`)
-const getDefinitions = require(`mdast-util-definitions`)
+const { visitParents: visitWithParents } = require(`unist-util-visit-parents`)
+const { definitions: getDefinitions } = require(`mdast-util-definitions`)
 const path = require(`path`)
 // query-string 8 以降は ESM 専用で、`require()` では default export が `default` に入る
 const { default: queryString } = require(`query-string`)

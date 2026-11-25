@@ -6,10 +6,10 @@ jest.mock(`fs`, () => {
 })
 
 const fs = require(`fs`)
-const Remark = require(`remark`)
+const { remark: createRemark } = require(`remark`)
 const plugin = require(`../index`)
 
-const remark = new Remark()
+const remark = createRemark()
 
 describe(`gatsby-remark-embed-snippet`, () => {
   beforeEach(() => {

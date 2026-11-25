@@ -1,10 +1,10 @@
-const Remark = require(`remark`)
-const toHAST = require(`mdast-util-to-hast`)
-const hastToHTML = require(`hast-util-to-html`)
+const { remark: createRemark } = require(`remark`)
+const { toHast: toHAST } = require(`mdast-util-to-hast`)
+const { toHtml: hastToHTML } = require(`hast-util-to-html`)
 const cheerio = require(`cheerio`)
 const plugin = require(`../`)
 
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,
