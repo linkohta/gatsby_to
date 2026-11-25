@@ -10,6 +10,10 @@ import { addPlugins } from "../../handlers/plugin-add"
  * @see {@link https://jestjs.io/docs/api#testeachtablename-fn-timeout}
  */
 
+// TypeScript の設定を初めて変換するとき、Babel は @babel/preset-typescript を読み込む。Babel 8 は
+// ESM だけで配布されており、Jest のキャッシュがないと、その変換に数秒かかる
+jest.setTimeout(30000)
+
 const root = join(__dirname, `../../../../..`)
 const fixtures = join(__dirname, `../fixtures`)
 const config = {

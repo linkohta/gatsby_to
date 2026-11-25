@@ -19,30 +19,52 @@ describe(`gatsby-plugin-typescript`, () => {
     it(`sets the correct babel preset and plugin`, () => {
       const actions = { setBabelPreset: jest.fn(), setBabelPlugin: jest.fn() }
       const options = {
-        isTSX: true,
+        isTSX: false,
         jsxPragma: `jsx`,
-        allExtensions: true,
+        allExtensions: false,
       }
       onCreateBabelConfig({ actions }, options)
       expect(actions.setBabelPreset).toHaveBeenCalledWith({
         name: expect.stringContaining(path.join(`@babel`, `preset-typescript`)),
-        options,
+        options: { jsxPragma: `jsx`, onlyRemoveTypeImports: false },
       })
       expect(actions.setBabelPlugin).toHaveBeenCalledTimes(3)
       expect(actions.setBabelPlugin).toHaveBeenCalledWith({
         name: expect.stringContaining(
-          path.join(`@babel`, `plugin-proposal-optional-chaining`)
+          path.join(`@babel`, `plugin-transform-optional-chaining`)
         ),
       })
       expect(actions.setBabelPlugin).toHaveBeenCalledWith({
         name: expect.stringContaining(
-          path.join(`@babel`, `plugin-proposal-nullish-coalescing-operator`)
+          path.join(`@babel`, `plugin-transform-nullish-coalescing-operator`)
         ),
       })
       expect(actions.setBabelPlugin).toHaveBeenCalledWith({
         name: expect.stringContaining(
-          path.join(`@babel`, `plugin-proposal-numeric-separator`)
+          path.join(`@babel`, `plugin-transform-numeric-separator`)
         ),
+      })
+    })
+
+    it(`maps the options removed in Babel 8 to their replacements`, () => {
+      const actions = { setBabelPreset: jest.fn(), setBabelPlugin: jest.fn() }
+      onCreateBabelConfig(
+        { actions },
+        {
+          isTSX: true,
+          allExtensions: true,
+          allowDeclareFields: true,
+          onlyRemoveTypeImports: true,
+          plugins: [],
+        }
+      )
+      expect(actions.setBabelPreset).toHaveBeenCalledWith({
+        name: expect.stringContaining(path.join(`@babel`, `preset-typescript`)),
+        options: { ignoreExtensions: true, onlyRemoveTypeImports: true },
+      })
+      expect(actions.setBabelPlugin).toHaveBeenCalledTimes(4)
+      expect(actions.setBabelPlugin).toHaveBeenCalledWith({
+        name: expect.stringContaining(path.join(`@babel`, `plugin-syntax-jsx`)),
       })
     })
   })

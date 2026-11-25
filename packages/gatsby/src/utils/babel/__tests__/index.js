@@ -1,3 +1,4 @@
+import { pathToFileURL } from "url"
 import runner from "@babel/helper-plugin-test-runner"
 
 /**
@@ -5,4 +6,5 @@ import runner from "@babel/helper-plugin-test-runner"
  * @see {@link https://babel.dev/docs/en/babel-helper-plugin-test-runner} for docs
  * @see {@link https://github.com/babel/babel/blob/main/packages/babel-helper-plugin-test-runner} for source code
  */
-runner(__dirname)
+// Babel 8 のランナーは、ディレクトリのパスではなく、このファイルの URL（`import.meta.url` に当たるもの）を受け取る
+runner(pathToFileURL(__filename).href)

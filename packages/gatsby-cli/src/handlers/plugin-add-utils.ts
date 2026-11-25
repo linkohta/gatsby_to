@@ -7,7 +7,11 @@ import {
   getConfigPath,
   getConfigStore,
 } from "gatsby-core-utils"
-import { transform, TransformOptions } from "@babel/core"
+import {
+  transformSync,
+  type InputOptions,
+  type PluginTarget,
+} from "@babel/core"
 import BabelPluginAddPluginsToGatsbyConfig from "./plugin-babel-utils"
 
 const addPluginToConfig = (
@@ -26,10 +30,12 @@ const addPluginToConfig = (
   let code
 
   try {
-    const transformOptions: TransformOptions = {
+    const transformOptions: InputOptions = {
       plugins: [
         [
-          BabelPluginAddPluginsToGatsbyConfig,
+          // プラグインはオプションの型を具体的に宣言しており、Babel の PluginTarget
+          // （オプションが object）にはそのまま代入できない
+          BabelPluginAddPluginsToGatsbyConfig as PluginTarget,
           {
             pluginOrThemeName: name,
             options,
@@ -46,7 +52,7 @@ const addPluginToConfig = (
       transformOptions.presets = [require.resolve(`@babel/preset-typescript`)]
     }
 
-    code = transform(src, transformOptions)?.code
+    code = transformSync(src, transformOptions)?.code
 
     // 取り除かれた型の import を戻し、簡単な整形を行い、追加された空の module export を削除する。
     // どのみち Babel がセミコロンを付けるので、一貫性を保つためにセミコロンを使う。

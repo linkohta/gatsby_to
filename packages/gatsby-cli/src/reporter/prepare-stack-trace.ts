@@ -3,7 +3,7 @@
  */
 
 import { readFileSync, readdirSync } from "fs"
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 import * as stackTrace from "stack-trace"
 import {
   TraceMap,

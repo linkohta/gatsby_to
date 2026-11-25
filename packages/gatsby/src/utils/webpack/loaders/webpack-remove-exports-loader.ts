@@ -29,7 +29,8 @@ const webpackRemoveExportsLoader: LoaderDefinitionFunction<IOptions> =
               [
                 require.resolve(`babel-preset-gatsby/babel-preset-react`),
                 {
-                  useBuiltIns: true,
+                  // Babel 8 では既定が automatic になったので、これまでの classic を明示する
+                  runtime: `classic`,
                   pragma: `React.createElement`,
                   // jsx は develop でしか使われないので、今のところはこれで問題ない
                   development: true,

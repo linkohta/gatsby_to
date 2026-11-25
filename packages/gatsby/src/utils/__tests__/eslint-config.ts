@@ -16,9 +16,14 @@ const siteDir = fs.realpathSync(
   fs.mkdtempSync(path.join(os.tmpdir(), `gatsby-eslint-config-`))
 )
 fs.writeFileSync(path.join(siteDir, `package.json`), `{}`)
+// リポジトリのルートには別のツールが使う Babel 7 向けの @babel/preset-flow があるので、
+// gatsby-plugin-flow が依存しているものを使う
+const flowPreset = require.resolve(`@babel/preset-flow`, {
+  paths: [path.dirname(require.resolve(`gatsby-plugin-flow/package.json`))],
+})
 fs.writeFileSync(
   path.join(siteDir, `.babelrc`),
-  JSON.stringify({ presets: [require.resolve(`@babel/preset-flow`)] })
+  JSON.stringify({ presets: [flowPreset] })
 )
 const pagePath = path.join(siteDir, `src`, `pages`, `index.js`)
 const componentPath = path.join(siteDir, `src`, `components`, `a.jsx`)

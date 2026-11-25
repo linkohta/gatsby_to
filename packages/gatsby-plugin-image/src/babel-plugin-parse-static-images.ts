@@ -1,5 +1,5 @@
 import type {
-  PluginObj,
+  PluginObject,
   template as BabelTemplate,
   types as BabelTypes,
 } from "@babel/core"
@@ -21,7 +21,7 @@ export default function attrs({
 }: {
   types: typeof BabelTypes
   template: typeof BabelTemplate
-}): PluginObj {
+}): PluginObject {
   return {
     visitor: {
       JSXOpeningElement(nodePath, state): void {

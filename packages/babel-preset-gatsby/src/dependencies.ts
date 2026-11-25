@@ -33,42 +33,40 @@ export default (_?: unknown, options: IPresetOptions = {}) => {
         // 最新の安定版の ECMAScript の機能
         require.resolve(`@babel/preset-env`),
         {
-          // エントリーポイントで core-js を import できるようにし、browserslist を使ってポリフィルを選ぶ
-          // V3 での変更。これを entry にする
-          useBuiltIns: `usage`,
-          corejs: 3,
           modules: false,
           // debug: true,
           targets,
           exclude: [
             // すべてのコードを遅くする変換を除外する (https://github.com/facebook/create-react-app/pull/5278)
             `transform-typeof-symbol`,
-            ...polyfillsToExclude,
           ],
         },
       ],
     ],
     plugins: [
-      // async/await、ジェネレーターなどに必要なランタイムのポリフィルを入れる
+      [
+        // Babel 8 の @babel/preset-env には useBuiltIns と corejs のオプションがなくなったので、
+        // 使われている機能に応じた core-js のポリフィルは、このプラグインで読み込む
+        require.resolve(`babel-plugin-polyfill-corejs3`),
+        {
+          method: `usage-global`,
+          version: `3.0`,
+          targets,
+          exclude: polyfillsToExclude,
+        },
+      ],
+      // async/await、ジェネレーターなどに必要なランタイムのヘルパーを import に置き換える
       // https://babeljs.io/docs/en/babel-plugin-transform-runtime
       [
         require.resolve(`@babel/plugin-transform-runtime`),
         {
-          corejs: false,
-          helpers: true,
-          regenerator: true,
-          // https://babeljs.io/docs/en/babel-plugin-transform-runtime#useesmodules
-          // Node の LTS の最も古いバージョンが ES Modules に対応したら、
-          // これを有効にすべきである。
-          useESModules: true,
-          // ランタイムをカプセル化し、正しいバージョンが確実に使われるようにする、
-          // ドキュメントに載っていないオプション
-          // https://github.com/babel/babel/blob/090c364a90fe73d36a30707fc612ce037bdbbb24/packages/babel-plugin-transform-runtime/src/index.js#L35-L42
+          // babel-plugin-polyfill-corejs3 があると、ヘルパーの読み込み元の既定値が
+          // @babel/runtime-corejs3 に変わる。これまでどおり @babel/runtime から読み込む
+          moduleName: `@babel/runtime`,
+          // ランタイムをカプセル化し、正しいバージョンが確実に使われるようにする
           absoluteRuntime: absoluteRuntimePath,
         },
       ],
-      // import() の構文に対応する
-      require.resolve(`@babel/plugin-syntax-dynamic-import`),
       stage === `build-javascript` && [
         // 本番ビルドから PropTypes を削除する
         require.resolve(`babel-plugin-transform-react-remove-prop-types`),

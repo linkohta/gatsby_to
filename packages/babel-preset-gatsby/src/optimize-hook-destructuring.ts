@@ -1,6 +1,9 @@
-import { NodePath, PluginObj, Visitor } from "@babel/core"
-import type * as BabelTypes from "@babel/types"
-import type { Program } from "@babel/types"
+import type {
+  NodePath,
+  PluginObject,
+  Visitor,
+  types as BabelTypes,
+} from "@babel/core"
 
 // フックらしい名前のものすべてに一致する（デフォルト）
 const isHook = /^use[A-Z]/
@@ -20,7 +23,7 @@ export default function ({
   types: t,
 }: {
   types: typeof BabelTypes
-}): PluginObj<Program> {
+}): PluginObject {
   const visitor: Visitor<IState> = {
     CallExpression(path, state: IState): void {
       const onlyBuiltIns = state.opts?.onlyBuiltIns || false
@@ -75,7 +78,7 @@ export default function ({
     name: `optimize-hook-destructuring`,
     visitor: {
       // preset-env が分割代入を壊す前に実行するための回避策
-      Program<Program>(path: NodePath<Program>, state: any): void {
+      Program(path: NodePath<BabelTypes.Program>, state: any): void {
         path.traverse(visitor, state)
       },
     },

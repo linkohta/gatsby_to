@@ -2,10 +2,9 @@
 /*  eslint-disable new-cap */
 import graphql from "gatsby/graphql"
 import nodePath from "path"
-import { NodePath, PluginObj } from "@babel/core"
+import type { NodePath, PluginObject, Scope } from "@babel/core"
 import { slash } from "gatsby-core-utils/path"
 import { murmurhash } from "gatsby-core-utils/murmurhash"
-import { Binding } from "babel__traverse"
 import {
   CallExpression,
   TaggedTemplateExpression,
@@ -28,6 +27,9 @@ import {
   isFunction,
   isIdentifier,
 } from "@babel/types"
+
+// @babel/core は Binding の型を export していないので、Scope から取り出す
+type Binding = NonNullable<ReturnType<Scope[`getBinding`]>>
 
 interface ISourcePosition {
   line: number
@@ -282,7 +284,7 @@ function isUseStaticQuery(path: NodePath<CallExpression>): boolean {
   return false
 }
 
-export default function ({ types: t }): PluginObj {
+export default function ({ types: t }): PluginObject {
   return {
     visitor: {
       Program(path: NodePath<Program>, state: any): void {
@@ -309,9 +311,9 @@ export default function ({ types: t }): PluginObj {
               // クエリを追加する
               const parent = path2.parent as JSXOpeningElement
               parent.attributes.push(
-                t.jSXAttribute(
-                  t.jSXIdentifier(`data`),
-                  t.jSXExpressionContainer(identifier)
+                t.jsxAttribute(
+                  t.jsxIdentifier(`data`),
+                  t.jsxExpressionContainer(identifier)
                 )
               )
               // import を追加する
@@ -422,7 +424,7 @@ export default function ({ types: t }): PluginObj {
           }
 
           // クエリをクエリのハッシュに置き換える。
-          templatePath.replaceWith(t.StringLiteral(queryHash))
+          templatePath.replaceWith(t.stringLiteral(queryHash))
 
           // トップレベルの JSXOpeningElement か Program が見つかるまで上へたどる
           // これで、export されたクエリと変数に入ったクエリを処理できる
@@ -589,7 +591,7 @@ export default function ({ types: t }): PluginObj {
               return null
             }
 
-            path2.replaceWith(t.StringLiteral(queryHash))
+            path2.replaceWith(t.stringLiteral(queryHash))
             return null
           },
         })

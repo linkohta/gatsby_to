@@ -22,7 +22,7 @@ const report = require(`gatsby-cli/lib/reporter`)
 
 import type { DocumentNode } from "graphql"
 import { babelParseToAst } from "../utils/babel-parse-to-ast"
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 import { getPathToLayoutComponent, md5 } from "gatsby-core-utils"
 
 const apiRunnerNode = require(`../utils/api-runner-node`)

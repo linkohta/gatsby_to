@@ -1,4 +1,4 @@
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 
 export function getCodeFrame(
   query: string,

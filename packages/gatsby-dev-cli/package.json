@@ -10,7 +10,7 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
-    "@babel/runtime": "^7.29.15",
+    "@babel/runtime": "^8.1.3",
     "chokidar": "^6.0.0",
     "configstore": "^8.0.0",
     "del": "^9.0.1",

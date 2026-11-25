@@ -1,13 +1,13 @@
 import path from "path"
 import _ from "lodash"
-import Babel, {
-  ConfigItem,
-  PluginItem,
-  CreateConfigItemOptions,
-} from "@babel/core"
+import type * as Babel from "@babel/core"
+import type { PluginAPI, PluginItem } from "@babel/core"
 
 import { IBabelStage } from "../redux/types"
 import { Stage } from "../commands/types"
+
+// プラグインとプリセットのどちらの設定アイテムも、この型で扱う
+type ConfigItem = Babel.ConfigItem<PluginAPI>
 
 interface ILoadCachedConfigReturnType {
   stages: {
@@ -71,7 +71,7 @@ export const prepareOptions = (
 
   // 必須のプラグインとプリセット
   const requiredPlugins = [
-    babel.createConfigItem(
+    babel.createConfigItemSync(
       [
         resolve(`babel-plugin-remove-graphql-queries`),
         // packages/babel-plugin-remove-graphql-queries/src/index.ts が staticQueryDir のデフォルト値を設定している
@@ -102,7 +102,7 @@ export const prepareOptions = (
     }
 
     requiredPlugins.push(
-      babel.createConfigItem(
+      babel.createConfigItemSync(
         [
           resolve(`./babel/babel-plugin-remove-api`),
           {
@@ -122,8 +122,8 @@ export const prepareOptions = (
     stage === `develop-html`
   ) {
     requiredPlugins.push(
-      babel.createConfigItem(
-        [resolve(`./babel/babel-plugin-add-slice-placeholder-location`)],
+      babel.createConfigItemSync(
+        resolve(`./babel/babel-plugin-add-slice-placeholder-location`),
         {
           type: `plugin`,
         }
@@ -135,7 +135,7 @@ export const prepareOptions = (
 
   if (stage === `develop`) {
     requiredPlugins.push(
-      babel.createConfigItem([resolve(`react-refresh/babel`)], {
+      babel.createConfigItemSync(resolve(`react-refresh/babel`), {
         type: `plugin`,
       })
     )
@@ -145,7 +145,7 @@ export const prepareOptions = (
   const fallbackPresets: Array<ConfigItem> = []
 
   fallbackPresets.push(
-    babel.createConfigItem(
+    babel.createConfigItemSync(
       [
         resolve(`babel-preset-gatsby`),
         {
@@ -167,7 +167,7 @@ export const prepareOptions = (
   if (stage) {
     pluginBabelConfig.stages[stage].plugins.forEach(plugin => {
       reduxPlugins.push(
-        babel.createConfigItem([resolve(plugin.name), plugin.options], {
+        babel.createConfigItemSync([resolve(plugin.name), plugin.options], {
           dirname: plugin.name,
           type: `plugin`,
         })
@@ -175,7 +175,7 @@ export const prepareOptions = (
     })
     pluginBabelConfig.stages[stage].presets.forEach(preset => {
       reduxPresets.push(
-        babel.createConfigItem([resolve(preset.name), preset.options], {
+        babel.createConfigItemSync([resolve(preset.name), preset.options], {
           dirname: preset.name,
           type: `preset`,
         })
@@ -210,7 +210,7 @@ export const addRequiredPresetOptions = (
   )
 
   if (index !== -1) {
-    presets[index] = babel.createConfigItem(
+    presets[index] = babel.createConfigItemSync(
       [
         gatsbyPresetResolved,
         { ...presets[index].options, stage: options.stage },
@@ -229,7 +229,7 @@ export const mergeConfigItemOptions = ({
 }: {
   items: Array<ConfigItem>
   itemToMerge: ConfigItem
-  type: CreateConfigItemOptions[`type`]
+  type: `plugin` | `preset`
   babel: typeof Babel
 }): Array<ConfigItem> => {
   const index = _.findIndex(
@@ -239,11 +239,11 @@ export const mergeConfigItemOptions = ({
 
   // これが存在する場合はオプションをマージし、そうでなければ配列に追加する
   if (index !== -1) {
-    items[index] = babel.createConfigItem(
+    items[index] = babel.createConfigItemSync(
       [
         itemToMerge.file?.resolved,
         _.merge({}, items[index].options, itemToMerge.options),
-      ],
+      ] as [string, Record<string, unknown>],
       {
         type,
       }

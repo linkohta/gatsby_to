@@ -1,5 +1,5 @@
 import { relative } from "path"
-import type { PluginObj, types as BabelTypes, PluginPass } from "@babel/core"
+import type { PluginObject, types as BabelTypes, PluginPass } from "@babel/core"
 import { ObjectProperty } from "@babel/types"
 import { store } from "../../redux"
 
@@ -17,23 +17,23 @@ export default function addSlicePlaceholderLocation(
   }: {
     types: typeof BabelTypes
   }
-): PluginObj {
+): PluginObject {
   return {
     name: `babel-plugin-add-slice-placeholder-location`,
     visitor: {
-      JSXOpeningElement(nodePath): void {
+      JSXOpeningElement(nodePath, state): void {
         if (!nodePath.get(`name`).referencesImport(`gatsby`, `Slice`)) {
           return
         }
 
-        if (this.file.opts.filename) {
+        if (state.file.opts.filename) {
           const __renderedByLocationProperties: Array<ObjectProperty> = [
             t.objectProperty(
               t.identifier(`fileName`),
               t.stringLiteral(
                 relative(
                   store.getState().program.directory,
-                  this.file.opts.filename
+                  state.file.opts.filename
                 )
               )
             ),

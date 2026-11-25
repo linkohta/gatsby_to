@@ -47,12 +47,7 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset()
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          Array [
-            "@babel/plugin-transform-runtime",
-            Object {
-              "version": "7.0.0-beta.0",
-            },
-          ],
+          "@babel/plugin-transform-runtime",
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",
@@ -133,12 +128,7 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset(null, { availableCompilerFlags: [`MAJOR`] })
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          Array [
-            "@babel/plugin-transform-runtime",
-            Object {
-              "version": "7.0.0-beta.0",
-            },
-          ],
+          "@babel/plugin-transform-runtime",
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",
@@ -188,12 +178,7 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset(null, { browser: true })
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          Array [
-            "@babel/plugin-transform-runtime",
-            Object {
-              "version": "7.0.0-beta.0",
-            },
-          ],
+          "@babel/plugin-transform-runtime",
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",

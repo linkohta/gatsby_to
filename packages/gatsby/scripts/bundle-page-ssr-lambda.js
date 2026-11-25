@@ -9,14 +9,6 @@ const webpack = require(`webpack`)
 
 const packageRoot = path.join(__dirname, `..`)
 
-// このパッケージのソースは、リポジトリのビルド用の Babel 8 と
-// babel-preset-gatsby-package で変換する。gatsby の依存に入っている babel-loader は
-// 利用者のサイト用の Babel 7 を読み込み、この設定を解釈できないので、
-// リポジトリのルートにある babel-loader（Babel 8 を読み込む）を使う
-const buildBabelLoader = require.resolve(`babel-loader`, {
-  paths: [path.join(packageRoot, `..`, `..`)],
-})
-
 const compiler = webpack({
   name: `Page SSR Lambda`,
   mode: `none`,
@@ -40,7 +32,7 @@ const compiler = webpack({
       {
         test: /\.ts$/,
         use: {
-          loader: buildBabelLoader,
+          loader: require.resolve(`babel-loader`),
           options: { cwd: packageRoot },
         },
       },

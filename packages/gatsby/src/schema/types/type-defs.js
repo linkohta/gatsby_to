@@ -27,7 +27,7 @@ const reportParsingError = error => {
   const { message, source, locations } = error
 
   if (source && locations && locations.length) {
-    const { codeFrameColumns } = require(`@babel/code-frame`)
+    const { codeFrameColumns } = require(`gatsby-core-utils/code-frame`)
 
     const frame = codeFrameColumns(
       source.body,

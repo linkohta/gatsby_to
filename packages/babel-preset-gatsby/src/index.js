@@ -59,42 +59,77 @@ export default function preset(_, options = {}) {
     )
   }
 
+  // Babel 8 の @babel/preset-react は、`.ts` のファイルでも JSX の構文を有効にする。
+  // JSX が有効だと `<T>(value: T) => value` のような型引数付きのアロー関数をパースできないので、
+  // JSX を書けない `.ts`、`.mts`、`.cts` には適用しない
+  const typeScriptWithoutJsx = /\.[cm]?ts$/
+
   return {
+    // Babel 8 では、各プリセットとプラグインの loose オプションがなくなった。
+    // これまでの loose: true と同じ変換になるよう、対応する assumptions を指定する。
+    // 配列以外の反復可能オブジェクト（Set など）で結果が変わる iterableIsArray は指定しない
+    assumptions: {
+      constantReexports: true,
+      constantSuper: true,
+      enumerableModuleMeta: true,
+      ignoreFunctionLength: true,
+      ignoreToPrimitiveHint: true,
+      mutableTemplateObject: true,
+      noClassCalls: true,
+      noClassPrototypeAssign: true,
+      noConstructorPrimitiveReturn: true,
+      objectRestNoSymbols: true,
+      privateFieldsAsProperties: true,
+      pureGetters: true,
+      setClassMethods: true,
+      setComputedProperties: true,
+      setPublicClassFields: true,
+      setSpreadProperties: true,
+      skipForOfIteratorClosing: true,
+      superIsCallableConstructor: true,
+    },
     presets: [
       [
         resolve(`@babel/preset-env`),
         {
-          corejs: 3,
-          loose: true,
           modules: stage === `test` ? `commonjs` : false,
-          useBuiltIns: `usage`,
           targets,
           // debug: true,
           exclude: [
             // すべてのコードを遅くする変換を除外する (https://github.com/facebook/create-react-app/pull/5278)
             `transform-typeof-symbol`,
-            // これらの変換はすでに用意している
-            `transform-spread`,
-            `proposal-nullish-coalescing-operator`,
-            `proposal-optional-chaining`,
-
-            ...polyfillsToExclude,
+          ],
+          // これまで専用のプラグインで、ターゲットに関係なく変換していたもの
+          include: [
+            `transform-nullish-coalescing-operator`,
+            `transform-optional-chaining`,
           ],
         },
       ],
-      [
-        resolve(`@babel/preset-react`),
-        {
-          useBuiltIns: true,
-          pragma:
-            options.reactRuntime === `automatic`
-              ? undefined
-              : `React.createElement`,
-          development: stage === `develop`,
-          runtime: options.reactRuntime || `classic`,
-          ...(reactImportSource && { importSource: reactImportSource }),
-        },
-      ],
+    ],
+    overrides: [
+      {
+        exclude: typeScriptWithoutJsx,
+        presets: [
+          [
+            resolve(`@babel/preset-react`),
+            {
+              pragma:
+                options.reactRuntime === `automatic`
+                  ? undefined
+                  : `React.createElement`,
+              development: stage === `develop`,
+              runtime: options.reactRuntime || `classic`,
+              ...(reactImportSource && { importSource: reactImportSource }),
+            },
+          ],
+        ],
+      },
+      {
+        // @babel/preset-react のうち、JSX がなくても意味のある変換だけを適用する
+        test: typeScriptWithoutJsx,
+        plugins: [resolve(`@babel/plugin-transform-react-pure-annotations`)],
+      },
     ],
     plugins: [
       [
@@ -104,39 +139,31 @@ export default function preset(_, options = {}) {
         },
       ],
       [
-        resolve(`@babel/plugin-proposal-class-properties`),
+        // Babel 8 の @babel/preset-env には useBuiltIns と corejs のオプションがなくなったので、
+        // 使われている機能に応じた core-js のポリフィルは、このプラグインで読み込む
+        resolve(`babel-plugin-polyfill-corejs3`),
         {
-          loose: true,
+          method: `usage-global`,
+          version: `3.0`,
+          targets,
+          exclude: polyfillsToExclude,
         },
       ],
-      [resolve(`@babel/plugin-proposal-nullish-coalescing-operator`)],
-      [resolve(`@babel/plugin-proposal-optional-chaining`)],
+      // ターゲットに関係なく変換する。下の @babel/plugin-transform-classes は、
+      // クラスフィールドが先に変換されていることを前提にしている
+      resolve(`@babel/plugin-transform-class-properties`),
       resolve(`babel-plugin-macros`),
-      resolve(`@babel/plugin-syntax-dynamic-import`),
       [
         resolve(`@babel/plugin-transform-runtime`),
         {
-          corejs: false,
-          helpers: true,
-          regenerator: true,
-          useESModules: stage !== `test`,
+          // babel-plugin-polyfill-corejs3 があると、ヘルパーの読み込み元の既定値が
+          // @babel/runtime-corejs3 に変わる。これまでどおり @babel/runtime から読み込む
+          moduleName: `@babel/runtime`,
           // クラウドビルドが壊れるので、今のところ無効にしている
           // absoluteRuntime: absoluteRuntimePath,
         },
       ],
-      // TODO v3 で loose モードをオプションとして指定できるようにする
-      isBrowser && [
-        resolve(`@babel/plugin-transform-spread`),
-        {
-          loose: false, // #14848 を修正する
-        },
-      ],
-      isBrowser && [
-        resolve(`@babel/plugin-transform-classes`),
-        {
-          loose: true,
-        },
-      ],
+      isBrowser && resolve(`@babel/plugin-transform-classes`),
       IS_TEST && resolve(`babel-plugin-dynamic-import-node`),
       stage === `build-javascript` && [
         // 本番ビルドから PropTypes を削除する

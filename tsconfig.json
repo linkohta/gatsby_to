@@ -20,10 +20,7 @@
     "jsx": "preserve",
     "typeRoots": ["./types", "**/node_modules/@types", "node_modules/@types"],
     "paths": {
-      "@reach/router/*": ["./node_modules/@gatsbyjs/reach-router/*"],
-      // ルートの `@babel/core` はビルド用の Babel 8 で、型定義を同梱している。
-      // 各パッケージが実行時に使うのは Babel 7 なので、型は Babel 7 用の定義から解決する
-      "@babel/core": ["./node_modules/@types/babel__core"]
+      "@reach/router/*": ["./node_modules/@gatsbyjs/reach-router/*"]
     }
   },
   "exclude": ["peril/*", "examples/*"]
