@@ -269,7 +269,7 @@
     "build:page-ssr-lambda": "node scripts/bundle-page-ssr-lambda.js",
     "build:cjs": "babel cache-dir --out-dir cache-dir/commonjs --ignore \"**/__tests__\" --ignore \"**/__mocks__\" && copyfiles -u 1 cache-dir/**/*.json cache-dir/commonjs",
     "build:src": "babel src --out-dir dist --source-maps --verbose --ignore \"**/gatsby-cli.js,src/internal-plugins/dev-404-page/raw_dev-404-page.js,src/utils/page-ssr-module/lambda.ts,**/__tests__,**/__mocks__\" --extensions \".ts,.tsx,.js\"",
-    "build:types": "tsc --emitDeclarationOnly --declaration --declarationDir dist && node scripts/check-declaration.js",
+    "build:types": "node ../../scripts/tsc-native.js --emitDeclarationOnly --declaration --declarationDir dist && node scripts/check-declaration.js",
     "clean-test-bundles": "find test/ -type f -name bundle.js* -exec rm -rf {} +",
     "prebuild": "rimraf dist && rimraf cache-dir/commonjs",
     "postinstall": "node scripts/postinstall.js",
@@ -278,7 +278,7 @@
     "watch:src": "npm run build:src -- --watch",
     "watch:page-ssr-lambda": "npm run build:page-ssr-lambda -- --watch",
     "version": "node ../../scripts/pin-version.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "node ../../scripts/tsc-native.js --noEmit"
   },
   "types": "index.d.ts",
   "yargs": {

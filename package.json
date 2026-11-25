@@ -71,6 +71,7 @@
     "rimraf": "^6.1.4",
     "signal-exit": "^3.0.7",
     "typescript": "^6.0.3",
+    "typescript-native": "npm:typescript@^7.0.2",
     "unified": "^9.2.2",
     "yargs": "^18.2.0"
   },

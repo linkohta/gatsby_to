@@ -8,7 +8,7 @@
   "homepage": "https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-mdx#readme",
   "scripts": {
     "build": "babel src --out-dir dist/ --ignore \"**/__tests__\" --ignore \"**/__mocks__\" --extensions \".ts\"",
-    "typegen": "tsc --emitDeclarationOnly --declaration --declarationDir dist/",
+    "typegen": "node ../../scripts/tsc-native.js --emitDeclarationOnly --declaration --declarationDir dist/",
     "prepare": "cross-env NODE_ENV=production npm run clean && npm run build && npm run typegen",
     "watch": "babel -w src --out-dir dist/ --ignore \"**/__tests__\" --extensions \".ts,.tsx\"",
     "test": "jest",
