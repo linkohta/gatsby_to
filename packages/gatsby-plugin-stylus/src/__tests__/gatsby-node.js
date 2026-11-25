@@ -35,6 +35,19 @@ describe(`gatsby-plugin-stylus`, () => {
       "PostCss plugins": {
         postCssPlugins: [`test1`],
       },
+      "stylus-loader options": {
+        sourceMap: true,
+        additionalData: `foo = 1`,
+        import: [`file.js`],
+      },
+      "stylusOptions and options at the top level": {
+        stylusOptions: { define: { foo: 1 }, import: [`file2.js`] },
+        import: [`file.js`],
+        compress: false,
+      },
+      "plugins option added by Gatsby": {
+        plugins: [],
+      },
       "css-loader use commonjs": {
         cssLoaderOptions: {
           esModule: false,
@@ -61,5 +74,24 @@ describe(`gatsby-plugin-stylus`, () => {
         expect(actions.setWebpackConfig).toMatchSnapshot()
       })
     }
+  })
+
+  it(`merges options at the top level into stylusOptions given as a function`, () => {
+    const stylusOptions = jest.fn().mockReturnValue({ define: { foo: 1 } })
+
+    onCreateWebpackConfig(
+      { actions, loaders, stage: `develop` },
+      { stylusOptions, import: [`file.js`] }
+    )
+
+    const [config] = actions.setWebpackConfig.mock.calls[0]
+    const { options } = config.module.rules[0].oneOf[1].use[3]
+    const loaderContext = { resourcePath: `/a.styl` }
+
+    expect(options.stylusOptions(loaderContext)).toEqual({
+      define: { foo: 1 },
+      import: [`file.js`],
+    })
+    expect(stylusOptions).toHaveBeenCalledWith(loaderContext)
   })
 })

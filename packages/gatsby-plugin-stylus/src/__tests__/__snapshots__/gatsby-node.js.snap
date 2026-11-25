@@ -16,7 +16,9 @@ exports[`gatsby-plugin-stylus Stage: build-html / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -58,7 +60,9 @@ exports[`gatsby-plugin-stylus Stage: build-html / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -101,9 +105,11 @@ exports[`gatsby-plugin-stylus Stage: build-html / Stylus options #1 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -147,13 +153,15 @@ exports[`gatsby-plugin-stylus Stage: build-html / Stylus options #2 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -196,7 +204,155 @@ exports[`gatsby-plugin-stylus Stage: build-html / css-loader use commonjs 1`] = 
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-html / plugins option added by Gatsby 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-html / stylus-loader options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-html / stylusOptions and options at the top level 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
                     },
                   ],
                 },
@@ -239,7 +395,9 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -251,7 +409,9 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -288,7 +448,9 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -300,7 +462,9 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -338,9 +502,11 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / Stylus options #1 1`] = 
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -354,9 +520,11 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / Stylus options #1 1`] = 
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -395,13 +563,15 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / Stylus options #2 1`] = 
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -415,13 +585,15 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / Stylus options #2 1`] = 
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -459,7 +631,9 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / css-loader use commonjs 
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -471,7 +645,196 @@ exports[`gatsby-plugin-stylus Stage: build-javascript / css-loader use commonjs 
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-javascript / plugins option added by Gatsby 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-javascript / stylus-loader options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: build-javascript / stylusOptions and options at the top level 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
                     },
                   ],
                 },
@@ -508,7 +871,9 @@ exports[`gatsby-plugin-stylus Stage: develop / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -520,7 +885,9 @@ exports[`gatsby-plugin-stylus Stage: develop / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -557,7 +924,9 @@ exports[`gatsby-plugin-stylus Stage: develop / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -569,7 +938,9 @@ exports[`gatsby-plugin-stylus Stage: develop / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -607,9 +978,11 @@ exports[`gatsby-plugin-stylus Stage: develop / Stylus options #1 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -623,9 +996,11 @@ exports[`gatsby-plugin-stylus Stage: develop / Stylus options #1 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -664,13 +1039,15 @@ exports[`gatsby-plugin-stylus Stage: develop / Stylus options #2 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -684,13 +1061,15 @@ exports[`gatsby-plugin-stylus Stage: develop / Stylus options #2 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -728,7 +1107,9 @@ exports[`gatsby-plugin-stylus Stage: develop / css-loader use commonjs 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -740,7 +1121,196 @@ exports[`gatsby-plugin-stylus Stage: develop / css-loader use commonjs 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop / plugins option added by Gatsby 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop / stylus-loader options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop / stylusOptions and options at the top level 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "miniCssExtract",
+                    "css({\\"importLoaders\\":2,\\"modules\\":false})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
                     },
                   ],
                 },
@@ -776,7 +1346,9 @@ exports[`gatsby-plugin-stylus Stage: develop-html / No options 1`] = `
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -818,7 +1390,9 @@ exports[`gatsby-plugin-stylus Stage: develop-html / PostCss plugins 1`] = `
                     "postcss({\\"plugins\\":[\\"test1\\"]})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
                     },
                   ],
                 },
@@ -861,9 +1435,11 @@ exports[`gatsby-plugin-stylus Stage: develop-html / Stylus options #1 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -907,13 +1483,15 @@ exports[`gatsby-plugin-stylus Stage: develop-html / Stylus options #2 1`] = `
                     Object {
                       "loader": "/resolved/path/stylus-loader",
                       "options": Object {
-                        "import": Array [
-                          "file.js",
-                          "file2.js",
-                        ],
-                        "use": Array [
-                          "foo",
-                        ],
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                            "file2.js",
+                          ],
+                          "use": Array [
+                            "foo",
+                          ],
+                        },
                       },
                     },
                   ],
@@ -956,7 +1534,155 @@ exports[`gatsby-plugin-stylus Stage: develop-html / css-loader use commonjs 1`] 
                     "postcss({})",
                     Object {
                       "loader": "/resolved/path/stylus-loader",
-                      "options": Object {},
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop-html / plugins option added by Gatsby 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {},
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop-html / stylus-loader options 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "additionalData": "foo = 1",
+                        "sourceMap": true,
+                        "stylusOptions": Object {
+                          "import": Array [
+                            "file.js",
+                          ],
+                        },
+                      },
+                    },
+                  ],
+                },
+                Object {
+                  "test": /\\\\\\.styl\\$/,
+                  "use": Array [
+                    "null",
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  ],
+  "results": Array [
+    Object {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`gatsby-plugin-stylus Stage: develop-html / stylusOptions and options at the top level 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      Object {
+        "module": Object {
+          "rules": Array [
+            Object {
+              "oneOf": Array [
+                Object {
+                  "test": /\\\\\\.module\\\\\\.styl\\$/,
+                  "use": Array [
+                    "css({\\"importLoaders\\":1,\\"modules\\":true})",
+                    "postcss({})",
+                    Object {
+                      "loader": "/resolved/path/stylus-loader",
+                      "options": Object {
+                        "stylusOptions": Object {
+                          "compress": false,
+                          "define": Object {
+                            "foo": 1,
+                          },
+                          "import": Array [
+                            "file2.js",
+                          ],
+                        },
+                      },
                     },
                   ],
                 },
