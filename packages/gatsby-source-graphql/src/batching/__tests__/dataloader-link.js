@@ -20,7 +20,7 @@ describe(`createDataloaderLink`, () => {
       uri: `some-endpoint`,
       fetch: makeFetch(),
     })
-    const observable = execute(link, { query: sampleQuery })
+    const observable = execute(link, { query: sampleQuery }, {})
     observable.subscribe({
       next: result => {
         expect(result).toEqual(expectedSampleQueryResult)
@@ -35,7 +35,7 @@ describe(`createDataloaderLink`, () => {
       uri: `some-endpoint`,
       fetch: jest.fn(() => Promise.reject(`FetchError`)),
     })
-    const observable = execute(link, { query: sampleQuery })
+    const observable = execute(link, { query: sampleQuery }, {})
     observable.subscribe({
       error: error => {
         expect(error).toEqual(`FetchError`)
@@ -55,7 +55,7 @@ describe(`createDataloaderLink`, () => {
       uri: `some-endpoint`,
       fetch: makeFetch(result),
     })
-    const observable = execute(link, { query: sampleQuery })
+    const observable = execute(link, { query: sampleQuery }, {})
     observable.subscribe({
       error: error => {
         expect(error.name).toEqual(`GraphQLError`)
@@ -83,7 +83,7 @@ describe(`createDataloaderLink`, () => {
       fetchOptions,
     })
 
-    const observable = execute(link, { query: sampleQuery })
+    const observable = execute(link, { query: sampleQuery }, {})
     const next = jest.fn()
 
     observable.subscribe({

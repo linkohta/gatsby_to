@@ -5,9 +5,9 @@ jest.mock(`@graphql-tools/wrap`, () => {
     RenameTypes: jest.fn(),
   }
 })
-jest.mock(`@apollo/client`, () => {
+jest.mock(`@apollo/client/link/http`, () => {
   return {
-    createHttpLink: jest.fn(),
+    BaseHttpLink: jest.fn(),
   }
 })
 jest.mock(`@graphql-tools/links`, () => {
@@ -15,7 +15,7 @@ jest.mock(`@graphql-tools/links`, () => {
     linkToExecutor: jest.fn(),
   }
 })
-const { createHttpLink } = require(`@apollo/client`)
+const { BaseHttpLink } = require(`@apollo/client/link/http`)
 const { testPluginOptionsSchema } = require(`gatsby-plugin-utils`)
 jest.mock(`gatsby/graphql`, () => {
   const graphql = jest.requireActual(`gatsby/graphql`)
@@ -126,7 +126,7 @@ describe(`createHttpLink`, () => {
       fetch: mockFetch,
     })
 
-    expect(createHttpLink).toHaveBeenCalledWith(
+    expect(BaseHttpLink).toHaveBeenCalledWith(
       expect.objectContaining({ fetch: mockFetch })
     )
   })
@@ -138,7 +138,7 @@ describe(`createHttpLink`, () => {
       url: `https://github.com`,
     })
 
-    expect(createHttpLink).toHaveBeenCalledWith(
+    expect(BaseHttpLink).toHaveBeenCalledWith(
       expect.objectContaining({ fetch: fetchWrapper })
     )
   })
