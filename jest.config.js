@@ -176,6 +176,7 @@ const esModules = [
   `p-defer`,
   `p-map`,
   `p-some`,
+  `p-queue`,
   `p-timeout`,
   `parse-english`,
   `parse-entities`,
