@@ -5,6 +5,7 @@ import type { IMdxMetadata } from "./types"
 import { enhanceMdxOptions, IMdxPluginOptions } from "./plugin-options"
 import { ERROR_CODES } from "./error-utils"
 import { cachedImport, createFileToMdxCacheKey } from "./cache-helpers"
+import { getProcessorData, setProcessorData } from "./processor-data"
 
 // MDX を JS にコンパイルする
 // 元の @mdx-js/loader との違い:
@@ -24,11 +25,12 @@ export async function compileMDX(
     const processor = createProcessor(options)
 
     // 必要なカスタムデータをプロセッサーに渡す
-    processor.data(
+    setProcessorData(
+      processor,
       `mdxNodeId`,
       await cache.get(createFileToMdxCacheKey(absolutePath))
     )
-    processor.data(`mdxMetadata`, {})
+    setProcessorData(processor, `mdxMetadata`, {})
 
     const result = await processor.process(
       // remark プラグインのために、元のファイルのパスを注入する。参照: https://github.com/gatsbyjs/gatsby/issues/26914
@@ -38,7 +40,7 @@ export async function compileMDX(
     // 後続の処理で上書きされないよう、メタデータを複製する
     const clonedMetadata = Object.assign(
       {},
-      processor.data(`mdxMetadata`) as IMdxMetadata
+      getProcessorData(processor, `mdxMetadata`)
     )
     const processedMDX = result.toString()
 

@@ -1,4 +1,5 @@
 import type { Plugin } from "unified"
+import { setProcessorData } from "./processor-data"
 
 /**
  * このプラグインは、ファイルからメタデータを取り出し、
@@ -7,7 +8,7 @@ import type { Plugin } from "unified"
 const rehypeMdxMetadataExtractor: Plugin = function () {
   const metadata = {}
   // eslint-disable-next-line @babel/no-invalid-this
-  this.data(`mdxMetadata`, metadata)
+  setProcessorData(this, `mdxMetadata`, metadata)
   return (_tree, file): void => {
     Object.assign(metadata, file.data.meta)
   }

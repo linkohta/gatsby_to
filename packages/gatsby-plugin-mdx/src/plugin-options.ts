@@ -26,7 +26,6 @@ type MdxDefaultOptions = (pluginOptions: PluginOptions) => IMdxPluginOptions
 export const defaultOptions: MdxDefaultOptions = pluginOptions => {
   const mdxOptions: ProcessorOptions = {
     format: `mdx`,
-    useDynamicImport: true,
     providerImportSource: `@mdx-js/react`,
   }
   const defaults = {
@@ -60,7 +59,16 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
   // Gatsby プロジェクトの設定をもとに jsxRuntime と jsxImportSource を設定する
   const { config } = helpers.store.getState()
   const { jsxRuntime, jsxImportSource } = config
-  options.mdxOptions.jsxRuntime = jsxRuntime || `classic`
+  // MDX 3 は classic ランタイムを非推奨にしていて、指定すると警告を出す。Gatsby の設定の既定値は classic なので、
+  // そのまま渡すとすべてのサイトで警告が出てしまう。classic でしか意味を持たない pragma 系のオプションが
+  // mdxOptions に指定されている場合だけ classic を使い、それ以外は automatic でコンパイルする。
+  // どちらでコンパイルしても、レンダリング結果は変わらない。
+  const { pragma, pragmaFrag, pragmaImportSource } = options.mdxOptions
+  const needsClassicRuntime = Boolean(
+    pragma || pragmaFrag || pragmaImportSource
+  )
+  options.mdxOptions.jsxRuntime =
+    needsClassicRuntime && jsxRuntime !== `automatic` ? `classic` : `automatic`
   options.mdxOptions.jsxImportSource = jsxImportSource || `react`
 
   if (!options.mdxOptions.remarkPlugins) {
@@ -122,11 +130,15 @@ export const enhanceMdxOptions: EnhanceMdxOptions = async (
     options.mdxOptions.rehypePlugins = []
   }
 
-  const passThrough = [`element`]
-  if (!options.mdxOptions.remarkRehypeOptions) {
-    options.mdxOptions.remarkRehypeOptions = {}
+  // remarkMdxHtmlPlugin が mdast の中に置いた hast の element ノードを、そのまま通す。
+  // 型は mdast のノード名しか受け付けないが、実行時は hast のノード名も指定できる。
+  const passThrough = [`element`] as unknown as NonNullable<
+    ProcessorOptions[`remarkRehypeOptions`]
+  >[`passThrough`]
+  options.mdxOptions.remarkRehypeOptions = {
+    ...options.mdxOptions.remarkRehypeOptions,
+    passThrough,
   }
-  options.mdxOptions.remarkRehypeOptions.passThrough = passThrough
 
   // rehype-infer-* などのプラグインが生成したメタデータを取り出す
   options.mdxOptions.rehypePlugins.push(rehypeMdxMetadataExtractor)
