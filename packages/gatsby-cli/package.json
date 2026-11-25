@@ -72,7 +72,7 @@
     "rollup": "^4.68.8",
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-internal": "^1.0.4",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "files": [
     "lib/",

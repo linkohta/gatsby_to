@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
     "paths": {
-      "~/*": ["*"],
+      "~/*": ["./src/*"],
       // このパッケージは Prettier 2 に依存している。ルートの Prettier 3 の型定義ではなく、
       // Prettier 2 の型定義（@types/prettier）で解決されるようにする
       "prettier": [
-        "../node_modules/@types/prettier",
-        "../../../node_modules/@types/prettier"
+        "./node_modules/@types/prettier",
+        "../../node_modules/@types/prettier"
       ]
     },
     "lib": ["ESNext", "DOM"],
     "target": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "ESNext",
     "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "types": ["*"],
     "skipLibCheck": true
   },
   "include": ["src"],

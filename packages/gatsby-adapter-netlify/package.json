@@ -47,7 +47,7 @@
     "cross-env": "^10.1.0",
     "memfs": "^4.80.1",
     "rimraf": "^6.1.4",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "gatsby": "^5.10.0-alpha"

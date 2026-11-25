@@ -1,6 +1,6 @@
 import path from "path"
 import resolveCwd from "resolve-cwd"
-import yargs from "yargs"
+import yargs, { type Arguments, type Argv } from "yargs"
 import envinfo from "envinfo"
 import { sync as existsSync } from "fs-exists-cached"
 import { run as runCreateGatsby } from "create-gatsby"
@@ -15,15 +15,15 @@ import { getPackageManager, setPackageManager } from "./util/package-manager"
 import reporter from "./reporter"
 
 const handlerP =
-  (fn: (args: yargs.Arguments) => void) =>
-  (args: yargs.Arguments): void => {
+  (fn: (args: Arguments) => void) =>
+  (args: Arguments): void => {
     Promise.resolve(fn(args)).then(
       () => process.exit(0),
       err => report.panic(err)
     )
   }
 
-function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
+function buildLocalCommands(cli: Argv, isLocalSite: boolean): void {
   const defaultHost = `localhost`
   const defaultPort = `8000`
   const directory = path.resolve(`.`)
@@ -101,13 +101,10 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
 
   function getCommandHandler(
     command: string,
-    handler?: (
-      args: yargs.Arguments,
-      cmd: (args: yargs.Arguments) => void
-    ) => void,
+    handler?: (args: Arguments, cmd: (args: Arguments) => void) => void,
     nodeEnv?: string | undefined
-  ): (argv: yargs.Arguments) => void {
-    return (argv: yargs.Arguments): void => {
+  ): (argv: Arguments) => void {
+    return (argv: Arguments): void => {
       report.setVerbose(!!argv.verbose)
 
       report.setNoColor(!!(argv.noColor || process.env.NO_COLOR))
@@ -201,7 +198,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
     handler: handlerP(
       getCommandHandler(
         `develop`,
-        (args: yargs.Arguments, cmd: (args: yargs.Arguments) => unknown) => {
+        (args: Arguments, cmd: (args: Arguments) => unknown) => {
           if (Object.prototype.hasOwnProperty.call(args, `inspect`)) {
             args.inspect = args.inspect || 9229
           }
@@ -279,8 +276,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
     handler: handlerP(
       getCommandHandler(
         `build`,
-        (args: yargs.Arguments, cmd: (args: yargs.Arguments) => void) =>
-          cmd(args),
+        (args: Arguments, cmd: (args: Arguments) => void) => cmd(args),
         `production`
       )
     ),
@@ -321,8 +317,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
 
     handler: getCommandHandler(
       `serve`,
-      (args: yargs.Arguments, cmd: (args: yargs.Arguments) => void) =>
-        cmd(args),
+      (args: Arguments, cmd: (args: Arguments) => void) => cmd(args),
       process.env.NODE_ENV || `production`
     ),
   })
@@ -337,7 +332,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
         default: false,
         describe: `Automagically copy environment information to clipboard`,
       }),
-    handler: (args: yargs.Arguments) => {
+    handler: (args: Arguments) => {
       try {
         const copyToClipboard =
           // Linux の tty ではクリップボードを利用できない
@@ -395,8 +390,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
     describe: `Get a node repl with context of Gatsby environment, see (https://www.gatsbyjs.com/docs/gatsby-repl/)`,
     handler: getCommandHandler(
       `repl`,
-      (args: yargs.Arguments, cmd: (args: yargs.Arguments) => void) =>
-        cmd(args),
+      (args: Arguments, cmd: (args: Arguments) => void) => cmd(args),
       process.env.NODE_ENV || `development`
     ),
   })
@@ -410,7 +404,7 @@ function buildLocalCommands(cli: yargs.Argv, isLocalSite: boolean): void {
         describe: "Valid commands include `docs`, `ls`.",
         type: `string`,
       }),
-    handler: async (args: yargs.Arguments) => {
+    handler: async (args: Arguments) => {
       const pluginHandler = require(`./handlers/plugin`).default
       await pluginHandler(siteInfo.directory, args.cmd as string | undefined)
     },
@@ -480,7 +474,7 @@ Gatsby version: ${gatsbyVersion}
 // yargs 17 以降の `parse()` は、ハンドラーが非同期のコマンドでは Promise を返す
 export const createCli = (
   argv: Array<string>
-): yargs.Arguments | Promise<yargs.Arguments> => {
+): Arguments | Promise<Arguments> => {
   const cli = yargs(argv).parserConfiguration({
     "boolean-negation": false,
   })
@@ -579,7 +573,7 @@ export const createCli = (
             describe: `Set package manager as \`npm\` or \`yarn\`.`,
           }),
 
-      handler: handlerP(({ cmd, key, value }: yargs.Arguments) => {
+      handler: handlerP(({ cmd, key, value }: Arguments) => {
         if (!getPackageManager()) {
           setPackageManager(`npm`)
         }

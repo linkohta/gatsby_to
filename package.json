@@ -70,7 +70,7 @@
     "react-dom": "^19.3.1",
     "rimraf": "^6.1.4",
     "signal-exit": "^3.0.7",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "unified": "^9.2.2",
     "yargs": "^18.2.0"
   },
