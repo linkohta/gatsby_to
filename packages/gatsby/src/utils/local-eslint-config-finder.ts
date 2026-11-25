@@ -18,9 +18,11 @@ export const hasLocalEslint = (directory: string): boolean => {
   }
 
   log(`Checking for eslint config file`)
-  const eslintFiles = globSync(`.eslintrc?(.js|.json|.yaml|.yml)`, {
-    cwd: directory,
-  })
+  // `.eslintrc*` に加えて、flat config（`eslint.config.*`）も、サイト独自の設定として扱う
+  const eslintFiles = [
+    `.eslintrc?(.js|.json|.yaml|.yml)`,
+    `eslint.config.@(js|mjs|cjs|ts|mts|cts)`,
+  ].flatMap(pattern => globSync(pattern, { cwd: directory }))
 
   if (eslintFiles.length) {
     return true
