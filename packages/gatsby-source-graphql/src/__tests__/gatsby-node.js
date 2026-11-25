@@ -1,7 +1,7 @@
 jest.mock(`@graphql-tools/wrap`, () => {
   return {
     wrapSchema: jest.fn(),
-    introspectSchema: jest.fn(),
+    schemaFromExecutor: jest.fn(),
     RenameTypes: jest.fn(),
   }
 })
