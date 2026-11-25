@@ -1,4 +1,5 @@
-const asciidoc = require(`asciidoctor`)()
+// asciidoctor 4 は ESM のみで、モジュール自体が API を持つ（ファクトリー関数ではない）
+const asciidoc = require(`asciidoctor`)
 const _ = require(`lodash`)
 
 function shouldOnCreateNode({ node }, pluginOptions = {}) {
@@ -46,12 +47,12 @@ async function onCreateNode(
   })
 
   try {
-    const html = doc.convert()
+    // asciidoctor 4 では変換が非同期になった
+    const html = await doc.convert()
     // title、subtitle、combined を取得できるよう、"partition" オプションを使う
     const title = doc.getDocumentTitle({ partition: true })
 
     let revision = null
-    let author = null
 
     if (doc.hasRevisionInfo()) {
       revision = {
@@ -61,15 +62,16 @@ async function onCreateNode(
       }
     }
 
-    if (doc.getAuthor()) {
-      author = {
-        fullName: doc.getAttribute(`author`),
-        firstName: doc.getAttribute(`firstname`),
-        lastName: doc.getAttribute(`lastname`) || ``,
-        middleName: doc.getAttribute(`middlename`) || ``,
-        authorInitials: doc.getAttribute(`authorinitials`) || ``,
-        email: doc.getAttribute(`email`) || ``,
-      }
+    // asciidoctor 2 の getAuthor() は著者がいない文書でも Opal の nil（真になるオブジェクト）を返していたため、
+    // author は常に作られていた。asciidoctor 4 では undefined になるが、author が null になると
+    // `author.fullName` などを読むサイトが壊れるので、これまでどおり常に作る
+    const author = {
+      fullName: doc.getAttribute(`author`),
+      firstName: doc.getAttribute(`firstname`),
+      lastName: doc.getAttribute(`lastname`) || ``,
+      middleName: doc.getAttribute(`middlename`) || ``,
+      authorInitials: doc.getAttribute(`authorinitials`) || ``,
+      email: doc.getAttribute(`email`) || ``,
     }
 
     const pageAttributes = extractPageAttributes(doc.getAttributes())

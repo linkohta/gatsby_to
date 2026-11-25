@@ -35,6 +35,7 @@ const esModules = [
   `ansi-regex`,
   `ansi-styles`,
   `array-iterate`,
+  `asciidoctor`,
   `atomically`,
   `bail`,
   `boxen`,
