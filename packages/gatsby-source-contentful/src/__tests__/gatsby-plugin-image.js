@@ -9,16 +9,12 @@ import { resolve } from "path"
 import { setFieldsOnGraphQLNodeType } from "../extend-node-type"
 import { generateImageSource } from "../gatsby-plugin-image"
 import * as fetchRemoteFileModule from "gatsby-core-utils/fetch-remote-file"
-import * as pluginSharp from "gatsby-plugin-sharp"
 
 const FIXTURES = resolve(__dirname, `..`, `__fixtures__`)
 
 jest
   .spyOn(fs, `readFile`)
   .mockImplementation(() => Promise.resolve(Buffer.from(`mockedFileContent`)))
-jest
-  .spyOn(pluginSharp, `getDominantColor`)
-  .mockImplementation(() => Promise.resolve(`#mocked`))
 jest
   .spyOn(fetchRemoteFileModule, `fetchRemoteFile`)
   .mockImplementation(() =>
