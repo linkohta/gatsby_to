@@ -815,6 +815,9 @@ export const createWebpackUtils = (
   plugins.eslint = (): WebpackPluginInstance => {
     const options = {
       extensions: [`js`, `jsx`],
+      // flat config は ESLint 9 を前提にしている。サイトが別のメジャーの eslint を
+      // 入れていても、gatsby が依存している eslint を使うようにする
+      eslintPath: require.resolve(`eslint`),
       exclude: [
         `/node_modules/`,
         `/bower_components/`,
@@ -829,6 +832,9 @@ export const createWebpackUtils = (
   plugins.eslintRequired = (): WebpackPluginInstance => {
     const options = {
       extensions: [`js`, `jsx`],
+      // flat config は ESLint 9 を前提にしている。サイトが別のメジャーの eslint を
+      // 入れていても、gatsby が依存している eslint を使うようにする
+      eslintPath: require.resolve(`eslint`),
       exclude: [
         `/node_modules/`,
         `/bower_components/`,

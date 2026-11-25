@@ -2,15 +2,17 @@ import { RuleTester } from "eslint"
 import { test } from "../../eslint-rules-helpers"
 const rule = require(`../limited-exports-page-templates`)
 
-const parserOptions = {
+const languageOptions = {
   ecmaVersion: 2018,
   sourceType: `module`,
-  ecmaFeatures: {
-    jsx: true,
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
-}
+} as const
 
-const ruleTester = new RuleTester({ parserOptions })
+const ruleTester = new RuleTester({ languageOptions })
 
 jest.mock(`../../eslint-rules-helpers`, () => {
   return {
