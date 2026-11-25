@@ -510,7 +510,9 @@ describe(`fetch-remote-file`, () => {
         url: `http://external.com/404.jpg`,
         cache,
       })
-    ).rejects.toThrow(`Response code 404 (Not Found)`)
+    ).rejects.toThrow(
+      `Request failed with status code 404 (Not Found): GET http://external.com/404.jpg`
+    )
   })
 
   it(`fails when 500 is triggered`, async () => {
@@ -523,7 +525,7 @@ describe(`fetch-remote-file`, () => {
       "Unable to fetch:
       http://external.com/500.jpg
       ---
-      Reason: Response code 500 (Internal Server Error)
+      Reason: Request failed with status code 500 (Internal Server Error): GET http://external.com/500.jpg
       ---
       Fetch details:
       {
@@ -534,7 +536,7 @@ describe(`fetch-remote-file`, () => {
         \\"responseStatusMessage\\": \\"Internal Server Error\\",
         \\"requestHeaders\\": {
           \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-          \\"accept-encoding\\": \\"gzip, deflate, br\\"
+          \\"accept-encoding\\": \\"gzip, deflate, br, zstd\\"
         },
         \\"responseHeaders\\": {
           \\"content-type\\": \\"text/html\\",
@@ -831,7 +833,7 @@ describe(`fetch-remote-file`, () => {
         "Unable to fetch:
         http://external.com/503-forever.svg
         ---
-        Reason: Response code 503 (Service Unavailable)
+        Reason: Request failed with status code 503 (Service Unavailable): GET http://external.com/503-forever.svg
         ---
         Fetch details:
         {
@@ -842,7 +844,7 @@ describe(`fetch-remote-file`, () => {
           \\"responseStatusMessage\\": \\"Service Unavailable\\",
           \\"requestHeaders\\": {
             \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-            \\"accept-encoding\\": \\"gzip, deflate, br\\"
+            \\"accept-encoding\\": \\"gzip, deflate, br, zstd\\"
           },
           \\"responseHeaders\\": {
             \\"content-type\\": \\"text/html\\",
@@ -874,10 +876,11 @@ describe(`fetch-remote-file`, () => {
           \\"errorCode\\": \\"ERR_GOT_REQUEST_ERROR\\",
           \\"requestHeaders\\": {
             \\"user-agent\\": \\"got (https://github.com/sindresorhus/got)\\",
-            \\"accept-encoding\\": \\"gzip, deflate, br\\"
+            \\"accept-encoding\\": \\"gzip, deflate, br, zstd\\"
           }
         }
-        ---"
+        ---
+        Cause: Network error"
       `)
 
       expect(gotStream).toHaveBeenCalledTimes(3)

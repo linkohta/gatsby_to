@@ -107,7 +107,7 @@
     "glob": "^14.0.6",
     "globals": "^17.14.0",
     "globby": "^16.2.4",
-    "got": "^11.8.6",
+    "got": "^16.2.0",
     "graphql": "^17.1.0",
     "graphql-compose": "^9.3.0",
     "graphql-http": "^1.23.1",

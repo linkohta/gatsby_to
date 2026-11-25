@@ -1,9 +1,11 @@
 const { sourceNodes } = require(`../gatsby-node`)
 const { browse } = require(`../search`)
-const got = require(`got`)
+const { default: got } = require(`got`)
 
 jest.mock(`../search`)
-jest.mock(`got`)
+jest.mock(`got`, () => {
+  return { __esModule: true, default: { get: jest.fn() } }
+})
 
 describe(`gatsby-source-npm-package-search`, () => {
   describe(`sourceNodes`, () => {

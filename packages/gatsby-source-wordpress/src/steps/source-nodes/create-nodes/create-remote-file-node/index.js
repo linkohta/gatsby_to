@@ -2,7 +2,7 @@ import { b64e } from "~/utils/string-encoding"
 import { withPluginKey } from "~/store"
 const fs = require(`fs-extra`)
 const { remoteFileDownloaderBarPromise } = require(`./progress-bar-promise`)
-const got = require(`got`)
+const { default: got } = require(`got`)
 const { createContentDigest } = require(`gatsby-core-utils`)
 const path = require(`path`)
 const { isWebUri } = require(`valid-url`)

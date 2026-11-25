@@ -1,6 +1,6 @@
 import fs from "fs-extra"
 import type { IncomingMessage } from "http"
-import type { Headers, Options } from "got"
+import type { Headers, OptionsInit } from "got"
 import type { GatsbyCache } from "gatsby"
 
 // 後方互換性のために I を残している
@@ -63,6 +63,9 @@ const ERROR_CODES_TO_RETRY = [
   `EAI_AGAIN`,
   `ERR_NON_2XX_3XX_RESPONSE`,
   `ERR_GOT_REQUEST_ERROR`,
+  // got 14 以降は、Content-Length より短いレスポンスをこのコードで報告する
+  // （それ以前は ECONNRESET だった）
+  `ERR_HTTP_CONTENT_LENGTH_MISMATCH`,
 ]
 
 /**
@@ -81,7 +84,7 @@ export async function requestRemoteNode(
   url: string | URL,
   headers: Headers,
   tmpFilename: string,
-  httpOptions?: Options,
+  httpOptions?: OptionsInit,
   attempt: number = 1
 ): Promise<IncomingMessage> {
   // TODO(v5): 動的 import の構文を使う。古い v4 のバージョンに V8-compile-cache があるため、現在はできない
@@ -158,6 +161,11 @@ export async function requestRemoteNode(
       if (timeout) {
         clearTimeout(timeout)
       }
+
+      // got 14 以降は、圧縮されたレスポンスの進捗に合計サイズが入らないので、
+      // 途中で切れても haveAllBytesBeenWritten が true のままになる。エラーになった
+      // ダウンロードを、書き込み完了の処理が成功として扱わないようにする
+      haveAllBytesBeenWritten = false
 
       fsWriteStream.close()
       await fs.remove(tmpFilename)
