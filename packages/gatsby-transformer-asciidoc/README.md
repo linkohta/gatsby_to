@@ -177,22 +177,24 @@ plugins: [
 In the example below, we will use a custom converter to convert paragraphs but the other nodes will be converted using the built-in HTML5 converter:
 
 ```javascript
-const asciidoc = require(`asciidoctor`)()
+const asciidoc = require(`asciidoctor`)
 
 class CustomConverter {
   constructor() {
-    this.baseConverter = asciidoc.Html5Converter.$new()
+    this.baseConverter = asciidoc.Html5Converter.create(`html5`)
   }
 
-  convert(node, transform) {
+  async convert(node, transform) {
     if (node.getNodeName() === "paragraph") {
-      return `<p>${node.getContent()}</p>`
+      return `<p>${await node.getContent()}</p>`
     }
 
     return this.baseConverter.convert(node, transform)
   }
 }
 ```
+
+This plugin uses Asciidoctor.js 4, a native JavaScript implementation with an asynchronous API: `require("asciidoctor")` returns the API itself (it is no longer a factory function), `Html5Converter.$new()` became `Html5Converter.create("html5")`, and `convert` and `node.getContent()` return promises. A converter written for Asciidoctor.js 2 has to be updated accordingly.
 
 gatsby-transformer-asciidoc takes then this class, **not** a instance of `CustomConverter`, as the `converterFactory` option.
 You can also reuse the internal converter of gatsby-transformer-asciidoc, since the constructor of a given `CustomConverter` will be call with it as parameter.

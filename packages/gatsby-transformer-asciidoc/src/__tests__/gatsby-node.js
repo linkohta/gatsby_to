@@ -1,12 +1,11 @@
 const path = require(`path`)
 const { onCreateNode, shouldOnCreateNode } = require(`../gatsby-node`)
 
-jest.mock(`asciidoctor`, () => () => {
+jest.mock(`asciidoctor`, () => {
   return {
     load: jest.fn(() => {
       return {
         hasRevisionInfo: jest.fn(),
-        getAuthor: jest.fn(),
         getAttributes: jest.fn(() => {
           return {}
         }),
@@ -92,7 +91,14 @@ describe(`gatsby-transformer-asciidoc`, () => {
       )
     }
     expect(actions.createNode).toHaveBeenCalledWith({
-      author: null,
+      author: {
+        fullName: undefined,
+        firstName: undefined,
+        lastName: ``,
+        middleName: ``,
+        authorInitials: ``,
+        email: ``,
+      },
       children: [],
       document: { main: `main`, subtitle: `subtitle`, title: `title` },
       html: `html generated`,
