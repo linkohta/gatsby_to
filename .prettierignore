@@ -32,3 +32,6 @@ packages/gatsby-source-wordpress/test-site/**
 
 # coverage
 coverage
+
+# Nx の作業データ
+.nx

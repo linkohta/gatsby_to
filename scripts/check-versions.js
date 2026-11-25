@@ -2,9 +2,10 @@ const { writeFileSync } = require(`fs`)
 // yargs 18 の require はインスタンスではなくファクトリー関数を返すので、解析する引数を渡して作る
 const { hideBin } = require(`yargs/helpers`)
 const yargs = require(`yargs`)(hideBin(process.argv))
-const { getPackages } = require(`@lerna/project`)
-const PackageGraph = require(`@lerna/package-graph`)
 const semver = require(`semver`)
+const { getPackages, getLocalDependencies } = require(
+  `./utils/workspace-packages`
+)
 
 let warned = false
 const argv = yargs
@@ -17,52 +18,49 @@ const argv = yargs
     describe: `Allow using "next" versions. Use this only for alpha/beta releases`,
   }).argv
 
-getPackages(process.cwd()).then(packages => {
-  const graph = new PackageGraph(packages, `allDependencies`, true)
+const packages = getPackages(process.cwd())
+const versions = new Map(packages.map(pkg => [pkg.name, pkg.version]))
+const localDependencies = getLocalDependencies(packages)
 
-  graph.forEach((pkgNode, name) => {
-    let outdated = Array.from(pkgNode.localDependencies.values()).filter(
-      localDep =>
-        !semver.satisfies(graph.get(localDep.name).version, localDep.fetchSpec)
+packages.forEach(pkg => {
+  let outdated = localDependencies
+    .get(pkg.name)
+    .filter(
+      localDep => !semver.satisfies(versions.get(localDep.name), localDep.spec)
     )
 
-    if (argv[`allow-next`]) {
-      outdated = outdated.filter(localDep => localDep.fetchSpec !== `next`)
-    }
+  if (argv[`allow-next`]) {
+    outdated = outdated.filter(localDep => localDep.spec !== `next`)
+  }
 
-    if (!outdated.length) return
+  if (!outdated.length) return
 
-    const msg = outdated
-      .map(
-        p =>
-          `  Depends on "${p.name}@${p.fetchSpec}" \n` +
-          `  instead of "${p.name}@${graph.get(p.name).version}". \n`
-      )
-      .join(`\n`)
+  const msg = outdated
+    .map(
+      p =>
+        `  Depends on "${p.name}@${p.spec}" \n` +
+        `  instead of "${p.name}@${versions.get(p.name)}". \n`
+    )
+    .join(`\n`)
 
-    console.error(`${pkgNode.name}: \n${msg}`)
-    warned = true
+  console.error(`${pkg.name}: \n${msg}`)
+  warned = true
 
-    if (argv.fix) {
-      const pkg = pkgNode.pkg
-      const next = pkg.toJSON()
-      const depTypes = [`dependencies`, `devDependencies`, `peerDependencies`]
-      outdated.forEach(p => {
-        depTypes.forEach(depKey => {
-          if (pkg[depKey] && pkg[depKey][p.name]) {
-            next[depKey][p.name] = `^${graph.get(p.name).version}`
-          }
-        })
+  if (argv.fix) {
+    const next = pkg.toJSON()
+    const depTypes = [`dependencies`, `devDependencies`, `peerDependencies`]
+    outdated.forEach(p => {
+      depTypes.forEach(depKey => {
+        if (next[depKey] && next[depKey][p.name]) {
+          next[depKey][p.name] = `^${versions.get(p.name)}`
+        }
       })
+    })
 
-      writeFileSync(
-        `${pkg.location}/package.json`,
-        JSON.stringify(next, null, 2)
-      )
-    }
-  })
-
-  if (warned) {
-    process.exit(1)
+    writeFileSync(`${pkg.location}/package.json`, JSON.stringify(next, null, 2))
   }
 })
+
+if (warned) {
+  process.exit(1)
+}

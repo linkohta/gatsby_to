@@ -63,3 +63,6 @@ package-lock.json
 !starters/*/package-lock.json
 
 .parcel-cache
+
+# Nx (Lerna のタスクランナー) の作業データ
+.nx/
