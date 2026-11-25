@@ -12,6 +12,9 @@ function matchesSnapshot(query): void {
     presets: [`@babel/preset-react`],
     plugins: [plugin],
     filename: `src/components/test.js`,
+    // ファイル名を渡すと、Babel はリポジトリのルートの .babelrc.js を読み込む。これは
+    // ビルド用の Babel 8 向けの設定で、このテストが使う Babel 7 では読み込めない
+    babelrc: false,
   })
 
   expect(codeWithoutFileName).toMatchSnapshot()

@@ -9,7 +9,7 @@ export const pluginErrorCodes = {
 }
 
 export class OperationError extends Error {
-  public node: IBulkOperationNode
+  declare public node: IBulkOperationNode
 
   constructor(node: IBulkOperationNode) {
     const { errorCode, id } = node
@@ -22,7 +22,7 @@ export class OperationError extends Error {
 }
 
 export class HttpError extends Error {
-  public response: Response
+  declare public response: Response
 
   constructor(response: Response) {
     super(response.statusText)

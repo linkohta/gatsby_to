@@ -173,7 +173,7 @@ const customBabelLoader = babelLoader.custom(babel => {
 export default customBabelLoader
 
 export class BabelConfigItemsCacheInvalidatorPlugin {
-  name: string
+  declare name: string
 
   constructor() {
     this.name = `BabelConfigItemsCacheInvalidatorPlugin`

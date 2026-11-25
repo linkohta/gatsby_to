@@ -45,18 +45,18 @@ export interface IGraphQLRunnerOptions {
 }
 
 export class GraphQLRunner {
-  parseCache: Map<Query, DocumentNode>
+  declare parseCache: Map<Query, DocumentNode>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  nodeModel: any // TODO: "../schema/node-model" を Flow から変換する
+  declare nodeModel: any // TODO: "../schema/node-model" を Flow から変換する
 
-  schema: GraphQLSchema
+  declare schema: GraphQLSchema
 
-  validDocuments: WeakMap<DocumentNode, DocumentNode>
-  scheduleClearCache: () => void
+  declare validDocuments: WeakMap<DocumentNode, DocumentNode>
+  declare scheduleClearCache: () => void
 
-  stats: IGraphQLRunnerStats | null
-  graphqlTracing: boolean
+  declare stats: IGraphQLRunnerStats | null
+  declare graphqlTracing: boolean
 
   constructor(
     protected store: Store<IGatsbyState>,

@@ -29,8 +29,8 @@ export const PARTIAL_HYDRATION_CHUNK_REASON = `PartialHydration client module`
 export class PartialHydrationPlugin {
   name = `PartialHydrationPlugin`
 
-  _manifestPath: string // マニフェストファイルの書き込み先の絶対パス
-  _reporter: typeof Reporter
+  declare _manifestPath: string // マニフェストファイルの書き込み先の絶対パス
+  declare _reporter: typeof Reporter
 
   _collectedCssModules = new Set<webpack.Module>()
   _previousManifest = {}

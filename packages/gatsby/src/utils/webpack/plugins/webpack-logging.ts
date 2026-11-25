@@ -7,8 +7,8 @@ type Reporter = typeof reporter
 
 export class WebpackLoggingPlugin {
   private PLUGIN_NAME = `WebpackLogging`
-  private rootDir: string
-  private reporter: Reporter
+  declare private rootDir: string
+  declare private reporter: Reporter
   private isVerbose = false
 
   constructor(rootDir: string, reporter: Reporter, isVerbose = false) {

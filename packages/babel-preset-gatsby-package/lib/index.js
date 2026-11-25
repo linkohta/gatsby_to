@@ -17,9 +17,7 @@ function preset(context, options = {}) {
 
   const IS_TEST = (BABEL_ENV || NODE_ENV) === `test`
 
-  const browserConfig = {
-    useBuiltIns: false,
-  }
+  const browserConfig = {}
 
   if (browser) {
     if (esm) {
@@ -34,8 +32,6 @@ function preset(context, options = {}) {
   }
 
   const nodeConfig = {
-    corejs: 3,
-    useBuiltIns: `entry`,
     targets: {
       node: nodeVersion,
     },
@@ -56,28 +52,61 @@ function preset(context, options = {}) {
   }
 
   return {
+    // Babel 8 では @babel/preset-env の loose オプションがなくなった。
+    // これまでの loose: true と同じ出力になるよう、対応する assumptions を指定する
+    assumptions: {
+      constantReexports: true,
+      constantSuper: true,
+      enumerableModuleMeta: true,
+      ignoreFunctionLength: true,
+      ignoreToPrimitiveHint: true,
+      mutableTemplateObject: true,
+      noClassCalls: true,
+      noClassPrototypeAssign: true,
+      noConstructorPrimitiveReturn: true,
+      objectRestNoSymbols: true,
+      privateFieldsAsProperties: true,
+      pureGetters: true,
+      setClassMethods: true,
+      setComputedProperties: true,
+      setPublicClassFields: true,
+      setSpreadProperties: true,
+      skipForOfIteratorClosing: true,
+      superIsCallableConstructor: true,
+    },
     presets: [
       [
         r(`@babel/preset-env`),
         Object.assign(
           {
-            loose: true,
             debug: !!debug,
+            // これまで @babel/plugin-proposal-optional-chaining と
+            // @babel/plugin-proposal-nullish-coalescing-operator で、対象の環境に関係なく変換していた。
+            // Babel 8 にはこれらのプラグインがないので、preset-env に必ず変換させる
+            include: [
+              `transform-optional-chaining`,
+              `transform-nullish-coalescing-operator`,
+            ],
+            // Babel 7 の preset-env は、loose: true のときにこの変換を外していた
+            exclude: [`transform-typeof-symbol`],
             shippedProposals: true,
             modules: esm ? false : `commonjs`,
-            bugfixes: esm,
           },
           browser ? browserConfig : nodeConfig
         ),
       ],
-      [r(`@babel/preset-react`)],
       r(`@babel/preset-flow`),
     ],
     plugins: [
-      r(`@babel/plugin-proposal-nullish-coalescing-operator`),
-      r(`@babel/plugin-proposal-optional-chaining`),
-      r(`@babel/plugin-transform-runtime`),
-      r(`@babel/plugin-syntax-dynamic-import`),
+      [
+        r(`@babel/plugin-transform-runtime`),
+        {
+          // Babel 8 の既定値は @babel/runtime 8 を前提にしている。各パッケージが依存しているのは
+          // @babel/runtime 7 なので、Babel 7 のときの既定値を指定する。これより新しいヘルパーは、
+          // これまでどおり import ではなく各ファイルに埋め込まれる
+          version: `7.0.0-beta.0`,
+        },
+      ],
       IS_TEST && r(`babel-plugin-dynamic-import-node`),
       [
         r(`./babel-transform-compiler-flags`),
@@ -87,6 +116,7 @@ function preset(context, options = {}) {
         },
       ],
       r(`@sigmacomputing/babel-plugin-lodash`),
+      r(`./babel-transform-static-import-specifier`),
       Array.isArray(keepDynamicImports) && keepDynamicImports.length > 0 && [
         r(`./babel-transform-mark-to-keep-dynamic-import`),
         {
@@ -96,8 +126,27 @@ function preset(context, options = {}) {
     ].filter(Boolean),
     overrides: [
       {
+        // Babel 8 のパーサーは、JSX が有効だと `<T>() => {}` や `<T = any>() => {}` のような
+        // ジェネリックのアロー関数を構文エラーにする。.ts には JSX を書けないので、
+        // .ts 以外にだけ @babel/preset-react を適用する
+        exclude: /\.ts$/,
+        presets: [
+          // Babel 8 は既定が automatic になった。出力を変えないために classic を指定する
+          [r(`@babel/preset-react`), { runtime: `classic` }],
+        ],
+      },
+      {
         test: [`**/*.ts`, `**/*.tsx`],
-        plugins: [[`@babel/plugin-transform-typescript`, { isTSX: true }]],
+        // 名前だけで指定すると、ビルドするパッケージの側から解決される。そのパッケージが
+        // 別のメジャーバージョンに依存していても、このプリセットの依存を使うようにする。
+        // isTSX は Babel 8 でなくなった
+        plugins: [r(`@babel/plugin-transform-typescript`)],
+      },
+      {
+        // @babel/preset-react を外した .ts でも、React.createElement() などの呼び出しに
+        // これまでどおり /*#__PURE__*/ が付くようにする
+        test: /\.ts$/,
+        plugins: [r(`@babel/plugin-transform-react-pure-annotations`)],
       },
     ],
   }

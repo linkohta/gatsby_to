@@ -3,12 +3,9 @@ const child = require(`child_process`)
 
 it(`Builds cache-dir with minimal config`, done => {
   const args = [
-    require.resolve(`@babel/cli/bin/babel.js`),
+    path.join(__dirname, `fixtures`, `compile-cache-dir.js`),
     path.join(__dirname, `..`),
-    `--config-file`,
-    path.join(__dirname, `.babelrc`),
-    `--ignore`,
-    `**/__tests__`,
+    path.join(__dirname, `fixtures`, `minimal-babel-config.json`),
   ]
 
   const spawn = child.spawn(process.execPath, args)

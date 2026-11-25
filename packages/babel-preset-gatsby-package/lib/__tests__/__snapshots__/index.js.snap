@@ -5,9 +5,14 @@ Array [
   Array [
     "@babel/preset-env",
     Object {
-      "bugfixes": false,
       "debug": false,
-      "loose": true,
+      "exclude": Array [
+        "transform-typeof-symbol",
+      ],
+      "include": Array [
+        "transform-optional-chaining",
+        "transform-nullish-coalescing-operator",
+      ],
       "modules": "commonjs",
       "shippedProposals": true,
       "targets": Object {
@@ -17,11 +22,7 @@ Array [
           "not android 4.4.3",
         ],
       },
-      "useBuiltIns": false,
     },
-  ],
-  Array [
-    "@babel/preset-react",
   ],
   "@babel/preset-flow",
 ]
@@ -32,9 +33,14 @@ Array [
   Array [
     "@babel/preset-env",
     Object {
-      "bugfixes": false,
       "debug": true,
-      "loose": true,
+      "exclude": Array [
+        "transform-typeof-symbol",
+      ],
+      "include": Array [
+        "transform-optional-chaining",
+        "transform-nullish-coalescing-operator",
+      ],
       "modules": "commonjs",
       "shippedProposals": true,
       "targets": Object {
@@ -44,11 +50,7 @@ Array [
           "not android 4.4.3",
         ],
       },
-      "useBuiltIns": false,
     },
-  ],
-  Array [
-    "@babel/preset-react",
   ],
   "@babel/preset-flow",
 ]
@@ -59,21 +61,53 @@ Array [
   Array [
     "@babel/preset-env",
     Object {
-      "bugfixes": true,
       "debug": false,
-      "loose": true,
+      "exclude": Array [
+        "transform-typeof-symbol",
+      ],
+      "include": Array [
+        "transform-optional-chaining",
+        "transform-nullish-coalescing-operator",
+      ],
       "modules": false,
       "shippedProposals": true,
       "targets": Object {
         "esmodules": true,
       },
-      "useBuiltIns": false,
     },
   ],
-  Array [
-    "@babel/preset-react",
-  ],
   "@babel/preset-flow",
+]
+`;
+
+exports[`babel-preset-gatsby-package in node mode applies @babel/preset-react only outside of .ts files 1`] = `
+Array [
+  Object {
+    "exclude": /\\\\\\.ts\\$/,
+    "presets": Array [
+      Array [
+        "@babel/preset-react",
+        Object {
+          "runtime": "classic",
+        },
+      ],
+    ],
+  },
+  Object {
+    "plugins": Array [
+      "@babel/plugin-transform-typescript",
+    ],
+    "test": Array [
+      "**/*.ts",
+      "**/*.tsx",
+    ],
+  },
+  Object {
+    "plugins": Array [
+      "@babel/plugin-transform-react-pure-annotations",
+    ],
+    "test": /\\\\\\.ts\\$/,
+  },
 ]
 `;
 
@@ -82,20 +116,20 @@ Array [
   Array [
     "@babel/preset-env",
     Object {
-      "bugfixes": false,
-      "corejs": 3,
       "debug": false,
-      "loose": true,
+      "exclude": Array [
+        "transform-typeof-symbol",
+      ],
+      "include": Array [
+        "transform-optional-chaining",
+        "transform-nullish-coalescing-operator",
+      ],
       "modules": "commonjs",
       "shippedProposals": true,
       "targets": Object {
         "node": "22.0.0",
       },
-      "useBuiltIns": "entry",
     },
-  ],
-  Array [
-    "@babel/preset-react",
   ],
   "@babel/preset-flow",
 ]
@@ -106,21 +140,44 @@ Array [
   Array [
     "@babel/preset-env",
     Object {
-      "bugfixes": false,
-      "corejs": 3,
       "debug": true,
-      "loose": true,
+      "exclude": Array [
+        "transform-typeof-symbol",
+      ],
+      "include": Array [
+        "transform-optional-chaining",
+        "transform-nullish-coalescing-operator",
+      ],
       "modules": "commonjs",
       "shippedProposals": true,
       "targets": Object {
         "node": "22.0.0",
       },
-      "useBuiltIns": "entry",
     },
-  ],
-  Array [
-    "@babel/preset-react",
   ],
   "@babel/preset-flow",
 ]
+`;
+
+exports[`babel-preset-gatsby-package in node mode specifies the assumptions that replace the loose mode 1`] = `
+Object {
+  "constantReexports": true,
+  "constantSuper": true,
+  "enumerableModuleMeta": true,
+  "ignoreFunctionLength": true,
+  "ignoreToPrimitiveHint": true,
+  "mutableTemplateObject": true,
+  "noClassCalls": true,
+  "noClassPrototypeAssign": true,
+  "noConstructorPrimitiveReturn": true,
+  "objectRestNoSymbols": true,
+  "privateFieldsAsProperties": true,
+  "pureGetters": true,
+  "setClassMethods": true,
+  "setComputedProperties": true,
+  "setPublicClassFields": true,
+  "setSpreadProperties": true,
+  "skipForOfIteratorClosing": true,
+  "superIsCallableConstructor": true,
+}
 `;

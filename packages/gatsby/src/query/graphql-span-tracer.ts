@@ -12,8 +12,8 @@ import { pathToArray } from "./utils"
  *  親スパンを追跡し、その取得方法を知っている
  */
 export default class GraphQLSpanTracer implements IGraphQLSpanTracer {
-  parentActivity: IPhantomReporter
-  activities: Map<string, IPhantomReporter>
+  declare parentActivity: IPhantomReporter
+  declare activities: Map<string, IPhantomReporter>
 
   constructor(name: string, activityArgs: IActivityArgs) {
     this.parentActivity = report.phantomActivity(

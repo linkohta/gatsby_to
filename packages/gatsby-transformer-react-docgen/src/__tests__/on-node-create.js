@@ -37,7 +37,13 @@ describe(`transformer-react-doc-gen: onCreateNode`, () => {
         reporter: { error: console.error },
         createContentDigest,
       },
-      { cwd: path.join(__dirname, `fixtures`), ...opts }
+      {
+        cwd: path.join(__dirname, `fixtures`),
+        // react-docgen は Babel 7 で解析する。このパッケージの .babelrc はビルド用の
+        // Babel 8 向けの設定で、Babel 7 では読み込めないので、読み込ませない
+        babelrc: false,
+        ...opts,
+      }
     )
   }
 

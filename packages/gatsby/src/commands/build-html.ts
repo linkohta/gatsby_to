@@ -524,7 +524,7 @@ const renderPartialHydrationQueue = async (
 
 class BuildHTMLError extends Error {
   codeFrame = ``
-  context?: {
+  declare context?: {
     path: string
   }
 

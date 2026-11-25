@@ -10,8 +10,8 @@ let previousChunkMapJson: string | undefined
 let previousWebpackStatsJson: string | undefined
 
 export class GatsbyWebpackStatsExtractor {
-  private plugin: { name: string }
-  private publicPath: string
+  declare private plugin: { name: string }
+  declare private publicPath: string
 
   constructor(publicPath: string) {
     this.plugin = { name: `GatsbyWebpackStatsExtractor` }

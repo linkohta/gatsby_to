@@ -42,8 +42,8 @@ interface IGraphQLTag {
 }
 
 class StringInterpolationNotAllowedError extends Error {
-  interpolationStart: ISourcePosition | undefined
-  interpolationEnd: ISourcePosition | undefined
+  declare interpolationStart: ISourcePosition | undefined
+  declare interpolationEnd: ISourcePosition | undefined
 
   constructor(
     interpolationStart: ISourcePosition | undefined,
@@ -61,7 +61,7 @@ class StringInterpolationNotAllowedError extends Error {
 }
 
 class EmptyGraphQLTagError extends Error {
-  templateLoc: SourceLocation | null
+  declare templateLoc: SourceLocation | null
 
   constructor(locationOfGraphqlString: SourceLocation | null) {
     super(`BabelPluginRemoveGraphQLQueries: Unexpected empty graphql tag.`)
@@ -71,9 +71,9 @@ class EmptyGraphQLTagError extends Error {
 }
 
 class GraphQLSyntaxError extends Error {
-  documentText: string
-  originalError: Error
-  templateLoc: SourceLocation | null
+  declare documentText: string
+  declare originalError: Error
+  declare templateLoc: SourceLocation | null
 
   constructor(
     documentText: string,
@@ -91,8 +91,8 @@ class GraphQLSyntaxError extends Error {
 }
 
 class ExportIsNotAsyncError extends Error {
-  exportStart: ISourcePosition | undefined
-  exportName: string
+  declare exportStart: ISourcePosition | undefined
+  declare exportName: string
 
   constructor(exportName: string, exportStart: ISourcePosition | undefined) {
     super(

@@ -11,12 +11,9 @@ module.exports = {
     ]
   ],
   plugins: [
-    [
-      `@babel/plugin-proposal-private-methods`,
-      {
-        loose: true,
-      },
-    ],
+    // Babel 8 では loose オプションがなくなった。同じ出力になる assumptions は
+    // babel-preset-gatsby-package が指定している
+    `@babel/plugin-transform-private-methods`,
     [
       `babel-plugin-module-resolver`,
       {
@@ -25,12 +22,7 @@ module.exports = {
         },
       },
     ],
-    [
-      `@babel/plugin-proposal-class-properties`,
-      {
-        loose: true,
-      },
-    ],
+    `@babel/plugin-transform-class-properties`,
     [
       `import-globals`,
       {

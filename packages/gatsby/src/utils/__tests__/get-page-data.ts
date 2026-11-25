@@ -40,10 +40,15 @@ jest.mock(`../cache-lmdb`, () => {
       init(): MockedCache {
         return this
       }
-      async get<T = unknown>(key): Promise<T | undefined> {
+      // 型引数の名前を mock で始めているのは、Babel 8 では型引数の名前も識別子のノードになり、
+      // babel-plugin-jest-hoist がモジュールファクトリーの外の変数への参照とみなすためである
+      async get<MockValue = unknown>(key): Promise<MockValue | undefined> {
         return MOCK_LMDBCACHE_INFO[key]
       }
-      async set<T>(key: string, value: T): Promise<T | undefined> {
+      async set<MockValue>(
+        key: string,
+        value: MockValue
+      ): Promise<MockValue | undefined> {
         MOCK_LMDBCACHE_INFO[key] = value
         return value
       }

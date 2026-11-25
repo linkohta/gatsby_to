@@ -30,13 +30,9 @@ module.exports = {
               [
                 `@babel/preset-env`,
                 {
-                  corejs: 3,
-                  loose: true,
-                  bugfixes: true,
                   // graphiql 6 は ESM 専用で、`exports` に `import` の条件しかない。
                   // CommonJS に変換すると解決できなくなるので、変換は webpack に任せる
                   modules: false,
-                  useBuiltIns: `entry`,
                   targets: [
                     `>0.25% and supports es6-module`,
                     `not dead and supports es6-module`,
@@ -46,20 +42,33 @@ module.exports = {
               [
                 `@babel/preset-react`,
                 {
-                  useBuiltIns: true,
+                  // Babel 8 は既定が automatic になった。出力を変えないために classic を指定する
+                  runtime: `classic`,
                   pragma: `React.createElement`,
                   development: mode !== `production`,
                 },
               ],
             ],
-            plugins: [
-              [
-                `@babel/plugin-proposal-class-properties`,
-                {
-                  loose: true,
-                },
-              ],
-            ],
+            // Babel 8 では preset-env の `loose` がなくなったので、同じ出力になる
+            // assumptions を個別に指定する
+            assumptions: {
+              arrayLikeIsIterable: true,
+              constantReexports: true,
+              enumerableModuleMeta: true,
+              ignoreFunctionLength: true,
+              ignoreToPrimitiveHint: true,
+              mutableTemplateObject: true,
+              noClassCalls: true,
+              objectRestNoSymbols: true,
+              privateFieldsAsProperties: true,
+              pureGetters: true,
+              setClassMethods: true,
+              setComputedProperties: true,
+              setPublicClassFields: true,
+              setSpreadProperties: true,
+              skipForOfIteratorClosing: true,
+              superIsCallableConstructor: true,
+            },
           },
         },
       },

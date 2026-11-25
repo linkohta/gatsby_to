@@ -31,7 +31,7 @@ interface IRequest {
  * このリゾルバーは、バンドルをできるだけ小さくするために core-js@2 の import を core-js@3 の import へ変換する。
  */
 export class CoreJSResolver {
-  _coreJSNodeModulesPath: string
+  declare _coreJSNodeModulesPath: string
 
   constructor() {
     // gatsby の core-js が置かれている node_modules ディレクトリを取得する

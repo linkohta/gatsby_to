@@ -1,6 +1,6 @@
 import { NodePath, PluginObj, Visitor } from "@babel/core"
-import * as BabelTypes from "@babel/types"
-import { Program } from "@babel/types"
+import type * as BabelTypes from "@babel/types"
+import type { Program } from "@babel/types"
 
 // フックらしい名前のものすべてに一致する（デフォルト）
 const isHook = /^use[A-Z]/

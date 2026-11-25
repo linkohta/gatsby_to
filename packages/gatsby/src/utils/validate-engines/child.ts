@@ -5,9 +5,9 @@ import * as path from "path"
 const originalModuleLoad = mod._load
 
 class EngineValidationError extends Error {
-  request: string
-  relativeToRoot: string
-  parentPath: string
+  declare request: string
+  declare relativeToRoot: string
+  declare parentPath: string
 
   constructor({
     request,

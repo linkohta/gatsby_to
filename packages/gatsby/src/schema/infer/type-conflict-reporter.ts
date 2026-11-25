@@ -55,8 +55,8 @@ const formatValue = (value: unknown): string => {
 }
 
 class TypeConflictEntry {
-  selector: string
-  types: Map<string, ITypeConflict>
+  declare selector: string
+  declare types: Map<string, ITypeConflict>
 
   constructor(selector: string) {
     this.selector = selector
@@ -90,7 +90,7 @@ class TypeConflictEntry {
 }
 
 class TypeConflictReporter {
-  entries: Map<string, TypeConflictEntry>
+  declare entries: Map<string, TypeConflictEntry>
 
   constructor() {
     this.entries = new Map()
