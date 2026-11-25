@@ -8,8 +8,8 @@ interface ITaskQueueNode<ValueType> {
  * 双方向連結リストで実装したタスクキュー
  */
 export class TaskQueue<ValueType> {
-  private head?: ITaskQueueNode<ValueType>
-  private tail?: ITaskQueueNode<ValueType>;
+  declare private head?: ITaskQueueNode<ValueType>
+  declare private tail?: ITaskQueueNode<ValueType>;
 
   *[Symbol.iterator](): Iterator<ITaskQueueNode<ValueType>> {
     let currentHead = this.head

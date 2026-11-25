@@ -33,7 +33,7 @@ export class WebsocketManager {
   clients: Set<IClientInfo> = new Set()
   errors: Map<string, string> = new Map()
   staticQueryResults: QueryResultsMap = new Map()
-  websocket: SocketIO | undefined
+  declare websocket: SocketIO | undefined
 
   init = ({ server }: { server: HTTPSServer | HTTPServer }): SocketIO => {
     // TypeScript の型チェックを通すためのもの。これがないと this.websocket が undefined だとエラーになる

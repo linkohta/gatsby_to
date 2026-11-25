@@ -34,7 +34,7 @@ const tracerReadyPromise = initTracer(
 
 export class GraphQLEngine {
   // private schema: GraphQLSchema
-  private runnerPromise?: Promise<GraphQLRunner>
+  declare private runnerPromise?: Promise<GraphQLRunner>
 
   constructor({ dbPath }: { dbPath: string }) {
     setupLmdbStore({ dbPath })

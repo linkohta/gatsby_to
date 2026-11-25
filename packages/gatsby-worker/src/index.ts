@@ -61,12 +61,12 @@ export type CreateWorkerPoolType<ExposedFunctions> = WorkerPool & {
 const childWrapperPath = require.resolve(`./child`)
 
 class TaskInfo<T> {
-  functionName: T
-  args: Array<any>
-  assignedToWorker?: IWorkerInfo<T>
-  promise: Promise<any>
-  resolve!: (r: any) => void
-  reject!: (e: Error) => void
+  declare functionName: T
+  declare args: Array<any>
+  declare assignedToWorker?: IWorkerInfo<T>
+  declare promise: Promise<any>
+  declare resolve: (r: any) => void
+  declare reject: (e: Error) => void
 
   constructor(opts: {
     functionName: T
@@ -117,7 +117,7 @@ export class WorkerPool<
   /**
    * すべてのワーカーでタスクの実行を予約する。ワーカーの初期設定に役立つ
    */
-  all: {
+  declare all: {
     [FunctionName in keyof WorkerModuleExports]: WrapReturnInArray<
       EnsureFunctionReturnsAPromise<WorkerModuleExports[FunctionName]>
     >
@@ -126,7 +126,7 @@ export class WorkerPool<
   /**
    * 1 つのワーカーでタスクの実行を予約する。複数のワーカーにタスクを分散させるのに役立つ。
    */
-  single: {
+  declare single: {
     [FunctionName in keyof WorkerModuleExports]: EnsureFunctionReturnsAPromise<
       WorkerModuleExports[FunctionName]
     >

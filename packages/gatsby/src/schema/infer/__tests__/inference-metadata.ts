@@ -344,8 +344,8 @@ describe(`Get example value for type inference`, () => {
 
   it(`goes through nested object-like objects`, () => {
     class ObjectLike {
-      key1: number
-      key2: string
+      declare key1: number
+      declare key2: string
       constructor(key1: number, key2: string) {
         this.key1 = key1
         this.key2 = key2

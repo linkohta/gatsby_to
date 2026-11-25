@@ -47,10 +47,12 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset()
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          "@babel/plugin-proposal-nullish-coalescing-operator",
-          "@babel/plugin-proposal-optional-chaining",
-          "@babel/plugin-transform-runtime",
-          "@babel/plugin-syntax-dynamic-import",
+          Array [
+            "@babel/plugin-transform-runtime",
+            Object {
+              "version": "7.0.0-beta.0",
+            },
+          ],
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",
@@ -64,6 +66,7 @@ describe(`babel-preset-gatsby-package`, () => {
             },
           ],
           "@sigmacomputing/babel-plugin-lodash",
+          "./babel-transform-static-import-specifier",
         ]
       `)
     })
@@ -76,6 +79,16 @@ describe(`babel-preset-gatsby-package`, () => {
     it(`specifies proper presets for debugging`, () => {
       const { presets } = preset(null, { debug: true })
       expect(presets).toMatchSnapshot()
+    })
+
+    it(`specifies the assumptions that replace the loose mode`, () => {
+      const { assumptions } = preset()
+      expect(assumptions).toMatchSnapshot()
+    })
+
+    it(`applies @babel/preset-react only outside of .ts files`, () => {
+      const { overrides } = preset()
+      expect(overrides).toMatchSnapshot()
     })
 
     it(`can pass custom nodeVersion target`, () => {
@@ -120,10 +133,12 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset(null, { availableCompilerFlags: [`MAJOR`] })
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          "@babel/plugin-proposal-nullish-coalescing-operator",
-          "@babel/plugin-proposal-optional-chaining",
-          "@babel/plugin-transform-runtime",
-          "@babel/plugin-syntax-dynamic-import",
+          Array [
+            "@babel/plugin-transform-runtime",
+            Object {
+              "version": "7.0.0-beta.0",
+            },
+          ],
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",
@@ -137,6 +152,7 @@ describe(`babel-preset-gatsby-package`, () => {
             },
           ],
           "@sigmacomputing/babel-plugin-lodash",
+          "./babel-transform-static-import-specifier",
         ]
       `)
     })
@@ -172,10 +188,12 @@ describe(`babel-preset-gatsby-package`, () => {
       const { plugins } = preset(null, { browser: true })
       expect(plugins).toMatchInlineSnapshot(`
         Array [
-          "@babel/plugin-proposal-nullish-coalescing-operator",
-          "@babel/plugin-proposal-optional-chaining",
-          "@babel/plugin-transform-runtime",
-          "@babel/plugin-syntax-dynamic-import",
+          Array [
+            "@babel/plugin-transform-runtime",
+            Object {
+              "version": "7.0.0-beta.0",
+            },
+          ],
           "babel-plugin-dynamic-import-node",
           Array [
             "./babel-transform-compiler-flags",
@@ -189,6 +207,7 @@ describe(`babel-preset-gatsby-package`, () => {
             },
           ],
           "@sigmacomputing/babel-plugin-lodash",
+          "./babel-transform-static-import-specifier",
         ]
       `)
     })

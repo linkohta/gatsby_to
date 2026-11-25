@@ -47,10 +47,10 @@ export const getDebugInfo = (program: IProgram): IDebugInfo | null => {
 }
 
 class ControllableScript {
-  private process?: ChildProcess
-  private script
-  private debugInfo: IDebugInfo | null
-  public isRunning
+  declare private process?: ChildProcess
+  declare private script
+  declare private debugInfo: IDebugInfo | null
+  declare public isRunning
   constructor(script, debugInfo: IDebugInfo | null) {
     this.script = script
     this.debugInfo = debugInfo

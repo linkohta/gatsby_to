@@ -17,13 +17,13 @@ interface ICacheProperties {
 }
 
 export default class GatsbyCache {
-  public name: string
-  public store: Store
-  public directory: string
+  declare public name: string
+  declare public store: Store
+  declare public directory: string
   // TODO: v4 で `.cache` を削除する。これは互換モードである。cache-manager のキャッシュ実装は
   // 内部のキャッシュを公開しており、公開のキャッシュインターフェースにはなかった `.del` 関数を
   // 使えるようにしていた（gatsby-plugin-sharp が、不要になったデータを消去するために使っている）
-  public cache?: MultiCache
+  declare public cache?: MultiCache
 
   // @ts-ignore - set & get types are missing from fsStore?
   constructor({ name = `db`, store = fsStore }: ICacheProperties = {}) {

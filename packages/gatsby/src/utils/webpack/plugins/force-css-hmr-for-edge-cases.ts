@@ -13,9 +13,9 @@ import { Compiler, Module } from "webpack"
  *  - （ランタイムが）まだ読み込んでいないページテンプレートが import している css が変更されたとき、css が再読み込みされる
  */
 export class ForceCssHMRForEdgeCases {
-  private name: string
-  private originalBlankCssHash: string | undefined
-  private blankCssKey: string | undefined
+  declare private name: string
+  declare private originalBlankCssHash: string | undefined
+  declare private blankCssKey: string | undefined
   private hackCounter = 0
   private previouslySeenCss: Set<string> = new Set<string>()
 

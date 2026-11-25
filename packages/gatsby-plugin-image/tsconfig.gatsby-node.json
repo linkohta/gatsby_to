@@ -1,0 +1,26 @@
+{
+  // build:gatsby-node 用の設定。ルートの `@babel/core` はビルド用の Babel 8 で型定義を
+  // 同梱しているが、このパッケージのプラグインは利用者の Babel 7 で動く。
+  // `paths` はコマンドラインから指定できないので、設定ファイルにしている
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "es2022",
+    "module": "commonjs",
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationDir": "./dist/src",
+    "paths": {
+      "@babel/core": ["../../node_modules/@types/babel__core"]
+    }
+  },
+  "files": [
+    "./src/gatsby-node.ts",
+    "./src/babel-plugin-parse-static-images.ts",
+    "./src/resolver-utils.ts",
+    "./src/types.d.ts"
+  ]
+}

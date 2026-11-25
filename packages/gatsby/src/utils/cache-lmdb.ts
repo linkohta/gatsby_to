@@ -26,15 +26,15 @@ function getAlreadyOpenedStore(): RootDatabase | undefined {
 }
 
 export default class GatsbyCacheLmdb {
-  private db: Database | undefined
-  private encoding: DatabaseOptions[`encoding`]
-  public readonly name: string
+  declare private db: Database | undefined
+  declare private encoding: DatabaseOptions[`encoding`]
+  declare public readonly name: string
   // キャッシュディレクトリにデータを書き込みたいプラグインのために必要である
-  public readonly directory: string
+  declare public readonly directory: string
   // TODO: v4 で `.cache` を削除する。これは互換モードである。cache-manager のキャッシュ実装は
   // 内部のキャッシュを公開しており、公開のキャッシュインターフェースにはなかった `.del` 関数を
   // 使えるようにしていた（gatsby-plugin-sharp が、不要になったデータを消去するために使っている）
-  public readonly cache: GatsbyCacheLmdb
+  declare public readonly cache: GatsbyCacheLmdb
 
   constructor({
     name = `db`,

@@ -10,6 +10,7 @@
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
     "paths": {
       "@reach/router/*": ["../../node_modules/@gatsbyjs/reach-router/*"],
+      "@babel/core": ["../../node_modules/@types/babel__core"],
       "react": ["./node_modules/@types/react"]
     }
   },

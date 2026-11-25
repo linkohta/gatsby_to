@@ -4,7 +4,20 @@ const { fixupPluginRules } = require(`@eslint/compat`)
 const js = require(`@eslint/js`)
 const globals = require(`globals`)
 const babelParser = require(`@babel/eslint-parser`)
-const babelPlugin = require(`@babel/eslint-plugin`)
+const { builtinRules } = require(`eslint/use-at-your-own-risk`)
+// @babel/eslint-plugin 8 は ESM 専用なので、require() ではプラグイン本体が default に入る
+const babelEslintPlugin = require(`@babel/eslint-plugin`).default
+
+// @babel/eslint-plugin 8 では no-invalid-this がなくなった。クラスフィールドには ESLint 本体の
+// ルールが対応済みなので、本体のルールを同じ名前で登録する。各ファイルにある
+// `eslint-disable @babel/no-invalid-this` をそのまま使えるようにするためである
+const babelPlugin = {
+  ...babelEslintPlugin,
+  rules: {
+    ...babelEslintPlugin.rules,
+    "no-invalid-this": builtinRules.get(`no-invalid-this`),
+  },
+}
 const tsParser = require(`@typescript-eslint/parser`)
 const tsPlugin = require(`@typescript-eslint/eslint-plugin`)
 const stylistic = require(`@stylistic/eslint-plugin`)

@@ -27,7 +27,7 @@ type ProcessWithPNP = NodeJS.ProcessVersions & { pnp?: string }
  * 直接使う構成に変えて、このプラグイン自体を不要にする方法もある
  */
 export class CacheFolderResolver {
-  private requestsFolder: string
+  declare private requestsFolder: string
   private isEnabled = false
 
   constructor(requestsFolder: string) {

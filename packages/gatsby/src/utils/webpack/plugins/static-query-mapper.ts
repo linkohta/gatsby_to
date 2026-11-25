@@ -60,8 +60,8 @@ function getRealPath(
 }
 
 export class StaticQueryMapper {
-  private store: Store<IGatsbyState>
-  private name: string
+  declare private store: Store<IGatsbyState>
+  declare private name: string
 
   constructor(store) {
     this.store = store
