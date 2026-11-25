@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "paths": {
       // paths はルートの tsconfig.json の設定を上書きするので、ルートの設定も書き写している
       "@reach/router/*": ["../../node_modules/@gatsbyjs/reach-router/*"],

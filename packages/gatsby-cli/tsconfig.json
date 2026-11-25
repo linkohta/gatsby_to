@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "include": ["src"],
   "compilerOptions": {
+    "rootDir": "./src",
     "skipLibCheck": true,
     // ink 3 は React 18 が必要なので、このパッケージだけ React 18 の型定義を使う。
     // 他のパッケージの型定義（`gatsby` など）経由でルートの React 19 の型定義が

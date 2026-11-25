@@ -4,7 +4,7 @@
   "scripts": {
     "build": "npm-run-all --npm-path npm -s clean -p build:*",
     "postbuild": "prepend-directive --files=dist/gatsby-image.browser.js,dist/gatsby-image.browser.modern.js --directive=\"use client\"",
-    "build:gatsby-node": "tsc --jsx react --downlevelIteration true --skipLibCheck true --esModuleInterop true --outDir dist/ src/gatsby-node.ts src/babel-plugin-parse-static-images.ts src/resolver-utils.ts src/types.d.ts -d --declarationDir dist/src",
+    "build:gatsby-node": "tsc --ignoreConfig --jsx react --target es2022 --module commonjs --strict false --skipLibCheck true --esModuleInterop true --outDir dist/ src/gatsby-node.ts src/babel-plugin-parse-static-images.ts src/resolver-utils.ts src/types.d.ts -d --declarationDir dist/src",
     "build:gatsby-ssr": "microbundle -i src/gatsby-ssr.tsx -f cjs -o ./[name].js --no-pkg-main --jsx React.createElement --jsxFragment React.Fragment --no-compress --external=common-tags,react --no-sourcemap",
     "build:server": "microbundle -f cjs,es --jsx React.createElement --jsxFragment React.Fragment --define SERVER=true",
     "build:browser": "microbundle -i src/index.browser.ts -f cjs,modern --jsx React.createElement --jsxFragment React.Fragment -o dist/gatsby-image.browser --define SERVER=false",
@@ -64,7 +64,7 @@
     "prepend-directive": "^1.1.0",
     "semver": "^7.8.6",
     "terser": "^5.51.4",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "@babel/core": "^7.12.3",

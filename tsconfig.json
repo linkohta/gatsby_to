@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "types": ["*"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,

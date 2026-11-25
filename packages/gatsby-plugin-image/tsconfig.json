@@ -4,15 +4,16 @@
     "declaration": true,
     "declarationMap": true,
     "jsx": "react",
-    "target": "es5",
+    "target": "es2015",
     "outDir": "./dist",
     "declarationDir": "./dist",
     "lib": ["es2016", "dom"],
     "esModuleInterop": true,
     "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "node",
-    "downlevelIteration": true
+    "moduleResolution": "bundler",
+    "strict": false,
+    "types": ["*"]
     // "jsxFactory": "createElement"
   },
   "files": ["./src/global.ts", "./src/index.ts", "./src/index.browser.ts"]

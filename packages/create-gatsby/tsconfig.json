@@ -48,6 +48,7 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "allowArbitraryExtensions": true,
     "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.json", "src/**/*.js"],
