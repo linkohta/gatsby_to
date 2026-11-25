@@ -1,9 +1,9 @@
-const Remark = require(`remark`)
-const visit = require(`unist-util-visit`)
+const { remark: createRemark } = require(`remark`)
+const { visit } = require(`unist-util-visit`)
 
 const plugin = require(`../`)
 
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,

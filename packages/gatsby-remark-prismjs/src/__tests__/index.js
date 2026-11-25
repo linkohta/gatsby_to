@@ -1,4 +1,4 @@
-const remark = require(`remark`)
+const { remark } = require(`remark`)
 const cheerio = require(`cheerio`)
 let plugin
 

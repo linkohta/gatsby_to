@@ -683,9 +683,9 @@ Object {
 <p><a href=\\"/My%20Blog%20Post/#my-blog-post\\">My Blog Post</a></p>
 <ul>
 <li>
-<p><a href=\\"/My%20Blog%20Post/#generating-tocs-with-code-classlanguage-textgatsby-transformer-remarkcode\\">Generating TOCs with <code class=\\"language-text\\">gatsby-transformer-remark</code></a></p>
+<p><a href=\\"/My%20Blog%20Post/#generating-tocs-with-\\">Generating TOCs with <code class=\\"language-text\\">gatsby-transformer-remark</code></a></p>
 <ul>
-<li><a href=\\"/My%20Blog%20Post/#embedding-code-classlanguage-textltcodecode-tags\\">Embedding <code class=\\"language-text\\">&lt;code></code> Tags</a></li>
+<li><a href=\\"/My%20Blog%20Post/#embedding--tags\\">Embedding <code class=\\"language-text\\">&lt;code></code> Tags</a></li>
 </ul>
 </li>
 </ul>

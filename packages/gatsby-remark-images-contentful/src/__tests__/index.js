@@ -90,9 +90,9 @@ const createPluginOptions = (content, imagePaths = `/`, options = {}) => {
     ...options,
   }
 }
-const Remark = require(`remark`)
+const { remark: createRemark } = require(`remark`)
 const plugin = require(`../index`)
-const remark = new Remark().data(`settings`, {
+const remark = createRemark().data(`settings`, {
   commonmark: true,
   footnotes: true,
   pedantic: true,

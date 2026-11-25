@@ -3,7 +3,7 @@
 const path = require(`path`)
 const fs = require(`fs`)
 const normalizePath = require(`normalize-path`)
-const visit = require(`unist-util-visit`)
+const { visit } = require(`unist-util-visit`)
 const rangeParser = require(`parse-numeric-range`)
 
 // 言語のデフォルトは extension.toLowerCase() である。
