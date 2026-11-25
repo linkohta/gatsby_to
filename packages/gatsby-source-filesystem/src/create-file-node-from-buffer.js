@@ -1,6 +1,6 @@
 const fs = require(`fs-extra`)
 const path = require(`path`)
-const fileType = require(`file-type`)
+const { fileTypeFromBuffer } = require(`file-type`)
 
 const { createFileNode } = require(`./create-file-node`)
 const { createContentDigest, createFilePath } = require(`gatsby-core-utils`)
@@ -69,7 +69,7 @@ async function processBufferNode({
     // ユーザーが拡張子を指定せず、リモートファイルからも取得できなかった場合は、
     // 推測を試みる
     if (typeof ext === `undefined`) {
-      const filetype = await fileType.fromBuffer(buffer)
+      const filetype = await fileTypeFromBuffer(buffer)
       ext = filetype ? `.${filetype.ext}` : `.bin`
     }
     filename = createFilePath(path.join(pluginCacheDir, hash), name, ext)
