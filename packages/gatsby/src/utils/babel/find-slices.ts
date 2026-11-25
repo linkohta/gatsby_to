@@ -1,5 +1,5 @@
 import traverse from "@babel/traverse"
-import type { Node } from "@babel/core"
+import type { types as BabelTypes } from "@babel/core"
 import { getAttributeValues } from "babel-jsx-utils"
 import reporter from "gatsby-cli/lib/reporter"
 
@@ -41,7 +41,7 @@ export function mergePreviouslyCollectedSlices(
 }
 
 export function collectSlices(
-  ast: Node,
+  ast: BabelTypes.Node,
   filename: string
 ): Record<string, ICollectedSlice> | null {
   const result: Record<string, ICollectedSlice> = {}
@@ -56,7 +56,8 @@ export function collectSlices(
       const unresolvedProps: Array<string> = []
 
       const props = getAttributeValues(
-        nodePath,
+        // babel-jsx-utils の型定義は Babel 7 の NodePath を前提にしている
+        nodePath as unknown as Parameters<typeof getAttributeValues>[0],
         prop => {
           unresolvedProps.push(prop)
         },

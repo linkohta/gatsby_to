@@ -1,19 +1,23 @@
-import { transform as babelTransform } from "@babel/core"
+import { transformSync as babelTransform, type PresetItem } from "@babel/core"
 import plugin from "../"
+
+// Babel 8 の `@babel/preset-react` は automatic ランタイムがデフォルトになった。ここで確かめたいのは
+// クエリの変換なので、JSX の出力はこれまでと同じ classic のままにしている
+const reactPreset: PresetItem = [`@babel/preset-react`, { runtime: `classic` }]
 
 function matchesSnapshot(query): void {
   // @ts-ignore - code exists
   const { code: codeWithoutFileName } = babelTransform(query, {
-    presets: [`@babel/preset-react`],
+    presets: [reactPreset],
     plugins: [plugin],
   })
   // @ts-ignore - code exists
   const { code: codeWithFileName } = babelTransform(query, {
-    presets: [`@babel/preset-react`],
+    presets: [reactPreset],
     plugins: [plugin],
     filename: `src/components/test.js`,
     // ファイル名を渡すと、Babel はリポジトリのルートの .babelrc.js を読み込む。これは
-    // ビルド用の Babel 8 向けの設定で、このテストが使う Babel 7 では読み込めない
+    // パッケージのビルド用の設定で、このテストで確かめたい出力を変えてしまう
     babelrc: false,
   })
 
@@ -24,7 +28,7 @@ function matchesSnapshot(query): void {
 function transform(query): string | null | undefined {
   // @ts-ignore - code exists
   const { code } = babelTransform(query, {
-    presets: [`@babel/preset-react`],
+    presets: [reactPreset],
     plugins: [plugin],
   })
   return code

@@ -4,24 +4,9 @@ exports[`dependencies should specify proper presets and plugins 1`] = `
 Object {
   "plugins": Array [
     Array [
-      "<PROJECT_ROOT>/node_modules/@babel/plugin-transform-runtime/lib/index.js",
+      "<PROJECT_ROOT>/node_modules/babel-plugin-polyfill-corejs3/lib/index.js",
       Object {
-        "absoluteRuntime": "<PROJECT_ROOT>/node_modules/@babel/runtime",
-        "corejs": false,
-        "helpers": true,
-        "regenerator": true,
-        "useESModules": true,
-      },
-    ],
-    "<PROJECT_ROOT>/node_modules/@babel/plugin-syntax-dynamic-import/lib/index.js",
-  ],
-  "presets": Array [
-    Array [
-      "<PROJECT_ROOT>/node_modules/@babel/preset-env/lib/index.js",
-      Object {
-        "corejs": 3,
         "exclude": Array [
-          "transform-typeof-symbol",
           "es.symbol",
           "es.symbol.async-iterator",
           "es.symbol.has-instance",
@@ -216,9 +201,28 @@ Object {
           "es.array.reduce",
           "es.array.reduce-right",
         ],
+        "method": "usage-global",
+        "targets": undefined,
+        "version": "3.0",
+      },
+    ],
+    Array [
+      "<PROJECT_ROOT>/node_modules/@babel/plugin-transform-runtime/lib/index.js",
+      Object {
+        "absoluteRuntime": "<PROJECT_ROOT>/node_modules/@babel/runtime",
+        "moduleName": "@babel/runtime",
+      },
+    ],
+  ],
+  "presets": Array [
+    Array [
+      "<PROJECT_ROOT>/node_modules/@babel/preset-env/lib/index.js",
+      Object {
+        "exclude": Array [
+          "transform-typeof-symbol",
+        ],
         "modules": false,
         "targets": undefined,
-        "useBuiltIns": "usage",
       },
     ],
   ],

@@ -1,11 +1,11 @@
-import { transform } from "@babel/core"
+import { transformSync } from "@babel/core"
 import preset from "../index"
 import plugin from "../optimize-hook-destructuring"
 
 const trim = s => s.join(`\n`).trim().replace(/^\s+/gm, ``)
 
 const babel = code =>
-  transform(code, {
+  transformSync(code, {
     filename: `noop.js`,
     presets: [preset],
     plugins: [plugin],

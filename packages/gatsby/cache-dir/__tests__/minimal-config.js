@@ -1,11 +1,22 @@
 const path = require(`path`)
 const child = require(`child_process`)
 
+// @babel/cli 8 は `exports` で package.json だけを公開しているので、実行ファイルの場所は
+// package.json の場所から組み立てる
+const babelCli = path.join(
+  path.dirname(require.resolve(`@babel/cli/package.json`)),
+  `bin`,
+  `babel.js`
+)
+
 it(`Builds cache-dir with minimal config`, done => {
   const args = [
-    path.join(__dirname, `fixtures`, `compile-cache-dir.js`),
+    babelCli,
     path.join(__dirname, `..`),
-    path.join(__dirname, `fixtures`, `minimal-babel-config.json`),
+    `--config-file`,
+    path.join(__dirname, `.babelrc`),
+    `--ignore`,
+    `**/__tests__`,
   ]
 
   const spawn = child.spawn(process.execPath, args)

@@ -38,11 +38,12 @@ describe(`babel-preset-gatsby`, () => {
   })
 
   it(`Allows to configure react runtime`, () => {
-    const { presets } = preset(null, {
+    const { overrides } = preset(null, {
       reactRuntime: `automatic`,
     })
 
-    expect(presets[1]).toEqual([
+    // @babel/preset-react は、`.ts` 以外のファイルにだけ適用する overrides の中にある
+    expect(overrides[0].presets[0]).toEqual([
       expect.stringContaining(path.join(`@babel`, `preset-react`)),
       expect.objectContaining({
         pragma: undefined,
@@ -52,12 +53,12 @@ describe(`babel-preset-gatsby`, () => {
   })
 
   it(`Allows to configure react importSource`, () => {
-    const { presets } = preset(null, {
+    const { overrides } = preset(null, {
       reactImportSource: `@emotion/react`,
       reactRuntime: `automatic`,
     })
 
-    expect(presets[1]).toEqual([
+    expect(overrides[0].presets[0]).toEqual([
       expect.stringContaining(path.join(`@babel`, `preset-react`)),
       expect.objectContaining({
         importSource: `@emotion/react`,

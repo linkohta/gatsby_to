@@ -6,6 +6,8 @@ rendering.
 
 **This plugin supports Emotion v11+**
 
+> **Known issue with Babel 8:** Gatsby now compiles sites with Babel 8, but `@emotion/babel-plugin` (up to 11.13.5) calls an API that Babel 8 removed. Builds fail with `path.hoist is not a function` as soon as a file contains static styles (for example the `css` prop or a `css` call). This plugin cannot be used until Emotion releases a version that supports Babel 8.
+
 Older versions should use versions of this plugin which support Emotion 8 and 9. Check out the Emotion 10 [migration
 guide](https://emotion.sh/docs/migrating-to-emotion-10#incremental-migration) for more information on how to upgrade.
 

@@ -77,16 +77,16 @@ describe(`Babelrc actions/reducer`, () => {
 
   it(`sets default presets/plugins if there's no userland babelrc`, () => {
     const fakeResolver = (moduleName): string => `/path/to/module/${moduleName}`
-    const babel = { createConfigItem: jest.fn() } as any
+    const babel = { createConfigItemSync: jest.fn() } as any
 
     prepareOptions(babel, { stage: `test` as any }, fakeResolver as any)
 
-    expect(babel.createConfigItem.mock.calls).toMatchSnapshot()
+    expect(babel.createConfigItemSync.mock.calls).toMatchSnapshot()
   })
 
   it(`adds stage option to babel-preset-gatsby defined with userland babelrc`, () => {
     const fakeResolver = (moduleName): string => `/path/to/module/${moduleName}`
-    const babel = { createConfigItem: jest.fn() }
+    const babel = { createConfigItemSync: jest.fn() }
     const presets: any = [
       {
         file: { resolved: fakeResolver(`babel-preset-gatsby`) },
@@ -95,7 +95,7 @@ describe(`Babelrc actions/reducer`, () => {
 
     addRequiredPresetOptions(babel, presets, { stage: `develop` }, fakeResolver)
 
-    expect(babel.createConfigItem.mock.calls).toMatchSnapshot()
+    expect(babel.createConfigItemSync.mock.calls).toMatchSnapshot()
   })
 
   it(`allows setting options`, () => {
@@ -126,7 +126,7 @@ describe(`Babelrc actions/reducer`, () => {
   })
 
   it(`allows merging config items`, () => {
-    const babel = { createConfigItem: jest.fn() } as any
+    const babel = { createConfigItemSync: jest.fn() } as any
     // ここで新しい変更がマージされる。
     mergeConfigItemOptions({
       items: [
@@ -146,7 +146,7 @@ describe(`Babelrc actions/reducer`, () => {
       type: `plugin`,
       babel,
     })
-    expect(babel.createConfigItem.mock.calls).toMatchSnapshot()
+    expect(babel.createConfigItemSync.mock.calls).toMatchSnapshot()
 
     expect(
       mergeConfigItemOptions({

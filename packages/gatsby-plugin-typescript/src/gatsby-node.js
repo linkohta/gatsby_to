@@ -1,18 +1,51 @@
 const resolvableExtensions = () => [`.ts`, `.tsx`]
 
+// Babel 8 の @babel/preset-typescript は、`isTSX`、`allExtensions`、`allowDeclareFields` を
+// 渡すとエラーにする。このプラグインのオプションとしては引き続き受け取り、
+// Babel 8 で同じ意味になる指定に置き換える
+function toPresetOptions({
+  // すべてのファイルで JSX をパースする指定だった。Babel 8 では @babel/plugin-syntax-jsx で有効にする
+  isTSX: _isTSX,
+  allExtensions,
+  // Babel 8 では常に有効で、無効にはできない
+  allowDeclareFields: _allowDeclareFields,
+  // Gatsby がすべてのプラグインのオプションに追加するもので、プリセットのオプションではない。
+  // Babel 8 のプリセットは、知らないオプションを渡すとエラーにする
+  plugins: _plugins,
+  ...presetOptions
+}) {
+  return {
+    // Babel 8 では既定値が true に変わった。true にすると、型としてだけ使っている import が
+    // `import type` で書かれていない限り残るので、これまでと同じ false を既定にする
+    onlyRemoveTypeImports: false,
+    ...presetOptions,
+    // `allExtensions` は、拡張子に関係なくすべてのファイルを TypeScript として扱う指定だった
+    ...(allExtensions && { ignoreExtensions: true }),
+  }
+}
+
 function onCreateBabelConfig({ actions }, options) {
+  const { isTSX, allExtensions } = options
+
   actions.setBabelPreset({
     name: require.resolve(`@babel/preset-typescript`),
-    options,
+    options: toPresetOptions(options),
+  })
+  if (allExtensions && isTSX) {
+    actions.setBabelPlugin({
+      name: require.resolve(`@babel/plugin-syntax-jsx`),
+    })
+  }
+  actions.setBabelPlugin({
+    name: require.resolve(`@babel/plugin-transform-optional-chaining`),
   })
   actions.setBabelPlugin({
-    name: require.resolve(`@babel/plugin-proposal-optional-chaining`),
+    name: require.resolve(
+      `@babel/plugin-transform-nullish-coalescing-operator`
+    ),
   })
   actions.setBabelPlugin({
-    name: require.resolve(`@babel/plugin-proposal-nullish-coalescing-operator`),
-  })
-  actions.setBabelPlugin({
-    name: require.resolve(`@babel/plugin-proposal-numeric-separator`),
+    name: require.resolve(`@babel/plugin-transform-numeric-separator`),
   })
 }
 

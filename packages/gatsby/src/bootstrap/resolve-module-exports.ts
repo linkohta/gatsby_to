@@ -1,7 +1,7 @@
 import * as fs from "fs-extra"
 import * as t from "@babel/types"
 import traverse from "@babel/traverse"
-import { codeFrameColumns, SourceLocation } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 import report from "gatsby-cli/lib/reporter"
 import { babelParseToAst } from "../utils/babel-parse-to-ast"
 import { testImportError } from "../utils/test-import-error"
@@ -32,7 +32,8 @@ const staticallyAnalyzeExports = (
       const codeFrame = codeFrameColumns(
         code,
         {
-          start: (err as unknown as { loc: SourceLocation[`start`] }).loc,
+          start: (err as unknown as { loc: { line: number; column: number } })
+            .loc,
         },
         {
           highlightCode: true,

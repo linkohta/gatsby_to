@@ -2,7 +2,10 @@ import { PreprocessSourceArgs } from "gatsby"
 import { babelParseToAst } from "./parser"
 import path from "path"
 import { extractStaticImageProps } from "./parser"
-import { codeFrameColumns, SourceLocation } from "@babel/code-frame"
+import {
+  codeFrameColumns,
+  ICodeFrameLocation,
+} from "gatsby-core-utils/code-frame"
 
 import { writeImages } from "./image-processing"
 import { getCacheDir } from "./node-utils"
@@ -47,7 +50,7 @@ export async function preprocessSource({
   })
 
   const images = extractStaticImageProps(ast, filename, (prop, nodePath) => {
-    const sourceLocation = nodePath.node.loc as SourceLocation
+    const sourceLocation = nodePath.node.loc as ICodeFrameLocation
     const { start, end } = sourceLocation
     reporter.error({
       id: `95314`,

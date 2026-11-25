@@ -98,15 +98,7 @@ function preset(context, options = {}) {
       r(`@babel/preset-flow`),
     ],
     plugins: [
-      [
-        r(`@babel/plugin-transform-runtime`),
-        {
-          // Babel 8 の既定値は @babel/runtime 8 を前提にしている。各パッケージが依存しているのは
-          // @babel/runtime 7 なので、Babel 7 のときの既定値を指定する。これより新しいヘルパーは、
-          // これまでどおり import ではなく各ファイルに埋め込まれる
-          version: `7.0.0-beta.0`,
-        },
-      ],
+      r(`@babel/plugin-transform-runtime`),
       IS_TEST && r(`babel-plugin-dynamic-import-node`),
       [
         r(`./babel-transform-compiler-flags`),

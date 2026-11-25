@@ -56,7 +56,14 @@ export function evaluateImageAttributes(
   onError?: (prop: string, nodePath: NodePath<any>) => void
 ): Record<string, unknown> {
   // 画像の生成に必要な属性だけを取得する
-  return normalizeProps(getAttributeValues(nodePath, onError, SHARP_ATTRIBUTES))
+  return normalizeProps(
+    getAttributeValues(
+      // babel-jsx-utils の型定義は Babel 7 の NodePath を前提にしている
+      nodePath as unknown as Parameters<typeof getAttributeValues>[0],
+      onError as Parameters<typeof getAttributeValues>[1],
+      SHARP_ATTRIBUTES
+    )
+  )
 }
 
 export function hashOptions(options: unknown): string {

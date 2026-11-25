@@ -2,7 +2,7 @@
 
 const fs = require(`fs-extra`)
 import { print, visit, getLocation } from "graphql"
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 const { distance: levenshtein } = require(`fastest-levenshtein`)
 import _ from "lodash"
 import report from "gatsby-cli/lib/reporter"

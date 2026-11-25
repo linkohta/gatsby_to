@@ -1,7 +1,7 @@
 import * as stackTrace from "stack-trace"
 import type { StackFrame } from "stack-trace"
 import url from "url"
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 import {
   TraceMap,
   originalPositionFor,

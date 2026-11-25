@@ -2,7 +2,7 @@ import * as t from "@babel/types"
 import generate from "@babel/generator"
 import template from "@babel/template"
 import { declare } from "@babel/helper-plugin-utils"
-import type { ConfigAPI, PluginObj } from "@babel/core"
+import type { ConfigAPI, PluginObject } from "@babel/core"
 
 const getKeyNameFromAttribute = (node: any): any =>
   node.key.name || node.key.value
@@ -297,8 +297,8 @@ export default declare(
       options: unknown
       key: string
     }
-  ): PluginObj => {
-    api.assertVersion(7)
+  ): PluginObject => {
+    api.assertVersion(8)
 
     return {
       visitor: {

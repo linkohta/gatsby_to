@@ -1,7 +1,11 @@
 import { declare } from "@babel/helper-plugin-utils"
 import * as t from "@babel/types"
-import type { PluginObj, ConfigAPI, NodePath } from "@babel/core"
+import type { PluginObject, PluginPass, ConfigAPI, NodePath } from "@babel/core"
 import { removeExportProperties } from "./babel-module-exports-helpers"
+
+interface IRemoveApiState extends PluginPass {
+  apiRemoved?: boolean
+}
 
 /**
  * 指定されたモジュールの export をファイルから取り除く。
@@ -9,8 +13,8 @@ import { removeExportProperties } from "./babel-module-exports-helpers"
 export default declare(function removeApiCalls(
   api: ConfigAPI,
   options: { apis?: Array<string> }
-): PluginObj {
-  api.assertVersion(7)
+): PluginObject<IRemoveApiState> {
+  api.assertVersion(8)
 
   const apisToRemove = options?.apis ?? []
 
@@ -123,7 +127,12 @@ export default declare(function removeApiCalls(
               t.isIdentifier(specifier.exported) &&
               apisToRemove.includes(specifier.exported.name)
             ) {
-              const binding = path.scope.bindings[specifier.local.name]
+              // Babel 8 の AST では、`export { "a b" as foo } from "X"` のように
+              // local が文字列リテラルになることがある
+              const localName = t.isIdentifier(specifier.local)
+                ? specifier.local.name
+                : specifier.local.value
+              const binding = path.scope.bindings[localName]
               // `export { foo } from "X"` の場合は、バインディングが存在しない
               if (binding) {
                 binding.path.remove()

@@ -144,5 +144,37 @@ describe(`gatsby-transformer-javascript-frontmatter`, () => {
         node.absolutePath
       )
     })
+
+    it.each([
+      [
+        `a generic arrow function`,
+        `const identity = <T>(value: T): T => value`,
+      ],
+      [`JSX`, `const Component = () => <div>Hello</div>`],
+    ])(
+      `should load frontmatter data from a .ts file with %s`,
+      async (_label, code) => {
+        node.extension = `ts`
+        loadNodeContent = jest.fn().mockReturnValue(`
+          ${code}
+
+          export const frontmatter = {
+            title: "Choropleth on d3v4",
+          }
+        `)
+
+        await onCreateNode({
+          node,
+          actions,
+          loadNodeContent,
+          createContentDigest,
+        })
+
+        expect(actions.createNode.mock.calls[0][0].frontmatter).toEqual({
+          title: `Choropleth on d3v4`,
+          error: false,
+        })
+      }
+    )
   })
 })

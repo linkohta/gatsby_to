@@ -22,6 +22,7 @@ const useJestUnit = !!process.env.GENERATE_JEST_REPORT
 
 // list to add ESM to ignore
 const esModules = [
+  `@babel/(?!runtime)`,
   `@mdx-js/mdx`,
   `@open-draft/deferred-promise`,
   `@sec-ant/readable-stream`,
@@ -37,6 +38,7 @@ const esModules = [
   `array-iterate`,
   `asciidoctor`,
   `atomically`,
+  `babel-plugin-polyfill-corejs3`,
   `bail`,
   `boxen`,
   `cacheable-lookup`,
@@ -100,6 +102,7 @@ const esModules = [
   `hastscript`,
   `html-void-elements`,
   `human-signals`,
+  `import-meta-resolve`,
   `indent-string`,
   `ip-regex`,
   `is-absolute-url`,
@@ -119,6 +122,7 @@ const esModules = [
   `is-safe-filename`,
   `is-stream`,
   `is-unicode-supported`,
+  `js-tokens`,
   `longest-streak`,
   `lowercase-keys`,
   `markdown-extensions`,
@@ -165,6 +169,7 @@ const esModules = [
   `nlcst-to-string`,
   `node-fetch`,
   `normalize-url`,
+  `obug`,
   `npm-run-path`,
   `p-any`,
   `p-cancelable`,
@@ -236,6 +241,7 @@ const esModules = [
   `until-async`,
   `url-join`,
   `uuid`,
+  `verkit`,
   `vfile`,
   `web-namespaces`,
   `when-exit`,

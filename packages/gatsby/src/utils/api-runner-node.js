@@ -10,7 +10,7 @@ const bindActionCreators = memoize(origBindActionCreators)
 const tracer = require(`opentracing`).globalTracer()
 const reporter = require(`gatsby-cli/lib/reporter`)
 const stackTrace = require(`stack-trace`)
-const { codeFrameColumns } = require(`@babel/code-frame`)
+const { codeFrameColumns } = require(`gatsby-core-utils/code-frame`)
 const fs = require(`fs-extra`)
 const { getCache } = require(`./get-cache`)
 import { createNodeId } from "./create-node-id"

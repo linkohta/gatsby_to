@@ -54,7 +54,14 @@ export default function parseMetadata(content, node, options) {
     if (err.loc) {
       err.codeFrame = codeFrameColumns(
         content,
-        err.loc.start || { start: err.loc },
+        err.loc.start || {
+          start: {
+            line: err.loc.line,
+            // @babel/code-frame は 8 で列の数え方を 1 始まりから 0 始まりに変え、列を指さないときは
+            // null を渡すようになった。表示が変わらないように、これまでの数え方から読み替える
+            column: err.loc.column ? err.loc.column - 1 : null,
+          },
+        },
         {
           highlightCode: true,
         }

@@ -1,6 +1,6 @@
 import babelLoader from "babel-loader"
 import type { Compiler } from "webpack"
-import Babel, { ConfigItem } from "@babel/core"
+import type { ConfigItem, InputOptions, PluginAPI } from "@babel/core"
 import {
   prepareOptions,
   getCustomOptions,
@@ -81,7 +81,7 @@ const customBabelLoader = babelLoader.custom(babel => {
     },
 
     // Babel の 'PartialConfig' オブジェクトが渡される。
-    config(partialConfig, { customOptions }): Babel.TransformOptions {
+    config(partialConfig, { customOptions }): InputOptions {
       const { stage, isPageTemplate, resourceQuery } = customOptions
       let configCacheKey = `${stage}-${isPageTemplate}-${resourceQuery}`
 
@@ -141,7 +141,7 @@ const customBabelLoader = babelLoader.custom(babel => {
       reduxPresets.forEach(preset => {
         options.presets = mergeConfigItemOptions({
           items: options.presets,
-          itemToMerge: preset as ConfigItem,
+          itemToMerge: preset as ConfigItem<PluginAPI>,
           type: `preset`,
           babel,
         })
@@ -150,7 +150,7 @@ const customBabelLoader = babelLoader.custom(babel => {
       reduxPlugins.forEach(plugin => {
         options.plugins = mergeConfigItemOptions({
           items: options.plugins,
-          itemToMerge: plugin as ConfigItem,
+          itemToMerge: plugin as ConfigItem<PluginAPI>,
           type: `plugin`,
           babel,
         })

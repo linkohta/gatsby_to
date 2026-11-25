@@ -1,9 +1,9 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault").default;
 exports.__esModule = true;
 exports.someFunction = someFunction;
-var e;
-function _interopRequireWildcard(t, r) { if (!r && t && t.__esModule) return t; var n, a, o = Object.defineProperty, f = { __proto__: null, default: t }; if (Object(t) !== t) return f; if (e || "function" != typeof WeakMap || (e = new WeakMap()), e) { if (e.has(t)) return e.get(t); e.set(t, f); } for (a in t) "default" !== a && {}.hasOwnProperty.call(t, a) && ((n = o && Object.getOwnPropertyDescriptor(t, a)) && (n.get || n.set) ? o(f, a, n) : f[a] = t[a]); return f; }
+var _interopRequireWildcard2 = _interopRequireDefault(require("@babel/runtime/helpers/interopRequireWildcard"));
 async function someFunction() {
-  return await Promise.resolve().then(() => _interopRequireWildcard(require("path")));
+  return await Promise.resolve().then(() => (0, _interopRequireWildcard2.default)(require("path")));
 }

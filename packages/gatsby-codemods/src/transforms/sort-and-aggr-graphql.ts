@@ -4,7 +4,7 @@ import {
   transformFromAstSync,
   parseSync,
   ParseResult,
-  PluginObj,
+  PluginObject,
 } from "@babel/core"
 
 import type { FileInfo } from "jscodeshift"
@@ -49,22 +49,36 @@ export function babelRecast(code: string, filePath: string): string {
 }
 
 function runParseSync(source: string, filePath: string): ParseResult | null {
-  const ast = parseSync(source, {
-    plugins: [
-      `@babel/plugin-syntax-jsx`,
-      `@babel/plugin-proposal-class-properties`,
-    ],
-    overrides: [
-      {
-        test: [`**/*.ts`, `**/*.tsx`],
-        plugins: [[`@babel/plugin-syntax-typescript`, { isTSX: true }]],
+  const parse = (withJSX: boolean): ParseResult | null =>
+    parseSync(source, {
+      // Babel 8 のパーサーはクラスフィールドを常に解釈する。TypeScript のファイルで JSX を
+      // 解釈するかどうかは、@babel/plugin-syntax-jsx が有効かどうかで決まる。
+      // 名前だけを渡すと、Babel は codemod を実行したフォルダーからプラグインを探し、
+      // そこにある別のバージョンを読み込むことがあるので、解決済みのパスを渡す
+      plugins: withJSX ? [require.resolve(`@babel/plugin-syntax-jsx`)] : [],
+      overrides: [
+        {
+          test: [`**/*.ts`, `**/*.tsx`],
+          plugins: [require.resolve(`@babel/plugin-syntax-typescript`)],
+        },
+      ],
+      filename: filePath,
+      parserOpts: {
+        tokens: true, // recast がこれを使う
       },
-    ],
-    filename: filePath,
-    parserOpts: {
-      tokens: true, // recast がこれを使う
-    },
-  })
+    })
+
+  let ast
+  try {
+    ast = parse(true)
+  } catch (jsxError) {
+    // Babel 8 のパーサーは、JSX が有効だと `<T>(value: T) => value` のような型引数付きの
+    // アロー関数を解釈できない（Babel 7 は解釈できた）。`.ts` では、JSX を無効にして解釈し直す
+    if (!/\.[cm]?ts$/.test(filePath)) {
+      throw jsxError
+    }
+    ast = parse(false)
+  }
   if (!ast) {
     console.log(
       `The codemod was unable to parse ${filePath}. If you're running against the '/src' directory and your project has a custom babel config, try running from the root of the project so the codemod can pick it up.`
@@ -88,7 +102,7 @@ function isValidGraphQLQuery(query: string): boolean {
   }
 }
 
-export function updateSortAndAggrField(): PluginObj<IState> {
+export function updateSortAndAggrField(): PluginObject<IState> {
   return {
     visitor: {
       TaggedTemplateExpression({ node }, state): void {

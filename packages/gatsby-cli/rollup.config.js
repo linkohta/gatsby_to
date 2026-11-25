@@ -67,13 +67,14 @@ export default {
             "targets": { "node": "22.0.0" }
           }
         ],
-        "@babel/preset-react"
+        // Babel 8 では既定が automatic になったので、これまでの classic を明示する
+        ["@babel/preset-react", { "runtime": "classic" }]
       ],
       plugins: ["@babel/plugin-transform-runtime", "@sigmacomputing/babel-plugin-lodash"],
       overrides: [
         {
           "test": ["**/*.ts", "**/*.tsx"],
-          "plugins": [["@babel/plugin-transform-typescript", { "isTSX": true }]]
+          "plugins": ["@babel/plugin-transform-typescript"]
         }
       ]
     }),

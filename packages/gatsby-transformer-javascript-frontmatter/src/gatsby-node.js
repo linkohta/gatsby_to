@@ -21,22 +21,14 @@ async function onCreateNode({
   const options = {
     sourceType: `module`,
     allowImportExportEverywhere: true,
+    // Babel 8 のパーサーは、仕様に入った構文（クラスフィールド、動的 import など）を
+    // 常に解釈するので、ここにはまだ提案段階の構文と JSX だけを並べている
     plugins: [
       `jsx`,
       `doExpressions`,
-      `objectRestSpread`,
-      [
-        `decorators`,
-        {
-          decoratorsBeforeExport: true,
-        },
-      ],
-      `classProperties`,
-      `exportExtensions`,
-      `asyncGenerators`,
+      `decorators`,
       `functionBind`,
       `functionSent`,
-      `dynamicImport`,
       _.includes([`ts`, `tsx`], node.extension) ? `typescript` : `flow`,
     ],
   }
@@ -45,7 +37,20 @@ async function onCreateNode({
   let frontmatter
   let error
   try {
-    const ast = babylon.parse(code, options)
+    let ast
+    try {
+      ast = babylon.parse(code, options)
+    } catch (jsxError) {
+      // Babel 8 のパーサーは、JSX が有効だと `<T>(value: T) => value` のような型引数付きの
+      // アロー関数を解釈できない（Babel 7 は解釈できた）。`.ts` では、JSX を無効にして解釈し直す
+      if (node.extension !== `ts`) {
+        throw jsxError
+      }
+      ast = babylon.parse(code, {
+        ...options,
+        plugins: options.plugins.filter(plugin => plugin !== `jsx`),
+      })
+    }
 
     const parseData = function parseData(node) {
       let value

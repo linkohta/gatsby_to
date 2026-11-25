@@ -359,4 +359,26 @@ describe(transformName, () => {
       `)
     })
   })
+
+  describe(`TypeScript`, () => {
+    const query = `allMarkdownRemark(sort: {fields: excerpt})`
+    const expectedQuery = `allMarkdownRemark(sort: { excerpt: ASC })`
+
+    it.each([
+      [
+        `a generic arrow function in .ts`,
+        `example.ts`,
+        `<T>(value: T): T => value`,
+      ],
+      [`JSX in .tsx`, `example.tsx`, `() => <div>Hello</div>`],
+    ])(`transforms a file with %s`, (_label, fileName, expression) => {
+      const result = applyTransform(transform, null, {
+        source: `${genSource(query)}\n\nexport const value = ${expression}\n`,
+        path: join(__dirname, `..`, `..`, fileName),
+      })
+
+      expect(result).toContain(expectedQuery)
+      expect(result).toContain(expression)
+    })
+  })
 })

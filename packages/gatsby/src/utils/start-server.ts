@@ -13,7 +13,7 @@ import http from "http"
 import https from "https"
 import cors from "cors"
 import launchEditor from "react-dev-utils/launchEditor"
-import { codeFrameColumns } from "@babel/code-frame"
+import { codeFrameColumns } from "gatsby-core-utils/code-frame"
 import * as fs from "fs-extra"
 
 import { withBasePath } from "../utils/path"
