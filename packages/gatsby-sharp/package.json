@@ -35,7 +35,7 @@
   "license": "MIT",
   "scripts": {
     "build": "babel src --out-dir dist --ignore \"**/__tests__\" --extensions \".ts,.js\"",
-    "typegen": "tsc --emitDeclarationOnly --declaration --declarationDir dist/",
+    "typegen": "node ../../scripts/tsc-native.js --emitDeclarationOnly --declaration --declarationDir dist/",
     "prepare": "cross-env NODE_ENV=production npm-run-all --npm-path npm -s build typegen",
     "watch": "babel -w src --out-dir dist --ignore \"**/__tests__\" --extensions \".ts,.js\""
   }

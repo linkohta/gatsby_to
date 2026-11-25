@@ -93,13 +93,9 @@ packagesWithTs.forEach(project => {
     `\n  - Percent Converted: ${percentConverted}%`
   )
 
+  // 型チェックには TypeScript 7（ネイティブ版）を使う
   const args = [
-    `--max-old-space-size=4096`,
-    path.resolve(
-      require.resolve(`typescript/package.json`),
-      `..`,
-      require(`typescript/package.json`).bin.tsc
-    ),
+    path.join(__dirname, `tsc-native.js`),
     `-p`,
     project,
     `--noEmit`,

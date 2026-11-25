@@ -95,7 +95,7 @@
     "build:rollup": "rollup -c --bundleConfigAsCjs",
     "build": "npm-run-all --npm-path npm -p build:babel build:rollup",
     "prepare": "cross-env NODE_ENV=production npm run build && npm run typegen",
-    "typegen": "rimraf --glob \"lib/**/*.d.ts\" && tsc --emitDeclarationOnly --declaration --declarationDir lib/",
+    "typegen": "rimraf --glob \"lib/**/*.d.ts\" && node ../../scripts/tsc-native.js --emitDeclarationOnly --declaration --declarationDir lib/",
     "watch:babel": "npm run build:babel -- --watch",
     "watch:rollup": "npm run build:rollup -- -w",
     "watch": "npm-run-all --npm-path npm -p watch:babel watch:rollup",
