@@ -189,7 +189,7 @@ let currentGitHash = null
     await promiseSpawn(
       process.execPath,
       [
-        `./node_modules/lerna/cli.js`,
+        `./node_modules/lerna/dist/cli.js`,
         `publish`,
         `--canary`,
         `premajor`,

@@ -1,9 +1,7 @@
-const { getPackages } = require(`@lerna/project`)
-const PackageGraph = require(`@lerna/package-graph`)
-const filterPackages = require(`@lerna/filter-packages`)
 const util = require(`util`)
 const path = require(`path`)
 const { exec, execSync } = require(`child_process`)
+const { getPublicPackages } = require(`../utils/workspace-packages`)
 
 const execP = util.promisify(exec)
 
@@ -36,38 +34,26 @@ module.exports = async function getUnownedPackages({
       })
   }
 
-  return getPackages(rootPath).then(async packages => {
-    const graph = new PackageGraph(packages, `dependencies`, true)
+  // filter out private packages
+  // adding owner to private packages will fail, because package doesn't exist
+  const publicGatsbyPackages = getPublicPackages(rootPath)
 
-    // filter out private packages
-    // adding owner to private packages will fail, because package doesn't exist
-    const publicGatsbyPackages = filterPackages(
-      graph.rawPackageList,
-      [],
-      [],
-      false
-    )
+  const alreadyOwnedPackages = await getPackagesWithReadWriteAccess(user)
 
-    const alreadyOwnedPackages = await getPackagesWithReadWriteAccess(user)
+  const publicGatsbyPackagesWithoutAccess = publicGatsbyPackages.filter(pkg => {
+    if (alreadyOwnedPackages[pkg.name]) {
+      return false
+    }
 
-    const publicGatsbyPackagesWithoutAccess = publicGatsbyPackages.filter(
-      pkg => {
-        if (alreadyOwnedPackages[pkg.name]) {
-          return false
-        }
-
-        try {
-          return !execSync(`npm view ${pkg.name} version`, { stdio: `pipe` })
-            .stderr
-        } catch (e) {
-          return false
-        }
-      }
-    )
-
-    return {
-      packages: publicGatsbyPackagesWithoutAccess,
-      user,
+    try {
+      return !execSync(`npm view ${pkg.name} version`, { stdio: `pipe` }).stderr
+    } catch (e) {
+      return false
     }
   })
+
+  return {
+    packages: publicGatsbyPackagesWithoutAccess,
+    user,
+  }
 }

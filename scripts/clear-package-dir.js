@@ -5,14 +5,12 @@ const { hideBin } = require(`yargs/helpers`)
 const yargs = require(`yargs`)(hideBin(process.argv))
 // chalk 5 以降は ESM のみで、require すると default に chalk が入ったモジュールが返る
 const { default: chalk } = require(`chalk`)
-const collectUpdates = require(`@lerna/collect-updates`)
-const PackageGraph = require(`@lerna/package-graph`)
-const Project = require(`@lerna/project`)
-const PromptUtilities = require(`@lerna/prompt`)
 const _ = require(`lodash`)
 const path = require(`path`)
+const readline = require(`readline`)
 const packlist = require(`npm-packlist`)
 const { execSync } = require(`child_process`)
+const { collectPackagesToPublish } = require(`./utils/workspace-packages`)
 
 const argv = yargs
   .command(
@@ -115,23 +113,21 @@ const getListOfFilesToClear = async ({ location, name }) => {
   return filesToDelete
 }
 
+const confirm = message =>
+  new Promise(resolve => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    })
+    rl.question(`${message} (y/N) `, answer => {
+      rl.close()
+      resolve(/^y(es)?$/i.test(answer.trim()))
+    })
+  })
+
 const run = async () => {
   try {
-    const project = new Project(process.cwd())
-
-    const packages = await project.getPackages()
-    const packageGraph = new PackageGraph(packages)
-
-    const changed = collectUpdates(
-      packageGraph.rawPackageList,
-      packageGraph,
-      { cwd: process.cwd() },
-      {
-        ...project.config,
-        loglevel: `silent`,
-        bump: argv.bump,
-      }
-    )
+    const changed = collectPackagesToPublish(argv.bump, process.cwd())
 
     const filesToDelete = _.flatten(
       await Promise.all(changed.map(getListOfFilesToClear))
@@ -140,9 +136,7 @@ const run = async () => {
     if (!argv[`dry-run`] && filesToDelete.length > 0) {
       if (
         argv[`force`] ||
-        (await PromptUtilities.confirm(
-          `Are you sure you want to delete those files?`
-        ))
+        (await confirm(`Are you sure you want to delete those files?`))
       ) {
         filesToDelete.forEach(file => {
           fs.removeSync(file)
