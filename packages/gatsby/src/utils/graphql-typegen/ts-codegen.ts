@@ -5,8 +5,6 @@ import { GraphQLSchema, Kind } from "graphql"
 import type { Types } from "@graphql-codegen/plugin-helpers"
 import type { TypeScriptPluginConfig } from "@graphql-codegen/typescript"
 import type { TypeScriptDocumentsPluginConfig } from "@graphql-codegen/typescript-operations"
-import { CodeFileLoader } from "@graphql-tools/code-file-loader"
-import { loadDocuments } from "@graphql-tools/load"
 import {
   IDefinitionMeta,
   IStateProgram,
@@ -49,7 +47,13 @@ const DEFAULT_TYPESCRIPT_CONFIG: Readonly<TypeScriptPluginConfig> = {
 
 const DEFAULT_TYPESCRIPT_OPERATIONS_CONFIG: Readonly<TypeScriptDocumentsPluginConfig> =
   {
-    ...DEFAULT_TYPESCRIPT_CONFIG,
+    avoidOptionals: true,
+    immutableTypes: true,
+    maybeValue: `T | null`,
+    noExport: true,
+    enumType: `string-literal`,
+    scalars: DEFAULT_TYPESCRIPT_CONFIG.scalars,
+    useTypeImports: true,
     exportFragmentSpreadSubTypes: true,
   }
 
@@ -112,6 +116,15 @@ export async function writeTypeScriptTypes(
   // そして、クエリをドキュメントとして抽出する
   // TODO: Gatsby 自体が gatsby-node の中のクエリを `definitions` に入れるようになれば、このコードパスは不要にできる
   try {
+    // code-file-loader 9 は ESM だけの Babel 8 を読み込む。型を生成するときにだけ必要なので、
+    // このモジュールを import しただけでは読み込まれないように、ここで require する
+    const { CodeFileLoader } = require(
+      `@graphql-tools/code-file-loader`
+    ) as typeof import("@graphql-tools/code-file-loader")
+    const { loadDocuments } = require(
+      `@graphql-tools/load`
+    ) as typeof import("@graphql-tools/load")
+
     gatsbyNodeDocuments = await loadDocuments(
       graphqlTypegenOptions.documentSearchPaths,
       {
@@ -120,6 +133,9 @@ export async function writeTypeScriptTypes(
             // https://www.graphql-tools.com/docs/graphql-tag-pluck を、Gatsby の graphql 関数だけを確認するように設定する
             pluckConfig: {
               modules: [{ name: `gatsby`, identifier: `graphql` }],
+              // code-file-loader 9 からは、`#graphql` で始まるテンプレートリテラルも既定で抽出する。
+              // Gatsby の graphql 関数に渡したクエリだけを対象にするため、無効にする
+              gqlHashComment: ``,
             },
           }),
         ],

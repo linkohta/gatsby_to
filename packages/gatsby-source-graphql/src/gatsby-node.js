@@ -1,6 +1,6 @@
 const { uuid } = require(`gatsby-core-utils`)
 const { buildSchema, printSchema } = require(`gatsby/graphql`)
-const { wrapSchema, introspectSchema, RenameTypes } = require(
+const { wrapSchema, schemaFromExecutor, RenameTypes } = require(
   `@graphql-tools/wrap`
 )
 const { linkToExecutor } = require(`@graphql-tools/links`)
@@ -79,7 +79,7 @@ exports.createSchemaCustomization = async (
     let sdl = await cache.get(cacheKey)
 
     if (!sdl) {
-      introspectionSchema = await introspectSchema(linkToExecutor(link))
+      introspectionSchema = await schemaFromExecutor(linkToExecutor(link))
       sdl = printSchema(introspectionSchema)
     } else {
       introspectionSchema = buildSchema(sdl)
