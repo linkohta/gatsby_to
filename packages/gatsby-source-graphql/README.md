@@ -87,7 +87,7 @@ module.exports = {
         fieldName: "github",
         // Create Apollo Link manually. Can return a Promise.
         createLink: pluginOptions => {
-          return createHttpLink({
+          return new BaseHttpLink({
             uri: "https://api.github.com/graphql",
             headers: {
               Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
@@ -170,6 +170,14 @@ add retries, error handling, logging and more to your GraphQL requests.
 
 Use the plugin's `createLink` option to add a custom Apollo Link to your GraphQL requests.
 
+The plugin uses Apollo Client 4. Links passed to `createLink` have to be created with `@apollo/client` 4:
+
+- Use `BaseHttpLink` from `@apollo/client/link/http` to send requests. `HttpLink` and `createHttpLink` need an `ApolloClient` instance, which the plugin does not create, so they fail with `Cannot read properties of undefined (reading 'queryManager')`.
+- Combine links with `ApolloLink.from([...])`. The bare `from`, `concat` and `split` functions are deprecated.
+- Custom links have to return an `Observable` from `rxjs`.
+
+See the [Apollo Client 4 migration guide](https://www.apollographql.com/docs/react/migrating/apollo-client-4-migration#apollo-link-changes) for details.
+
 You can compose different types of links, depending on the functionality you're trying to achieve.
 The most common links are:
 
@@ -183,7 +191,8 @@ Here's an example of using the HTTP link with retries (using [@apollo/client/lin
 
 ```js
 // gatsby-config.js
-const { createHttpLink, from } = require(`@apollo/client`)
+const { ApolloLink } = require(`@apollo/client`)
+const { BaseHttpLink } = require(`@apollo/client/link/http`)
 const { RetryLink } = require(`@apollo/client/link/retry`)
 
 const retryLink = new RetryLink({
@@ -211,7 +220,10 @@ module.exports = {
         // `pluginOptions`: all plugin options
         //   (i.e. in this example object with keys `typeName`, `fieldName`, `url`, `createLink`)
         createLink: pluginOptions =>
-          from([retryLink, createHttpLink({ uri: pluginOptions.url })]),
+          ApolloLink.from([
+            retryLink,
+            new BaseHttpLink({ uri: pluginOptions.url }),
+          ]),
       },
     },
   ],

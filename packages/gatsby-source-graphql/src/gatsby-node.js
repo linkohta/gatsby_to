@@ -4,7 +4,10 @@ const { wrapSchema, schemaFromExecutor, RenameTypes } = require(
   `@graphql-tools/wrap`
 )
 const { linkToExecutor } = require(`@graphql-tools/links`)
-const { createHttpLink } = require(`@apollo/client`)
+// Apollo Client 4 の `HttpLink` は ApolloClient のインスタンスを前提にしている（クライアントの
+// 情報をリクエストに付ける）。ここではリンクを ApolloClient なしで実行するので、
+// HTTP の送信だけを行う `BaseHttpLink` を使う
+const { BaseHttpLink } = require(`@apollo/client/link/http`)
 const { fetchWrapper } = require(`./fetch`)
 const { createDataloaderLink } = require(`./batching/dataloader-link`)
 
@@ -67,7 +70,7 @@ exports.createSchemaCustomization = async (
       fetchOptions,
       headers: typeof headers === `function` ? await headers() : headers,
     }
-    link = batch ? createDataloaderLink(options) : createHttpLink(options)
+    link = batch ? createDataloaderLink(options) : new BaseHttpLink(options)
   }
 
   let introspectionSchema

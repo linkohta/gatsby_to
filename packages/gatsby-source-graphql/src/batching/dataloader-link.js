@@ -1,5 +1,7 @@
 const DataLoader = require(`dataloader`)
-const { ApolloLink, Observable } = require(`@apollo/client`)
+const { ApolloLink } = require(`@apollo/client`)
+// Apollo Client 4 のリンクは、zen-observable ではなく rxjs の Observable を返す
+const { Observable } = require(`rxjs`)
 const { print } = require(`gatsby/graphql`)
 const { merge, resolveResult } = require(`./merge-queries`)
 
