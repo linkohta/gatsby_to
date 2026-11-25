@@ -12,7 +12,7 @@ import { slash } from "./path"
 import { requestRemoteNode } from "./remote-file-utils/fetch-file"
 import { getStorage, getDatabaseDir } from "./utils/get-storage"
 import { createMutex } from "./mutex"
-import type { Options } from "got"
+import type { OptionsInit } from "got"
 import type { IFetchRemoteFileOptions } from "./remote-file-utils/fetch-file"
 
 interface ITask {
@@ -186,7 +186,7 @@ async function fetchFile({
 
     // htaccess 認証が渡されていれば追加する。これは拡張性があまり
     // 高くない。検証付きの適切な API を定義すべきである。
-    const httpOptions: Options = {}
+    const httpOptions: OptionsInit = {}
     if (auth && (auth.htaccess_pass || auth.htaccess_user)) {
       httpOptions.username = auth.htaccess_user
       httpOptions.password = auth.htaccess_pass

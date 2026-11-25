@@ -1,4 +1,4 @@
-const got = require(`got`)
+const { default: got } = require(`got`)
 const url = require(`url`)
 const { browse } = require(`./search`)
 

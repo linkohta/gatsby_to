@@ -3,25 +3,28 @@ import got from "got"
 const baseUrl = `http://fixture`
 const proxyUrl = `http://fixture-proxy`
 
-jest.mock(`got`, () =>
-  jest.fn(path => {
-    if (path.includes(proxyUrl)) {
-      path = path.replace(proxyUrl, baseUrl)
-    }
+jest.mock(`got`, () => {
+  return {
+    __esModule: true,
+    default: jest.fn(path => {
+      if (path.includes(proxyUrl)) {
+        path = path.replace(proxyUrl, baseUrl)
+      }
 
-    let last = ``
-    if (path.includes(`i18n-test`)) {
-      last = `i18n-test-`
-    }
-    last += path.split(`/`).pop()
-    try {
-      return { body: require(`./fixtures/${last}.json`.replace(`?`, `___`)) }
-    } catch (e) {
-      console.log(`Error`, e)
-      return null
-    }
-  })
-)
+      let last = ``
+      if (path.includes(`i18n-test`)) {
+        last = `i18n-test-`
+      }
+      last += path.split(`/`).pop()
+      try {
+        return { body: require(`./fixtures/${last}.json`.replace(`?`, `___`)) }
+      } catch (e) {
+        console.log(`Error`, e)
+        return null
+      }
+    }),
+  }
+})
 
 const probeImageSize = require(`probe-image-size`)
 
@@ -131,6 +134,16 @@ describe(`gatsby-source-drupal`, () => {
     expect(nodes[createNodeId(`und.article-1`)]).toBeDefined()
     expect(nodes[createNodeId(`und.article-2`)]).toBeDefined()
     expect(nodes[createNodeId(`und.article-3`)]).toBeDefined()
+  })
+
+  it(`Passes only options that got accepts`, () => {
+    // 本物の got は、知らないオプションを受け取ると例外を投げる
+    const { Options } = jest.requireActual(`got`)
+
+    expect(got).toHaveBeenCalled()
+    for (const [url, options] of got.mock.calls) {
+      expect(() => new Options(url, options)).not.toThrow()
+    }
   })
 
   it(`Nodes contain contentDigest`, () => {
@@ -808,7 +821,7 @@ describe(`gatsby-source-drupal`, () => {
 
   describe(`Error handling`, () => {
     describe(`Does end activities if error is thrown`, () => {
-      const got = require(`got`)
+      const { default: got } = require(`got`)
       beforeEach(() => {
         nodes = {}
         reporter.activityTimer.mockClear()

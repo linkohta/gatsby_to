@@ -3,7 +3,7 @@ const _ = require(`lodash`)
 const { getMonorepoPackageJsonPath } = require(
   `./get-monorepo-package-json-path`
 )
-const got = require(`got`)
+const { default: got } = require(`got`)
 
 function difference(object, base) {
   function changes(object, base) {

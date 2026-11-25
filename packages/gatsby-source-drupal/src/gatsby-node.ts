@@ -1,4 +1,4 @@
-const got = require(`got`)
+const { default: got } = require(`got`)
 const _ = require(`lodash`)
 // url-join 5 以降は ESM 専用で、`require()` では default export が `default` に入る
 const { default: urlJoin } = require(`url-join`)
@@ -92,12 +92,17 @@ async function worker([url, options]) {
   }
   delete options.searchParams
 
+  // got 12 以降は知らないオプションを渡すと例外を投げるので、
+  // トレース用の parentSpan は取り除く
+  const gotOptions = { ...options }
+  delete gotOptions.parentSpan
+
   const response = await got(url, {
     agent,
     cache: false,
     // request: http2wrapper.auto,
     // http2: true,
-    ...options,
+    ...gotOptions,
   })
 
   httpSpan.setTag(SemanticAttributes.HTTP_STATUS_CODE, response?.statusCode)
