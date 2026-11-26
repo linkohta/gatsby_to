@@ -19,9 +19,6 @@ env:
   COMPILER_OPTIONS: GATSBY_MAJOR=5
   NODE_NO_WARNINGS: 1
   BROWSERSLIST_IGNORE_OLD_DATA: true
-  # グローバルにインストールされた libvips は使わない
-  # https://sharp.pixelplumbing.com/install/#custom-libvips
-  SHARP_IGNORE_GLOBAL_LIBVIPS: 1
 
 jobs:
   lint:
