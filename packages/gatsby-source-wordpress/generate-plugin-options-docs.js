@@ -3,7 +3,6 @@ const Joi = require(`@hapi/joi`)
 const Handlebars = require(`handlebars`)
 const fs = require(`fs-extra`)
 const _ = require(`lodash`)
-const toc = require(`markdown-toc`)
 const prettierConfig = require(`../../.prettierrc.js`)
 
 const {
@@ -138,6 +137,57 @@ function joiKeysToMD({
 }
 
 /**
+ * 見出しのテキストを、GitHub が見出しに付けるアンカーと同じ形に変換する
+ *
+ * @param {string} title
+ */
+function slugify(title) {
+  return title
+    .toLowerCase()
+    .split(` `)
+    .join(`-`)
+    .replace(/[|$&`~=\\/@+*!?({[\]})<>.,;:'"^]/g, ``)
+}
+
+/**
+ * markdown の見出しから、入れ子のリストの形の目次を作る。
+ * コードブロックの中の `#` で始まる行は見出しとして扱わない
+ *
+ * @param {string} markdown
+ */
+function generateTableOfContents(markdown) {
+  const headings = []
+  let isInCodeBlock = false
+
+  markdown.split(`\n`).forEach(line => {
+    if (line.startsWith(`\`\`\``)) {
+      isInCodeBlock = !isInCodeBlock
+      return
+    }
+
+    const match = !isInCodeBlock && /^(#{1,6}) (.+)$/.exec(line)
+    if (match) {
+      headings.push({ level: match[1].length, title: match[2].trim() })
+    }
+  })
+
+  const topLevel = Math.min(...headings.map(heading => heading.level))
+  const seenSlugs = new Map()
+
+  return headings
+    .map(({ level, title }) => {
+      const slug = slugify(title)
+      const count = seenSlugs.get(slug) || 0
+      seenSlugs.set(slug, count + 1)
+
+      return `${`  `.repeat(level - topLevel)}- [${title}](#${
+        count > 0 ? `${slug}-${count}` : slug
+      })`
+    })
+    .join(`\n`)
+}
+
+/**
  * Joi スキーマの description を markdown に変換し、
  * ファイルシステムに書き出す
  *
@@ -163,7 +213,7 @@ async function generateMdStringFromSchemaDescription(description) {
   const docs = joiKeysToMD({
     keys: description.children,
   })
-  const tableOfContents = toc(docs).content
+  const tableOfContents = generateTableOfContents(docs)
 
   const mdContents = template({
     tableOfContents,
