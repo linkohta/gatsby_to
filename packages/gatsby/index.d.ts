@@ -206,7 +206,7 @@ export type HeadProps<
  */
 export type HeadFC<DataType = object, PageContextType = object> = (
   props: HeadProps<DataType, PageContextType>
-) => JSX.Element
+) => React.ReactElement<any, any>
 
 type SerializableProps =
   | ISerializableObject
@@ -234,7 +234,9 @@ export interface SlicePlaceholderProps {
 /**
  * スライスのプレースホルダーとして使うコンポーネント。ページ内で [スライス](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) を挿入する位置を示す。
  */
-export declare function Slice(props: SlicePlaceholderProps): JSX.Element
+export declare function Slice(
+  props: SlicePlaceholderProps
+): React.ReactElement<any, any>
 
 /**
  * [スライスコンポーネント](https://gatsbyjs.com/docs/reference/built-in-components/gatsby-slice/) 用の props オブジェクト

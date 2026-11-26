@@ -210,7 +210,7 @@ This guide assumes that you don't have any existing ESLint configuration yet. Yo
 1. Install dependencies
 
    ```shell
-   npm install --save-dev eslint @graphql-eslint/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser
+   npm install --save-dev eslint@9 @eslint/js@9 @graphql-eslint/eslint-plugin typescript-eslint
    ```
 
 1. Edit your `package.json` to add two scripts:
@@ -218,50 +218,52 @@ This guide assumes that you don't have any existing ESLint configuration yet. Yo
    ```json:title=package.json
    {
      "scripts": {
-       "lint": "eslint --ignore-path .gitignore .",
+       "lint": "eslint .",
        "lint:fix": "npm run lint -- --fix"
      },
    }
    ```
 
-1. Create a `.eslintrc.js` file to configure ESLint:
+1. Create an `eslint.config.mjs` file to configure ESLint:
 
-   ```js:title=.eslintrc.js
-   module.exports = {
-     root: true,
-     overrides: [
-       {
-         files: ['*.ts', '*.tsx'],
-         processor: '@graphql-eslint/graphql',
-         parser: "@typescript-eslint/parser",
-         extends: [
-           "eslint:recommended",
-           "plugin:@typescript-eslint/recommended"
-         ],
-         env: {
-           es6: true,
-         },
+   ```js:title=eslint.config.mjs
+   import { defineConfig } from "eslint/config"
+   import js from "@eslint/js"
+   import tseslint from "typescript-eslint"
+   import graphqlPlugin from "@graphql-eslint/eslint-plugin"
+
+   export default defineConfig(
+     {
+       ignores: [".cache/", "public/", "src/gatsby-types.d.ts"],
+     },
+     {
+       files: ["**/*.ts", "**/*.tsx"],
+       extends: [js.configs.recommended, tseslint.configs.recommended],
+       processor: graphqlPlugin.processor,
+     },
+     {
+       files: ["**/*.graphql"],
+       languageOptions: {
+         parser: graphqlPlugin.parser,
        },
-       {
-         files: ['*.graphql'],
-         parser: '@graphql-eslint/eslint-plugin',
-         plugins: ['@graphql-eslint'],
-         rules: {
-           '@graphql-eslint/no-anonymous-operations': 'error',
-           '@graphql-eslint/naming-convention': [
-             'error',
-             {
-               OperationDefinition: {
-                 style: 'PascalCase',
-                 forbiddenPrefixes: ['Query', 'Mutation', 'Subscription', 'Get'],
-                 forbiddenSuffixes: ['Query', 'Mutation', 'Subscription'],
-               },
+       plugins: {
+         "@graphql-eslint": graphqlPlugin,
+       },
+       rules: {
+         "@graphql-eslint/no-anonymous-operations": "error",
+         "@graphql-eslint/naming-convention": [
+           "error",
+           {
+             OperationDefinition: {
+               style: "PascalCase",
+               forbiddenPrefixes: ["Query", "Mutation", "Subscription", "Get"],
+               forbiddenSuffixes: ["Query", "Mutation", "Subscription"],
              },
-           ],
-         },
+           },
+         ],
        },
-     ],
-   }
+     }
+   )
    ```
 
 1. Create a `graphql.config.js` at the root of your project with the following contents:
