@@ -116,13 +116,32 @@ describe(`gatsby-plugin-google-analytics`, () => {
           const isExcluded = pathname =>
             excludeGAPaths.some(rx => rx.test(pathname))
 
-          expect(excludeGAPaths).toHaveLength(2)
+          expect(isExcluded(`/preview`)).toBe(true)
           expect(isExcluded(`/preview/`)).toBe(true)
           expect(isExcluded(`/preview/a/b/`)).toBe(true)
           expect(isExcluded(`/do-not-track/me/too/`)).toBe(true)
           expect(isExcluded(`/do-not-track/me/too`)).toBe(false)
           expect(isExcluded(`/previews/`)).toBe(false)
           expect(isExcluded(`/`)).toBe(false)
+        })
+
+        it(`does not let a single-segment wildcard match a trailing slash or deeper paths`, () => {
+          const { setPostBodyComponents } = setup({
+            exclude: [`/blog/*`],
+          })
+
+          const script =
+            setPostBodyComponents.mock.calls[0][0][0].props
+              .dangerouslySetInnerHTML.__html
+          const [, source] = script.match(/window\.excludeGAPaths=(\[.*?\]);/)
+          const excludeGAPaths = new Function(`return ${source}`)()
+          const isExcluded = pathname =>
+            excludeGAPaths.some(rx => rx.test(pathname))
+
+          expect(isExcluded(`/blog/a`)).toBe(true)
+          expect(isExcluded(`/blog/a/`)).toBe(false)
+          expect(isExcluded(`/blog/a/b`)).toBe(false)
+          expect(isExcluded(`/blog/`)).toBe(false)
         })
 
         it(`sets optimizeId`, () => {
