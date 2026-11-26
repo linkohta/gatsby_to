@@ -1,4 +1,18 @@
 import React from "react"
+import picomatch from "picomatch"
+
+// 除外パスの glob を、ブラウザーで評価する正規表現に変換する。
+// minimatch 10 までの `makeRe()` と結果をそろえるために、次の 2 点を合わせている。
+// - `strictSlashes`: `/blog/*` が `/blog/a/` に一致しないようにする
+// - `/preview/**` のように `/**` で終わる glob は、`/preview` 自体にも一致させる
+const globToRegExps = glob => {
+  const options = { strictSlashes: true }
+  const regExps = [picomatch.makeRe(glob, options)]
+  if (glob.endsWith(`/**`) && glob.length > 3) {
+    regExps.push(picomatch.makeRe(glob.slice(0, -3), options))
+  }
+  return regExps
+}
 
 const knownOptions = {
   createOnly: {
@@ -49,10 +63,8 @@ export const onRenderBody = (
 
   const excludeGAPaths = []
   if (typeof pluginOptions.exclude !== `undefined`) {
-    const Minimatch = require(`minimatch`).Minimatch
     pluginOptions.exclude.map(exclude => {
-      const mm = new Minimatch(exclude)
-      excludeGAPaths.push(mm.makeRe())
+      excludeGAPaths.push(...globToRegExps(exclude))
     })
   }
 
