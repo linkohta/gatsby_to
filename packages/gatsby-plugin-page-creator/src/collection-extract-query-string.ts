@@ -4,7 +4,8 @@ import { Reporter } from "gatsby/reporter"
 import { extractModel } from "./path-utils"
 import { CODES, prefixId } from "./error-utils"
 
-// この関数は、実際のコレクションファイルを開き、そこで使われている queryString を取り出す
+// この関数は、コレクションファイルのパスから、ページの元になるノードを取得する queryString を組み立てる。
+// ファイルの中身は、削除された collectionGraphql が使われていないかを調べるためだけに読む
 export function collectionExtractQueryString(
   absolutePath: string,
   reporter: Reporter,
