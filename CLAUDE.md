@@ -25,7 +25,7 @@
 
 ## セットアップとよく使うコマンド
 
-前提は Node.js 22（22.22.2 以上）または 24（24.15.0 以上）と Yarn 1 系です（ルートの `package.json` の `engines`）。Yarn 2 以降には対応していません。各パッケージが利用者向けに対応している Node.js（各パッケージの `engines`）も同じ範囲です。
+前提は Node.js 24（24.15.0 以上）と Yarn 1 系です（ルートの `package.json` の `engines`）。Yarn 2 以降には対応していません。Node.js 22 では、開発用の依存（verdaccio 7）が対応していないため `yarn install` が失敗します。各パッケージが利用者向けに対応している Node.js（各パッケージの `engines`）は、22（22.22.2 以上）または 24（24.15.0 以上）です。ただし、`gatsby-dev-cli` は verdaccio 7 に依存するため 24 以上です。
 
 ```shell
 yarn bootstrap                     # 依存のインストールと全パッケージのビルド
