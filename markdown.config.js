@@ -10,6 +10,9 @@ const exclusionList = [
 ]
 
 module.exports = {
+  // README の印は markdown-magic 0.x の書式（`AUTO-GENERATED-CONTENT:START (名前)`）のまま使う。
+  // markdown-magic 4 の既定は `docs` なので、ここで指定する。
+  matchWord: `AUTO-GENERATED-CONTENT`,
   transforms: {
     LIST_STARTERS() {
       const base = path.join(process.cwd(), `starters`)
@@ -38,8 +41,8 @@ module.exports = {
           .join(`\n`)}
       `.replace(/^[^|]+/gm, ``)
     },
-    STARTER(content, options, { originalPath }) {
-      const starter = path.basename(path.dirname(originalPath))
+    STARTER({ srcPath }) {
+      const starter = path.basename(path.dirname(srcPath))
 
       if (exclusionList.includes(starter)) {
         return ``
