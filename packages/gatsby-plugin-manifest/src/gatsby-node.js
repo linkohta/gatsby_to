@@ -117,7 +117,7 @@ exports.onPostBootstrap = async (
 }
 
 /**
- * 完全なトライフォース、またはトライフォースの 1 つ以上の構成要素。
+ * `makeManifest` に渡す引数。
  * @typedef {Object} makeManifestArgs
  * @property {Object} cache - gatsby-node api から渡される
  * @property {Object} reporter - gatsby-node api から渡される

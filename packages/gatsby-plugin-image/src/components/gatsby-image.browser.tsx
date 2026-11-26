@@ -109,7 +109,8 @@ const GatsbyImageHydrator: FC<GatsbyImageProps> = function GatsbyImageHydrator({
       )
     }
 
-    // plugin image コンポーネントは少し特殊で、サーバーサイドレンダリングされた場合は、遅延読み込みに対応するための script タグを追加している
+    // plugin image コンポーネントは少し特殊で、サーバーサイドレンダリングされた場合は、ハイドレーションを待たずに
+    // 遅延読み込みができるよう、gatsby-ssr で script タグを追加している。
     // この場合はハイドレーションを止めるが、正しいイベントは発火させる。
     const ssrImage = root.current.querySelector(
       `[data-gatsby-image-ssr]`

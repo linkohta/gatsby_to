@@ -1,6 +1,7 @@
 /*
- * This module is used when calling reporter.
- * these logs
+ * このモジュールは `reporter.activityTimer()` が呼ばれたときに使われる。
+ * スピナーで表示するアクティビティの開始、ステータスの更新、終了を、
+ * reporter の redux ストアへアクションとして送る。
  */
 import * as reporterActionsForTypes from "./redux/actions"
 import { ActivityStatuses, ActivityTypes } from "./constants"

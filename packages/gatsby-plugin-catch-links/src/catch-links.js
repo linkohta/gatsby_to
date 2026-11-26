@@ -163,7 +163,8 @@ export const routeThroughBrowserOrApp =
     event.preventDefault()
 
     // issue #8907 を参照: destination.pathname には gatsby-transformer-remark が付けた
-    // pathPrefix がすでに含まれているが、gatsby-link.navigate にはそれを含まない href が必要である
+    // pathPrefix がすでに含まれている。gatsby-link の navigate は自身で pathPrefix を付けるので、
+    // pathPrefix を取り除いた href を渡す必要がある
     const destinationPathname = slashedPathname(destination.pathname).replace(
       pathStartRegEx,
       `/`

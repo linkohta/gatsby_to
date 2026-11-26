@@ -329,8 +329,8 @@ export class WorkerPool<
           try {
             await fs.remove(workerInFlightsDumpLocation)
           } catch {
-            // これは単なる後始末であり、このファイルの削除に失敗しても
-            // 支障はない
+            // これは単なる後始末である。中身はすでに読み込み済みで、ワーカーを起動し直すときは
+            // 別の一時ディレクトリを使うため、このファイルの削除に失敗しても支障はない
           }
         }
 

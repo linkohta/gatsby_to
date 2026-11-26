@@ -32,7 +32,7 @@ async function onCreateNode(
     )
   }
 
-  // 渡された imagesdir オプションを変更する
+  // 渡されたオプションを複製し、imagesdir 属性（未指定の場合は `/images@`）の先頭に pathPrefix を付ける
   const asciidocOptions = processPluginOptions(pluginOptions, pathPrefix)
 
   const { createNode, createParentChildLink } = actions
