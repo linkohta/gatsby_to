@@ -18,7 +18,6 @@
   ],
   "devDependencies": {
     "@ascorbic/worker-threads-shim": "^1.0.0",
-    "@lukeed/uuid": "^2.0.1",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.20.5",
     "ansi-wordwrap": "^1.0.2",

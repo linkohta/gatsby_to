@@ -40,7 +40,6 @@
     "gray-matter": "^4.0.3",
     "mdast-util-mdx": "^3.0.0",
     "mdast-util-to-hast": "^13.2.2",
-    "mdast-util-to-markdown": "^2.2.4",
     "mdast-util-toc": "^7.2.0",
     "rehype-infer-description-meta": "^2.0.0",
     "remark-unwrap-images": "^4.0.1",
