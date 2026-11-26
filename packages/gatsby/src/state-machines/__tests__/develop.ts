@@ -18,6 +18,9 @@ const actions = {
 const services = {
   initialize: jest.fn(),
   initializeData: jest.fn(),
+  // モックにしないと本物の postBootstrap が動く。そのアクティビティの終了時に reporter が
+  // 1 秒のタイマーを仕掛けるので、Jest のワーカープロセスが時間内に終了できなくなる
+  postBootstrap: jest.fn(),
   reloadData: jest.fn(),
   runQueries: jest.fn(),
   startWebpackServer: jest.fn(),
