@@ -5,6 +5,6 @@ Array [
   "Syntax error in \\"/bad/file\\":
 Missing initializer in const declaration. (1:13)
 > 1 | const exports.blah = () = }}}
-    |             ^",
+    |              ^",
 ]
 `;

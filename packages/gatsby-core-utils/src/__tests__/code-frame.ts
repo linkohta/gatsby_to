@@ -1,4 +1,4 @@
-import { codeFrameColumns } from "../code-frame"
+import { codeFrameColumns, fromBabelPosition } from "../code-frame"
 
 const source = [`const a = 1`, `function foo() {`, `  return a + 2`, `}`].join(
   `\n`
@@ -144,6 +144,54 @@ describe(`codeFrameColumns`, () => {
       "  Unexpected token
       > 1 | const a = 1
         2 | function foo() {"
+    `)
+  })
+})
+
+describe(`fromBabelPosition`, () => {
+  // Babel のパーサーや AST の位置は、列を 0 から数える
+  it(`points at the character of a 0-based column`, () => {
+    // 1 行目の `a` は、0 始まりで 6 列目にある
+    expect(
+      codeFrameColumns(source, {
+        start: fromBabelPosition({ line: 1, column: 6 }),
+      })
+    ).toMatchInlineSnapshot(`
+      "> 1 | const a = 1
+          |       ^
+        2 | function foo() {
+        3 |   return a + 2
+        4 | }"
+    `)
+  })
+
+  it(`points at the first character for column 0`, () => {
+    expect(
+      codeFrameColumns(source, {
+        start: fromBabelPosition({ line: 2, column: 0 }),
+      })
+    ).toMatchInlineSnapshot(`
+      "  1 | const a = 1
+      > 2 | function foo() {
+          | ^
+        3 |   return a + 2
+        4 | }"
+    `)
+  })
+
+  it(`marks a range between 0-based columns`, () => {
+    // 3 行目の `a + 2` は、0 始まりで 9 列目から 14 列目の手前までにある
+    expect(
+      codeFrameColumns(source, {
+        start: fromBabelPosition({ line: 3, column: 9 }),
+        end: fromBabelPosition({ line: 3, column: 14 }),
+      })
+    ).toMatchInlineSnapshot(`
+      "  1 | const a = 1
+        2 | function foo() {
+      > 3 |   return a + 2
+          |          ^^^^^
+        4 | }"
     `)
   })
 })

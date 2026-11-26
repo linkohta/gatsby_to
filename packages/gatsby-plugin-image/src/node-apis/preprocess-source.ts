@@ -4,7 +4,7 @@ import path from "path"
 import { extractStaticImageProps } from "./parser"
 import {
   codeFrameColumns,
-  ICodeFrameLocation,
+  fromBabelPosition,
 } from "gatsby-core-utils/code-frame"
 
 import { writeImages } from "./image-processing"
@@ -50,8 +50,10 @@ export async function preprocessSource({
   })
 
   const images = extractStaticImageProps(ast, filename, (prop, nodePath) => {
-    const sourceLocation = nodePath.node.loc as ICodeFrameLocation
-    const { start, end } = sourceLocation
+    const { start, end } = nodePath.node.loc as {
+      start: { line: number; column: number }
+      end: { line: number; column: number }
+    }
     reporter.error({
       id: `95314`,
       filePath: filename,
@@ -61,11 +63,15 @@ export async function preprocessSource({
       },
       context: {
         prop,
-        codeFrame: codeFrameColumns(contents, sourceLocation, {
-          linesAbove: 6,
-          linesBelow: 6,
-          highlightCode: true,
-        }),
+        codeFrame: codeFrameColumns(
+          contents,
+          { start: fromBabelPosition(start), end: fromBabelPosition(end) },
+          {
+            linesAbove: 6,
+            linesBelow: 6,
+            highlightCode: true,
+          }
+        ),
       },
     })
   })

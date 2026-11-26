@@ -12,12 +12,12 @@ function sleep(timeout = 100): Promise<void> {
 async function doAsync(
   mutex: ReturnType<typeof createMutex>,
   result: Array<string> = [],
-  waitTime: number,
+  waitFor: number | Promise<void>,
   id: string
 ): Promise<Array<string>> {
   await mutex.acquire()
   result.push(`start ${id}`)
-  await sleep(waitTime)
+  await (typeof waitFor === `number` ? sleep(waitFor) : waitFor)
   result.push(`stop ${id}`)
   await mutex.release()
 
@@ -83,9 +83,17 @@ describe(`mutex`, () => {
 
     const result: Array<string> = []
 
-    const mutexPromise = doAsync(mutex1, result, 50, `1`)
+    // 1 の処理は、2 の処理が終わるまでミューテックスを保持し続ける。待ち時間で順序を
+    // 作ると、負荷が高いときに 2 がミューテックスを取る前に 1 が終わってしまうことがある
+    let finishFirst: () => void = () => {}
+    const secondIsDone = new Promise<void>(resolve => {
+      finishFirst = resolve
+    })
+
+    const mutexPromise = doAsync(mutex1, result, secondIsDone, `1`)
     await sleep(0)
     await doAsync(mutex2, result, 10, `2`)
+    finishFirst()
     await mutexPromise
 
     expect(result).toMatchInlineSnapshot(`

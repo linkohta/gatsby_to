@@ -21,6 +21,18 @@ export interface ICodeFrameLocation {
 
 export type CodeFrameOptions = Options
 
+/**
+ * Babel のパーサーのエラーや AST のノードが持つ位置（列が 0 始まり）を、`codeFrameColumns` に
+ * 渡す位置（列が 1 始まり）へ読み替える。読み替えずに渡すと、印が 1 文字左にずれ、
+ * 行頭（列 0）を指す位置では印が付かなくなる。
+ */
+export function fromBabelPosition(position: {
+  line: number
+  column: number
+}): ICodeFramePosition {
+  return { line: position.line, column: position.column + 1 }
+}
+
 // `@babel/code-frame` が行を分けるときと同じ規則
 const NEWLINE = /\r\n|[\n\r\u2028\u2029]/
 

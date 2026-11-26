@@ -3,8 +3,6 @@ import { store } from "../../../redux"
 import { actions } from "../../../redux/actions"
 import { getDataStore } from "../../../datastore"
 
-jest.setTimeout(15000)
-
 jest.mock(`gatsby-cli/lib/reporter`, () => {
   return {}
 })
@@ -41,7 +39,8 @@ it(`worker can access node created in main process`, async () => {
   await getDataStore().ready()
 
   const nodeStoredInMainProcess = getDataStore().getNode(testNodeId)
-  // lmdb（2.5.3）は、読み取りに使ったスナップショットを、タイマーで解放するまで使い続ける。
+  // lmdb は、読み取りに使ったスナップショットを、タイマーで解放するまで使い続ける
+  // （2.5.3 でも 3.5.11 でも同じ）。
   // ワーカーは上で読み取りを行ったばかりなので、ノードを作成する前のスナップショットが
   // まだ残っていることがある。その場合は null が返るので、新しいスナップショットに
   // 切り替わってノードが見えるようになるまで読み直す
