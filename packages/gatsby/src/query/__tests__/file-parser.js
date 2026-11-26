@@ -334,8 +334,20 @@ const query = graphql\`{ __typename }\`
 `,
 }
 
+const CODE_FRAME_FILE_INFO = {
+  "error-interpolation.js": `import { graphql } from 'gatsby'
+export const query = graphql\`query { foo \${bar} }\`
+`,
+  "error-config-not-async.js": `import { graphql } from 'gatsby'
+export function config() {
+  const query = graphql\`{ __typename }\`
+}
+`,
+}
+
 const MOCK_FILE_INFO = {
   ...SLICES_FILE_INFO,
+  ...CODE_FRAME_FILE_INFO,
   ...QUERY_FILE_INFO,
   ...HEAD_FILE_INFO,
 }
@@ -421,6 +433,54 @@ describe(`File parser`, () => {
       }).toMatchSnapshot()
     }
   )
+
+  describe(`code frames of errors`, () => {
+    const originalForceColor = process.env.FORCE_COLOR
+
+    beforeAll(() => {
+      // コードフレームに色のエスケープシーケンスが入らないようにする
+      process.env.FORCE_COLOR = `0`
+    })
+
+    afterAll(() => {
+      if (originalForceColor === undefined) {
+        delete process.env.FORCE_COLOR
+      } else {
+        process.env.FORCE_COLOR = originalForceColor
+      }
+    })
+
+    const getError = async fileName => {
+      const errors = []
+      await parser.parseFile(fileName, errors.push.bind(errors))
+      expect(errors).toHaveLength(1)
+      return errors[0]
+    }
+
+    it(`marks the interpolation in a graphql tag`, async () => {
+      const error = await getError(`error-interpolation.js`)
+      expect(error.id).toBe(`85916`)
+      expect(error.context.codeFrame).toMatchInlineSnapshot(`
+        "  1 | import { graphql } from 'gatsby'
+        > 2 | export const query = graphql\`query { foo \${bar} }\`
+            |                                          ^^^^^^
+          3 |"
+      `)
+    })
+
+    it(`marks the start of a config export that is not async`, async () => {
+      const error = await getError(`error-config-not-async.js`)
+      expect(error.id).toBe(`85929`)
+      expect(error.context.codeFrame).toMatchInlineSnapshot(`
+        "  1 | import { graphql } from 'gatsby'
+        > 2 | export function config() {
+            |        ^
+          3 |   const query = graphql\`{ __typename }\`
+          4 | }
+          5 |"
+      `)
+    })
+  })
 
   describe(`Head export`, () => {
     const HEAD_KEYS = Object.keys(HEAD_FILE_INFO)

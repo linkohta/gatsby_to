@@ -22,7 +22,10 @@ const report = require(`gatsby-cli/lib/reporter`)
 
 import type { DocumentNode } from "graphql"
 import { babelParseToAst } from "../utils/babel-parse-to-ast"
-import { codeFrameColumns } from "gatsby-core-utils/code-frame"
+import {
+  codeFrameColumns,
+  fromBabelPosition,
+} from "gatsby-core-utils/code-frame"
 import { getPathToLayoutComponent, md5 } from "gatsby-core-utils"
 
 const apiRunnerNode = require(`../utils/api-runner-node`)
@@ -478,6 +481,14 @@ type CollectedSlice = {
 
 const cache = {}
 
+// Babel の AST の位置（列が 0 始まり）を、コードフレーム用の位置（列が 1 始まり）へ読み替える
+const toCodeFrameLocation = location => {
+  return {
+    start: location.start && fromBabelPosition(location.start),
+    end: location.end && fromBabelPosition(location.end),
+  }
+}
+
 export default class FileParser {
   constructor({ parentSpan } = {}) {
     this.parentSpan = parentSpan
@@ -590,7 +601,7 @@ export default class FileParser {
           id: `85916`,
           location,
           context: {
-            codeFrame: codeFrameColumns(text, location, {
+            codeFrame: codeFrameColumns(text, toCodeFrameLocation(location), {
               highlightCode: process.env.FORCE_COLOR !== `0`,
             }),
           },
@@ -608,7 +619,7 @@ export default class FileParser {
           location,
           context: {
             codeFrame: location
-              ? codeFrameColumns(text, location, {
+              ? codeFrameColumns(text, toCodeFrameLocation(location), {
                   highlightCode: process.env.FORCE_COLOR !== `0`,
                 })
               : null,
@@ -645,7 +656,7 @@ export default class FileParser {
           location,
           context: {
             exportName: err.exportName,
-            codeFrame: codeFrameColumns(text, location, {
+            codeFrame: codeFrameColumns(text, toCodeFrameLocation(location), {
               highlightCode: process.env.FORCE_COLOR !== `0`,
             }),
           },

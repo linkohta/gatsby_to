@@ -57,9 +57,9 @@ export default function parseMetadata(content, node, options) {
         err.loc.start || {
           start: {
             line: err.loc.line,
-            // @babel/code-frame は 8 で列の数え方を 1 始まりから 0 始まりに変え、列を指さないときは
-            // null を渡すようになった。表示が変わらないように、これまでの数え方から読み替える
-            column: err.loc.column ? err.loc.column - 1 : null,
+            // Babel のパーサーのエラーの列も、@babel/code-frame 8 が受け取る列も 0 始まりなので、
+            // そのまま渡す
+            column: err.loc.column,
           },
         },
         {
