@@ -1,11 +1,12 @@
 # gatsby-remark-custom-blocks
 
-> **Note**: this plugin is incompatible with `gatsby-transformer-remark@^4.0.0`
+> **Note**: this plugin is incompatible with `gatsby-transformer-remark@^4.0.0` and later
+> (including the current version, which parses with remark 15)
 > because the upstream [`remark-custom-blocks`](https://github.com/zestedesavoir/zmarkdown/tree/master/packages/remark-custom-blocks)
-> package is not upgraded to remark 13 yet.
+> package only supports the parser of remark 12 and earlier. Builds fail with
+> `Cannot set properties of undefined (setting 'customBlocks')`.
 >
-> The work on upgrading to remark 13 is in progress, so follow [this issue](https://github.com/zestedesavoir/zmarkdown/issues/416)
-> for updates.
+> See [this issue](https://github.com/zestedesavoir/zmarkdown/issues/416) for the state of the upstream package.
 >
 > The latest compatible version is `gatsby-transformer-remark@3.2.0`.
 

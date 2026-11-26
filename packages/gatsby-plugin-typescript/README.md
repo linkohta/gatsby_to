@@ -36,6 +36,8 @@ module.exports = {
 ```
 
 For more detailed documentation on the available options, visit https://babeljs.io/docs/en/babel-preset-typescript#options.
+
+Gatsby compiles sites with Babel 8, whose `@babel/preset-typescript` no longer has the `isTSX`, `allExtensions` and `allowDeclareFields` options. This plugin still accepts them and translates them: `allExtensions` becomes the preset's `ignoreExtensions`, `isTSX` together with `allExtensions` enables JSX parsing for every file, and `allowDeclareFields` is always on. `onlyRemoveTypeImports` defaults to `false` in this plugin (the preset itself defaults to `true` in Babel 8).
 To add TypeScript Babel plugins (e.g. `@babel/plugin-proposal-decorators`), you can try using a [custom .babelrc file](https://www.gatsbyjs.com/docs/babel/#how-to-use-a-custom-babelrc-file).
 
 ## Caveats

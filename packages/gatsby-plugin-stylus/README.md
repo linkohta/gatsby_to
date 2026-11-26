@@ -15,8 +15,8 @@ Provides drop-in support for Stylus
 plugins: [`gatsby-plugin-stylus`]
 ```
 
-If you need to override the default options passed into [`css-loader`](https://github.com/webpack-contrib/css-loader).
-**Note:** Gatsby is using `css-loader@^5.0.0`.
+If you need to override the default [CSS Modules options](https://github.com/webpack-contrib/css-loader#modules) passed into [`css-loader`](https://github.com/webpack-contrib/css-loader), use `cssLoaderOptions.modules`.
+**Note:** Gatsby is using `css-loader@^7.1.5`. Only the `modules` option of `cssLoaderOptions` is passed to `css-loader`; other keys are ignored.
 
 ```javascript:title=gatsby-config.js
 plugins: [
@@ -24,7 +24,9 @@ plugins: [
     resolve: `gatsby-plugin-stylus`,
     options: {
       cssLoaderOptions: {
-        camelCase: false,
+        modules: {
+          exportLocalsConvention: `camelCaseOnly`,
+        },
       },
     },
   },
@@ -38,8 +40,8 @@ Any file with the `module` extension will use CSS modules. CSS modules are impor
 
 ### With Stylus plugins
 
-This plugin has the same API as
-[stylus-loader](https://github.com/shama/stylus-loader#stylus-plugins), which
+This plugin uses [stylus-loader](https://github.com/webpack-contrib/stylus-loader) 9. Stylus options such as `use` and `import` can be written
+directly in the plugin options (the plugin passes them to the loader as `stylusOptions`), which
 means you can add stylus plugins with `use`:
 
 ```javascript:title=gatsby-config.js
