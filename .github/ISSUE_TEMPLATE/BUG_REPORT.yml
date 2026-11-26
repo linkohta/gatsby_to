@@ -1,56 +1,53 @@
 name: Bug Report
-description: Something isn't working as expected? Report your bugs here.
+description: 期待どおりに動かない場合は、こちらからバグを報告してください。
 labels: ["type: bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        # Welcome 👋 
+        # バグ報告
 
-        Thanks for taking the time to fill out this bug report.
-        Please fill out each section below. This info allows Gatsby maintainers to diagnose (and fix!) your issue as quickly as possible. Otherwise we might need to close the issue without e.g. clear reproduction steps.
+        このリポジトリは [gatsbyjs/gatsby](https://github.com/gatsbyjs/gatsby) のフォークです。ここでは、このリポジトリのコードで起きる問題を受け付けます。
+        下の各項目を記入してください。再現手順がはっきりしていると、原因の調査と修正が早く進みます。
 
-        Also please verify that your issue is present in `gatsby@next`, too. The `next` version is the latest beta version of Gatsby and has any pending changes that are in the next stable release.
-        Bug reports also shouldn't be used for support requests about a specific problem in your site, please use GitHub Discussions for that.
+        npm に公開されている本家の Gatsby だけで起きる問題は、本家へ報告してください。
 
-        Useful Links:
-        - Documentation: https://www.gatsbyjs.com/docs/
-        - How to File an Issue: https://www.gatsbyjs.com/contributing/how-to-file-an-issue/
+        参考リンク:
+        - ドキュメント（本家、英語）: https://www.gatsbyjs.com/docs/
+        - 開発ルール: https://github.com/linkohta/gatsby_to/blob/master/CLAUDE.md
   - type: checkboxes
     attributes:
-      label: Preliminary Checks
-      description: Please make sure that you verify each checkbox and follow the instructions for them.
+      label: 事前の確認
+      description: それぞれの項目を確認してから、チェックを入れてください。
       options:
-        - label: "This issue is not a duplicate. Before opening a new issue, please search existing issues: https://github.com/gatsbyjs/gatsby/issues"
+        - label: "同じ内容の Issue がないことを確認しました: https://github.com/linkohta/gatsby_to/issues"
           required: true
-        - label: "This issue is not a question, feature request, RFC, or anything other than a bug report directly related to Gatsby. Please post those things in GitHub Discussions: https://github.com/gatsbyjs/gatsby/discussions"
+        - label: "これは質問や機能の要望ではなく、このリポジトリのコードに直接関係するバグの報告です。"
           required: true
   - type: textarea
     attributes:
-      label: Description
-      description: Describe the issue that you're seeing.
-      placeholder: Be as precise as you can. Feel free to share screenshots, videos, or data from the devtools of your browser.
+      label: 説明
+      description: 起きている問題を説明してください。
+      placeholder: できるだけ具体的に書いてください。スクリーンショット、動画、ブラウザーの開発者ツールの情報も歓迎します。
     validations:
       required: true
   - type: input
     id: reproduction-link
     attributes:
-      label: Reproduction Link
+      label: 再現用のリンク
       placeholder: "https://github.com/username/repository-name/"
       description: |
-        Link to a minimal reproduction (GitHub repository, CodeSandbox, StackBlitz, etc.).
+        最小限の再現用プロジェクト（GitHub のリポジトリなど）へのリンクです。
 
-        **Do not link to your actual project**, but provide a minimal reproduction in a fresh project — how to make a minimal reproduction: https://gatsby.dev/reproduction
+        **実際のプロジェクトではなく**、新しく作った最小限のプロジェクトで再現させてください。作り方（本家、英語）: https://gatsby.dev/reproduction
 
-        You can use these links to quickly set up a new reproduction:
-        - CodeSandbox: https://githubbox.com/gatsbyjs/gatsby-starter-minimal
-        - StackBlitz: https://githubblitz.com/gatsbyjs/gatsby-starter-minimal
+        このリポジトリのパッケージをサイトで使うには、`gatsby-dev-cli` でローカルのビルドをコピーします: https://github.com/linkohta/gatsby_to/tree/master/packages/gatsby-dev-cli
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Steps to Reproduce
-      description: Clear steps describing how to reproduce the issue.
+      label: 再現手順
+      description: 問題を再現する手順を、順番に書いてください。
       value: |
         1.
         2.
@@ -60,23 +57,23 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Expected Result
-      description: Describe what you expected to happen.
+      label: 期待する結果
+      description: どうなることを期待していたかを書いてください。
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Actual Result
-      description: Describe what actually happened.
+      label: 実際の結果
+      description: 実際に何が起きたかを書いてください。
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Environment
+      label: 環境
       render: shell
-      description: Run "gatsby info --clipboard" in your project directory and paste the output here.
+      description: プロジェクトのディレクトリで "gatsby info --clipboard" を実行し、出力を貼り付けてください。
       placeholder: |
-        You'll get an output similar to this:
+        次のような出力が得られます:
 
         System:
           OS: Operating System
@@ -95,10 +92,10 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Config Flags
-      description: Do you use any "flags" inside "gatsby-config"? If yes, please paste them here.
+      label: 設定のフラグ
+      description: 設定ファイル（gatsby-config）で flags を使っている場合は、ここに貼り付けてください。
       placeholder: |
-        For example:
+        例:
 
         DEV_SSR: true
         FAST_DEV: false
