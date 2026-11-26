@@ -4,7 +4,9 @@ Provides drop-in support for [styled-jsx](https://github.com/vercel/styled-jsx).
 
 ## Install
 
-`npm install styled-jsx gatsby-plugin-styled-jsx`
+`npm install styled-jsx@3 gatsby-plugin-styled-jsx`
+
+> **Note:** Install styled-jsx 3, the version in this plugin's `peerDependencies`. Gatsby compiles sites with Babel 8, and the Babel plugin of styled-jsx 5 cannot be loaded by Babel 8.
 
 ## How to use
 

@@ -17,8 +17,8 @@ plugins: [`gatsby-plugin-postcss`]
 
 If you need to pass options to PostCSS use the plugins options; see [`postcss-loader`](https://github.com/postcss/postcss-loader) for all available options.
 
-If you need to override the default options passed into [`css-loader`](https://github.com/webpack-contrib/css-loader).
-**Note:** Gatsby is using `css-loader@^5.0.0`.
+If you need to override the default [CSS Modules options](https://github.com/webpack-contrib/css-loader#modules) passed into [`css-loader`](https://github.com/webpack-contrib/css-loader), use `cssLoaderOptions.modules`.
+**Note:** Gatsby is using `css-loader@^7.1.5`. Only the `modules` option of `cssLoaderOptions` is passed to `css-loader`; other keys are ignored.
 
 ```javascript:title=gatsby-config.js
 plugins: [
@@ -26,7 +26,9 @@ plugins: [
     resolve: `gatsby-plugin-postcss`,
     options: {
       cssLoaderOptions: {
-        camelCase: false,
+        modules: {
+          exportLocalsConvention: `camelCaseOnly`,
+        },
       },
     },
   },
@@ -67,8 +69,6 @@ module.exports = () => ({
 })
 ```
 
-If you need to override the default options passed into [`css-loader`](https://github.com/webpack-contrib/css-loader).
-
 In this example `css-loader` is configured to output classnames as is, instead of converting them to camel case. Named exports must be disabled for this to work, and so you have to import CSS using `import styles from './file.css` instead of `import * as styles from './file.module.css'`
 
 ```javascript:title=gatsby-config.js
@@ -77,8 +77,10 @@ plugins: [
     resolve: `gatsby-plugin-postcss`,
     options: {
       cssLoaderOptions: {
-        exportLocalsConvention: false,
-        namedExport: false,
+        modules: {
+          exportLocalsConvention: `asIs`,
+          namedExport: false,
+        },
       },
     },
   },

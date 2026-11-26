@@ -37,8 +37,8 @@ plugins: [
 ]
 ```
 
-If you need to override the default options passed into [`css-loader`](https://github.com/webpack-contrib/css-loader)
-**Note:** Gatsby is using `css-loader@^5.0.0`.
+If you need to override the default [CSS Modules options](https://github.com/webpack-contrib/css-loader#modules) passed into [`css-loader`](https://github.com/webpack-contrib/css-loader), use `cssLoaderOptions.modules`.
+**Note:** Gatsby is using `css-loader@^7.1.5`. Only the `modules` option of `cssLoaderOptions` is passed to `css-loader`; other keys are ignored.
 
 ```javascript
 // in gatsby-config.js
@@ -47,7 +47,9 @@ plugins: [
     resolve: `gatsby-plugin-less`,
     options: {
       cssLoaderOptions: {
-        camelCase: false,
+        modules: {
+          exportLocalsConvention: `camelCaseOnly`,
+        },
       },
     },
   },

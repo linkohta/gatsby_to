@@ -97,6 +97,8 @@ Gatsby は、保守しやすく、高性能で、コンテンツが豊富な Web
 
    サイトは `http://localhost:8000` で動いています。`my-gatsby-site` ディレクトリを好みのコードエディターで開き、`src/pages/index.js` を編集してください。変更を保存すると、ブラウザーにすぐ反映されます。
 
+`npm init gatsby` で作ったサイトは、npm に公開されている本家の Gatsby を使います。このリポジトリのパッケージをサイトで試す場合は、[`gatsby-dev-cli`](./packages/gatsby-dev-cli) を使って、ローカルでビルドしたパッケージをサイトへコピーしてください。
+
 これで、完全に機能する Gatsby の Web サイトができました。Gatsby サイトをカスタマイズする方法については、[プラグイン](https://gatsbyjs.com/plugins/)と[公式チュートリアル](https://www.gatsbyjs.com/docs/tutorial/getting-started/)を参照してください。
 
 ## 🎓 Gatsby を学ぶ
@@ -131,11 +133,13 @@ Gatsby は、誰もが歓迎され、多様で、安全なコミュニティを�
 
 このリポジトリで開発する際は、[**CLAUDE.md**](./CLAUDE.md) の開発ルールに従ってください。セットアップの手順、コードとコメントの書き方、依存パッケージの更新方針、リファクタリング方針、コミットと PR のルールをまとめています。
 
+開発には Node.js 24（24.15.0 以上）と Yarn 1 系が必要です。リポジトリをクローンしたら、`yarn bootstrap` で依存のインストールと全パッケージのビルドを行います。各パッケージを利用する側の Node.js は、22（22.22.2 以上）または 24（24.15.0 以上）に対応しています（`gatsby-dev-cli` だけは 24 以上です）。
+
 本家の Gatsby へコントリビュートする場合は、本家の[**コントリビューションガイド**](https://www.gatsbyjs.com/contributing/)を参照してください。
 
 ### このリポジトリの構成について
 
-このリポジトリは、[Lerna](https://github.com/lerna/lerna) で管理している[モノレポ](https://trunkbaseddevelopment.com/monorepos/)です。つまり、このコードベースでは[複数のパッケージ](./packages)をまとめて管理しています。
+このリポジトリは、Yarn workspaces と [Lerna](https://github.com/lerna/lerna) で管理している[モノレポ](https://trunkbaseddevelopment.com/monorepos/)です。つまり、このコードベースでは[複数のパッケージ](./packages)をまとめて管理しています。
 
 ## 📝 ライセンス
 

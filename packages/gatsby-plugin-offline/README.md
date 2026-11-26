@@ -154,7 +154,7 @@ const options = {
     {
       // Add runtime caching of various other page resources
       urlPattern:
-        /^https?:.*\.(png|jpg|jpeg|webp|svg|gif|tiff|js|woff|woff2|json|css)$/,
+        /^https?:.*\.(png|jpg|jpeg|webp|avif|svg|gif|tiff|js|woff|woff2|json|css)$/,
       handler: `StaleWhileRevalidate`,
     },
     {

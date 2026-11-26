@@ -8,6 +8,8 @@ Gatsby packages to Gatsby sites that you're testing your changes on.
 
 `npm install -g gatsby-dev-cli`
 
+`gatsby-dev-cli` requires Node.js 24 (24.15.0 or later), because it depends on verdaccio 7.
+
 ## Configuration / First time setup
 
 The gatsby-dev-cli tool needs to know where your cloned Gatsby repository is
