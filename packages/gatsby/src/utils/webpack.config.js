@@ -582,7 +582,8 @@ module.exports = async (
   }
 
   if (stage === `build-html` || stage === `develop-html`) {
-    config.target = `node14.15`
+    // 対応する Node.js の下限（22）に合わせる
+    config.target = `node22`
   } else {
     config.target = [`web`, `es5`]
   }
