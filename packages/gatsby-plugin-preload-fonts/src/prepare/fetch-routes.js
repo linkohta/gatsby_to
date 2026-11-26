@@ -1,10 +1,36 @@
 const { createContentDigest, isCI } = require(`gatsby-core-utils`)
-const { request } = require(`graphql-request`)
 const { formatRelative } = require(`date-fns`)
 // chalk 5 以降は ESM 専用で、`require()` では default export が `default` に入る
 const { default: chalk } = require(`chalk`)
 
 const { red, blue, bold, dim } = chalk
+
+// 開発サーバーの GraphQL エンドポイントへクエリを 1 回送るだけなので、
+// クライアントライブラリを使わずに Node.js 標準の `fetch` で送る。
+// HTTP のエラーと GraphQL の `errors` は、どちらも例外として呼び出し元に伝える。
+const request = async (endpoint, query) => {
+  const response = await fetch(endpoint, {
+    method: `POST`,
+    headers: {
+      "Content-Type": `application/json`,
+      Accept: `application/json`,
+    },
+    body: JSON.stringify({ query }),
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `GraphQL request failed with status ${response.status} ${response.statusText}`
+    )
+  }
+
+  const { data, errors } = await response.json()
+  if (errors && errors.length > 0) {
+    throw new Error(errors.map(error => error.message).join(`\n`))
+  }
+
+  return data
+}
 
 module.exports = async ({ logger, endpoint, cache }) => {
   const query = `
