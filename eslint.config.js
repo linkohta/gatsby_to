@@ -415,7 +415,6 @@ module.exports = [
     languageOptions: {
       globals: {
         __PATH_PREFIX__: false,
-        __TRAILNG_SLASH__: false,
         ___emitter: false,
       },
     },
