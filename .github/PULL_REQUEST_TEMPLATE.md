@@ -1,38 +1,37 @@
 <!--
-  Have any questions? Check out the contributing docs at https://gatsby.dev/contribute, or
-  ask in this Pull Request and a Gatsby maintainer will be happy to help :)
+  開発ルールは CLAUDE.md にまとめています。PR のタイトルは Conventional Commits の形式で書き、
+  種別とスコープは英語、説明は日本語にします。
 
-  For any major changes, please first open a bug report (if it's a bug) or a feature request.
+  影響の大きい変更（公開 API、対応する Node.js の下限、ビルドの土台になるツールなど）は、
+  着手する前にリポジトリの所有者へ確認してください。
 -->
 
 ## Description
 
-<!-- Write a brief description of the changes introduced by this PR -->
+<!-- 何を変えたか、なぜ変えたかを書いてください -->
 
 ### Documentation
 
 <!--
-  Where is this feature or API documented?
+  この変更に関係する文書（README.md、CLAUDE.md、各パッケージの README.md、docs/）はありますか。
 
-  - If docs exist:
-    - Update any references, if relevant. This includes Guides and Gatsby Internals docs.
-  - If no docs exist:
-    - Create a stub for documentation including bullet points for how to use the feature, code snippets (including from happy path tests), etc.
+  - 文書がある場合: 変更に合わせて更新してください。
+  - 文書がない場合: 必要であれば、使い方を簡単に書いてください。
 -->
 
 ### Tests
 
-<!-- Did you add tests (unit tests, E2E tests, etc.)? How did you test this change? -->
+<!-- どう確認したかを書いてください。実行した lint、型チェック、テストと、その結果を含めます -->
 
 ## Related Issues
 
 <!--
-  Link to the issue that is fixed by this PR (if there is one)
-  e.g. Fixes #1234
+  この PR で解決する Issue があれば、リンクしてください
+  例: Fixes #1234
 
-  Link to an issue that is partially addressed by this PR (if there are any)
-  e.g. Addresses #1234
+  この PR で一部だけ対応する Issue があれば、リンクしてください
+  例: Addresses #1234
 
-  Link to related issues (if there are any)
-  e.g. Related to #1234
+  関連する Issue や PR があれば、リンクしてください
+  例: Related to #1234
 -->

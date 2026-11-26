@@ -1,22 +1,22 @@
-# Security Policy
+# セキュリティポリシー
 
-## Supported Versions
+このリポジトリは [gatsbyjs/gatsby](https://github.com/gatsbyjs/gatsby) のフォークで、本家とは別に保守しています。このリポジトリで見つけた脆弱性は、本家ではなく、このリポジトリへ報告してください。
 
-The following versions are currently being supported with security updates.
+## サポート対象のバージョン
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.x     | :heavy_check_mark: |
-| 4.x     | :x:                |
-| 3.x     | :x:                |
-| 2.x     | :x:                |
-| 1.x     | :x:                |
-| < 1.0   | :x:                |
+セキュリティ更新の対象は、`master` ブランチにある最新のコード（Gatsby 5.x）だけです。
 
-## Reporting a Vulnerability
+| バージョン | サポート           |
+| ---------- | ------------------ |
+| 5.x        | :heavy_check_mark: |
+| 4.x 以前   | :x:                |
 
-If you believe you have found a security issue with any of Gatsby's open source or commercial offerings, we would love to receive your report! Security findings can be emailed to security@gatsbyjs.com.
+## 脆弱性の報告
 
-When reporting a security issue, describe the issue in detail and include steps to reproduce. The more detail provided, the more likely we will be able to reproduce the issue and determine a course of action.
+脆弱性を見つけた場合は、公開の Issue には書かず、GitHub の[非公開の脆弱性報告](https://github.com/linkohta/gatsby_to/security/advisories/new)（リポジトリの「Security」タブの「Report a vulnerability」）から報告してください。
 
-Please do not report findings from `npm audit`. We are aware of package dependency issues that are reported by this tool and do review these reports. In many cases the issues reported by `npm audit` are misleading and do not present a tangible/exploitable security risk for Gatsby users.
+報告には、問題の詳しい説明と再現手順を含めてください。情報が詳しいほど、再現と対応の判断がしやすくなります。
+
+本家の Gatsby にも同じ問題がある場合は、本家の[セキュリティポリシー](https://github.com/gatsbyjs/gatsby/security/policy)に沿って、本家にも報告してください。
+
+`npm audit` や `yarn audit` の結果をそのまま報告することは控えてください。依存パッケージについて報告される問題は把握していて、定期的に確認しています。多くの場合、Gatsby の利用者にとって実際に悪用できるリスクにはなりません。実際に悪用できることを確認できた場合は、その手順を添えて報告してください。

@@ -1,41 +1,42 @@
 name: Documentation
-description: Did you find an error in our documentation? Report your findings here.
+description: ドキュメントの誤りを見つけた場合は、こちらから報告してください。
 labels: ["type: documentation"]
 body:
   - type: markdown
     attributes:
       value: |
-        # Welcome 👋
+        # ドキュメントの報告
 
-        Thanks for taking the time to fill out this issue.
-        Please fill out each section below. This info allows Gatsby maintainers to triage and fix your issue as quickly as possible.
+        このリポジトリにある文書（`README.md`、`CLAUDE.md`、各パッケージの `README.md`、`docs/` など）の誤りを受け付けます。
+        下の各項目を記入してください。
 
-        Useful links:
+        公式サイト（gatsbyjs.com）のドキュメントは本家のものです。公式サイトの誤りは、本家へ報告してください。
 
-        - Documentation: https://www.gatsbyjs.com/docs/
-        - Contributing: https://www.gatsbyjs.com/contributing/
+        参考リンク:
+
+        - 開発ルール: https://github.com/linkohta/gatsby_to/blob/master/CLAUDE.md
   - type: checkboxes
     attributes:
-      label: Preliminary Checks
-      description: Please make sure that you verify each checkbox and follow the instructions for them.
+      label: 事前の確認
+      description: それぞれの項目を確認してから、チェックを入れてください。
       options:
-        - label: "This issue is not a duplicate. Before opening a new issue, please search existing issues: https://github.com/gatsbyjs/gatsby/issues"
+        - label: "同じ内容の Issue がないことを確認しました: https://github.com/linkohta/gatsby_to/issues"
           required: true
-        - label: "This issue is not a question, feature request, RFC, or anything other than a bug report. Please post those things in GitHub Discussions: https://github.com/gatsbyjs/gatsby/discussions"
+        - label: "これは質問や機能の要望ではなく、このリポジトリにある文書の誤りの報告です。"
           required: true
   - type: textarea
     validations:
       required: true
     attributes:
-      label: Summary
+      label: 概要
       description: |
-        What problem(s) did you run into that caused you to request a fix to the documentation or additional documentation? What questions do you think we should answer?
+        どの文書のどの記述に、どのような問題がありましたか。実際の動作やコードと食い違っている場合は、その内容も書いてください。
   - type: textarea
     validations:
       required: true
     attributes:
-      label: Steps to Resolve this Issue
-      description: How can the problem be solved? Are there any additional steps required? Do any other pages need to be updated?
+      label: 解決に必要な作業
+      description: どう直せばよいですか。ほかに更新が必要な文書はありますか。
       value: |
         1.
         2.

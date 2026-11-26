@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Gatsby Documentation
+  - name: Gatsby のドキュメント（本家、英語）
     url: https://www.gatsbyjs.com/docs/
-    about: Check out the Gatsby documentation for answers to common questions
-  - name: Gatsby Discussions
-    url: https://github.com/gatsbyjs/gatsby/discussions
-    about: Ask questions, request features & discuss RFCs
+    about: Gatsby の使い方についての質問は、まず本家のドキュメントを確認してください
+  - name: 脆弱性の報告
+    url: https://github.com/linkohta/gatsby_to/security/advisories/new
+    about: 脆弱性は公開の Issue には書かず、非公開の脆弱性報告から報告してください
