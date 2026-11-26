@@ -4,6 +4,11 @@
   "exclude": ["**/__tests__/**/*"],
   "compilerOptions": {
     "skipLibCheck": true,
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // gatsby の index.d.ts 経由で読み込まれるこのパッケージ自身の型を、dist ではなく src に解決する。
+    // dist と src の 2 つの Joi の型定義を構造で比べることになり、TypeScript 7 が TS2321 で失敗するため
+    "paths": {
+      "gatsby-plugin-utils": ["./src/index.ts"]
+    }
   }
 }

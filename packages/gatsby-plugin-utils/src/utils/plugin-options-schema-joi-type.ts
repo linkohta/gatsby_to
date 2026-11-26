@@ -3,6 +3,12 @@
 // https://github.com/sideway/joi/tree/master/lib/index.d.ts
 // The only change @mxstbr made was to add support for our custom
 // .dotenv extension to AnySchema.
+// joi 18.3.2 の lib/index.d.ts に合わせている。
+
+import type {
+  StandardJSONSchemaV1,
+  StandardSchemaV1,
+} from "@standard-schema/spec"
 
 type Types =
   | "any"
@@ -20,7 +26,7 @@ type Types =
 
 type BasicType = boolean | number | string | any[] | object | null
 
-type LanguageMessages = Record<string, string>
+type LanguageMessages = Record<string, string | Record<string, string>>
 
 type PresenceMode = "optional" | "required" | "forbidden"
 
@@ -71,11 +77,18 @@ interface ErrorFormattingOptions {
     label?: string | false
 
     /**
-     * the characters used around array avlues. Defaults to `'[]'`
+     * the characters used around array values. Defaults to `'[]'`
      *
      * @default '[]'
      */
     array?: string | false
+
+    /**
+     * the characters used around array string values. Defaults to no wrapping.
+     *
+     * @default false
+     */
+    string?: string | false
   }
 }
 
@@ -92,6 +105,12 @@ interface BaseValidationOptions {
    * @default false
    */
   allowUnknown?: boolean
+  /**
+   * when true, return artifacts alongside the value.
+   *
+   * @default false
+   */
+  artifacts?: boolean
   /**
    * when true, schema caching is enabled (for schemas with explicit caching rules).
    *
@@ -137,7 +156,7 @@ interface BaseValidationOptions {
    */
   noDefaults?: boolean
   /**
-   * when true, inputs are shallow cloned to include non-enumerables properties.
+   * when true, inputs are shallow cloned to include non-enumerable properties.
    *
    * @default false
    */
@@ -177,6 +196,12 @@ interface ValidationOptions extends BaseValidationOptions {
 }
 
 interface AsyncValidationOptions extends ValidationOptions {
+  /**
+   * when true, artifacts are returned alongside the value (i.e. `{ value, artifacts }`)
+   *
+   * @default false
+   */
+  artifacts?: boolean
   /**
    * when true, warnings are returned alongside the value (i.e. `{ value, warning }`).
    *
@@ -243,13 +268,34 @@ interface HierarchySeparatorOptions {
   separator?: string | false
 }
 
+interface DependencyOptions extends HierarchySeparatorOptions {
+  /**
+   * overrides the default check for a present value.
+   *
+   * @default (resolved) => resolved !== undefined
+   */
+  isPresent?: (resolved: any) => boolean
+}
+
 interface EmailOptions {
+  /**
+   * if `true`, domains ending with a `.` character are permitted
+   *
+   * @default false
+   */
+  allowFullyQualified?: boolean
   /**
    * If `true`, Unicode characters are permitted
    *
    * @default true
    */
   allowUnicode?: boolean
+  /**
+   * If `true`, underscores (`_`) are allowed in the domain name
+   *
+   * @default false
+   */
+  allowUnderscore?: boolean
   /**
    * if `true`, ignore invalid email length errors.
    *
@@ -280,16 +326,33 @@ interface EmailOptions {
    * @default 2
    */
   minDomainSegments?: number
+  /**
+   * The maximum number of domain segments (e.g. `x.y.z` has 3 segments) allowed. Defaults to no limit.
+   *
+   * @default Infinity
+   */
+  maxDomainSegments?: number
 }
 
 interface DomainOptions {
+  /**
+   * if `true`, domains ending with a `.` character are permitted
+   *
+   * @default false
+   */
+  allowFullyQualified?: boolean
   /**
    * If `true`, Unicode characters are permitted
    *
    * @default true
    */
   allowUnicode?: boolean
-
+  /**
+   * If `true`, underscores (`_`) are allowed in the domain name
+   *
+   * @default false
+   */
+  allowUnderscore?: boolean
   /**
    * Options for TLD (top level domain) validation. By default, the TLD must be a valid name listed on the [IANA registry](http://data.iana.org/TLD/tlds-alpha-by-domain.txt)
    *
@@ -302,6 +365,12 @@ interface DomainOptions {
    * @default 2
    */
   minDomainSegments?: number
+  /**
+   * The maximum number of domain segments (e.g. `x.y.z` has 3 segments) allowed. Defaults to no limit.
+   *
+   * @default Infinity
+   */
+  maxDomainSegments?: number
 }
 
 interface HexOptions {
@@ -310,6 +379,15 @@ interface HexOptions {
    * @default false
    */
   byteAligned?: boolean
+  /**
+   * controls whether the prefix `0x` or `0X` is allowed (or required) on hex strings.
+   * When `true`, the prefix must be provided.
+   * When `false`, the prefix is forbidden.
+   * When `optional`, the prefix is allowed but not required.
+   *
+   * @default false
+   */
+  prefix?: boolean | "optional"
 }
 
 interface IpOptions {
@@ -323,10 +401,27 @@ interface IpOptions {
   cidr?: PresenceMode
 }
 
-type GuidVersions = "uuidv1" | "uuidv2" | "uuidv3" | "uuidv4" | "uuidv5"
+type GuidVersions =
+  | "uuidv1"
+  | "uuidv2"
+  | "uuidv3"
+  | "uuidv4"
+  | "uuidv5"
+  | "uuidv6"
+  | "uuidv7"
+  | "uuidv8"
 
 interface GuidOptions {
-  version: GuidVersions[] | GuidVersions
+  version?: GuidVersions[] | GuidVersions
+  separator?: boolean | "-" | ":"
+  /**
+   * Defines the allowed or required GUID wrapper characters where:
+   * - `undefined` - (default) the GUID can be optionally wrapped with `{}`, `[]`, or `()`. The opening and closing characters must be a matching pair.
+   * - `true` - the GUID must be wrapped with `{}`, `[]`, or `()`. The opening and closing characters must be a matching pair.
+   * - `false` - wrapper characters are not allowed.
+   * - `'['`, `'{'`, or `'('` - a specific wrapper is required (e.g., if `wrapper` is `'['`, the GUID must be enclosed in square brackets).
+   */
+  wrapper?: true | false | "[" | "{" | "(" | undefined
 }
 
 interface UriOptions {
@@ -358,6 +453,12 @@ interface UriOptions {
    * Validate the domain component using the options specified in `string.domain()`.
    */
   domain?: DomainOptions
+  /**
+   * Encode URI before validation.
+   *
+   * @default false
+   */
+  encodeUri?: boolean
 }
 
 interface DataUriOptions {
@@ -397,7 +498,7 @@ interface SwitchDefault {
   otherwise: SchemaLike
 }
 
-interface WhenOptions {
+interface WhenOptions<ThenSchema = any, OtherwiseSchema = any> {
   /**
    * the required condition joi type.
    */
@@ -412,12 +513,12 @@ interface WhenOptions {
   /**
    * the alternative schema type if the condition is true. Required if otherwise or switch are missing.
    */
-  then?: SchemaLike
+  then?: SchemaLike<ThenSchema>
 
   /**
    * the alternative schema type if the condition is false. Required if then or switch are missing.
    */
-  otherwise?: SchemaLike
+  otherwise?: SchemaLike<OtherwiseSchema>
 
   /**
    * the list of cases. Required if then is missing.  Required if then or otherwise are missing.
@@ -430,15 +531,15 @@ interface WhenOptions {
   break?: boolean
 }
 
-interface WhenSchemaOptions {
+interface WhenSchemaOptions<ThenSchema = any, OtherwiseSchema = any> {
   /**
    * the alternative schema type if the condition is true. Required if otherwise is missing.
    */
-  then?: SchemaLike
+  then?: SchemaLike<ThenSchema>
   /**
    * the alternative schema type if the condition is false. Required if then is missing.
    */
-  otherwise?: SchemaLike
+  otherwise?: SchemaLike<OtherwiseSchema>
 }
 
 interface Cache {
@@ -548,6 +649,12 @@ interface ReferenceOptions extends HierarchySeparatorOptions {
    * when true, the reference resolves by reaching into maps and sets.
    */
   iterables?: boolean
+
+  /**
+   * when true, the value of the reference is used instead of its name in error messages
+   * and template rendering. Defaults to false.
+   */
+  render?: boolean
 }
 
 interface StringRegexOptions {
@@ -596,6 +703,7 @@ interface ErrorReport extends Error {
   messages: LanguageMessages
   state: State
   value: any
+  local: any
 }
 
 interface ValidationError extends Error {
@@ -617,7 +725,7 @@ interface ValidationError extends Error {
    */
   annotate(stripColors?: boolean): string
 
-  _object: any
+  _original: any
 }
 
 interface ValidationErrorItem {
@@ -629,14 +737,25 @@ interface ValidationErrorItem {
 
 type ValidationErrorFunction = (
   errors: ErrorReport[]
-) => string | ValidationErrorItem | Error
+) => string | ValidationErrorItem | Error | ErrorReport[]
 
-interface ValidationResult {
-  error?: ValidationError
-  errors?: ValidationError
-  warning?: ValidationError
-  value: any
+interface ValidationWarning {
+  message: string
+
+  details: ValidationErrorItem[]
 }
+
+type ValidationResult<TSchema = any> =
+  | {
+      error: undefined
+      warning?: ValidationError
+      value: TSchema
+    }
+  | {
+      error: ValidationError
+      warning?: ValidationError
+      value: any
+    }
 
 interface CreateErrorOptions {
   flags?: boolean
@@ -665,40 +784,116 @@ interface CustomHelpers<V = any> {
   prefs: ValidationOptions
   original: V
   warn: (code: string, local?: Context) => void
+  error: (code: string, local?: Context, localState?: State) => ErrorReport
+  message: (messages: LanguageMessages, local?: Context) => ErrorReport
+}
+
+type CustomValidator<V = any, R = V> = (
+  value: V,
+  helpers: CustomHelpers<R>
+) => R | ErrorReport
+
+interface ExternalHelpers<V = any> {
+  schema: ExtensionBoundSchema
+  linked: ExtensionBoundSchema | null
+  state: State
+  prefs: ValidationOptions
+  original: V
+  warn: (code: string, local?: Context) => void
   error: (code: string, local?: Context) => ErrorReport
   message: (messages: LanguageMessages, local?: Context) => ErrorReport
 }
 
-type CustomValidator<V = any> = (value: V, helpers: CustomHelpers) => V
+type ExternalValidationFunction<V = any, R = V> = (
+  value: V,
+  helpers: ExternalHelpers<R>
+) => R | undefined
 
-type ExternalValidationFunction = (value: any) => any
+type Primitives = string | number | boolean | bigint | symbol | null
 
-type SchemaLikeWithoutArray =
-  | string
-  | number
-  | boolean
-  | null
-  | Schema
-  | SchemaMap
-type SchemaLike = SchemaLikeWithoutArray | object
+type SchemaLikeWithoutArray<TSchema = any> = Exclude<
+  Primitives | Schema<TSchema> | SchemaMap<TSchema>,
+  any[]
+>
+type SchemaLike<TSchema = any> = SchemaLikeWithoutArray<TSchema> | object
 
-type SchemaMap<TSchema = any> = {
+type NullableType<T> = undefined | null | T
+
+type IsPrimitiveSubset<T> = [T] extends [string]
+  ? true
+  : [T] extends [number]
+    ? true
+    : [T] extends [bigint]
+      ? true
+      : [T] extends [boolean]
+        ? true
+        : [T] extends [symbol]
+          ? true
+          : [T] extends [null]
+            ? true
+            : [T] extends [undefined]
+              ? true
+              : false
+
+type IsUnion<T, U extends T = T> = T extends unknown
+  ? [U] extends [T]
+    ? false
+    : true
+  : false
+
+type IsNonPrimitiveSubsetUnion<T> =
+  true extends IsUnion<T>
+    ? true extends IsPrimitiveSubset<T>
+      ? false
+      : true
+    : false
+
+type ObjectPropertiesSchema<T = any> =
+  true extends IsNonPrimitiveSubsetUnion<Exclude<T, undefined | null>>
+    ? AlternativesSchema
+    : T extends NullableType<string>
+      ? StringSchema
+      : T extends NullableType<number>
+        ? NumberSchema
+        : T extends NullableType<bigint>
+          ? NumberSchema
+          : T extends NullableType<boolean>
+            ? BooleanSchema
+            : T extends NullableType<Date>
+              ? DateSchema
+              : T extends NullableType<Buffer>
+                ? BinarySchema
+                : T extends NullableType<Array<any>>
+                  ? ArraySchema
+                  : T extends NullableType<object>
+                    ? StrictSchemaMap<T> | ObjectSchema<T>
+                    : never
+
+type PartialSchemaMap<TSchema = any> = {
   [key in keyof TSchema]?: SchemaLike | SchemaLike[]
 }
 
-export type Schema =
-  | AnySchema
-  | ArraySchema
-  | AlternativesSchema
-  | BinarySchema
-  | BooleanSchema
-  | DateSchema
-  | FunctionSchema
-  | NumberSchema
-  | ObjectSchema
-  | StringSchema
-  | LinkSchema
-  | SymbolSchema
+type StrictSchemaMap<TSchema = any> = {
+  [key in keyof TSchema]-?: ObjectPropertiesSchema<TSchema[key]>
+}
+
+type SchemaMap<TSchema = any, isStrict = false> = isStrict extends true
+  ? StrictSchemaMap<TSchema>
+  : PartialSchemaMap<TSchema>
+
+export type Schema<P = any> =
+  | AnySchema<P>
+  | ArraySchema<P>
+  | AlternativesSchema<P>
+  | BinarySchema<P>
+  | BooleanSchema<P>
+  | DateSchema<P>
+  | FunctionSchema<P>
+  | NumberSchema<P>
+  | ObjectSchema<P>
+  | StringSchema<P>
+  | LinkSchema<P>
+  | SymbolSchema<P>
 
 type SchemaFunction = (schema: Schema) => Schema
 
@@ -805,7 +1000,17 @@ interface SchemaInternals {
   ): ValidationResult
 }
 
-interface AnySchema extends SchemaInternals {
+interface AnySchema<TSchema = any>
+  extends
+    SchemaInternals,
+    StandardSchemaV1<any, TSchema>,
+    StandardJSONSchemaV1<any, TSchema> {
+  /**
+   * The Standard properties.
+   */
+  readonly "~standard": StandardSchemaV1.Props<any, TSchema> &
+    StandardJSONSchemaV1.Props<any, TSchema>
+
   /**
    * Flags of current schema.
    */
@@ -832,7 +1037,13 @@ interface AnySchema extends SchemaInternals {
    * Assign target alteration options to a schema that are applied when `any.tailor()` is called.
    * @param targets - an object where each key is a target name, and each value is a function that takes an schema and returns an schema.
    */
-  alter(targets: Record<string, SchemaFunction>): this
+  alter(targets: Record<string, (schema: this) => Schema>): this
+
+  /**
+   * Assigns the schema an artifact id which is included in the validation result if the rule passed validation.
+   * @param id - any value other than undefined which will be returned as-is in the result artifacts map.
+   */
+  artifact(id: any): this
 
   /**
    * By default, some Joi methods to function properly need to rely on the Joi instance they are attached to because
@@ -870,7 +1081,7 @@ interface AnySchema extends SchemaInternals {
    *    - a [references](#refkey-options)
    *    - a function which returns the default value using the signature `function(parent, helpers)` where:
    *        - `parent` - a clone of the object containing the value being validated. Note that since specifying a
-   *          `parent` ragument performs cloning, do not declare format arguments if you are not using them.
+   *          `parent` argument performs cloning, do not declare format arguments if you are not using them.
    *        - `helpers` - same as those described in [`any.custom()`](anycustomermethod_description)
    *
    * When called without any `value` on an object schema type, a default value will be automatically generated
@@ -909,8 +1120,8 @@ interface AnySchema extends SchemaInternals {
   dotenv(name: string): this
 
   /**
-   * Considers anything that matches the schema to be empty (undefined).
-   * @param schema - any object or joi schema to match. An undefined schema unsets that rule.
+   * Considers anything that matches the schema to be empty (undefined). Overrides any previous calls to empty.
+   * @param schema - an object, value, or joi schema to match or an array of objects, values, and joi schemas to match. An undefined schema unsets that rule.
    */
   empty(schema?: SchemaLike): this
 
@@ -1002,6 +1213,11 @@ interface AnySchema extends SchemaInternals {
    * Disallows values.
    */
   invalid(...values: any[]): this
+
+  /**
+   * Returns a boolean indicating whether this schema contains a rule that requires asynchronous validation.
+   */
+  isAsync(): boolean
 
   /**
    * Same as `rule({ keep: true })`.
@@ -1140,12 +1356,24 @@ interface AnySchema extends SchemaInternals {
   /**
    * Validates a value using the schema and options.
    */
-  validate(value: any, options?: ValidationOptions): ValidationResult
+  validate(value: any, options?: ValidationOptions): ValidationResult<TSchema>
 
   /**
    * Validates a value using the schema and options.
    */
-  validateAsync(value: any, options?: AsyncValidationOptions): Promise<any>
+  validateAsync<TOpts extends AsyncValidationOptions>(
+    value: any,
+    options?: TOpts
+  ): Promise<
+    TOpts extends { artifacts: true } | { warnings: true }
+      ? { value: TSchema } & (TOpts extends { artifacts: true }
+          ? { artifacts: Map<any, string[][]> }
+          : {}) &
+          (TOpts extends { warnings: true }
+            ? { warning: ValidationWarning }
+            : {})
+      : TSchema
+  >
 
   /**
    * Same as `rule({ warn: true })`.
@@ -1165,7 +1393,7 @@ interface AnySchema extends SchemaInternals {
   /**
    * Converts the type into an alternatives type where the conditions are merged into the type definition where:
    */
-  when(ref: string | Reference, options: WhenOptions): this
+  when(ref: string | Reference, options: WhenOptions | WhenOptions[]): this
 
   /**
    * Converts the type into an alternatives type where the conditions are merged into the type definition where:
@@ -1180,7 +1408,7 @@ interface Description {
   flags?: object
   notes?: string[]
   tags?: string[]
-  meta?: any[]
+  metas?: any[]
   example?: any[]
   valids?: any[]
   invalids?: any[]
@@ -1198,21 +1426,21 @@ interface Context {
 
 interface State {
   key?: string
-  path: Array<string | number>
+  path: (string | number)[]
   parent?: any
   reference?: any
   ancestors?: any
   localize?(...args: any[]): State
 }
 
-interface BooleanSchema extends AnySchema {
+interface BooleanSchema<TSchema = boolean> extends AnySchema<TSchema> {
   /**
    * Allows for additional values to be considered valid booleans by converting them to false during validation.
    * String comparisons are by default case insensitive,
    * see `boolean.sensitive()` to change this behavior.
    * @param values - strings, numbers or arrays of them
    */
-  falsy(...values: Array<string | number>): this
+  falsy(...values: Array<string | number | null>): this
 
   /**
    * Allows the values provided to truthy and falsy as well as the "true" and "false" default conversion
@@ -1225,10 +1453,10 @@ interface BooleanSchema extends AnySchema {
    * String comparisons are by default case insensitive, see `boolean.sensitive()` to change this behavior.
    * @param values - strings, numbers or arrays of them
    */
-  truthy(...values: Array<string | number>): this
+  truthy(...values: Array<string | number | null>): this
 }
 
-interface NumberSchema extends AnySchema {
+interface NumberSchema<TSchema = number> extends AnySchema<TSchema> {
   /**
    * Specifies that the value must be greater than limit.
    * It can also be a reference to another field.
@@ -1295,7 +1523,7 @@ interface NumberSchema extends AnySchema {
   unsafe(enabled?: any): this
 }
 
-interface StringSchema extends AnySchema {
+interface StringSchema<TSchema = string> extends AnySchema<TSchema> {
   /**
    * Requires the string value to only contain a-z, A-Z, and 0-9.
    */
@@ -1312,7 +1540,7 @@ interface StringSchema extends AnySchema {
   case(direction: "upper" | "lower"): this
 
   /**
-   * Requires the number to be a credit card number (Using Lunh Algorithm).
+   * Requires the number to be a credit card number (Using Luhn Algorithm).
    */
   creditCard(): this
 
@@ -1460,7 +1688,7 @@ interface StringSchema extends AnySchema {
   uuid(options?: GuidOptions): this
 }
 
-interface SymbolSchema extends AnySchema {
+interface SymbolSchema<TSchema = Symbol> extends AnySchema<TSchema> {
   // TODO: support number and symbol index
   map(
     iterable:
@@ -1488,7 +1716,13 @@ interface ArrayUniqueOptions extends HierarchySeparatorOptions {
 
 type ComparatorFunction = (a: any, b: any) => boolean
 
-interface ArraySchema extends AnySchema {
+type UnwrapSchemaLikeWithoutArray<T> =
+  T extends SchemaLikeWithoutArray<infer U> ? U : never
+
+type NoNestedArrays<T extends readonly unknown[]> =
+  Extract<T[number], readonly unknown[]> extends never ? T : never
+
+interface ArraySchema<TSchema = any[]> extends AnySchema<TSchema> {
   /**
    * Verifies that an assertion passes for at least one item in the array, where:
    * `schema` - the validation rules required to satisfy the assertion. If the `schema` includes references, they are resolved against
@@ -1506,7 +1740,48 @@ interface ArraySchema extends AnySchema {
    *
    * @param type - a joi schema object to validate each array item against.
    */
-  items(...types: SchemaLikeWithoutArray[]): this
+  items<A>(a: SchemaLikeWithoutArray<A>): ArraySchema<A[]>
+  items<A, B>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>
+  ): ArraySchema<(A | B)[]>
+  items<A, B, C>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>
+  ): ArraySchema<(A | B | C)[]>
+  items<A, B, C, D>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>
+  ): ArraySchema<(A | B | C | D)[]>
+  items<A, B, C, D, E>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>,
+    e: SchemaLikeWithoutArray<E>
+  ): ArraySchema<(A | B | C | D | E)[]>
+  items<A, B, C, D, E, F>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>,
+    e: SchemaLikeWithoutArray<E>,
+    f: SchemaLikeWithoutArray<F>
+  ): ArraySchema<(A | B | C | D | E | F)[]>
+  items<
+    TItems,
+    TTItems extends SchemaLikeWithoutArray<TItems>[] =
+      SchemaLikeWithoutArray<TItems>[],
+  >(
+    ...types: NoNestedArrays<TTItems>
+  ): ArraySchema<
+    {
+      [I in keyof TTItems]: UnwrapSchemaLikeWithoutArray<TTItems[I]>
+    }[number][]
+  >
 
   /**
    * Specifies the exact number of items in the array.
@@ -1567,18 +1842,21 @@ interface ObjectPatternOptions {
   matches: SchemaLike | Reference
 }
 
-export interface ObjectSchema<TSchema = any> extends AnySchema {
+export interface ObjectSchema<TSchema = any> extends AnySchema<TSchema> {
   /**
    * Defines an all-or-nothing relationship between keys where if one of the peers is present, all of them are required as well.
    *
    * Optional settings must be the last argument.
    */
-  and(...peers: Array<string | HierarchySeparatorOptions>): this
+  and(...peers: Array<string | DependencyOptions>): this
 
   /**
    * Appends the allowed object keys. If schema is null, undefined, or {}, no changes will be applied.
    */
   append(schema?: SchemaMap<TSchema>): this
+  append<TSchemaExtended = any, T = TSchemaExtended>(
+    schema?: SchemaMap<T>
+  ): ObjectSchema<T>
 
   /**
    * Verifies an assertion where.
@@ -1619,21 +1897,21 @@ export interface ObjectSchema<TSchema = any> extends AnySchema {
    *
    * Optional settings must be the last argument.
    */
-  nand(...peers: Array<string | HierarchySeparatorOptions>): this
+  nand(...peers: Array<string | DependencyOptions>): this
 
   /**
    * Defines a relationship between keys where one of the peers is required (and more than one is allowed).
    *
    * Optional settings must be the last argument.
    */
-  or(...peers: Array<string | HierarchySeparatorOptions>): this
+  or(...peers: Array<string | DependencyOptions>): this
 
   /**
    * Defines an exclusive relationship between a set of keys where only one is allowed but none are required.
    *
    * Optional settings must be the last argument.
    */
-  oxor(...peers: Array<string | HierarchySeparatorOptions>): this
+  oxor(...peers: Array<string | DependencyOptions>): this
 
   /**
    * Specify validation rules for unknown keys matching a pattern.
@@ -1675,11 +1953,7 @@ export interface ObjectSchema<TSchema = any> extends AnySchema {
   /**
    * Requires the presence of other keys whenever the specified key is present.
    */
-  with(
-    key: string,
-    peers: string | string[],
-    options?: HierarchySeparatorOptions
-  ): this
+  with(key: string, peers: string | string[], options?: DependencyOptions): this
 
   /**
    * Forbids the presence of other keys whenever the specified is present.
@@ -1687,7 +1961,7 @@ export interface ObjectSchema<TSchema = any> extends AnySchema {
   without(
     key: string,
     peers: string | string[],
-    options?: HierarchySeparatorOptions
+    options?: DependencyOptions
   ): this
 
   /**
@@ -1695,10 +1969,10 @@ export interface ObjectSchema<TSchema = any> extends AnySchema {
    *
    * Optional settings must be the last argument.
    */
-  xor(...peers: Array<string | HierarchySeparatorOptions>): this
+  xor(...peers: Array<string | DependencyOptions>): this
 }
 
-interface BinarySchema extends AnySchema {
+interface BinarySchema<TSchema = Buffer> extends AnySchema<TSchema> {
   /**
    * Sets the string encoding format if a string input is converted to a buffer.
    */
@@ -1720,7 +1994,7 @@ interface BinarySchema extends AnySchema {
   length(limit: number | Reference): this
 }
 
-interface DateSchema extends AnySchema {
+interface DateSchema<TSchema = Date> extends AnySchema<TSchema> {
   /**
    * Specifies that the value must be greater than date.
    * Notes: 'now' can be passed in lieu of date so as to always compare relatively to the current date,
@@ -1765,7 +2039,7 @@ interface DateSchema extends AnySchema {
   timestamp(type?: "javascript" | "unix"): this
 }
 
-interface FunctionSchema extends ObjectSchema {
+interface FunctionSchema<TSchema = Function> extends ObjectSchema<TSchema> {
   /**
    * Specifies the arity of the function where:
    * @param n - the arity expected.
@@ -1790,12 +2064,18 @@ interface FunctionSchema extends ObjectSchema {
   maxArity(n: number): this
 }
 
-interface AlternativesSchema extends AnySchema {
+interface AlternativesSchema<TSchema = any> extends AnySchema<TSchema> {
   /**
    * Adds a conditional alternative schema type, either based on another key value, or a schema peeking into the current value.
    */
-  conditional(ref: string | Reference, options: WhenOptions): this
-  conditional(ref: Schema, options: WhenSchemaOptions): this
+  conditional<ThenSchema, OtherwiseSchema>(
+    ref: string | Reference,
+    options: WhenOptions | WhenOptions[]
+  ): AlternativesSchema<ThenSchema | OtherwiseSchema>
+  conditional<ThenSchema, OtherwiseSchema>(
+    ref: Schema,
+    options: WhenSchemaOptions<ThenSchema, OtherwiseSchema>
+  ): AlternativesSchema<ThenSchema | OtherwiseSchema>
 
   /**
    * Requires the validated value to match a specific set of the provided alternative.try() schemas.
@@ -1806,10 +2086,41 @@ interface AlternativesSchema extends AnySchema {
   /**
    * Adds an alternative schema type for attempting to match against the validated value.
    */
+  try<A>(a: SchemaLikeWithoutArray<A>): AlternativesSchema<A>
+  try<A, B>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>
+  ): AlternativesSchema<A | B>
+  try<A, B, C>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>
+  ): AlternativesSchema<A | B | C>
+  try<A, B, C, D>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>
+  ): AlternativesSchema<A | B | C | D>
+  try<A, B, C, D, E>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>,
+    e: SchemaLikeWithoutArray<E>
+  ): AlternativesSchema<A | B | C | D | E>
+  try<A, B, C, D, E, F>(
+    a: SchemaLikeWithoutArray<A>,
+    b: SchemaLikeWithoutArray<B>,
+    c: SchemaLikeWithoutArray<C>,
+    d: SchemaLikeWithoutArray<D>,
+    e: SchemaLikeWithoutArray<E>,
+    f: SchemaLikeWithoutArray<F>
+  ): AlternativesSchema<A | B | C | D | E | F>
   try(...types: SchemaLikeWithoutArray[]): this
 }
 
-interface LinkSchema extends AnySchema {
+interface LinkSchema<TSchema = any> extends AnySchema<TSchema> {
   /**
    * Same as `any.concat()` but the schema is merged after the link is resolved which allows merging with schemas of the same type as the resolved link.
    * Will throw an exception during validation if the merged types are not compatible.
@@ -1818,9 +2129,15 @@ interface LinkSchema extends AnySchema {
 
   /**
    * Initializes the schema after constructions for cases where the schema has to be constructed first and then initialized.
-   * If `ref` was not passed to the constructor, `link.ref()` must be called prior to usaged.
+   * If `ref` was not passed to the constructor, `link.ref()` must be called prior to usage.
    */
   ref(ref: string): this
+
+  /**
+   * Limits the maximum recursion depth allowed when resolving the link.
+   * Validation fails with `link.maxRecursion` when the link is entered more than `limit` times in the same validation chain.
+   */
+  maxRecursion(limit: number): this
 }
 
 interface Reference extends Exclude<ReferenceOptions, "prefix"> {
@@ -1899,6 +2216,13 @@ interface CoerceObject {
   from?: string | string[]
 }
 
+type PrepareFunction = (value: any, helpers: CustomHelpers) => any
+
+interface PrepareObject {
+  method: PrepareFunction
+  undefined?: boolean
+}
+
 interface ExtensionFlag {
   setter?: string
   default?: any
@@ -1918,7 +2242,7 @@ interface ExtensionTerm {
 }
 
 interface Extension {
-  type: string
+  type: string | RegExp
   args?(...args: SchemaLike[]): Schema
   base?: Schema
   coerce?: CoerceFunction | CoerceObject
@@ -1929,7 +2253,7 @@ interface Extension {
   messages?: LanguageMessages | string
   modifiers?: Record<string, (rule: any, enabled?: boolean) => any>
   overrides?: Record<string, (value: any) => Schema>
-  prepare?(value: any, helpers: CustomHelpers): any
+  prepare?: PrepareFunction | PrepareObject
   rebuild?(schema: ExtensionBoundSchema): void
   rules?: Record<string, ExtensionRule & ThisType<SchemaInternals>>
   terms?: Record<string, ExtensionTerm>
@@ -1961,84 +2285,163 @@ export interface PluginOptionsSchemaJoi {
 
   ValidationError: new (
     message: string,
-    details: any,
+    details: ValidationErrorItem[],
     original: any
   ) => ValidationError
 
   /**
    * Generates a schema object that matches any data type.
    */
-  any(): AnySchema
+  any<TSchema = any>(): AnySchema<TSchema>
 
   /**
    * Generates a schema object that matches an array data type.
    */
-  array(): ArraySchema
+  array<TSchema = any[]>(): ArraySchema<TSchema>
 
   /**
-   * Generates a schema object that matches a boolean data type (as well as the strings 'true', 'false', 'yes', and 'no'). Can also be called via bool().
+   * Generates a schema object that matches a boolean data type (as well as the strings 'true' and 'false'). Can also be called via boolean().
    */
-  bool(): BooleanSchema
+  bool<TSchema = boolean>(): BooleanSchema<TSchema>
 
   /**
-   * Generates a schema object that matches a boolean data type (as well as the strings 'true', 'false', 'yes', and 'no'). Can also be called via bool().
+   * Generates a schema object that matches a boolean data type (as well as the strings 'true' and 'false'). Can also be called via bool().
    */
-  boolean(): BooleanSchema
+  boolean<TSchema = boolean>(): BooleanSchema<TSchema>
 
   /**
    * Generates a schema object that matches a Buffer data type (as well as the strings which will be converted to Buffers).
    */
-  binary(): BinarySchema
+  binary<TSchema = Buffer>(): BinarySchema<TSchema>
 
   /**
    * Generates a schema object that matches a date type (as well as a JavaScript date string or number of milliseconds).
    */
-  date(): DateSchema
+  date<TSchema = Date>(): DateSchema<TSchema>
 
   /**
    * Generates a schema object that matches a function type.
    */
-  func(): FunctionSchema
+  func<TSchema = Function>(): FunctionSchema<TSchema>
 
   /**
    * Generates a schema object that matches a function type.
    */
-  function(): FunctionSchema
+  function<TSchema = Function>(): FunctionSchema<TSchema>
 
   /**
    * Generates a schema object that matches a number data type (as well as strings that can be converted to numbers).
    */
-  number(): NumberSchema
+  number<TSchema = number>(): NumberSchema<TSchema>
 
   /**
    * Generates a schema object that matches an object data type (as well as JSON strings that have been parsed into objects).
    */
   // tslint:disable-next-line:no-unnecessary-generics
-  object<TSchema = any, T = TSchema>(
-    schema?: SchemaMap<T>
+  object<TSchema = any, isStrict = false, T = TSchema>(
+    schema?: SchemaMap<T, isStrict>
   ): ObjectSchema<TSchema>
 
   /**
    * Generates a schema object that matches a string data type. Note that empty strings are not allowed by default and must be enabled with allow('').
    */
-  string(): StringSchema
+  string<TSchema = string>(): StringSchema<TSchema>
 
   /**
    * Generates a schema object that matches any symbol.
    */
-  symbol(): SymbolSchema
+  symbol<TSchema = Symbol>(): SymbolSchema<TSchema>
 
   /**
    * Generates a type that will match one of the provided alternative schemas
    */
-  alternatives(types: SchemaLike[]): AlternativesSchema
-  alternatives(...types: SchemaLike[]): AlternativesSchema
+  alternatives<A, B>(
+    params: [SchemaLike<A>, SchemaLike<B>]
+  ): AlternativesSchema<A | B>
+  alternatives<A, B, C>(
+    params: [SchemaLike<A>, SchemaLike<B>, SchemaLike<C>]
+  ): AlternativesSchema<A | B | C>
+  alternatives<A, B, C, D>(
+    params: [SchemaLike<A>, SchemaLike<B>, SchemaLike<C>, SchemaLike<D>]
+  ): AlternativesSchema<A | B | C | D>
+  alternatives<A, B, C, D, E>(
+    params: [
+      SchemaLike<A>,
+      SchemaLike<B>,
+      SchemaLike<C>,
+      SchemaLike<D>,
+      SchemaLike<E>,
+    ]
+  ): AlternativesSchema<A | B | C | D | E>
+  alternatives<A, B>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>
+  ): AlternativesSchema<A | B>
+  alternatives<A, B, C>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>
+  ): AlternativesSchema<A | B | C>
+  alternatives<A, B, C, D>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>,
+    d: SchemaLike<D>
+  ): AlternativesSchema<A | B | C | D>
+  alternatives<A, B, C, D, E>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>,
+    d: SchemaLike<D>,
+    e: SchemaLike<E>
+  ): AlternativesSchema<A | B | C | D | E>
+  alternatives<TSchema = any>(
+    types: SchemaLike<TSchema>[]
+  ): AlternativesSchema<TSchema>
+  alternatives<TSchema = any>(
+    ...types: SchemaLike<TSchema>[]
+  ): AlternativesSchema<TSchema>
 
   /**
    * Alias for `alternatives`
    */
-  alt(types: SchemaLike[]): AlternativesSchema
-  alt(...types: SchemaLike[]): AlternativesSchema
+  alt<A, B>(params: [SchemaLike<A>, SchemaLike<B>]): AlternativesSchema<A | B>
+  alt<A, B, C>(
+    params: [SchemaLike<A>, SchemaLike<B>, SchemaLike<C>]
+  ): AlternativesSchema<A | B | C>
+  alt<A, B, C, D>(
+    params: [SchemaLike<A>, SchemaLike<B>, SchemaLike<C>, SchemaLike<D>]
+  ): AlternativesSchema<A | B | C | D>
+  alt<A, B, C, D, E>(
+    params: [
+      SchemaLike<A>,
+      SchemaLike<B>,
+      SchemaLike<C>,
+      SchemaLike<D>,
+      SchemaLike<E>,
+    ]
+  ): AlternativesSchema<A | B | C | D | E>
+  alt<A, B>(a: SchemaLike<A>, b: SchemaLike<B>): AlternativesSchema<A | B>
+  alt<A, B, C>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>
+  ): AlternativesSchema<A | B | C>
+  alt<A, B, C, D>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>,
+    d: SchemaLike<D>
+  ): AlternativesSchema<A | B | C | D>
+  alt<A, B, C, D, E>(
+    a: SchemaLike<A>,
+    b: SchemaLike<B>,
+    c: SchemaLike<C>,
+    d: SchemaLike<D>,
+    e: SchemaLike<E>
+  ): AlternativesSchema<A | B | C | D | E>
+  alt<TSchema = any>(types: SchemaLike[]): AlternativesSchema<TSchema>
+  alt<TSchema = any>(...types: SchemaLike[]): AlternativesSchema<TSchema>
 
   /**
    * Links to another schema node and reuses it for validation, typically for creative recursive schemas.
@@ -2049,7 +2452,7 @@ export interface PluginOptionsSchemaJoi {
    * in absolute terms from the schema run-time root (`Joi.link('/a')`),
    * or using schema ids implicitly using object keys or explicitly using `any.id()` (`Joi.link('#a.b.c')`).
    */
-  link(ref?: string): LinkSchema
+  link<TSchema = any>(ref?: string): LinkSchema<TSchema>
 
   /**
    * Validates a value against a schema and throws if validation fails.
@@ -2073,13 +2476,17 @@ export interface PluginOptionsSchemaJoi {
    * @param schema - the schema object.
    * @param message - optional message string prefix added in front of the error message. may also be an Error object.
    */
-  attempt(value: any, schema: Schema, options?: ValidationOptions): any
-  attempt(
+  attempt<TSchema extends Schema>(
     value: any,
-    schema: Schema,
+    schema: TSchema,
+    options?: ValidationOptions
+  ): TSchema extends Schema<infer Value> ? Value : never
+  attempt<TSchema extends Schema>(
+    value: any,
+    schema: TSchema,
     message: string | Error,
     options?: ValidationOptions
-  ): any
+  ): TSchema extends Schema<infer Value> ? Value : never
 
   cache: CacheConfiguration
 
@@ -2144,7 +2551,7 @@ export interface PluginOptionsSchemaJoi {
   /**
    * Checks whether or not the provided argument is a joi schema.
    */
-  isSchema(schema: any, options?: IsSchemaOptions): boolean
+  isSchema(schema: any, options?: IsSchemaOptions): schema is AnySchema
 
   /**
    * A special value used with `any.allow()`, `any.invalid()`, and `any.valid()` as the first value to reset any previously set values.
@@ -2241,7 +2648,10 @@ export interface PluginOptionsSchemaJoi {
   /**
    * Converts the type into an alternatives type where the conditions are merged into the type definition where:
    */
-  when(ref: string | Reference, options: WhenOptions): AlternativesSchema
+  when(
+    ref: string | Reference,
+    options: WhenOptions | WhenOptions[]
+  ): AlternativesSchema
   when(ref: Schema, options: WhenSchemaOptions): AlternativesSchema
 
   /**
