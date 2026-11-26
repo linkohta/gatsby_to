@@ -21,7 +21,6 @@
 | `deprecated-packages/`                | 廃止済みパッケージ。変更しない                                              |
 | `scripts/`                            | ビルド、リリース、依存更新などの補助スクリプト                              |
 | `.github/`                            | CI（GitHub Actions）と Issue、PR のテンプレート                             |
-| `peril/`                              | 本家の自動化（Danger）の設定。このリポジトリでは動いていない                |
 
 ## セットアップとよく使うコマンド
 

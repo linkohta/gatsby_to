@@ -78,7 +78,6 @@ module.exports = [
       `**/public/*`,
       `**/__testfixtures__/**`,
       `**/__tests__/fixtures/**`,
-      `**/peril`,
       `**/docs`,
       `**/starters`,
       `**/benchmarks`,
