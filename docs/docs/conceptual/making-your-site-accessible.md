@@ -40,19 +40,23 @@ For websites, rendering [static HTML](/docs/glossary#static) pages means that Ja
 
 Gatsby ships with the `eslint-plugin-jsx-a11y` package and warnings for all of its rules enabled by default. [eslint-plugin-jsx-a11y](https://github.com/evcohen/eslint-plugin-jsx-a11y) is an accessibility [linting](/docs/glossary#linting) tool for your code, helping you develop more inclusive Gatsby projects by reducing the time to find accessibility errors. This plugin encourages you to include alternative text for image tags, validates [ARIA](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA) props, and eliminates redundant role properties, among other things.
 
-For more on supported rules, check out the docs for [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y). You can customize those rules in your [`.eslintrc`](/docs/how-to/custom-configuration/eslint/#configuring-eslint).
+For more on supported rules, check out the docs for [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y). You can customize those rules in your own [`eslint.config.js`](/docs/how-to/custom-configuration/eslint/#configuring-eslint) after installing `eslint` and `eslint-plugin-jsx-a11y`.
 
-```json:title=.eslintrc
-{
-  "extends": ["react-app", "plugin:jsx-a11y/recommended"],
-  "plugins": ["jsx-a11y"],
-  "rules": {
-    "jsx-a11y/rule-name": "warn"
-  }
-}
+```js:title=eslint.config.js
+const jsxA11y = require("eslint-plugin-jsx-a11y")
+
+module.exports = [
+  { ignores: [".cache/", "public/"] },
+  jsxA11y.flatConfigs.recommended,
+  {
+    rules: {
+      "jsx-a11y/rule-name": "warn",
+    },
+  },
+]
 ```
 
-Note: Including a local `.eslintrc` file will [override](/docs/how-to/custom-configuration/eslint/#configuring-eslint) all of Gatsby's default linting and disable the built-in `eslint-loader`, meaning your tweaked rules won't make it to your browser's developer console or your terminal window but will still be displayed if you have ESLint plugins enabled in your IDE. If you would like to change this behavior and make sure the `eslint-loader` pulls in your customizations, you'll need to enable the loader yourself. One way to do this is by using the Community plugin [`gatsby-plugin-eslint`](/plugins/gatsby-plugin-eslint/). Additionally, if you would still like to take advantage of some subset of the default [ESLint config Gatsby ships with](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby/src/utils/eslint-config.ts), you'll need to copy them manually to your local `.eslintrc` file.
+Note: Including a local ESLint config file will [override](/docs/how-to/custom-configuration/eslint/#configuring-eslint) all of Gatsby's default linting and disable the built-in ESLint setup, meaning your tweaked rules won't make it to your browser's developer console or your terminal window but will still be displayed if you have ESLint plugins enabled in your IDE or run ESLint yourself (e.g. with `npx eslint .`). Additionally, if you would still like to take advantage of some subset of the default [ESLint config Gatsby ships with](https://github.com/linkohta/gatsby_to/blob/master/packages/gatsby/src/utils/eslint-config.ts), you'll need to copy them manually to your local `eslint.config.js` file.
 
 This is a start to testing for accessibility: [further recommendations](#how-to-improve-accessibility) can be found below.
 
