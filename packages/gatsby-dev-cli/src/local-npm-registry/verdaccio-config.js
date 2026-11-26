@@ -10,6 +10,12 @@ const verdaccioConfig = {
     title: `gatsby-dev`,
   },
   self_path: `./`,
+  // 公開に使うユーザーの登録先。指定しないと、実行したディレクトリに `htpasswd` が作られる
+  auth: {
+    htpasswd: {
+      file: path.join(os.tmpdir(), `verdaccio`, `htpasswd`),
+    },
+  },
   log: { type: `stdout`, format: `pretty-timestamped`, level: `warn` },
   packages: {
     "**": {

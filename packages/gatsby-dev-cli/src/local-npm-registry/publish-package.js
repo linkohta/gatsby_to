@@ -4,10 +4,42 @@ const path = require(`path`)
 const { promisifiedSpawn } = require(`../utils/promisified-spawn`)
 const { registryUrl } = require(`./verdaccio-config`)
 
-const NPMRCContent = `${registryUrl.replace(
-  /https?:/g,
-  ``
-)}/:_authToken="gatsby-dev"`
+const registryUser = { name: `gatsby-dev`, password: `gatsby-dev` }
+
+let authTokenPromise = null
+
+/**
+ * ローカルレジストリにユーザーを登録し、公開に使うトークンを取得する。
+ * verdaccio 7 以降は、無効なトークンが付いたリクエストを匿名として扱わずに 401 で拒否するため、
+ * ダミーのトークンでは公開できない。レジストリは起動のたびに作り直すので、最初の公開の前に 1 回だけ登録する。
+ */
+const getRegistryAuthToken = () => {
+  if (!authTokenPromise) {
+    authTokenPromise = fetch(
+      `${registryUrl}/-/user/org.couchdb.user:${registryUser.name}`,
+      {
+        method: `PUT`,
+        headers: { "Content-Type": `application/json` },
+        body: JSON.stringify(registryUser),
+      }
+    ).then(async response => {
+      const body = await response.json()
+      if (!response.ok || !body.token) {
+        throw new Error(
+          `Failed to register a user on the local registry: ${response.status} ${JSON.stringify(body)}`
+        )
+      }
+      return body.token
+    })
+  }
+
+  return authTokenPromise
+}
+
+exports.getRegistryAuthToken = getRegistryAuthToken
+
+const getNPMRCContent = authToken =>
+  `${registryUrl.replace(/https?:/g, ``)}/:_authToken="${authToken}"`
 
 const { getMonorepoPackageJsonPath } = require(
   `../utils/get-monorepo-package-json-path`
@@ -94,12 +126,11 @@ const adjustPackageJson = ({
 }
 
 /**
- * 匿名での公開にはダミーの .npmrc が必要である
- * https://github.com/verdaccio/verdaccio/issues/212#issuecomment-308578500 を参照
- * これは（リンク先のコメントにあるとおり）`npm publish` と `yarn publish` の要件であり、
- * verdaccio の制約ではない。
+ * `npm publish` と `yarn publish` は認証情報がないと実行できないので、
+ * ローカルレジストリのトークンを書いた .npmrc を一時的に置く
  */
-const createTemporaryNPMRC = ({ pathToPackage, root }) => {
+const createTemporaryNPMRC = ({ pathToPackage, root, authToken }) => {
+  const NPMRCContent = getNPMRCContent(authToken)
   const NPMRCPathInPackage = path.join(pathToPackage, `.npmrc`)
   fs.outputFileSync(NPMRCPathInPackage, NPMRCContent)
 
@@ -120,6 +151,9 @@ const publishPackage = async ({
   packageNameToPath,
   root,
 }) => {
+  // package.json を書き換える前に取得する。取得に失敗しても、ファイルを元に戻す必要がないようにするためである
+  const authToken = await getRegistryAuthToken()
+
   const monoRepoPackageJsonPath = getMonorepoPackageJsonPath({
     packageName,
     packageNameToPath,
@@ -136,7 +170,11 @@ const publishPackage = async ({
 
   const pathToPackage = path.dirname(monoRepoPackageJsonPath)
 
-  const uncreateTemporaryNPMRC = createTemporaryNPMRC({ pathToPackage, root })
+  const uncreateTemporaryNPMRC = createTemporaryNPMRC({
+    pathToPackage,
+    root,
+    authToken,
+  })
 
   // npm publish
   const publishCmd = [

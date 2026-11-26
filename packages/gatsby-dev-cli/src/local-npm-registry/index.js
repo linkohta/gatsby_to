@@ -16,8 +16,9 @@ const startServer = () => {
 
   console.log(`Starting local verdaccio server`)
 
-  // ストレージを消去する
+  // ストレージと、前回の起動で登録したユーザーを消去する
   fs.removeSync(verdaccioConfig.storage)
+  fs.removeSync(verdaccioConfig.auth.htpasswd.file)
 
   VerdaccioInitPromise = runServer(verdaccioConfig).then(
     webServer =>
