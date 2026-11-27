@@ -631,16 +631,6 @@
     "@babel/template" "^8.1.2"
     "@babel/types" "^8.1.3"
 
-"@babel/node@^8.1.2":
-  version "8.1.2"
-  resolved "https://registry.yarnpkg.com/@babel/node/-/node-8.1.2.tgz#a21f8ed86871bd8df2932d0009805b0e385f080e"
-  integrity sha512-n6M6iW/90SfMNHm3MlqdDu2IfL7Mv/MVZvTmTn0v6878YgcuNKQtTNzCTwPCsl7YzrPU7wCvdkJoKAzX6dlGXA==
-  dependencies:
-    "@babel/register" "^8.1.2"
-    commander "^14.0.2"
-    core-js "^3.48.0"
-    v8flags "^4.0.1"
-
 "@babel/parser@^7.1.0", "@babel/parser@^7.10.5", "@babel/parser@^7.18.11", "@babel/parser@^7.20.7", "@babel/parser@^7.23.9", "@babel/parser@^7.24.4", "@babel/parser@^7.24.7", "@babel/parser@^7.29.12", "@babel/parser@^7.29.13", "@babel/parser@^7.29.15", "@babel/parser@^7.29.7", "@babel/parser@^7.3.3":
   version "7.29.15"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.29.15.tgz#2e2bcf6e51bfc99e1a00417f0a122ba27a441dba"
@@ -10186,7 +10176,7 @@ core-js-pure@^3.23.3:
   resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.27.1.tgz#ede4a6b8440585c7190062757069c01d37a19dca"
   integrity sha512-BS2NHgwwUppfeoqOXqi08mUqS5FiZpuRuJJpKsaME7kJz0xxuk0xkhDdfMIlP/zLa80krBqss1LtD7f889heAw==
 
-core-js@3.51.0, core-js@^3.48.0, core-js@^3.51.0:
+core-js@3.51.0, core-js@^3.51.0:
   version "3.51.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.51.0.tgz#9a7b197159ab83173b50efbe0c4846bec94b3abb"
   integrity sha512-7bDKx/5jm5MxzsXxc93g6Z2+4ZsuT/MddrfRmTDJNAkWsYWHU8EVNEsBiIEWnMAMCHMmRfUEjkuo3jeNBOIHRw==
@@ -10883,11 +10873,6 @@ dataloader@^2.2.3:
   resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-2.2.3.tgz#42d10b4913515f5b37c6acedcb4960d6ae1b1517"
   integrity sha512-y2krtASINtPFS1rSDjacrFgn1dcUuoREVabwlOGOe4SdxenREqwjwjElAdwvbGM7kgZz9a3KVicWR7vcz8rnzA==
 
-date-fns@^1.30.1:
-  version "1.30.1"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
-  integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
-
 date-fns@^4.4.0:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.4.0.tgz#806539edf45c616b2b76b5f78b88c56ed3c7e036"
@@ -11137,11 +11122,6 @@ devtools-protocol@0.0.1724436:
   version "0.0.1724436"
   resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1724436.tgz#8a8fb2c7d07b5d78f225b033b7f70642a05969ce"
   integrity sha512-GcO1782pvzpmY4pQO1zjr8WZ95Wv8GodOs0v5J9QWwLGulTzfYIYECEd9iUsnqJmcehu+VMKxZquvjY8T2jhAA==
-
-dictionary-en@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/dictionary-en/-/dictionary-en-3.2.0.tgz#5d5b5a156a5b1eb26ff96c80da3b919587f16b4b"
-  integrity sha512-oujbJhuplUTlDntmOoultEcNyk8ge7cFI6yXNn7eJvpbBJOhGNhWtK0XjOJsiwl4EfIeyvDKwGB95vJXv1d+lQ==
 
 diff@^5.0.0, diff@^5.1.0:
   version "5.2.2"
@@ -16221,7 +16201,7 @@ js-yaml@5.5.0, js-yaml@^5.5.0:
   dependencies:
     argparse "^3.0.3"
 
-js-yaml@^3.13.1, js-yaml@^3.14.1:
+js-yaml@^3.13.1:
   version "3.15.2"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.15.2.tgz#3f83823ac6be17f570f23b2ecdef3777ff5ea364"
   integrity sha512-6EuL879VkRA+1Cz578mKMiKvjPNEuk6+r1JaFzoSWejZmtf7xWbIyw1e3KkxlkzTIt9Taw6JBhEppG7utc1P+w==
@@ -26033,11 +26013,6 @@ v8-to-istanbul@^9.0.1:
     "@jridgewell/trace-mapping" "^0.3.12"
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
-
-v8flags@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/v8flags/-/v8flags-4.0.1.tgz#98fe6c4308317c5f394d85a435eb192490f7e132"
-  integrity sha512-fcRLaS4H/hrZk9hYwbdRM35D0U8IYMfEClhXxCivOojl+yTRAZH3Zy2sSy6qVCiGbV9YAtPssP6jaChqC9vPCg==
 
 valid-url@^1.0.9:
   version "1.0.9"
