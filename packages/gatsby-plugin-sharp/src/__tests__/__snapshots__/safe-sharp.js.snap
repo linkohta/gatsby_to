@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`safe-sharp prints generic instructions when the installed packages can't be listed 1`] = `
+Array [
+  Array [
+    "It looks like there are multiple versions of \\"sharp\\" module installed.
+Please update any packages that depend on \\"sharp\\".
+
+To get a list of installed packages that depend on \\"sharp\\" try running:
+ - npm list sharp (if you use npm)
+ - yarn why sharp (if you use yarn)
+ and update packages that depend on version older than latest listed in output of above command.
+
+If an older version of \\"sharp\\" still persists and this error is displayed after updating your packages, open an issue in the package's repository and request them to update the \\"sharp\\" dependency.",
+  ],
+]
+`;
+
+exports[`safe-sharp prints the guidance when sharp reports the error through console.error 1`] = `
+Array [
+  Array [
+    "Incompatible library version: sharp.node requires version 1.0.0 or later",
+    "extra",
+  ],
+  Array [
+    "It looks like there are multiple versions of \\"sharp\\" module installed.
+Please update any packages that depend on \\"sharp\\".
+
+List of installed packages that depend on sharp:
+ - gatsby-plugin-sharp (0.35.5)
+ - gatsby-plugin-old (0.22.1) - needs update
+
+If you are using npm, run:
+
+npm install gatsby-plugin-old
+
+If you are using yarn, run:
+
+yarn add gatsby-plugin-old
+
+If an older version of \\"sharp\\" still persists and this error is displayed after updating your packages, open an issue in the package's repository and request them to update the \\"sharp\\" dependency.",
+  ],
+]
+`;
+
+exports[`safe-sharp prints which packages need an update when sharp throws an incompatible version error 1`] = `
+Array [
+  Array [
+    "It looks like there are multiple versions of \\"sharp\\" module installed.
+Please update any packages that depend on \\"sharp\\".
+
+List of installed packages that depend on sharp:
+ - gatsby-plugin-sharp (0.35.5)
+ - gatsby-plugin-old (0.22.1) - needs update
+
+If you are using npm, run:
+
+npm install gatsby-plugin-old
+
+If you are using yarn, run:
+
+yarn add gatsby-plugin-old
+
+If an older version of \\"sharp\\" still persists and this error is displayed after updating your packages, open an issue in the package's repository and request them to update the \\"sharp\\" dependency.",
+  ],
+]
+`;
